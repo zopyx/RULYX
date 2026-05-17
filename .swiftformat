@@ -1,0 +1,8 @@
+--indent 4
+--stripunusedargs always
+--semicolons never
+--trimwhitespace always
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--exclude Pods,.build,DerivedData
