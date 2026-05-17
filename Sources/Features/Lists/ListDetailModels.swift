@@ -25,7 +25,7 @@ struct ListBulkActionResult: Identifiable, Equatable {
             case .import:
                 "Import Handles"
             case .block:
-                "Block Members"
+                "Block Followers"
             case .mute:
                 "Mute Members"
             case .unblock:

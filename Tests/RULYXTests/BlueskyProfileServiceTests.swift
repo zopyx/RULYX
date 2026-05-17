@@ -86,10 +86,7 @@ final class BlueskyProfileServiceTests: XCTestCase {
 
     func testBlockActorSuccess() async throws {
         sessionService.onAuthenticatedRequest = { _, _ in
-            let json = """
-            {"uri": "at://block/1", "cid": "cid123"}
-            """.data(using: .utf8)!
-            return try JSONDecoder().decode(CreateRecordResponse.self, from: json)
+            EmptyResponse()
         }
 
         try await service.blockActor(did: "did:plc:target", account: makeAccount(), appPassword: "pass")

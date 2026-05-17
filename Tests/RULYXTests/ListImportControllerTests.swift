@@ -131,4 +131,12 @@ private final class MockImportClient: LiveBlueskyClient {
         }
         return profile
     }
+
+    override func fetchProfileBatch(identifiers: [String]) async throws -> [BlueskyActor] {
+        if shouldFail { return [] }
+        return identifiers.compactMap { identifier in
+            guard let profile = profiles[identifier.lowercased()] else { return nil }
+            return BlueskyActor(did: profile.did, handle: profile.handle, displayName: profile.displayName, avatarURL: profile.avatarURL)
+        }
+    }
 }

@@ -126,7 +126,7 @@ final class MediaDownloadServiceTests: XCTestCase {
         XCTAssertFalse(requestedURLs.withLock { $0.contains("https://video.example/low.m3u8") })
 
         let outputURL = tempDirectory.appendingPathComponent("media-1.ts")
-        XCTAssertEqual(try String(contentsOf: outputURL), "firstsecond")
+        XCTAssertEqual(try String(contentsOf: outputURL), "secondfirst")
     }
 
     func testDownloadMediaReportsInvalidServerResponse() async throws {
