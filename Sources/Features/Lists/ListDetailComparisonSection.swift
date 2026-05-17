@@ -16,13 +16,11 @@ extension ListDetailView {
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
 
-        @State private var showingCompareHelp = false
-
         private func bucketLocKey(_ bucket: ComparisonBucket) -> String {
             switch bucket {
-            case .overlap: return "list.compare.bucket_overlap"
-            case .onlyInCurrent: return "list.compare.bucket_only_current"
-            case .onlyInOther: return "list.compare.bucket_only_other"
+            case .overlap: "list.compare.bucket_overlap"
+            case .onlyInCurrent: "list.compare.bucket_only_current"
+            case .onlyInOther: "list.compare.bucket_only_other"
             }
         }
 
@@ -129,46 +127,11 @@ extension ListDetailView {
                     }
                 }
             } label: {
-                HStack {
-                    Text(verbatim: loc("list.compare.title"))
-                    Spacer()
-                    Button {
-                        showingCompareHelp = true
-                    } label: {
-                        Image(systemName: "info.circle")
-                            .font(.caption)
-                            .foregroundStyle(Color.skyPrimary)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(loc("list.compare.help.label"))
-                    .accessibilityHint(loc("list.compare.help.hint"))
-                }
-            }
-            .sheet(isPresented: $showingCompareHelp) {
-                NavigationStack {
-                    List {
-                        HelpSection(
-                            title: loc("list.compare.help_bucket"),
-                            bulletPoints: [
-                                loc("list.compare.help_overlap"),
-                                loc("list.compare.help_only_current"),
-                                loc("list.compare.help_only_other"),
-                                loc("list.compare.help_copy"),
-                                loc("list.compare.help_move"),
-                            ]
-                        )
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                    }
-                    .navigationTitle(loc("list.compare.help_title"))
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button(loc("actions.done")) { showingCompareHelp = false }
-                                .accessibilityHint(loc("list.compare.help.close.hint"))
-                        }
-                    }
-                }
+                Text(verbatim: loc("list.compare.title"))
+                    .functionHelpInteractive(
+                        title: loc("list.compare.help_title"),
+                        text: loc("list.compare.help_tooltip")
+                    )
             }
         }
 

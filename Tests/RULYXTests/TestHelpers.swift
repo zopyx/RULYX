@@ -16,6 +16,7 @@ func makeMember(did: String = "did:plc:member", handle: String = "member.bsky.so
     )
 }
 
+@MainActor
 func makeList(id: String = "at://list/1", name: String = "Test List", kind: BlueskyList.Kind = .moderation, memberCount: Int? = nil) -> BlueskyList {
     BlueskyList(id: id, name: name, description: kind.title, memberCount: memberCount, kind: kind)
 }

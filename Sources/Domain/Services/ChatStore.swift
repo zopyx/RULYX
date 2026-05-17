@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import UIKit
+import UserNotifications
 
 @MainActor
 final class ChatStore: ObservableObject {
@@ -265,7 +266,7 @@ final class ChatStore: ObservableObject {
 
     private func updateAppBadge() {
         let totalUnread = conversations.reduce(0) { $0 + $1.unreadCount }
-        UIApplication.shared.applicationIconBadgeNumber = totalUnread
+        Task { try? await UNUserNotificationCenter.current().setBadgeCount(totalUnread) }
     }
 
     // MARK: - Polling

@@ -122,6 +122,10 @@ struct ListsView: View {
                         } header: {
                             HStack {
                                 Text(loc("lists.moderation_lists"))
+                                    .functionHelp(
+                                        title: loc("lists.moderation_lists"),
+                                        text: loc("lists.moderation_lists.help")
+                                    )
                                 Spacer()
                                 Button {
                                     presentationState.createListKind = .moderation
@@ -165,6 +169,10 @@ struct ListsView: View {
                         } header: {
                             HStack {
                                 Text(loc("lists.lists"))
+                                    .functionHelp(
+                                        title: loc("lists.lists"),
+                                        text: loc("lists.lists.help")
+                                    )
                                 Spacer()
                                 Button {
                                     presentationState.createListKind = .regular
@@ -204,6 +212,10 @@ struct ListsView: View {
                             }
                         } header: {
                             Text(loc("lists.advanced"))
+                                .functionHelp(
+                                    title: loc("lists.advanced"),
+                                    text: loc("lists.advanced.help")
+                                )
                         }
 
                         if let errorMessage = viewModel.errorMessage {
@@ -344,7 +356,7 @@ struct ListsView: View {
                     MentionsSearchView(
                         did: activeAccount.did ?? activeAccount.handle,
                         handle: activeAccount.handle,
-                        displayName: activeAccount.displayName ?? activeAccount.handle
+                        displayName: activeAccount.displayName
                     )
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)

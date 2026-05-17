@@ -92,8 +92,8 @@ final class LiveBlueskyClientTests: XCTestCase {
         }
 
         let blocked = try await client.fetchBlockedActors(account: makeAccount(handle: "test.bsky.social"), appPassword: "pass")
-        XCTAssertEqual(blocked.count, 1)
-        XCTAssertEqual(blocked[0].handle, "blocked.bsky.social")
+        XCTAssertEqual(blocked.actors.count, 1)
+        XCTAssertEqual(blocked.actors[0].handle, "blocked.bsky.social")
     }
 
     func testFetchBlocksEmpty() async throws {
@@ -106,6 +106,6 @@ final class LiveBlueskyClientTests: XCTestCase {
         }
 
         let blocked = try await client.fetchBlockedActors(account: makeAccount(handle: "test.bsky.social"), appPassword: "pass")
-        XCTAssertTrue(blocked.isEmpty)
+        XCTAssertTrue(blocked.actors.isEmpty)
     }
 }

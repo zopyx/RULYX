@@ -161,6 +161,7 @@
 		BC76BF1B09E270F8E2C82297 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC510A8C26A27895D9F18C91 /* ConversationListView.swift */; };
 		BDC3DF6F1B30A99EDB60D233 /* CustomSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BC1B1C6F11B6ECB47B7C38 /* CustomSearchViewModel.swift */; };
 		C4F19EFE40D63950CE3C7C0E /* ListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 741E2169946E95FC95D9281A /* ListDetailView.swift */; };
+		C7FDB21508B3D003F05F7029 /* FunctionHelpModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */; };
 		CB294FA1201E62383542BE8E /* FeedTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BE169952D43B0D6F3941A5 /* FeedTimelineView.swift */; };
 		CB8463BEB64EF9484278166C /* ja.json in Resources */ = {isa = PBXBuildFile; fileRef = 83B3F04F6B6A8D971735B290 /* ja.json */; };
 		CB92F8BAC45E4EDD80C3DFE2 /* RULYXApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FAFCD1F150B6EDC814E753 /* RULYXApp.swift */; };
@@ -392,6 +393,7 @@
 		C8DB2630E3CFC2DFA4B6A431 /* FollowerDiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDiffView.swift; sourceTree = "<group>"; };
 		C97F1C64A2434A71ED6D5D5E /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		C9C15F3EC6473AAFBE5DF3E8 /* ListDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailViewModel.swift; sourceTree = "<group>"; };
+		CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionHelpModifier.swift; sourceTree = "<group>"; };
 		CC6C6354A3B0AAD68494A616 /* SkeletonRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonRow.swift; sourceTree = "<group>"; };
 		CC9175EDE69D7111DF25CC02 /* PreviewBlueskyClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewBlueskyClient.swift; sourceTree = "<group>"; };
 		CCEF8AED13F2B79D85FD49B9 /* BlueskyAPIDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPIDTOs.swift; sourceTree = "<group>"; };
@@ -664,6 +666,7 @@
 				00247ABCA73D8B2603E8CDE3 /* ActorSearchResultRow.swift */,
 				4DDA82F772411DBDF26E3BB4 /* AppStyling.swift */,
 				7E73015FFF0E908DAB113970 /* BlueskyActorRow.swift */,
+				CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */,
 				7A5D7000E53B53FE6C003496 /* GIFPickerView.swift */,
 				0BA4021225B9BDA8F1BED731 /* ImageCarouselView.swift */,
 				02B51EB3F99EB2D9290D1B37 /* InlineAnimatedMediaView.swift */,
@@ -1080,6 +1083,7 @@
 				CB294FA1201E62383542BE8E /* FeedTimelineView.swift in Sources */,
 				747F69785535C00DE735B82B /* FeedTimelineViewModel.swift in Sources */,
 				26EA41B91FE55BBC34A30219 /* FollowerDiffView.swift in Sources */,
+				C7FDB21508B3D003F05F7029 /* FunctionHelpModifier.swift in Sources */,
 				47CB701956751D8A606925EE /* GIFPickerView.swift in Sources */,
 				3DB486679FEFC46E16A11AE7 /* GIFService.swift in Sources */,
 				2951ED986F755DF6DEB781C6 /* GlassSupport.swift in Sources */,

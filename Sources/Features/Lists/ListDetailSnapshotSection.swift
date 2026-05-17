@@ -13,11 +13,8 @@ extension ListDetailView {
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
 
-        @State private var showingSnapshotHelp = false
-
         var body: some View {
-            Group {
-            }
+            Group {}
         }
     }
 }

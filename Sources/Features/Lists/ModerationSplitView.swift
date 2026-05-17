@@ -193,7 +193,7 @@ struct ModerationSplitView: View {
             } description: {
                 Text(verbatim: localizationManager.localized("lists.no_account.desc"))
             }
-        } else if viewModel.isLoading && !viewModel.isRefreshing {
+        } else if viewModel.isLoading, !viewModel.isRefreshing {
             loadingSkeleton
         } else {
             sidebarList
@@ -276,6 +276,10 @@ struct ModerationSplitView: View {
                 }
             } header: {
                 Text(verbatim: localizationManager.localized("lists.relationships"))
+                    .functionHelp(
+                        title: localizationManager.localized("lists.relationships"),
+                        text: localizationManager.localized("lists.relationships.help")
+                    )
             }
 
             // Moderation lists
