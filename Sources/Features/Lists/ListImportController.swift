@@ -38,7 +38,6 @@ final class ListImportController {
             items.append(.init(token: token, actor: nil, classification: .unresolved, message: nil))
         }
 
-        let session = URLSession.shared
         let apiBatchSize = 25
 
         if !tokensToResolve.isEmpty {
@@ -50,7 +49,7 @@ final class ListImportController {
                     let batchIndices = Array(chunk)
                     group.addTask {
                         let batchTokens = batchIndices.map(\.token)
-                        let profiles = (try? await LiveBlueskyClient.fetchProfileBatch(identifiers: batchTokens, session: session)) ?? []
+                        let profiles = (try? await client.fetchProfileBatch(identifiers: batchTokens)) ?? []
                         let byHandle: [String: BlueskyActor] = Dictionary(
                             uniqueKeysWithValues: profiles.map { ($0.handle.lowercased(), $0) }
                         )

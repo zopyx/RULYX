@@ -75,21 +75,18 @@ final class LiveAuthenticationTests: XCTestCase {
         let envURL = repositoryRootURL()
             .appendingPathComponent(".env")
         guard FileManager.default.fileExists(atPath: envURL.path) else {
-            XCTFail("Missing BLUESKY_TEST_USER/BLUESKY_TEST_PASSWORD environment variables or .env file at \(envURL.path)")
-            throw LiveAuthenticationTestError.missingCredentials(envURL.path)
+            throw XCTSkip("Missing BLUESKY_TEST_USER/BLUESKY_TEST_PASSWORD environment variables or .env file at \(envURL.path)")
         }
 
         let fileContents = try String(contentsOf: envURL, encoding: .utf8)
         let values = dotenvValues(from: fileContents)
 
         guard let handle = values["BLUESKY_TEST_USER"], !handle.isEmpty else {
-            XCTFail("BLUESKY_TEST_USER is missing from \(envURL.path)")
-            throw LiveAuthenticationTestError.missingKey("BLUESKY_TEST_USER")
+            throw XCTSkip("BLUESKY_TEST_USER is missing from \(envURL.path)")
         }
 
         guard let appPassword = values["BLUESKY_TEST_PASSWORD"], !appPassword.isEmpty else {
-            XCTFail("BLUESKY_TEST_PASSWORD is missing from \(envURL.path)")
-            throw LiveAuthenticationTestError.missingKey("BLUESKY_TEST_PASSWORD")
+            throw XCTSkip("BLUESKY_TEST_PASSWORD is missing from \(envURL.path)")
         }
 
         return (handle, appPassword)

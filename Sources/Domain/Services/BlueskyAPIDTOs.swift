@@ -598,7 +598,7 @@ struct RichEmbedExternal: Decodable {
         title = try container.decodeIfPresent(String.self, forKey: .title)
         description = try container.decodeIfPresent(String.self, forKey: .description)
 
-        if let thumbURL = try container.decodeIfPresent(String.self, forKey: .thumb) {
+        if let thumbURL = try? container.decodeIfPresent(String.self, forKey: .thumb) {
             thumb = thumbURL
         } else if let blob = try container.decodeIfPresent(RichEmbedExternalThumbBlob.self, forKey: .thumb) {
             thumb = blob.urlString

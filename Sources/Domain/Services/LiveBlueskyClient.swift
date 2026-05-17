@@ -549,6 +549,10 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    func fetchProfileBatch(identifiers: [String]) async throws -> [BlueskyActor] {
+        try await Self.fetchProfileBatch(identifiers: identifiers, session: session)
+    }
+
     static func fetchProfileBatch(identifiers: [String], session: URLSession) async throws -> [BlueskyActor] {
         let actorsParam = identifiers.map { URLQueryItem(name: "actors", value: $0) }
         guard let profilesURL = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles") else {
