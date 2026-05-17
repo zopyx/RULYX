@@ -176,9 +176,9 @@ Actions:
 ### Suggested Project Structure
 
 ```text
-BlueskyModeration/
+RULYX/
   App/
-    BlueskyModerationApp.swift
+    RULYXApp.swift
     RootView.swift
   Features/
     Accounts/

@@ -54,11 +54,11 @@
 ### Credential Storage
 
 - **App Passwords:** Stored in iOS Keychain (`AccountStore.swift`, line 85)
-  - Service: `com.ajung.BlueskyModeration.password`
+  - Service: `com.ajung.RULYX.password`
   - Account: account `UUID.uuidString`
   - Accessibility: `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`
 - **Session JWTs:** Stored in iOS Keychain (`BlueskySessionService.swift`, line 72)
-  - Service: `com.ajung.BlueskyModeration.session`
+  - Service: `com.ajung.RULYX.session`
   - Account: account `UUID.uuidString`
   - Encoded as JSON string via `JSONEncoder`
 - **Keychain Service:** `KeychainService` (`Sources/Domain/Services/KeychainService.swift`, line 15) — wraps `SecItemAdd`/`SecItemCopyMatching`/`SecItemDelete` for `kSecClassGenericPassword`
@@ -122,8 +122,8 @@ Used for local persistence of all app state. **Privacy manifest** (`PrivacyInfo.
 
 | Cache | Location | File | Lines |
 |-------|----------|------|-------|
-| Dashboard data | `Library/Caches/com.ajung.BlueskyModeration/dashboard_{key}.json` | `DashboardCache.swift` | 11–18 |
-| Relationship data | `Library/Caches/com.ajung.BlueskyModeration/{key}.json` | `RelationshipCache.swift` | 4–11 |
+| Dashboard data | `Library/Caches/com.ajung.RULYX/dashboard_{key}.json` | `DashboardCache.swift` | 11–18 |
+| Relationship data | `Library/Caches/com.ajung.RULYX/{key}.json` | `RelationshipCache.swift` | 4–11 |
 
 ### iCloud Sync
 

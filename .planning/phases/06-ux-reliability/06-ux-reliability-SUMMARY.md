@@ -17,7 +17,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - UITests/BlueskyModerationUITests/BlueskyModerationUITests.swift
+    - UITests/RULYXUITests/RULYXUITests.swift
 key-decisions:
   - Used existing --uitesting pattern where onboarding is auto-dismissed, verifying the post-onboarding state directly
   - Tests use English localization labels (set by --uitesting) for button identification
@@ -57,7 +57,7 @@ The Phase 6 test additions were included in a pre-existing commit that was alrea
 
 ## Files Created/Modified
 
-- `UITests/BlueskyModerationUITests/BlueskyModerationUITests.swift` — Added 4 new flow-based UI tests for onboarding skip, account management flow, settings navigation, and moderation tab accessibility
+- `UITests/RULYXUITests/RULYXUITests.swift` — Added 4 new flow-based UI tests for onboarding skip, account management flow, settings navigation, and moderation tab accessibility
 
 ## Decisions Made
 

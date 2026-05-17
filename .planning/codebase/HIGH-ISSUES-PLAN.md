@@ -80,7 +80,7 @@ Issues are ordered to minimize rework — lint/tooling fixes first, then simple 
 
 ### 3.1 HIGH — Test Credentials in `.env` File
 
-**Files:** `Tests/BlueskyModerationTests/LiveAuthenticationTests.swift:67-93`, `.env`
+**Files:** `Tests/RULYXTests/LiveAuthenticationTests.swift:67-93`, `.env`
 **Risk:** Credential leak via git commit or CI logs
 
 **Plan:**
@@ -133,7 +133,7 @@ Issues are ordered to minimize rework — lint/tooling fixes first, then simple 
 
 ### 5.1 HIGH — AccountStore Has Only 2 Tests
 
-**File:** `Tests/BlueskyModerationTests/AccountStoreTests.swift` (2 tests)
+**File:** `Tests/RULYXTests/AccountStoreTests.swift` (2 tests)
 **Risk:** No tests for `removeAccount`, `setActiveAccount`, `setLabel`, `moveAccount`, `refreshAccountProfiles`, `mergeCloudAccounts`
 
 **Plan:**
@@ -151,7 +151,7 @@ Add tests for each untested method:
 
 ### 5.2 HIGH — Zero UI Tests
 
-**File:** `UITests/BlueskyModerationUITests/BlueskyModerationUITests.swift` (0 tests)
+**File:** `UITests/RULYXUITests/RULYXUITests.swift` (0 tests)
 **Risk:** UI regressions undetectable in CI
 
 **Plan:**

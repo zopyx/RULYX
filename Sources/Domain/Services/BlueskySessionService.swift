@@ -20,7 +20,7 @@ final class BlueskySessionService: BlueskySessionServicing {
     private let requestExecutor: BlueskyRequestExecuting
     private let keychain: KeychainServicing
     private var cachedSessions: [String: BlueskySession] = [:]
-    private let persistedSessionService = "com.ajung.BlueskyModeration.session"
+    private let persistedSessionService = "com.ajung.RULYX.session"
 
     init(
         baseURL: URL = .bskySocial,

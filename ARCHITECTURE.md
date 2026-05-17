@@ -1,4 +1,4 @@
-# Rulyx (BlueskyModeration) — Architecture Document
+# Rulyx (RULYX) — Architecture Document
 
 ## 1. Project Overview
 
@@ -12,14 +12,14 @@ Rulyx is a native iOS-only SwiftUI application for Bluesky moderation. It enable
 | Architecture | MVVM + Service Layer + ObservableObject Stores |
 | DI Pattern | Manual via `AppDependencies` (EnvironmentObject injection) |
 | Build Tool | xcodegen (project.yml → .xcodeproj) |
-| Bundle ID | `com.ajung.BlueskyModeration` |
+| Bundle ID | `com.ajung.RULYX` |
 | Display Name | RULYX |
 | Target | iPhone only (`TARGETED_DEVICE_FAMILY = "1"`) |
 
 ## 2. Directory Structure
 
 ```
-BlueskyModeration/
+RULYX/
 ├── Sources/
 │   ├── App/                  # App entry, DI, root navigation
 │   ├── Domain/
@@ -85,7 +85,7 @@ The app follows a layered MVVM architecture with three distinct tiers:
 All dependencies are created in `AppDependencies` and injected as `@EnvironmentObject` at the root level.
 
 ```
-BlueskyModerationApp
+RULYXApp
   └── AppDependencies (StateObject)
        ├── accountStore: AccountStore
        ├── listService: BlueskyListService
@@ -308,7 +308,7 @@ preferencesStore.objectWillChange.sink { [weak self] in
 
 ### Dashboard & Relationship Caches
 
-File-system caches in the app's caches directory (`com.ajung.BlueskyModeration/`):
+File-system caches in the app's caches directory (`com.ajung.RULYX/`):
 - `DashboardCache`: Cached lists, profile, block counts (one file per account DID)
 - `RelationshipCache`: Cached follower/following lists
 
@@ -488,8 +488,8 @@ The `PinningDelegate` enforces SSL pinning for `bsky.social`:
 | Data | Mechanism | Location |
 |------|-----------|----------|
 | Account metadata | UserDefaults (Codable JSON) | Standard |
-| App passwords | Keychain | `com.ajung.BlueskyModeration.password` |
-| Auth sessions | Keychain | `com.ajung.BlueskyModeration.session` |
+| App passwords | Keychain | `com.ajung.RULYX.password` |
+| Auth sessions | Keychain | `com.ajung.RULYX.session` |
 | Workspace preferences | UserDefaults | Standard |
 | Audit log | UserDefaults (Codable JSON) | Standard |
 | List snapshots | UserDefaults (Codable JSON) | Standard |
@@ -804,7 +804,7 @@ PushNotificationCoordinator
 A high-level dependency graph showing the direction of dependencies:
 
 ```
-BlueskyModerationApp
+RULYXApp
   └── AppDependencies
        ├── AccountStore ────────────── KeychainService
        ├── ModerationWorkspaceStore ── WorkspacePreferencesStore

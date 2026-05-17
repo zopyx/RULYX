@@ -1,4 +1,4 @@
-# BlueskyModeration Design Guide
+# RULYX Design Guide
 
 ## Color System
 
