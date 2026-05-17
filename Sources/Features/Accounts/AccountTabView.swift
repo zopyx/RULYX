@@ -52,6 +52,7 @@ struct AccountTabView: View {
                 }
             }
             .navigationTitle(loc("account.manage.title"))
+            .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(editMode.isEditing ? loc("actions.done") : loc("account.manage.edit")) {

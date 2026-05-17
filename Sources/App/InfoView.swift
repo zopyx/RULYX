@@ -553,7 +553,8 @@ private struct DebugInfoView: View {
         sysctlbyname("hw.machine", nil, &size, nil, 0)
         var machine = [CChar](repeating: 0, count: size)
         sysctlbyname("hw.machine", &machine, &size, nil, 0)
-        return String(cString: machine)
+        let data = Data(bytes: machine, count: machine.count)
+        return String(data: data, encoding: .utf8)?.trimmingCharacters(in: .init(charactersIn: "\0")) ?? ""
     }
 
     private var interfaceOrientation: String {

@@ -759,7 +759,7 @@ struct BlueskyProfileView: View {
 
     private func fetchBlockCounts() async {
         guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account) else { return }
+              accountStore.appPassword(for: account) != nil else { return }
         guard isOwnProfile, showBetaFeatures else { return }
         isFetchingBlockCounts = true
         do {

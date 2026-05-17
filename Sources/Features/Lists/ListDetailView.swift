@@ -367,36 +367,47 @@ struct ListDetailView: View {
                                 .foregroundStyle(.secondary)
                         }
                         if !isOwnedList, let ownerActor {
-                            HStack(spacing: 10) {
-                                if let avatarURL = ownerActor.avatarURL {
-                                    AsyncImage(url: avatarURL) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    } placeholder: {
+                            NavigationLink {
+                                BlueskyProfileView(
+                                    member: BlueskyListMember(
+                                        recordURI: "owner:\(ownerActor.did)",
+                                        actor: ownerActor
+                                    ),
+                                    list: nil
+                                )
+                            } label: {
+                                HStack(spacing: 10) {
+                                    if let avatarURL = ownerActor.avatarURL {
+                                        AsyncImage(url: avatarURL) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Circle()
+                                                .fill(Color.skyPrimary.opacity(0.16))
+                                        }
+                                        .frame(width: 28, height: 28)
+                                        .clipShape(Circle())
+                                    } else {
                                         Circle()
                                             .fill(Color.skyPrimary.opacity(0.16))
+                                            .frame(width: 28, height: 28)
+                                            .overlay {
+                                                Text(ownerActor.displayName?.prefix(1).uppercased() ?? "?")
+                                                    .font(.caption.weight(.bold))
+                                                    .foregroundStyle(Color.skyPrimary)
+                                            }
                                     }
-                                    .frame(width: 28, height: 28)
-                                    .clipShape(Circle())
-                                } else {
-                                    Circle()
-                                        .fill(Color.skyPrimary.opacity(0.16))
-                                        .frame(width: 28, height: 28)
-                                        .overlay {
-                                            Text(ownerActor.displayName?.prefix(1).uppercased() ?? "?")
-                                                .font(.caption.weight(.bold))
-                                                .foregroundStyle(Color.skyPrimary)
-                                        }
-                                }
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(ownerActor.displayName ?? ownerActor.handle)
-                                        .font(.subheadline.weight(.semibold))
-                                    Text("@\(ownerActor.handle)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text(ownerActor.displayName ?? ownerActor.handle)
+                                            .font(.subheadline.weight(.semibold))
+                                        Text("@\(ownerActor.handle)")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                             }
+                            .buttonStyle(.plain)
                             .padding(.top, 8)
                         }
                     }

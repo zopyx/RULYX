@@ -192,6 +192,8 @@ private struct MockLiveBlueskyClient: BlueskyProfileInspecting {
 
     func blockActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func unblockActor(recordURI _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func followActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func unfollowActor(recordURI _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func muteActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func unmuteActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func fetchFollowers(actor _: String, account _: AppAccount, appPassword _: String?) async throws -> [BlueskyActor] {
