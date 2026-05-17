@@ -484,9 +484,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             request.timeoutInterval = 30
             let (data, response) = try await session.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
-                throw BlueskyAPIError.invalidResponse
+                return ClearskyBlocklistResult(actors: [], totalCount: 0)
             }
-            let decoded = try JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data)
+            guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
+                return ClearskyBlocklistResult(actors: [], totalCount: 0)
+            }
             let entries = decoded.data.blocklist
             for entry in entries {
                 allDIDs.insert(entry.did)
@@ -496,13 +498,20 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             page += 1
         } while true
 
-        var actors = try await resolveProfiles(dids: Array(allDIDs).sorted())
-        for i in actors.indices {
-            if let dateStr = blockedDates[actors[i].did] {
-                actors[i].blockedDate = parseDate(dateStr)
+        guard !allDIDs.isEmpty else {
+            return ClearskyBlocklistResult(actors: [], totalCount: 0)
+        }
+
+        guard let actors = try? await resolveProfiles(dids: Array(allDIDs).sorted()) else {
+            return ClearskyBlocklistResult(actors: [], totalCount: allDIDs.count)
+        }
+        var result = actors
+        for i in result.indices {
+            if let dateStr = blockedDates[result[i].did] {
+                result[i].blockedDate = parseDate(dateStr)
             }
         }
-        return ClearskyBlocklistResult(actors: actors, totalCount: allDIDs.count)
+        return ClearskyBlocklistResult(actors: result, totalCount: allDIDs.count)
     }
 
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
