@@ -5,7 +5,7 @@
 ## Directory Layout
 
 ```
-BlueskyModeration/
+RULYX/
 ├── Sources/
 │   ├── App/                          # App entry, DI, root navigation, settings
 │   ├── Features/
@@ -22,9 +22,9 @@ BlueskyModeration/
 │       ├── Theme/                    # Colors, styles, glass effects
 │       └── Localizations/            # i18n engine + 16 language JSON files
 ├── Tests/
-│   └── BlueskyModerationTests/       # Unit tests
+│   └── RULYXTests/       # Unit tests
 ├── UITests/
-│   └── BlueskyModerationUITests/     # UI tests
+│   └── RULYXUITests/     # UI tests
 ├── WidgetExtension/
 │   └── RulyxWidget.swift             # iOS widget
 ├── Assets/
@@ -42,8 +42,8 @@ BlueskyModeration/
 **Purpose:** App entry point, dependency injection container, root navigation, settings
 
 **Key files:**
-- `BlueskyModerationApp.swift` (37 lines): `@main` iOS entry point — creates `AppDependencies`, manages lock screen overlay with `ZStack` + transition, injects environment objects, restores sessions on `.task {}`
-- `BlueskyModerationApp+macOS.swift` (26 lines): `#if os(macOS)` alternate `@main` entry — same DI pattern but separate target
+- `RULYXApp.swift` (37 lines): `@main` iOS entry point — creates `AppDependencies`, manages lock screen overlay with `ZStack` + transition, injects environment objects, restores sessions on `.task {}`
+- `RULYXApp+macOS.swift` (26 lines): `#if os(macOS)` alternate `@main` entry — same DI pattern but separate target
 - `AppDependencies.swift` (29 lines): `@MainActor final class ObservableObject` — creates all services in `init()`, exposes as properties (accountStore, listService, profileService, workspaceStore, actionPresetStore, blueskyClient, localizationManager). **Single source of truth for DI.**
 - `RootView.swift` (115 lines): `TabView` with 4 tabs (moderation via `ListsView`, settings via `SettingsView`, info via `InfoView`, accounts via `AccountTabView`), onboarding sheet, preferred color scheme `.dark`
 - `SettingsView.swift` (138 lines): Language picker, debug mode toggle, cache clearing, Face ID lock toggle
@@ -202,7 +202,7 @@ BlueskyModeration/
 **Purpose:** App branding colors, glass effects
 
 **Files:**
-- `Color+BlueskyModeration.swift` (15 lines): `.skyPrimary`, `.skyAccent` with light/dark mode adaptivity
+- `Color+RULYX.swift` (15 lines): `.skyPrimary`, `.skyAccent` with light/dark mode adaptivity
 - `GlassSupport.swift`: Glass/transparency effects (referenced as `.glassProminentButton()`)
 
 ### `Sources/Shared/Localizations/` — Internationalization
@@ -265,7 +265,7 @@ This is a **feature-first** organization with layer-based naming within each fea
 3. Add `{FeatureName}ViewModel.swift` (`@MainActor final class: ObservableObject`)
 4. Add controllers as `{FeatureName}Controller.swift` if business logic is complex
 5. Add feature-specific types in `{FeatureName}Models.swift`
-6. Add tests in `Tests/BlueskyModerationTests/{FeatureName}Tests.swift`
+6. Add tests in `Tests/RULYXTests/{FeatureName}Tests.swift`
 
 **New Service:**
 1. Define protocol in `Sources/Domain/Services/{Name}Servicing.swift` (or extend existing)
@@ -296,9 +296,9 @@ This is a **feature-first** organization with layer-based naming within each fea
 
 ## Special Directories
 
-**`Tests/BlueskyModerationTests/`:** Unit tests matching production structure — 26 test files covering ViewModels, Services, Controllers, and utilities. Uses `import XCTest @testable import BlueskyModeration`.
+**`Tests/RULYXTests/`:** Unit tests matching production structure — 26 test files covering ViewModels, Services, Controllers, and utilities. Uses `import XCTest @testable import RULYX`.
 
-**`UITests/BlueskyModerationUITests/`:** UI test targets (minimal content).
+**`UITests/RULYXUITests/`:** UI test targets (minimal content).
 
 **`WidgetExtension/`:** Single-file widget (`RulyxWidget.swift`) for iOS home screen.
 

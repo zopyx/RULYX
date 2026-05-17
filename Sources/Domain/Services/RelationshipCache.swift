@@ -3,7 +3,7 @@ import Foundation
 enum RelationshipCache {
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.ajung.BlueskyModeration")
+            .appendingPathComponent("com.ajung.RULYX")
     }
 
     private static func fileURL(forKey key: String) -> URL {

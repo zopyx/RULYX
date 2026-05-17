@@ -63,7 +63,7 @@ struct RulyxWidgetEntryView: View {
 }
 
 struct RulyxWidget: Widget {
-    let kind = "com.ajung.BlueskyModeration.RulyxWidget"
+    let kind = "com.ajung.RULYX.RulyxWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: ListCountProvider()) { entry in

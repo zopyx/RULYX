@@ -15,7 +15,7 @@ final class AccountStore: ObservableObject {
     private let keychain: KeychainServicing
     private let accountsKey = "bluesky.savedAccounts"
     private let activeAccountKey = "bluesky.activeAccountID"
-    private let passwordService = "com.ajung.BlueskyModeration.password"
+    private let passwordService = "com.ajung.RULYX.password"
 
     init(
         defaults: UserDefaults = .standard,

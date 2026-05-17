@@ -2,7 +2,7 @@ import Foundation
 import os
 
 enum AppLogger {
-    private static let subsystem = Bundle.main.bundleIdentifier ?? "com.ajung.BlueskyModeration"
+    private static let subsystem = Bundle.main.bundleIdentifier ?? "com.ajung.RULYX"
 
     static let search = Logger(subsystem: subsystem, category: "search")
     static let persistence = Logger(subsystem: subsystem, category: "persistence")

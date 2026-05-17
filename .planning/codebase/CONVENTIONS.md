@@ -91,7 +91,7 @@ import Foundation        // or SwiftUI, XCTest, Security, Charts, os
 
 - Single import per framework (one line per framework)
 - No blank lines between imports
-- In test files: `@testable import BlueskyModeration` first, then `import XCTest`
+- In test files: `@testable import RULYX` first, then `import XCTest`
 - Imports at file top only (no conditional imports observed)
 
 **Frameworks used across the codebase:**

@@ -7,26 +7,26 @@
 **Runner:** XCTest (bundled with Xcode)
 
 **Config:** `project.yml` defines two test targets:
-- `BlueskyModerationTests` — unit tests (line 39-50)
+- `RULYXTests` — unit tests (line 39-50)
   - Type: `bundle.unit-test`
   - Sources: `Tests/`
-  - Depends on: `BlueskyModeration`
-- `BlueskyModerationUITests` — UI tests (line 51-62)
+  - Depends on: `RULYX`
+- `RULYXUITests` — UI tests (line 51-62)
   - Type: `bundle.ui-testing`
   - Sources: `UITests/`
-  - Depends on: `BlueskyModeration`
+  - Depends on: `RULYX`
 
 **Run Commands:**
 ```bash
 # Via scheme (runs both test targets)
-xcodebuild -project BlueskyModeration.xcodeproj -scheme BlueskyModeration -destination 'generic/platform=iOS Simulator' build-for-testing CODE_SIGNING_ALLOWED=NO
+xcodebuild -project RULYX.xcodeproj -scheme RULYX -destination 'generic/platform=iOS Simulator' build-for-testing CODE_SIGNING_ALLOWED=NO
 
 # Run from Xcode: Product → Test (Cmd+U)
 ```
 
 ## Test File Organization
 
-**Location:** All unit tests in `Tests/BlueskyModerationTests/`
+**Location:** All unit tests in `Tests/RULYXTests/`
 
 **Naming:** `{TypeName}Tests.swift` — matches tested type name exactly.
 
@@ -60,14 +60,14 @@ xcodebuild -project BlueskyModeration.xcodeproj -scheme BlueskyModeration -desti
 | `ViewModelTests.swift` | Combined test class for ListsViewModel + ProfileInspectorViewModel + ListDetailViewModel (197 lines) |
 | `WorkspacePreferencesStoreTests.swift` | Saved/recent searches, persistence, deduplication (131 lines) |
 
-**UI Tests:** 1 file at `UITests/BlueskyModerationUITests/BlueskyModerationUITests.swift` (51 lines)
+**UI Tests:** 1 file at `UITests/RULYXUITests/RULYXUITests.swift` (51 lines)
 - Tests: app launch, tab bar existence/navigation, settings screen, info screen segments
 
 ## Test Structure
 
 **Suite Organization:**
 ```swift
-@testable import BlueskyModeration
+@testable import RULYX
 import XCTest
 
 @MainActor

@@ -40,7 +40,7 @@
 - **WidgetKit** — `RulyxWidget.swift` (line 1: `import WidgetKit`)
 
 **Testing:**
-- **XCTest** — Unit tests in `Tests/BlueskyModerationTests/`, UI tests in `UITests/BlueskyModerationUITests/`
+- **XCTest** — Unit tests in `Tests/RULYXTests/`, UI tests in `UITests/RULYXUITests/`
 - No third-party testing libraries (no Quick/Nimble, no Swift Testing framework)
 
 **Build/Dev:**
@@ -71,8 +71,8 @@
 - No `xcconfig` files detected
 
 **Build:**
-- `xcodegen generate` — Generates `BlueskyModeration.xcodeproj`
-- Build command: `xcodebuild -project BlueskyModeration.xcodeproj -scheme BlueskyModeration -destination 'generic/platform=iOS Simulator' build CODE_SIGNING_ALLOWED=NO`
+- `xcodegen generate` — Generates `RULYX.xcodeproj`
+- Build command: `xcodebuild -project RULYX.xcodeproj -scheme RULYX -destination 'generic/platform=iOS Simulator' build CODE_SIGNING_ALLOWED=NO`
 
 **Code Quality:**
 - `.swiftformat` — Auto-format with `swiftformat Sources Tests`

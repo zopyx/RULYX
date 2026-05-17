@@ -11,8 +11,8 @@
 - **Fix approach:** Extract and validate the server's public key against a hardcoded fingerprint. Use a library like `TrustKit` or implement manual `SecTrustEvaluate` with pinned SPKI hashes.
 
 ### HIGH: Test Credentials in `.env` File Read by Live Tests
-- **Issue:** `LiveAuthenticationTests.swift` at `Tests/BlueskyModerationTests/LiveAuthenticationTests.swift:67-93` reads `BLUESKY_TEST_USER` and `BLUESKY_TEST_PASSWORD` from a `.env` file at the repository root. The `.env` file is present in the project directory.
-- **Files:** `Tests/BlueskyModerationTests/LiveAuthenticationTests.swift:67-93`, `.env`
+- **Issue:** `LiveAuthenticationTests.swift` at `Tests/RULYXTests/LiveAuthenticationTests.swift:67-93` reads `BLUESKY_TEST_USER` and `BLUESKY_TEST_PASSWORD` from a `.env` file at the repository root. The `.env` file is present in the project directory.
+- **Files:** `Tests/RULYXTests/LiveAuthenticationTests.swift:67-93`, `.env`
 - **Impact:** Test credentials could be accidentally committed to git or leaked via CI logs. The `.env` file exists on disk with real credentials.
 - **Fix approach:** Use iOS keychain or CI environment variables only. Add `.env` to `.gitignore` (verify it is already). Never store credentials in files accessible to the repo.
 
@@ -134,7 +134,7 @@
 - **Issue:** The project has a `WidgetExtension/` directory with a widget target, but no explicit entry point pattern analysis was possible. The widget shares `UserDefaults.standard` via `App Groups` which requires specific entitlement configuration in `project.yml`.
 - **Files:** `WidgetExtension/RulyxWidget.swift:27`, `project.yml`
 - **Impact:** Widget data sharing via `UserDefaults.standard` (not app-group) means widget and app may not share data correctly.
-- **Fix approach:** Use `UserDefaults(suiteName: "group.com.ajung.BlueskyModeration")` for widget data sharing.
+- **Fix approach:** Use `UserDefaults(suiteName: "group.com.ajung.RULYX")` for widget data sharing.
 
 ## Concurrency / Swift 6
 
@@ -160,24 +160,24 @@
 
 ### HIGH: AccountStore Has Only 2 Tests
 - **Issue:** `AccountStoreTests.swift` contains only 2 tests: one for adding an account and one for session-based loading. Critical methods like `removeAccount`, `setActiveAccount`, `setLabel`, `moveAccount`, `refreshAccountProfiles`, `mergeCloudAccounts` have zero tests.
-- **Files:** `Tests/BlueskyModerationTests/AccountStoreTests.swift` (2 tests)
+- **Files:** `Tests/RULYXTests/AccountStoreTests.swift` (2 tests)
 - **Impact:** Account management is a core security-sensitive feature. Bugs in credential deletion, cloud sync merging, or account switching could lead to data loss or credential leaks.
 - **Priority:** HIGH
 
 ### HIGH: Zero Tests for Views (UI Tests Empty)
-- **Issue:** `UITests/BlueskyModerationUITests/BlueskyModerationUITests.swift` at 0 test methods. No snapshot tests, no UI interaction tests exist.
-- **Files:** `UITests/BlueskyModerationUITests/BlueskyModerationUITests.swift`
+- **Issue:** `UITests/RULYXUITests/RULYXUITests.swift` at 0 test methods. No snapshot tests, no UI interaction tests exist.
+- **Files:** `UITests/RULYXUITests/RULYXUITests.swift`
 - **Impact:** UI regressions are undetectable in CI. Critical user flows (account add, list management, bulk operations) have no automated validation.
 - **Priority:** HIGH
 
 ### MEDIUM: ProfileInspectorViewModel Has Only 5 Tests
 - **Issue:** `ProfileInspectorViewModelTests.swift` has 5 tests. The view model handles search, inspection, error states, and credential validation. Coverage is minimal.
-- **Files:** `Tests/BlueskyModerationTests/ProfileInspectorViewModelTests.swift`
+- **Files:** `Tests/RULYXTests/ProfileInspectorViewModelTests.swift`
 - **Impact:** Profile inspection is a core feature (search, inspect, label display, moderation actions). Missing tests for error handling, empty states, and edge cases.
 
 ### MEDIUM: ListDetailViewModelTests Missing Bulk Operation Tests
 - **Issue:** `ListDetailViewModelTests.swift` has 24 tests but does not test `bulkAddSelectedActors`, `bulkRemoveSelectedMembers`, `bulkBlockSelectedMembers`, `retryFailures`, `performActorBatch` or any of the bulk operation methods.
-- **Files:** `Tests/BlueskyModerationTests/ListDetailViewModelTests.swift`, `Sources/Features/Lists/ListDetailViewModel+Bulk.swift`
+- **Files:** `Tests/RULYXTests/ListDetailViewModelTests.swift`, `Sources/Features/Lists/ListDetailViewModel+Bulk.swift`
 - **Impact:** Bulk operations are the core feature of the app. No test coverage for multi-step operations, progress tracking, or error recovery.
 
 ### MEDIUM: NetworkGraphView, TrendDetectionView, FollowerDiffView Untested
@@ -187,7 +187,7 @@
 
 ### LOW: ModerationWorkspaceStore Has Only 3 Tests
 - **Issue:** `ModerationWorkspaceStoreTests.swift` has only 3 tests for a store that manages saved searches, recent searches, operation logs, and queued actions.
-- **Files:** `Tests/BlueskyModerationTests/ModerationWorkspaceStoreTests.swift`
+- **Files:** `Tests/RULYXTests/ModerationWorkspaceStoreTests.swift`
 - **Impact:** Operations tracking and search history persistence are untested.
 
 ## Tech Debt
@@ -200,7 +200,7 @@
 
 ### MEDIUM: Inconsistent DI Pattern — Some Services Use .shared, Others Use EnvironmentObject
 - **Issue:** `LocalizationManager.shared` (singleton) and `AppLockManager.shared` (singleton) are accessed via `.shared` directly. Other services are injected via `@EnvironmentObject` through `AppDependencies`. This mixed approach makes testing harder for singleton-dependent code.
-- **Files:** `Sources/Shared/Localizations/LocalizationManager.swift:5`, `Sources/Shared/Support/AppLockManager.swift:6`, `Sources/App/AppDependencies.swift`, `Sources/App/BlueskyModerationApp.swift:6`
+- **Files:** `Sources/Shared/Localizations/LocalizationManager.swift:5`, `Sources/Shared/Support/AppLockManager.swift:6`, `Sources/App/AppDependencies.swift`, `Sources/App/RULYXApp.swift:6`
 - **Impact:** Singletons are hard to mock in tests. `AppLockManager.shared` and `LocalizationManager.shared` cannot be replaced in unit tests without side effects.
 - **Fix approach:** Standardize on environment object injection for all services. Remove singleton accessors.
 

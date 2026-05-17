@@ -1,4 +1,4 @@
-# Release Checklist — BlueskyModeration
+# Release Checklist — RULYX
 
 ## Pre-Build Verification
 
@@ -6,12 +6,12 @@
 - [ ] `xcodegen generate` produces a clean project with no warnings
 - [ ] Build succeeds for Release configuration:
   ```bash
-  xcodebuild -scheme BlueskyModeration -configuration Release \
+  xcodebuild -scheme RULYX -configuration Release \
     -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' build
   ```
 - [ ] All unit tests pass:
   ```bash
-  xcodebuild test -scheme BlueskyModeration \
+  xcodebuild test -scheme RULYX \
     -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
   ```
 

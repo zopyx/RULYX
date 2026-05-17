@@ -19,7 +19,7 @@
 **App Layer:**
 - Purpose: App entry point, DI container, root navigation
 - Location: `Sources/App/`
-- Contains: `BlueskyModerationApp.swift` (lines 1-37), `BlueskyModerationApp+macOS.swift` (lines 1-26), `RootView.swift` (lines 1-115), `AppDependencies.swift` (lines 1-29), `SettingsView.swift` (lines 1-138), `InfoView.swift`
+- Contains: `RULYXApp.swift` (lines 1-37), `RULYXApp+macOS.swift` (lines 1-26), `RootView.swift` (lines 1-115), `AppDependencies.swift` (lines 1-29), `SettingsView.swift` (lines 1-138), `InfoView.swift`
 - Depends on: All other layers (wires everything together)
 - Used by: SwiftUI runtime
 
@@ -114,12 +114,12 @@
 ## Entry Points
 
 **iOS Entry Point:**
-- Location: `Sources/App/BlueskyModerationApp.swift`, lines 1-37
+- Location: `Sources/App/RULYXApp.swift`, lines 1-37
 - Triggers: App launch via `@main`
 - Responsibilities: Creates `AppDependencies`, manages lock screen, restores sessions on `.task {}`
 
 **macOS Entry Point:**
-- Location: `Sources/App/BlueskyModerationApp+macOS.swift`, lines 1-26
+- Location: `Sources/App/RULYXApp+macOS.swift`, lines 1-26
 - Platform-guarded with `#if os(macOS)`
 - Uses same `AppDependencies` and `RootView`
 
