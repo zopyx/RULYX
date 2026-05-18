@@ -428,12 +428,27 @@ struct MentionsSearchView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard !targets.isEmpty else { return }
+
+        let blockedDIDs: Set<String>
+        do {
+            let blockedResult = try await blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
+            blockedDIDs = Set(blockedResult.actors.map(\.did))
+        } catch {
+            blockedDIDs = []
+            AppLogger.moderation.error("Failed to fetch blocked actors: \(error.localizedDescription, privacy: .public)")
+        }
+        let filteredTargets = targets.filter { !blockedDIDs.contains($0.did) }
+        guard !filteredTargets.isEmpty else {
+            blockSuccessCount = 0
+            return
+        }
+
         isBlockingLikers = true
         blockedCount = 0
-        totalToBlock = targets.count
+        totalToBlock = filteredTargets.count
         currentBlockingHandle = nil
         var lastError: String?
-        for target in targets {
+        for target in filteredTargets {
             currentBlockingHandle = displayHandle(for: target)
             do {
                 try await blueskyClient.blockActor(did: target.did, account: account, appPassword: appPassword)
@@ -457,12 +472,29 @@ struct MentionsSearchView: View {
 
     private func addLikers(_ targets: [PendingLikerTarget], to list: BlueskyList, account: AppAccount, appPassword: String) async {
         guard !targets.isEmpty else { return }
+
+        let memberDIDs: Set<String>
+        do {
+            let members = try await blueskyClient.fetchListMembers(list: list, account: account, appPassword: appPassword)
+            memberDIDs = Set(members.map(\.actor.did))
+        } catch {
+            memberDIDs = []
+            AppLogger.moderation.error("Failed to fetch list members: \(error.localizedDescription, privacy: .public)")
+        }
+        let filteredTargets = targets.filter { !memberDIDs.contains($0.did) }
+        guard !filteredTargets.isEmpty else {
+            addSuccessMessage = loc("post.add_likers.done")
+                .replacingOccurrences(of: "{count}", with: "0")
+                .replacingOccurrences(of: "{list}", with: list.name)
+            return
+        }
+
         isAddingLikersToList = true
         addedCount = 0
-        totalToAdd = targets.count
+        totalToAdd = filteredTargets.count
         currentAddingHandle = nil
         var lastError: String?
-        for target in targets {
+        for target in filteredTargets {
             currentAddingHandle = displayHandle(for: target)
             do {
                 _ = try await blueskyClient.addActor(did: target.did, to: list, account: account, appPassword: appPassword)

@@ -3,6 +3,7 @@ import SwiftUI
 struct ChatMessageBubble: View {
     let message: ChatMessage
     let isOutgoing: Bool
+    var onOpenProfile: ((String) -> Void)?
 
     private var timeString: String {
         let formatter = DateFormatter()
@@ -16,10 +17,16 @@ struct ChatMessageBubble: View {
             if isOutgoing { Spacer(minLength: 60) }
 
             VStack(alignment: isOutgoing ? .trailing : .leading, spacing: 4) {
-                Text(message.text)
+                Text(mentionAttributedString(from: message.text, isOutgoing: isOutgoing))
                     .font(.body)
-                    .foregroundStyle(isOutgoing ? .white : .primary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .environment(\.openURL, OpenURLAction { url in
+                        if url.scheme == "mention", let handle = url.host {
+                            onOpenProfile?(handle)
+                            return .handled
+                        }
+                        return .systemAction
+                    })
 
                 HStack(spacing: 4) {
                     if !message.reactions.isEmpty {
@@ -45,6 +52,22 @@ struct ChatMessageBubble: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 2)
+    }
+
+    private func mentionAttributedString(from text: String, isOutgoing: Bool) -> AttributedString {
+        var attributed = AttributedString(text)
+        guard let regex = try? NSRegularExpression(pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?")
+        else { return attributed }
+        let nsRange = NSRange(text.startIndex..., in: text)
+        for match in regex.matches(in: text, range: nsRange).reversed() {
+            guard let range = Range(match.range, in: text),
+                  let attrRange = Range(match.range, in: attributed) else { continue }
+            let handle = String(text[range].dropFirst())
+            attributed[attrRange].link = URL(string: "mention://\(handle)")
+            attributed[attrRange].foregroundColor = isOutgoing ? Color.white : Color.skyPrimary
+            attributed[attrRange].underlineStyle = .single
+        }
+        return attributed
     }
 }
 

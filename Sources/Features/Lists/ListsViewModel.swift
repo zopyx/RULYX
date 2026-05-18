@@ -4,8 +4,8 @@ import Foundation
 final class ListsViewModel: ObservableObject {
     @Published private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     @Published private(set) var activeProfile: BlueskyProfile?
-    @Published private(set) var blockingCount = 0
-    @Published private(set) var blockedByCount = 0
+    @Published private(set) var blockingCount: Int?
+    @Published private(set) var blockedByCount: Int?
     @Published private(set) var isLoading = false
     @Published private(set) var isRefreshing = false
     @Published private(set) var isFromCache = false
@@ -14,8 +14,8 @@ final class ListsViewModel: ObservableObject {
     func reset() {
         listsByKind = [:]
         activeProfile = nil
-        blockingCount = 0
-        blockedByCount = 0
+        blockingCount = nil
+        blockedByCount = nil
         isLoading = false
         isRefreshing = false
         errorMessage = nil
@@ -30,8 +30,8 @@ final class ListsViewModel: ObservableObject {
         guard let account else {
             listsByKind = [:]
             activeProfile = nil
-            blockingCount = 0
-            blockedByCount = 0
+            blockingCount = nil
+            blockedByCount = nil
             errorMessage = nil
             return
         }

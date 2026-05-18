@@ -7,6 +7,7 @@ struct ConversationDetailView: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @State private var messageText = ""
     @State private var showProfile = false
+    @State private var mentionProfileHandle: String?
     @State private var showScrollToBottom = false
     @FocusState private var isFocused: Bool
 
@@ -147,6 +148,33 @@ struct ConversationDetailView: View {
                 .interactiveDismissDisabled(false)
             }
         }
+        .sheet(item: $mentionProfileHandle) { handle in
+            NavigationStack {
+                BlueskyProfileView(
+                    member: BlueskyListMember(
+                        recordURI: "mention:\(handle)",
+                        actor: BlueskyActor(
+                            did: handle,
+                            handle: handle,
+                            displayName: nil,
+                            avatarURL: nil
+                        )
+                    ),
+                    list: nil
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+                .environmentObject(workspaceStore)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(loc("actions.done")) {
+                            mentionProfileHandle = nil
+                        }
+                    }
+                }
+            }
+            .interactiveDismissDisabled(false)
+        }
     }
 
     private var scrollView: some View {
@@ -279,7 +307,9 @@ struct ConversationDetailView: View {
     private func messageView(for kind: ChatMessageKind) -> some View {
         switch kind {
         case let .message(msg):
-            ChatMessageBubble(message: msg, isOutgoing: msg.senderDID == chatStore.currentAccountDID)
+            ChatMessageBubble(message: msg, isOutgoing: msg.senderDID == chatStore.currentAccountDID, onOpenProfile: { handle in
+                mentionProfileHandle = handle
+            })
         case let .deleted(d):
             deletedMessageView(d)
         case let .system(s):
