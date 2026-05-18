@@ -50,7 +50,7 @@ struct ListsView: View {
                             } label: {
                                 relationshipRow(
                                     label: loc("lists.followers"),
-                                    count: viewModel.activeProfile?.followersCount ?? 0
+                                    count: viewModel.activeProfile?.followersCount
                                 )
                             }
                             .buttonStyle(.plain)
@@ -60,7 +60,7 @@ struct ListsView: View {
                             } label: {
                                 relationshipRow(
                                     label: loc("lists.following"),
-                                    count: viewModel.activeProfile?.followsCount ?? 0
+                                    count: viewModel.activeProfile?.followsCount
                                 )
                             }
                             .buttonStyle(.plain)
@@ -400,14 +400,14 @@ struct ListsView: View {
         )
     }
 
-    private func relationshipRow(label: String, count: Int) -> some View {
+    private func relationshipRow(label: String, count: Int?) -> some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(label)
                     .appFont(.heading)
                     .lineLimit(1)
                     .foregroundStyle(.primary)
-                Text("\(count)")
+                Text(count.map { "\($0)" } ?? "-")
                     .appFont(.statistic)
                     .foregroundStyle(Color.skyPrimary)
             }

@@ -252,13 +252,13 @@ struct ModerationSplitView: View {
                     sidebarRelationshipButton(
                         icon: "person.3",
                         label: loc("lists.followers"),
-                        count: viewModel.activeProfile?.followersCount ?? 0,
+                        count: viewModel.activeProfile?.followersCount,
                         action: { showFollowers = true }
                     )
                     sidebarRelationshipButton(
                         icon: "person.3.fill",
                         label: loc("lists.following"),
-                        count: viewModel.activeProfile?.followsCount ?? 0,
+                        count: viewModel.activeProfile?.followsCount,
                         action: { showFollowing = true }
                     )
                     sidebarRelationshipButton(
@@ -378,7 +378,7 @@ struct ModerationSplitView: View {
 
     // MARK: - Helpers
 
-    private func sidebarRelationshipButton(icon: String, label: String, count: Int, action: @escaping () -> Void) -> some View {
+    private func sidebarRelationshipButton(icon: String, label: String, count: Int?, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: icon)
@@ -389,7 +389,7 @@ struct ModerationSplitView: View {
                     Text(verbatim: label)
                         .appFont(.heading)
                         .foregroundStyle(.primary)
-                    Text("\(count)")
+                    Text(count.map { "\($0)" } ?? "-")
                         .appFont(.statistic)
                         .foregroundStyle(.secondary)
                 }
