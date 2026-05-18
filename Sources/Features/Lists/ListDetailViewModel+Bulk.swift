@@ -399,6 +399,9 @@ extension ListDetailViewModel {
             }
             bulkActionResult = retryResult
 
+        case .report:
+            errorMessage = "Cannot retry reports automatically."
+
         case .copy, .move:
             guard let comparisonList else {
                 errorMessage = "Select a comparison list before retrying this action."

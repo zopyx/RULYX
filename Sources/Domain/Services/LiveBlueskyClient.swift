@@ -421,6 +421,41 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    private static let bskyLabelerDID = "did:plc:ar7c4by46qjdydhdevvrndac"
+
+    func reportAccount(did targetDID: String, reasonType: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
+        let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = CreateModerationReportRequest(
+                reasonType: reasonType,
+                reason: reason,
+                subject: ModerationReportSubject(did: targetDID, uri: nil, cid: nil),
+                modTool: ModerationReportTool(
+                    name: "RULYX/1.0",
+                    meta: ["account": account.handle]
+                )
+            )
+            let url = authSession.pdsURL.appendingPathComponent("xrpc/com.atproto.moderation.createReport")
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
+            request.setValue("\(Self.bskyLabelerDID)#atproto_labeler", forHTTPHeaderField: "atproto-proxy")
+            request.httpBody = try JSONEncoder().encode(body)
+            let (data, httpResponse) = try await httpClient.data(for: request)
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
+                    throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Report failed.")
+                }
+                throw BlueskyAPIError.invalidResponse
+            }
+            return try JSONDecoder().decode(CreateModerationReportResponse.self, from: data)
+        }
+    }
+
     func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> BlueskyProfile {
         let response: ProfileViewDetailed = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1075,6 +1110,51 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 path: "app.bsky.feed.searchPosts",
                 method: "GET",
                 queryItems: queryItems,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+    }
+
+    // MARK: - Notifications
+
+    func fetchNotifications(cursor: String? = nil, limit: Int = 50, account: AppAccount, appPassword: String?) async throws -> ListNotificationsResponse {
+        try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
+            var queryItems = [URLQueryItem(name: "limit", value: "\(limit)")]
+            if let cursor {
+                queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            return try await requestExecutor.send(
+                path: "app.bsky.notification.listNotifications",
+                method: "GET",
+                queryItems: queryItems,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+    }
+
+    func getUnreadCount(account: AppAccount, appPassword: String?) async throws -> Int {
+        let response: UnreadCountResponse = try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
+            try await requestExecutor.send(
+                path: "app.bsky.notification.getUnreadCount",
+                method: "GET",
+                queryItems: [],
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+        return response.count
+    }
+
+    func updateSeen(at date: Date, account: AppAccount, appPassword: String?) async throws {
+        let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
+            let body = UpdateSeenRequest(seenAt: ISO8601DateFormatter().string(from: date))
+            return try await requestExecutor.send(
+                path: "app.bsky.notification.updateSeen",
+                method: "POST",
+                queryItems: [],
+                body: body,
                 accessToken: authSession.accessJWT,
                 hostURL: authSession.pdsURL
             )

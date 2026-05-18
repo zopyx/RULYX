@@ -121,4 +121,8 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
     func unmuteActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {
         try await Task.sleep(for: .milliseconds(120))
     }
+
+    func reportAccount(did _: String, reasonType _: String, reason _: String?, account _: AppAccount, appPassword _: String?) async throws {
+        try await Task.sleep(for: .milliseconds(150))
+    }
 }

@@ -11,6 +11,7 @@ struct ListBulkActionResult: Identifiable, Equatable {
         case mute
         case unblock
         case unmute
+        case report
 
         var title: String {
             switch self {
@@ -32,6 +33,8 @@ struct ListBulkActionResult: Identifiable, Equatable {
                 "Unblock Members"
             case .unmute:
                 "Unmute Members"
+            case .report:
+                "Report Accounts"
             }
         }
 
@@ -55,6 +58,8 @@ struct ListBulkActionResult: Identifiable, Equatable {
                 "unblocked"
             case .unmute:
                 "unmuted"
+            case .report:
+                "reported"
             }
         }
     }

@@ -43,6 +43,16 @@ struct RootView: View {
                         }
                     }
 
+                NotificationTab()
+                    .tag(WorkspaceTab.notifications)
+                    .tabItem {
+                        Label {
+                            Text(localizationManager.localized("tab.notifications"))
+                        } icon: {
+                            Image(systemName: "bell")
+                        }
+                    }
+
                 ChatTab()
                     .tag(WorkspaceTab.chat)
                     .tabItem {
@@ -107,7 +117,7 @@ struct RootView: View {
                 }
         )
         .onChange(of: showBetaFeatures) { _, newValue in
-            if !newValue, workspaceStore.selectedTab == .timeline || workspaceStore.selectedTab == .chat {
+            if !newValue, workspaceStore.selectedTab == .timeline || workspaceStore.selectedTab == .notifications || workspaceStore.selectedTab == .chat {
                 workspaceStore.selectedTab = .moderation
             }
         }
@@ -169,7 +179,7 @@ struct RootView: View {
 
     private func orderedTabs(showBeta: Bool) -> [WorkspaceTab] {
         if showBeta {
-            [.moderation, .timeline, .chat, .info, .settings, .account]
+            [.moderation, .timeline, .notifications, .chat, .info, .settings, .account]
         } else {
             [.moderation, .info, .settings, .account]
         }
