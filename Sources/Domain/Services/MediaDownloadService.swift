@@ -49,6 +49,7 @@ actor MediaDownloadService {
     private let videoSegmentDownloadConcurrency = 6
 
     private let downloadSession: URLSession
+    private let httpClient: HTTPClient
 
     init(session: URLSession? = nil) {
         if let session {
@@ -62,6 +63,7 @@ actor MediaDownloadService {
             config.requestCachePolicy = .useProtocolCachePolicy
             downloadSession = URLSession(configuration: config)
         }
+        httpClient = HTTPClient(session: downloadSession)
     }
 
     func downloadImages(
@@ -95,7 +97,6 @@ actor MediaDownloadService {
 
         var nextAssetIndex = 0
         var completed = 0
-        let session = downloadSession
         let segmentLimit = videoSegmentDownloadConcurrency
 
         await withTaskGroup(of: MediaAssetDownloadOutcome.self) { group in
@@ -103,8 +104,8 @@ actor MediaDownloadService {
             for _ in 0 ..< initialCount {
                 let asset = assets[nextAssetIndex]
                 nextAssetIndex += 1
-                group.addTask {
-                    await Self.process(asset, in: targetDir, using: session, segmentLimit: segmentLimit)
+                group.addTask { [httpClient] in
+                    await Self.process(asset, in: targetDir, using: httpClient, segmentLimit: segmentLimit)
                 }
             }
 
@@ -120,8 +121,8 @@ actor MediaDownloadService {
                 if nextAssetIndex < assets.count {
                     let asset = assets[nextAssetIndex]
                     nextAssetIndex += 1
-                    group.addTask {
-                        await Self.process(asset, in: targetDir, using: session, segmentLimit: segmentLimit)
+                    group.addTask { [httpClient] in
+                        await Self.process(asset, in: targetDir, using: httpClient, segmentLimit: segmentLimit)
                     }
                 }
             }
@@ -133,7 +134,7 @@ actor MediaDownloadService {
     private static func process(
         _ asset: MediaAssetDownload,
         in targetDir: URL,
-        using session: URLSession,
+        using httpClient: HTTPClient,
         segmentLimit: Int
     ) async -> MediaAssetDownloadOutcome {
         do {
@@ -145,7 +146,7 @@ actor MediaDownloadService {
                     filenameStem: asset.filenameStem,
                     preferredExtension: preferredExtension,
                     in: targetDir,
-                    using: session
+                    using: httpClient
                 )
                 return MediaAssetDownloadOutcome(index: asset.index, savedFilename: filename, error: nil)
 
@@ -154,7 +155,7 @@ actor MediaDownloadService {
                     playlistURL: playlistURL,
                     filenameStem: asset.filenameStem,
                     in: targetDir,
-                    using: session,
+                    using: httpClient,
                     segmentLimit: segmentLimit
                 )
                 return MediaAssetDownloadOutcome(index: asset.index, savedFilename: filename, error: nil)
@@ -171,17 +172,17 @@ actor MediaDownloadService {
         filenameStem: String,
         preferredExtension: String?,
         in targetDir: URL,
-        using session: URLSession
+        using httpClient: HTTPClient
     ) async throws -> String {
         var request = URLRequest(url: url)
         request.cachePolicy = .useProtocolCachePolicy
         request.timeoutInterval = 120
 
         try Task.checkCancellation()
-        let (temporaryURL, response) = try await session.download(for: request)
-        _ = try validate(response)
+        let (temporaryURL, httpResponse) = try await httpClient.download(for: request)
+        _ = try validate(httpResponse)
 
-        let fileExtension = preferredExtension ?? fileExtension(for: response, fallbackURL: url, defaultValue: "jpg")
+        let fileExtension = preferredExtension ?? fileExtension(for: httpResponse, fallbackURL: url, defaultValue: "jpg")
         let filename = "\(filenameStem).\(fileExtension)"
         let destinationURL = targetDir.appendingPathComponent(filename)
         try moveDownloadedFile(from: temporaryURL, to: destinationURL)
@@ -192,12 +193,12 @@ actor MediaDownloadService {
         playlistURL: URL,
         filenameStem: String,
         in targetDir: URL,
-        using session: URLSession,
+        using httpClient: HTTPClient,
         segmentLimit: Int
     ) async throws -> String {
         try Task.checkCancellation()
-        let resolvedPlaylistURL = try await resolvePlaylistURL(from: playlistURL, using: session)
-        let playlistContents = try await loadPlaylist(from: resolvedPlaylistURL, using: session)
+        let resolvedPlaylistURL = try await resolvePlaylistURL(from: playlistURL, using: httpClient)
+        let playlistContents = try await loadPlaylist(from: resolvedPlaylistURL, using: httpClient)
         let segmentURLs = playlistSegmentURLs(from: playlistContents, baseURL: resolvedPlaylistURL.deletingLastPathComponent())
         guard !segmentURLs.isEmpty else {
             throw MediaDownloadFailure.invalidPlaylist
@@ -222,7 +223,7 @@ actor MediaDownloadService {
                         from: segmentURL,
                         index: currentIndex,
                         tempDirectory: tempDirectory,
-                        using: session
+                        using: httpClient
                     )
                     return (currentIndex, fileURL)
                 }
@@ -246,7 +247,7 @@ actor MediaDownloadService {
                             from: segmentURL,
                             index: currentIndex,
                             tempDirectory: tempDirectory,
-                            using: session
+                            using: httpClient
                         )
                         return (currentIndex, fileURL)
                     }
@@ -287,22 +288,22 @@ actor MediaDownloadService {
         return transportStreamURL.lastPathComponent
     }
 
-    private static func loadPlaylist(from url: URL, using session: URLSession) async throws -> String {
+    private static func loadPlaylist(from url: URL, using httpClient: HTTPClient) async throws -> String {
         var request = URLRequest(url: url)
         request.cachePolicy = .useProtocolCachePolicy
         request.timeoutInterval = 60
 
         try Task.checkCancellation()
-        let (data, response) = try await session.data(for: request)
-        _ = try validate(response)
+        let (data, httpResponse) = try await httpClient.data(for: request)
+        _ = try validate(httpResponse)
         guard let playlist = String(data: data, encoding: .utf8) else {
             throw URLError(.cannotDecodeContentData)
         }
         return playlist
     }
 
-    private static func resolvePlaylistURL(from url: URL, using session: URLSession) async throws -> URL {
-        let playlistContents = try await loadPlaylist(from: url, using: session)
+    private static func resolvePlaylistURL(from url: URL, using httpClient: HTTPClient) async throws -> URL {
+        let playlistContents = try await loadPlaylist(from: url, using: httpClient)
         let baseURL = url.deletingLastPathComponent()
         let lines = playlistContents
             .components(separatedBy: .newlines)
@@ -333,7 +334,7 @@ actor MediaDownloadService {
             throw MediaDownloadFailure.invalidPlaylist
         }
 
-        return try await resolvePlaylistURL(from: bestVariant.url, using: session)
+        return try await resolvePlaylistURL(from: bestVariant.url, using: httpClient)
     }
 
     private static func parseBandwidth(from streamInfoLine: String) -> Int? {
@@ -359,15 +360,15 @@ actor MediaDownloadService {
         from url: URL,
         index: Int,
         tempDirectory: URL,
-        using session: URLSession
+        using httpClient: HTTPClient
     ) async throws -> URL {
         var request = URLRequest(url: url)
         request.cachePolicy = .reloadIgnoringLocalCacheData
         request.timeoutInterval = 120
 
         try Task.checkCancellation()
-        let (temporaryURL, response) = try await session.download(for: request)
-        _ = try validate(response)
+        let (temporaryURL, httpResponse) = try await httpClient.download(for: request)
+        _ = try validate(httpResponse)
 
         let fileURL = tempDirectory.appendingPathComponent(String(format: "%05d.ts", index))
         try moveDownloadedFile(from: temporaryURL, to: fileURL)

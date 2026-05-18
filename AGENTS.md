@@ -14,10 +14,9 @@ swiftformat Sources Tests
 ```
 
 ## Platform Constraints
-- **iPhone only** — TARGETED_DEVICE_FAMILY = "1"
-- **No iPad support** — no iPad-specific code, no iPad orientations
+- **iPhone + iPad** — TARGETED_DEVICE_FAMILY = "1,2"
 - **No macOS** — no Mac target, no Mac Catalyst
-- Do not add `#if os(macOS)` or iPad-only code paths
+- Do not add `#if os(macOS)` code paths
 
 ## Key Architecture
 - **Services**: `BlueskyRequestExecutor`, `BlueskySessionService`, `BlueskyListService`, `BlueskyProfileService`, `LiveBlueskyClient`

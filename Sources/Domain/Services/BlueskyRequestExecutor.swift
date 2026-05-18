@@ -27,11 +27,11 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
     }
 
     private let baseURL: URL
-    private let session: URLSession
+    private let httpClient: HTTPClient
 
-    init(baseURL: URL = .bskySocial, session: URLSession = .shared) {
+    init(baseURL: URL = .bskySocial, httpClient: HTTPClient = HTTPClient()) {
         self.baseURL = baseURL
-        self.session = session
+        self.httpClient = httpClient
     }
 
     func send<Response: Decodable>(
@@ -57,7 +57,6 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
 
         if let accessToken {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
@@ -68,10 +67,7 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
 
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw BlueskyAPIError.invalidResponse
-        }
+        let (data, httpResponse) = try await httpClient.data(for: request)
 
         if httpResponse.statusCode == 401 {
             throw BlueskyAPIError.unauthorized

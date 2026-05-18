@@ -628,7 +628,7 @@ struct ListDetailView: View {
     private func loadOwner() async {
         guard !isOwnedList, let did = ownerDID else { return }
         do {
-            let actors = try await LiveBlueskyClient.fetchProfileBatch(identifiers: [did], session: URLSession.shared)
+            let actors = try await LiveBlueskyClient.fetchProfileBatch(identifiers: [did], httpClient: HTTPClient())
             ownerActor = actors.first
         } catch {
             AppLogger.performance.error("Failed to fetch list owner: \(error.localizedDescription, privacy: .public)")

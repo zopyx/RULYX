@@ -10,7 +10,7 @@ final class BlueskyRequestExecutorTests: XCTestCase {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         session = URLSession(configuration: config)
-        executor = BlueskyRequestExecutor(baseURL: URL(string: "https://test.bsky.social")!, session: session)
+        executor = BlueskyRequestExecutor(baseURL: URL(string: "https://test.bsky.social")!, httpClient: HTTPClient(session: session))
     }
 
     override func tearDown() {

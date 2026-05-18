@@ -89,7 +89,7 @@ struct ClearskyListsView: View {
         let dids = Set(entries.map(\.did))
         guard !dids.isEmpty else { return }
         do {
-            let actors = try await LiveBlueskyClient.fetchProfileBatch(identifiers: Array(dids), session: URLSession.shared)
+            let actors = try await LiveBlueskyClient.fetchProfileBatch(identifiers: Array(dids), httpClient: HTTPClient())
             for actor in actors {
                 for entry in entries where entry.did == actor.did {
                     ownerHandles[entry.url] = actor.handle
