@@ -145,7 +145,7 @@ struct InfoView: View {
     }
 
     private var openSourceCard: some View {
-        Link(destination: URL(string: "https://github.com/zopyx/bluesky-who-blocks-me-and-block-back")!) {
+        Link(destination: URL(string: "https://github.com/zopyx/RULYX")!) {
             HStack(spacing: 14) {
                 Image(systemName: "chevron.left.forwardslash.chevron.right")
                     .font(.title)
@@ -268,8 +268,8 @@ struct InfoView: View {
 
             legalRow(icon: "doc.text.magnifyingglass", title: localizationManager.localized("info.legal.license"), value: localizationManager.localized("info.legal.license_value"))
 
-            Link(destination: URL(string: "https://github.com/zopyx/bluesky-who-blocks-me-and-block-back")!) {
-                legalRow(icon: "chevron.left.forwardslash.chevron.right", title: localizationManager.localized("info.view_github"), value: "github.com/zopyx/bluesky-who-blocks-me-and-block-back", link: true)
+            Link(destination: URL(string: "https://github.com/zopyx/RULYX")!) {
+                legalRow(icon: "chevron.left.forwardslash.chevron.right", title: localizationManager.localized("info.view_github"), value: "github.com/zopyx/RULYX", link: true)
             }
             .tint(.primary)
             .accessibilityLabel(loc("info.github.label"))
