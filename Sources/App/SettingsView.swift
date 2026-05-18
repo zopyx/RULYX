@@ -87,17 +87,13 @@ struct SettingsView: View {
 
                 if showBetaFeatures {
                     Section {
-                        ForEach(GIFProvider.allCases) { provider in
-                            let key = Binding(
-                                get: { UserDefaults.standard.string(forKey: provider.apiKeyUserDefaultsKey) ?? "" },
-                                set: { UserDefaults.standard.set($0.isEmpty ? nil : $0, forKey: provider.apiKeyUserDefaultsKey) }
-                            )
-                            SecureField(loc("settings.gif_api_key").replacingOccurrences(of: "{provider}", with: provider.rawValue), text: key)
-                        }
+                        let key = Binding(
+                            get: { UserDefaults.standard.string(forKey: "klipyAPIKey") ?? "" },
+                            set: { UserDefaults.standard.set($0.isEmpty ? nil : $0, forKey: "klipyAPIKey") }
+                        )
+                        SecureField(loc("settings.klipy_api_key"), text: key)
                     } header: {
-                        Text(verbatim: loc("settings.gif_services"))
-                    } footer: {
-                        Text(verbatim: loc("settings.gif_services_desc"))
+                        Text(verbatim: loc("settings.klipy_services"))
                     }
                 }
 
