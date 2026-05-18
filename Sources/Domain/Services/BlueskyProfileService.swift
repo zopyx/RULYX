@@ -460,4 +460,39 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             )
         }
     }
+
+    private static let bskyLabelerDID = "did:plc:ar7c4by46qjdydhdevvrndac"
+
+    func reportAccount(did targetDID: String, reasonType: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
+        let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = CreateModerationReportRequest(
+                reasonType: reasonType,
+                reason: reason,
+                subject: ModerationReportSubject(did: targetDID, uri: nil, cid: nil),
+                modTool: ModerationReportTool(
+                    name: "RULYX/1.0",
+                    meta: ["account": account.handle]
+                )
+            )
+            let url = authSession.pdsURL.appendingPathComponent("xrpc/com.atproto.moderation.createReport")
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
+            request.setValue("\(Self.bskyLabelerDID)#atproto_labeler", forHTTPHeaderField: "atproto-proxy")
+            request.httpBody = try JSONEncoder().encode(body)
+            let (data, urlResponse) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = urlResponse as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+                if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
+                    throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Report failed.")
+                }
+                throw BlueskyAPIError.invalidResponse
+            }
+            return try JSONDecoder().decode(CreateModerationReportResponse.self, from: data)
+        }
+    }
 }

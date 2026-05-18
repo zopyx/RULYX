@@ -6,6 +6,7 @@ enum WorkspaceTab: String, Hashable {
     case settings
     case info
     case timeline
+    case notifications
     case chat
 }
 

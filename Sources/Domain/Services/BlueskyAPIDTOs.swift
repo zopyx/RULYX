@@ -868,3 +868,68 @@ struct RepostRecord: Encodable {
     let subject: FeedPostTarget
     let createdAt: String
 }
+
+// MARK: - Moderation Report
+
+struct CreateModerationReportRequest: Encodable {
+    let reasonType: String
+    let reason: String?
+    let subject: ModerationReportSubject
+    let modTool: ModerationReportTool?
+}
+
+struct ModerationReportSubject: Encodable {
+    let did: String?
+    let uri: String?
+    let cid: String?
+}
+
+struct ModerationReportTool: Encodable {
+    let name: String
+    let meta: [String: String]?
+}
+
+struct CreateModerationReportResponse: Decodable {
+    let id: Int
+    let reasonType: String
+    let reason: String?
+    let reportedBy: String
+    let createdAt: String
+}
+
+enum ModerationReportReasonType: String, CaseIterable, Identifiable {
+    case harassmentTargeted = "tools.ozone.report.defs#reasonHarassmentTargeted"
+    case harassmentHateSpeech = "tools.ozone.report.defs#reasonHarassmentHateSpeech"
+    case harassmentDoxxing = "tools.ozone.report.defs#reasonHarassmentDoxxing"
+    case harassmentTroll = "tools.ozone.report.defs#reasonHarassmentTroll"
+    case harassmentOther = "tools.ozone.report.defs#reasonHarassmentOther"
+
+    var id: String { rawValue }
+}
+
+// MARK: - Notifications
+
+struct ListNotificationsResponse: Decodable {
+    let cursor: String?
+    let notifications: [NotificationItem]
+}
+
+struct NotificationItem: Decodable, Identifiable {
+    let uri: String
+    let cid: String
+    let author: ActorView
+    let reason: String
+    let reasonSubject: String?
+    var isRead: Bool
+    let indexedAt: String
+
+    var id: String { uri }
+}
+
+struct UpdateSeenRequest: Encodable {
+    let seenAt: String
+}
+
+struct UnreadCountResponse: Decodable {
+    let count: Int
+}

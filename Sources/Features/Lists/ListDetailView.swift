@@ -22,6 +22,9 @@ struct ListDetailView: View {
     @State private var exportProgressMessage: String?
     @State private var exportProgressFraction: Double?
     @State private var ownerActor: BlueskyActor?
+    @State private var isSubscribing = false
+    @State private var subscriptionRecordURI: String?
+    @State private var subscribeError: String?
     @Environment(\.dismiss) private var dismiss
 
     private var ownerDID: String? {
@@ -413,6 +416,82 @@ struct ListDetailView: View {
                     }
                 }
                 .padding(.vertical, 4)
+            }
+
+            if !isOwnedList {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 10) {
+                            Image(systemName: subscriptionRecordURI != nil ? "bell.slash.fill" : "bell.badge.fill")
+                                .font(.title3)
+                                .foregroundStyle(subscriptionRecordURI != nil ? .red : .blue)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(verbatim: subscriptionRecordURI != nil ? loc("list.detail.subscribed") : loc("list.detail.subscribe"))
+                                    .font(.subheadline.weight(.semibold))
+                                Text(verbatim: loc("list.detail.subscribe.desc"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        if let error = subscribeError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
+
+                        Button {
+                            guard let myDID = account.did else {
+                                subscribeError = "Account DID not available"
+                                return
+                            }
+                            isSubscribing = true
+                            subscribeError = nil
+                            Task {
+                                do {
+                                    if let recordURI = subscriptionRecordURI {
+                                        try await blueskyClient.removeMember(
+                                            recordURI: recordURI,
+                                            account: account,
+                                            appPassword: appPassword
+                                        )
+                                        subscriptionRecordURI = nil
+                                    } else {
+                                        let uri = try await blueskyClient.addActor(
+                                            did: myDID,
+                                            to: currentList,
+                                            account: account,
+                                            appPassword: appPassword
+                                        )
+                                        subscriptionRecordURI = uri
+                                    }
+                                } catch {
+                                    subscribeError = AppError.userMessage(from: error)
+                                }
+                                isSubscribing = false
+                            }
+                        } label: {
+                            HStack {
+                                Spacer()
+                                if isSubscribing {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else if subscriptionRecordURI != nil {
+                                    Label(loc("list.detail.unsubscribe"), systemImage: "bell.slash.fill")
+                                } else {
+                                    Text(loc("list.detail.subscribe"))
+                                        .fontWeight(.semibold)
+                                }
+                                Spacer()
+                            }
+                        }
+                        .disabled(isSubscribing)
+                        .buttonStyle(.borderedProminent)
+                        .tint(subscriptionRecordURI != nil ? .red : .blue)
+                        .accessibilityHint(loc("list.detail.subscribe.hint"))
+                    }
+                    .padding(.vertical, 4)
+                }
             }
 
             BatchProgressSection(batchState: batchState, viewModel: viewModel)
