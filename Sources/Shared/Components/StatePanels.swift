@@ -1,3 +1,5 @@
+import MessageUI
+import PhotosUI
 import SwiftUI
 
 struct LoadingPanel: View {
@@ -237,8 +239,14 @@ struct SimplifiedReportSheet: View {
     @Binding var selectedReason: ModerationReportReasonType
     @Binding var evidenceText: String
     let isSubmitting: Bool
+    let makeSupportDraft: () -> SupportEmailDraft
     let onCancel: () -> Void
     let onSubmit: () -> Void
+
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var supportImage: UIImage?
+    @State private var mailDraft: SupportEmailDraft?
+    @State private var isShowingMailUnavailableAlert = false
 
     var body: some View {
         NavigationStack {
@@ -289,6 +297,47 @@ struct SimplifiedReportSheet: View {
                     .listRowBackground(isSubmitting ? Color.gray : Color.red)
                     .foregroundStyle(.white)
                 }
+
+                Section {
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                        Label(loc("report.support.attachment.add"), systemImage: "paperclip")
+                    }
+
+                    if let supportImage {
+                        HStack(spacing: 12) {
+                            Image(uiImage: supportImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 64, height: 64)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(loc("report.support.attachment"))
+                                    .appFont(.subheading)
+                                Button(role: .destructive) {
+                                    selectedPhotoItem = nil
+                                    self.supportImage = nil
+                                } label: {
+                                    Label(loc("report.support.attachment.remove"), systemImage: "trash")
+                                }
+                                .buttonStyle(.borderless)
+                            }
+                        }
+                    }
+
+                    Button {
+                        guard MFMailComposeViewController.canSendMail() else {
+                            isShowingMailUnavailableAlert = true
+                            return
+                        }
+                        mailDraft = makeSupportDraft()
+                    } label: {
+                        Label(loc("report.support.email"), systemImage: "envelope")
+                    }
+                    .disabled(isSubmitting)
+                } header: {
+                    Text(loc("report.support.section"))
+                }
             }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
@@ -298,6 +347,84 @@ struct SimplifiedReportSheet: View {
                         .disabled(isSubmitting)
                 }
             }
+            .onChange(of: selectedPhotoItem) { _, newItem in
+                guard let newItem else {
+                    supportImage = nil
+                    return
+                }
+
+                Task {
+                    guard let data = try? await newItem.loadTransferable(type: Data.self),
+                          let image = UIImage(data: data)
+                    else { return }
+                    await MainActor.run {
+                        supportImage = image
+                    }
+                }
+            }
+            .sheet(item: $mailDraft) { draft in
+                SupportMailComposeView(
+                    draft: draft,
+                    attachmentImage: supportImage
+                )
+            }
+            .alert(loc("report.support.mail_unavailable"), isPresented: $isShowingMailUnavailableAlert) {
+                Button(loc("actions.ok")) {}
+            }
+        }
+    }
+}
+
+struct SupportEmailDraft: Identifiable {
+    let subject: String
+    let body: String
+
+    var id: String { subject + body }
+}
+
+private struct SupportMailComposeView: UIViewControllerRepresentable {
+    let draft: SupportEmailDraft
+    let attachmentImage: UIImage?
+
+    @Environment(\.dismiss) private var dismiss
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(dismiss: dismiss)
+    }
+
+    func makeUIViewController(context: Context) -> MFMailComposeViewController {
+        let controller = MFMailComposeViewController()
+        controller.mailComposeDelegate = context.coordinator
+        controller.setToRecipients(["support@bluesky.com"])
+        controller.setSubject(draft.subject)
+        controller.setMessageBody(draft.body, isHTML: false)
+        if let attachmentImage,
+           let data = attachmentImage.jpegData(compressionQuality: 0.9)
+        {
+            controller.addAttachmentData(
+                data,
+                mimeType: "image/jpeg",
+                fileName: "support-attachment.jpg"
+            )
+        }
+        return controller
+    }
+
+    func updateUIViewController(_: MFMailComposeViewController, context _: Context) {}
+
+    final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        private let dismiss: DismissAction
+
+        init(dismiss: DismissAction) {
+            self.dismiss = dismiss
+        }
+
+        func mailComposeController(
+            _: MFMailComposeViewController,
+            didFinishWith _: MFMailComposeResult,
+            error _: Error?
+        ) {
+            dismiss()
         }
     }
 }
