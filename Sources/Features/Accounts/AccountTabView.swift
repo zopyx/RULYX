@@ -51,13 +51,38 @@ struct AccountTabView: View {
                     }
 
                     Section {
-                        Picker(loc("account.preferred_search"), selection: $accountStore.preferredSearchAccountID) {
+                        Menu {
                             ForEach(accountStore.accounts) { account in
-                                Text(account.displayName ?? account.handle)
-                                    .tag(account.id as AppAccount.ID?)
+                                Button {
+                                    accountStore.preferredSearchAccountID = account.id
+                                } label: {
+                                    HStack {
+                                        AccountRowView(
+                                            account: account,
+                                            isActive: account.id == accountStore.activeAccountID
+                                        )
+                                        if account.id == accountStore.preferredSearchAccountID {
+                                            Spacer()
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            if let prefID = accountStore.preferredSearchAccountID,
+                               let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+                                AccountRowView(
+                                    account: prefAccount,
+                                    isActive: prefAccount.id == accountStore.activeAccountID
+                                )
+                            } else if let first = accountStore.accounts.first {
+                                AccountRowView(
+                                    account: first,
+                                    isActive: first.id == accountStore.activeAccountID
+                                )
                             }
                         }
-                        .pickerStyle(.menu)
+                        .buttonStyle(.plain)
                         Text(loc("account.preferred_search.hint"))
                             .font(.caption)
                             .foregroundStyle(.secondary)

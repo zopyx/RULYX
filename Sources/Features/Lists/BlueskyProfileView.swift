@@ -125,14 +125,24 @@ struct BlueskyProfileView: View {
                     } else {
                         List {
                             ForEach(ownedLists) { list in
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(list.name).font(.subheadline.weight(.semibold))
-                                    Text(list.kind.title).font(.caption).foregroundStyle(.secondary)
-                                    if let count = list.memberCount {
-                                        Text("\(count) members").font(.caption).foregroundStyle(.secondary)
+                                NavigationLink {
+                                    ListDetailView(
+                                        list: list,
+                                        onListUpdated: { _ in }
+                                    )
+                                    .environmentObject(accountStore)
+                                    .environmentObject(blueskyClient)
+                                    .environmentObject(workspaceStore)
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(list.name).font(.subheadline.weight(.semibold))
+                                        Text(list.kind.title).font(.caption).foregroundStyle(.secondary)
+                                        if let count = list.memberCount {
+                                            Text(loc("profile.stats.owned_lists.member_count").replacingOccurrences(of: "{count}", with: "\(count)")).font(.caption).foregroundStyle(.secondary)
+                                        }
                                     }
+                                    .padding(.vertical, 2)
                                 }
-                                .padding(.vertical, 2)
                             }
                         }
                         .listStyle(.insetGrouped)

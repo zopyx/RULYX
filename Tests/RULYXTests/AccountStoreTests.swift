@@ -11,6 +11,7 @@ final class AccountStoreTests: XCTestCase {
         return (store, keychain)
     }
 
+    @discardableResult
     private func addTestAccount(store: AccountStore, client: BlueskyAuthenticating, handle: String = "moderator.bsky.social") async -> Bool {
         await store.addAccount(handle: handle, appPassword: "abcd-efgh-ijkl-mnop", client: client)
     }

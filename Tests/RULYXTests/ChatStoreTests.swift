@@ -7,6 +7,7 @@ final class ChatStoreTests: XCTestCase {
     private var service: MockChatService!
     private let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
 
+    @MainActor
     override func setUp() {
         super.setUp()
         service = MockChatService()
@@ -14,6 +15,7 @@ final class ChatStoreTests: XCTestCase {
         store.setAccount(account, appPassword: "password")
     }
 
+    @MainActor
     override func tearDown() {
         super.tearDown()
         store.stopPolling()

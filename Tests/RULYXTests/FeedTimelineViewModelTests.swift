@@ -8,6 +8,7 @@ final class FeedTimelineViewModelTests: XCTestCase {
     private let account = AppAccount(handle: "test.bsky.social")
     private let appPassword = "password"
 
+    @MainActor
     override func setUp() {
         super.setUp()
         client = MockTimelineClient()
@@ -15,6 +16,7 @@ final class FeedTimelineViewModelTests: XCTestCase {
         UserDefaults.standard.removeObject(forKey: "mutedWords")
     }
 
+    @MainActor
     override func tearDown() {
         super.tearDown()
         viewModel.stopPolling()
