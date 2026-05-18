@@ -211,4 +211,10 @@ private struct MockLiveBlueskyClient: BlueskyProfileInspecting {
     func fetchFollowingPage(actor _: String, cursor _: String?, account _: AppAccount, appPassword _: String?) async throws -> PagedActorSearch {
         PagedActorSearch(actors: [], cursor: nil)
     }
+
+    func reportAccount(did _: String, reasonType _: String, reason _: String?, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func reportAccount(did _: String, reason _: String?, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func reportAccount(did _: String, selectedReason _: ModerationReportReasonType?, reason _: String?, account _: AppAccount, appPassword _: String?) async throws {}
 }

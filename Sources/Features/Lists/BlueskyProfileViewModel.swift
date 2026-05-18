@@ -21,6 +21,7 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published private(set) var pendingListMemberStates: [String: Bool] = [:]
     @Published var showReportSheet = false
     @Published var isReporting = false
+    @Published var selectedReportReason = ModerationReportReasonType.simplifiedDefault
 
     func fetchClearskyLists(handle: String, using client: LiveBlueskyClient) async {
         isFetchingLists = true
@@ -164,7 +165,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
-    func reportAccount(reasonType: String, reason: String?, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+    func reportAccount(reason: String?, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let profile else { return }
 
         isReporting = true
@@ -176,12 +177,12 @@ final class BlueskyProfileViewModel: ObservableObject {
         do {
             try await client.reportAccount(
                 did: profile.did,
-                reasonType: reasonType,
+                selectedReason: selectedReportReason,
                 reason: reason,
                 account: account,
                 appPassword: appPassword
             )
-            statusMessage = "Report submitted."
+            statusMessage = loc("actions.done")
         } catch {
             errorMessage = AppError.userMessage(from: error)
         }

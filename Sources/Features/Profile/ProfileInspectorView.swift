@@ -9,6 +9,10 @@ struct ProfileInspectorView: View {
     @StateObject private var viewModel = ProfileInspectorViewModel()
     @State private var isShowingQuickAccountSwitcher = false
     @State private var isShowingAccountManagement = false
+    @State private var reportEvidenceText = ""
+    @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault
+    @State private var isShowingReportSheet = false
+    @State private var isSubmittingReport = false
 
     var body: some View {
         NavigationStack {
@@ -223,6 +227,19 @@ struct ProfileInspectorView: View {
                     }
 
                     Section {
+                        Button {
+                            selectedReportReason = .simplifiedDefault
+                            reportEvidenceText = ""
+                            isShowingReportSheet = true
+                        } label: {
+                            Label {
+                                Text(verbatim: loc("profile.report"))
+                            } icon: {
+                                Image(systemName: "exclamationmark.shield")
+                            }
+                        }
+                        .disabled(isSubmittingReport)
+
                         NavigationLink {
                             BlueskyProfileView(
                                 member: BlueskyListMember(
@@ -345,6 +362,32 @@ struct ProfileInspectorView: View {
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
             }
+            .sheet(isPresented: $isShowingReportSheet) {
+                if let inspection = viewModel.inspection,
+                   let account = accountStore.activeAccount,
+                   let appPassword = activePassword
+                {
+                    SimplifiedReportSheet(
+                        title: loc("profile.report"),
+                        selectedReason: $selectedReportReason,
+                        evidenceText: $reportEvidenceText,
+                        isSubmitting: isSubmittingReport,
+                        onCancel: {
+                            isShowingReportSheet = false
+                        },
+                        onSubmit: {
+                            isShowingReportSheet = false
+                            Task {
+                                await submitSimplifiedReport(
+                                    did: inspection.profile.did,
+                                    account: account,
+                                    appPassword: appPassword
+                                )
+                            }
+                        }
+                    )
+                }
+            }
             .task {
                 if viewModel.query.isEmpty {
                     viewModel.query = workspaceStore.lastProfileQuery
@@ -403,6 +446,23 @@ struct ProfileInspectorView: View {
         isShowingQuickAccountSwitcher = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             isShowingAccountManagement = true
+        }
+    }
+
+    private func submitSimplifiedReport(did: String, account: AppAccount, appPassword: String) async {
+        isSubmittingReport = true
+        defer { isSubmittingReport = false }
+
+        do {
+            try await blueskyClient.reportAccount(
+                did: did,
+                selectedReason: selectedReportReason,
+                reason: reportEvidenceText.nilIfBlank,
+                account: account,
+                appPassword: appPassword
+            )
+        } catch {
+            viewModel.errorMessage = AppError.userMessage(from: error)
         }
     }
 }

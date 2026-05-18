@@ -83,7 +83,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 description: item.description ?? item.purpose.displayTitle,
                 memberCount: item.listItemCount,
                 kind: item.purpose.kind,
-                avatarURL: URL(string: item.avatar ?? "")
+                avatarURL: URL(string: item.avatar ?? ""),
+                cid: item.cid
             )
         }
     }
@@ -278,7 +279,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             )
         }
 
-        return BlueskyList(id: response.uri, name: name, description: description, memberCount: 0, kind: kind)
+        return BlueskyList(id: response.uri, name: name, description: description, memberCount: 0, kind: kind, cid: response.cid)
     }
 
     func deleteList(list: BlueskyList, account: AppAccount, appPassword: String?) async throws {
@@ -328,7 +329,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             )
         }
 
-        return BlueskyList(id: list.id, name: title, description: description, memberCount: list.memberCount, kind: list.kind)
+        return BlueskyList(id: list.id, name: title, description: description, memberCount: list.memberCount, kind: list.kind, avatarURL: list.avatarURL, cid: list.cid)
     }
 
     func blockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
@@ -453,6 +454,73 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 throw BlueskyAPIError.invalidResponse
             }
             return try JSONDecoder().decode(CreateModerationReportResponse.self, from: data)
+        }
+    }
+
+    func reportAccount(did targetDID: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
+        try await reportAccount(
+            did: targetDID,
+            selectedReason: nil,
+            reason: reason,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    func reportAccount(
+        did targetDID: String,
+        selectedReason: ModerationReportReasonType?,
+        reason: String?,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws {
+        try await reportAccount(
+            did: targetDID,
+            reasonType: (selectedReason ?? ModerationReportReasonType.simplifiedDefault).rawValue,
+            reason: reason,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    func reportList(_ list: BlueskyList, reason: String?, account: AppAccount, appPassword: String?) async throws {
+        try await reportList(
+            list,
+            selectedReason: nil,
+            reason: reason,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    func reportList(
+        _ list: BlueskyList,
+        selectedReason: ModerationReportReasonType?,
+        reason: String?,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws {
+        let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = CreateModerationReportRequest(
+                reasonType: (selectedReason ?? ModerationReportReasonType.simplifiedDefault).rawValue,
+                reason: reason,
+                subject: ModerationReportSubject(did: nil, uri: list.id, cid: list.cid),
+                modTool: ModerationReportTool(
+                    name: Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "RULYX",
+                    meta: nil
+                )
+            )
+            return try await requestExecutor.send(
+                path: "com.atproto.moderation.createReport",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
         }
     }
 
@@ -1066,6 +1134,24 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 hostURL: authSession.pdsURL
             )
         }
+    }
+
+    func fetchPosts(uris: [String]) async throws -> [RichPost] {
+        guard let url = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts") else {
+            throw BlueskyAPIError.invalidURL
+        }
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        components.queryItems = uris.map { URLQueryItem(name: "uris", value: $0) }
+        guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
+        var req = URLRequest(url: finalURL)
+        req.setValue("application/json", forHTTPHeaderField: "Accept")
+        req.timeoutInterval = 30
+        let (data, httpResponse) = try await httpClient.data(for: req)
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
+            throw BlueskyAPIError.invalidResponse
+        }
+        let decoded = try JSONDecoder().decode(GetPostsResponse.self, from: data)
+        return decoded.posts
     }
 
     func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {

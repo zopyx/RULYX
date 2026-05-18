@@ -19,11 +19,11 @@ final class MockBlueskyListService: BlueskyListServicing {
         let moderationBase = 1 + (seed % 3)
 
         return [
-            BlueskyList(id: "\(account.handle)-mod-1", name: "Spam Watch", description: "Accounts frequently reported for spam patterns.", memberCount: 120 + moderationBase, kind: .moderation),
-            BlueskyList(id: "\(account.handle)-mod-2", name: "Reply Filters", description: "Aggressive reply actors tracked for moderation review.", memberCount: 42 + moderationBase, kind: .moderation),
-            BlueskyList(id: "\(account.handle)-list-1", name: "Trusted Sources", description: "Accounts curated for signal over noise.", memberCount: 65 + regularBase, kind: .regular),
-            BlueskyList(id: "\(account.handle)-list-2", name: "Community Core", description: "People to monitor for community health updates.", memberCount: 18 + regularBase, kind: .regular),
-            BlueskyList(id: "\(account.handle)-list-3", name: "New Reports", description: "Freshly observed accounts pending deeper review.", memberCount: 7 + regularBase, kind: .regular),
+            BlueskyList(id: "\(account.handle)-mod-1", name: "Spam Watch", description: "Accounts frequently reported for spam patterns.", memberCount: 120 + moderationBase, kind: .moderation, cid: "cid-mod-1"),
+            BlueskyList(id: "\(account.handle)-mod-2", name: "Reply Filters", description: "Aggressive reply actors tracked for moderation review.", memberCount: 42 + moderationBase, kind: .moderation, cid: "cid-mod-2"),
+            BlueskyList(id: "\(account.handle)-list-1", name: "Trusted Sources", description: "Accounts curated for signal over noise.", memberCount: 65 + regularBase, kind: .regular, cid: "cid-list-1"),
+            BlueskyList(id: "\(account.handle)-list-2", name: "Community Core", description: "People to monitor for community health updates.", memberCount: 18 + regularBase, kind: .regular, cid: "cid-list-2"),
+            BlueskyList(id: "\(account.handle)-list-3", name: "New Reports", description: "Freshly observed accounts pending deeper review.", memberCount: 7 + regularBase, kind: .regular, cid: "cid-list-3"),
         ]
     }
 
@@ -68,7 +68,7 @@ final class MockBlueskyListService: BlueskyListServicing {
     func createList(name: String, description: String, kind: BlueskyList.Kind, account _: AppAccount, appPassword _: String?) async throws -> BlueskyList {
         try await Task.sleep(for: .milliseconds(100))
         let id = "at://did:plc:preview/app.bsky.graph.list/\(UUID().uuidString)"
-        return BlueskyList(id: id, name: name, description: description, memberCount: 0, kind: kind)
+        return BlueskyList(id: id, name: name, description: description, memberCount: 0, kind: kind, cid: UUID().uuidString)
     }
 
     func deleteList(list _: BlueskyList, account _: AppAccount, appPassword _: String?) async throws {
@@ -77,7 +77,21 @@ final class MockBlueskyListService: BlueskyListServicing {
 
     func updateListMetadata(list: BlueskyList, title: String, description: String, account _: AppAccount, appPassword _: String?) async throws -> BlueskyList {
         try await Task.sleep(for: .milliseconds(120))
-        return BlueskyList(id: list.id, name: title, description: description, memberCount: list.memberCount, kind: list.kind)
+        return BlueskyList(id: list.id, name: title, description: description, memberCount: list.memberCount, kind: list.kind, cid: list.cid)
+    }
+
+    func reportList(_: BlueskyList, reason _: String?, account _: AppAccount, appPassword _: String?) async throws {
+        try await Task.sleep(for: .milliseconds(100))
+    }
+
+    func reportList(
+        _: BlueskyList,
+        selectedReason _: ModerationReportReasonType?,
+        reason _: String?,
+        account _: AppAccount,
+        appPassword _: String?
+    ) async throws {
+        try await Task.sleep(for: .milliseconds(100))
     }
 
     private func previewMembers(for list: BlueskyList) -> [BlueskyListMember] {

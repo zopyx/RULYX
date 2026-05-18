@@ -25,6 +25,10 @@ struct ListDetailView: View {
     @State private var isSubscribing = false
     @State private var subscriptionRecordURI: String?
     @State private var subscribeError: String?
+    @State private var reportEvidenceText = ""
+    @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault
+    @State private var isShowingReportSheet = false
+    @State private var isReportingList = false
     @Environment(\.dismiss) private var dismiss
 
     private var ownerDID: String? {
@@ -74,6 +78,27 @@ struct ListDetailView: View {
             }
             .sheet(isPresented: $importState.isShowingImportSheet, content: importSheetContent)
             .sheet(isPresented: importPreviewPresentedBinding, content: importPreviewSheetContent)
+            .sheet(isPresented: $isShowingReportSheet) {
+                if let account = accountStore.activeAccount,
+                   let appPassword = accountStore.appPassword(for: account)
+                {
+                    SimplifiedReportSheet(
+                        title: loc("actions.report"),
+                        selectedReason: $selectedReportReason,
+                        evidenceText: $reportEvidenceText,
+                        isSubmitting: isReportingList,
+                        onCancel: {
+                            isShowingReportSheet = false
+                        },
+                        onSubmit: {
+                            isShowingReportSheet = false
+                            Task {
+                                await reportCurrentList(account: account, appPassword: appPassword)
+                            }
+                        }
+                    )
+                }
+            }
             .fileImporter(
                 isPresented: $importState.isShowingImportFilePicker,
                 allowedContentTypes: [.plainText, .commaSeparatedText]
@@ -492,6 +517,17 @@ struct ListDetailView: View {
                     }
                     .padding(.vertical, 4)
                 }
+
+                Section {
+                    Button(role: .destructive) {
+                        selectedReportReason = .simplifiedDefault
+                        reportEvidenceText = ""
+                        isShowingReportSheet = true
+                    } label: {
+                        Label(loc("actions.report"), systemImage: "exclamationmark.shield")
+                    }
+                    .disabled(isReportingList)
+                }
             }
 
             BatchProgressSection(batchState: batchState, viewModel: viewModel)
@@ -711,6 +747,23 @@ struct ListDetailView: View {
             ownerActor = actors.first
         } catch {
             AppLogger.performance.error("Failed to fetch list owner: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func reportCurrentList(account: AppAccount, appPassword: String) async {
+        isReportingList = true
+        defer { isReportingList = false }
+
+        do {
+            try await blueskyClient.reportList(
+                currentList,
+                selectedReason: selectedReportReason,
+                reason: reportEvidenceText.nilIfBlank,
+                account: account,
+                appPassword: appPassword
+            )
+        } catch {
+            viewModel.errorMessage = AppError.userMessage(from: error)
         }
     }
 }

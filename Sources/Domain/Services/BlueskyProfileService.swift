@@ -495,4 +495,30 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             return try JSONDecoder().decode(CreateModerationReportResponse.self, from: data)
         }
     }
+
+    func reportAccount(did targetDID: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
+        try await reportAccount(
+            did: targetDID,
+            selectedReason: nil,
+            reason: reason,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    func reportAccount(
+        did targetDID: String,
+        selectedReason: ModerationReportReasonType?,
+        reason: String?,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws {
+        try await reportAccount(
+            did: targetDID,
+            reasonType: (selectedReason ?? ModerationReportReasonType.simplifiedDefault).rawValue,
+            reason: reason,
+            account: account,
+            appPassword: appPassword
+        )
+    }
 }
