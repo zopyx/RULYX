@@ -108,4 +108,40 @@ final class LiveBlueskyClientTests: XCTestCase {
         let blocked = try await client.fetchBlockedActors(account: makeAccount(handle: "test.bsky.social"), appPassword: "pass")
         XCTAssertTrue(blocked.actors.isEmpty)
     }
+
+    func testReportListUsesListRecordSubject() async throws {
+        let account = makeAccount()
+        let list = BlueskyList(
+            id: "at://did:plc:list/app.bsky.graph.list/abc123",
+            name: "Spam Watch",
+            description: "Test",
+            memberCount: 3,
+            kind: .moderation,
+            cid: "cid-list-123"
+        )
+        let expectation = expectation(description: "report list request captured")
+
+        requestExecutor.onSend = { path, method, _, body, _, _ in
+            XCTAssertEqual(path, "com.atproto.moderation.createReport")
+            XCTAssertEqual(method, "POST")
+
+            let requestBody = try XCTUnwrap(body as? CreateModerationReportRequest)
+            XCTAssertEqual(requestBody.reasonType, ModerationReportReasonType.simplifiedDefault.rawValue)
+            XCTAssertEqual(requestBody.reason, "spam list")
+            XCTAssertNil(requestBody.subject.did)
+            XCTAssertEqual(requestBody.subject.uri, list.id)
+            XCTAssertEqual(requestBody.subject.cid, list.cid)
+            expectation.fulfill()
+            return CreateModerationReportResponse(
+                id: 1,
+                reasonType: requestBody.reasonType,
+                reason: requestBody.reason,
+                reportedBy: account.did ?? "",
+                createdAt: "2026-05-18T10:00:00Z"
+            )
+        }
+
+        try await client.reportList(list, reason: "spam list", account: account, appPassword: "pass")
+        await fulfillment(of: [expectation], timeout: 1.0)
+    }
 }

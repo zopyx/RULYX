@@ -19,6 +19,7 @@ struct GetListResponse: Decodable {
 
 struct ListView: Decodable {
     let uri: String
+    let cid: String?
     let name: String
     let description: String?
     let purpose: ListPurpose
@@ -28,6 +29,7 @@ struct ListView: Decodable {
 
 struct ListViewBasic: Decodable {
     let uri: String
+    let cid: String?
     let name: String
     let purpose: ListPurpose
     let listItemCount: Int?
@@ -651,6 +653,12 @@ struct RichAspectRatio: Decodable {
     let height: Int?
 }
 
+// MARK: - Get Posts
+
+struct GetPostsResponse: Decodable {
+    let posts: [RichPost]
+}
+
 // MARK: - Post Thread
 
 struct GetPostThreadResponse: Decodable {
@@ -905,6 +913,8 @@ enum ModerationReportReasonType: String, CaseIterable, Identifiable {
     case harassmentOther = "tools.ozone.report.defs#reasonHarassmentOther"
 
     var id: String { rawValue }
+
+    static let simplifiedDefault = ModerationReportReasonType.harassmentOther
 }
 
 // MARK: - Notifications

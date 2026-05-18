@@ -232,6 +232,101 @@ struct OnboardingRow: View {
     }
 }
 
+struct SimplifiedReportSheet: View {
+    let title: String
+    @Binding var selectedReason: ModerationReportReasonType
+    @Binding var evidenceText: String
+    let isSubmitting: Bool
+    let onCancel: () -> Void
+    let onSubmit: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker(loc("profile.report.reason"), selection: $selectedReason) {
+                        ForEach(ModerationReportReasonType.allCases) { reason in
+                            Text(reason.localizedTitle)
+                                .tag(reason)
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+                } header: {
+                    Text(loc("profile.report.reason"))
+                }
+
+                Section {
+                    ZStack(alignment: .topLeading) {
+                        if evidenceText.isEmpty {
+                            Text(loc("profile.report.evidence_placeholder"))
+                                .foregroundStyle(.tertiary)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 8)
+                        }
+                        TextEditor(text: $evidenceText)
+                            .frame(minHeight: 100)
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text(loc("profile.report.evidence"))
+                }
+
+                Section {
+                    Button(action: onSubmit) {
+                        HStack {
+                            Spacer()
+                            if isSubmitting {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text(loc("profile.report.submit"))
+                                    .fontWeight(.semibold)
+                            }
+                            Spacer()
+                        }
+                    }
+                    .disabled(isSubmitting)
+                    .listRowBackground(isSubmitting ? Color.gray : Color.red)
+                    .foregroundStyle(.white)
+                }
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(loc("actions.cancel"), action: onCancel)
+                        .disabled(isSubmitting)
+                }
+            }
+        }
+    }
+}
+
+extension String {
+    var nilIfBlank: String? {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
+@MainActor
+extension ModerationReportReasonType {
+    var localizedTitle: String {
+        switch self {
+        case .harassmentTargeted:
+            loc("profile.report.reason.harassment_targeted")
+        case .harassmentHateSpeech:
+            loc("profile.report.reason.harassment_hate_speech")
+        case .harassmentDoxxing:
+            loc("profile.report.reason.harassment_doxxing")
+        case .harassmentTroll:
+            loc("profile.report.reason.harassment_troll")
+        case .harassmentOther:
+            loc("profile.report.reason.harassment_other")
+        }
+    }
+}
+
 #Preview {
     ScrollView {
         VStack(spacing: 24) {

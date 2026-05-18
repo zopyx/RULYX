@@ -85,14 +85,14 @@ struct NotificationTab: View {
 
     private var listContent: some View {
         List {
-            ForEach(viewModel.entries) { notification in
-                NotificationRow(notification: notification)
+            ForEach(viewModel.entries) { entry in
+                NotificationRow(notification: entry.notification, relatedPost: entry.relatedPost)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        handleTap(notification)
+                        handleTap(entry)
                     }
                     .onAppear {
-                        if notification.id == viewModel.entries.last?.id {
+                        if entry.id == viewModel.entries.last?.id {
                             loadMore()
                         }
                     }
@@ -104,17 +104,17 @@ struct NotificationTab: View {
         }
     }
 
-    private func handleTap(_ notification: NotificationItem) {
-        if let reasonSubject = notification.reasonSubject,
-           notification.reason != "follow"
+    private func handleTap(_ entry: NotificationEntry) {
+        if let relatedPostURI = entry.relatedPostURI,
+           entry.notification.reason != "follow"
         {
-            selectedPostURI = reasonSubject
+            selectedPostURI = relatedPostURI
         } else {
             selectedActor = BlueskyActor(
-                did: notification.author.did,
-                handle: notification.author.handle,
-                displayName: notification.author.displayName,
-                avatarURL: URL(string: notification.author.avatar ?? "")
+                did: entry.notification.author.did,
+                handle: entry.notification.author.handle,
+                displayName: entry.notification.author.displayName,
+                avatarURL: URL(string: entry.notification.author.avatar ?? "")
             )
         }
     }

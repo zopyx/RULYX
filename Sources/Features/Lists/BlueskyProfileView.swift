@@ -29,7 +29,6 @@ struct BlueskyProfileView: View {
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
     @State private var showClearskyLists = false
-    @State private var reportReasonType: ModerationReportReasonType = .harassmentTargeted
     @State private var reportReasonText = ""
 
     private var unblockedBlockers: Int? {
@@ -120,7 +119,26 @@ struct BlueskyProfileView: View {
         .sheet(isPresented: $viewModel.showReportSheet) {
             if let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account) {
-                reportSheet(account: account, appPassword: appPassword)
+                SimplifiedReportSheet(
+                    title: loc("profile.report"),
+                    selectedReason: $viewModel.selectedReportReason,
+                    evidenceText: $reportReasonText,
+                    isSubmitting: viewModel.isReporting,
+                    onCancel: {
+                        viewModel.showReportSheet = false
+                    },
+                    onSubmit: {
+                        viewModel.showReportSheet = false
+                        Task {
+                            await viewModel.reportAccount(
+                                reason: reportReasonText.nilIfBlank,
+                                account: account,
+                                appPassword: appPassword,
+                                using: blueskyClient
+                            )
+                        }
+                    }
+                )
             }
         }
         .sheet(item: $blockedAccessType) { type in
@@ -343,7 +361,7 @@ struct BlueskyProfileView: View {
                             .accessibilityHint(viewerState.muted ? loc("profile.unmute.hint") : loc("profile.mute.hint"))
 
                             Button {
-                                reportReasonType = .harassmentTargeted
+                                viewModel.selectedReportReason = .simplifiedDefault
                                 reportReasonText = ""
                                 viewModel.showReportSheet = true
                             } label: {
@@ -741,86 +759,6 @@ struct BlueskyProfileView: View {
             } else {
                 avatarPlaceholder(for: profile)
             }
-        }
-    }
-
-    private func reportSheet(account: AppAccount, appPassword: String) -> some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Picker(loc("profile.report.reason"), selection: $reportReasonType) {
-                        ForEach(ModerationReportReasonType.allCases) { reason in
-                            Text(reasonLabel(reason)).tag(reason)
-                        }
-                    }
-                }
-
-                Section {
-                    ZStack(alignment: .topLeading) {
-                        if reportReasonText.isEmpty {
-                            Text(loc("profile.report.evidence_placeholder"))
-                                .foregroundStyle(.tertiary)
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 8)
-                        }
-                        TextEditor(text: $reportReasonText)
-                            .frame(minHeight: 100)
-                            .foregroundStyle(.primary)
-                    }
-                } header: {
-                    Text(loc("profile.report.evidence"))
-                }
-
-                Section {
-                    Button {
-                        viewModel.showReportSheet = false
-                        Task {
-                            await viewModel.reportAccount(
-                                reasonType: reportReasonType.rawValue,
-                                reason: reportReasonText.isEmpty ? nil : reportReasonText,
-                                account: account,
-                                appPassword: appPassword,
-                                using: blueskyClient
-                            )
-                        }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            if viewModel.isReporting {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text(loc("profile.report.submit"))
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .disabled(viewModel.isReporting)
-                    .listRowBackground(viewModel.isReporting ? Color.gray : Color.red)
-                    .foregroundStyle(.white)
-                }
-            }
-            .navigationTitle(loc("profile.report.sheet_title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) {
-                        viewModel.showReportSheet = false
-                    }
-                    .disabled(viewModel.isReporting)
-                }
-            }
-        }
-    }
-
-    private func reasonLabel(_ reason: ModerationReportReasonType) -> String {
-        switch reason {
-        case .harassmentTargeted: loc("profile.report.reason.harassment_targeted")
-        case .harassmentHateSpeech: loc("profile.report.reason.harassment_hate_speech")
-        case .harassmentDoxxing: loc("profile.report.reason.harassment_doxxing")
-        case .harassmentTroll: loc("profile.report.reason.harassment_troll")
-        case .harassmentOther: loc("profile.report.reason.harassment_other")
         }
     }
 

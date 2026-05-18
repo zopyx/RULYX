@@ -33,7 +33,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
                 name: item.name,
                 description: item.description ?? item.purpose.displayTitle,
                 memberCount: item.listItemCount,
-                kind: item.purpose.kind
+                kind: item.purpose.kind,
+                cid: item.cid
             )
         }
     }
@@ -211,7 +212,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             name: name,
             description: description.isEmpty ? kind.title : description,
             memberCount: 0,
-            kind: kind
+            kind: kind,
+            cid: response.cid
         )
     }
 
@@ -281,7 +283,55 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             name: title,
             description: description.isEmpty ? list.kind.title : description,
             memberCount: list.memberCount,
-            kind: list.kind
+            kind: list.kind,
+            avatarURL: list.avatarURL,
+            cid: list.cid
         )
+    }
+
+    func reportList(
+        _ list: BlueskyList,
+        reason: String?,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws {
+        try await reportList(
+            list,
+            selectedReason: nil,
+            reason: reason,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    func reportList(
+        _ list: BlueskyList,
+        selectedReason: ModerationReportReasonType?,
+        reason: String?,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws {
+        let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = CreateModerationReportRequest(
+                reasonType: (selectedReason ?? ModerationReportReasonType.simplifiedDefault).rawValue,
+                reason: reason,
+                subject: ModerationReportSubject(did: nil, uri: list.id, cid: list.cid),
+                modTool: ModerationReportTool(
+                    name: Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "RULYX",
+                    meta: nil
+                )
+            )
+            return try await requestExecutor.send(
+                path: "com.atproto.moderation.createReport",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
     }
 }

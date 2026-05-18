@@ -17,4 +17,6 @@ protocol BlueskyProfileInspecting {
     func fetchFollowing(actor actorDID: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor]
     func fetchFollowingPage(actor actorDID: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedActorSearch
     func reportAccount(did targetDID: String, reasonType: String, reason: String?, account: AppAccount, appPassword: String?) async throws
+    func reportAccount(did targetDID: String, reason: String?, account: AppAccount, appPassword: String?) async throws
+    func reportAccount(did targetDID: String, selectedReason: ModerationReportReasonType?, reason: String?, account: AppAccount, appPassword: String?) async throws
 }

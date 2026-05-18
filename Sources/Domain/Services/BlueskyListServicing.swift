@@ -11,4 +11,6 @@ protocol BlueskyListServicing {
     func updateListMetadata(list: BlueskyList, title: String, description: String, account: AppAccount, appPassword: String?) async throws -> BlueskyList
     func createList(name: String, description: String, kind: BlueskyList.Kind, account: AppAccount, appPassword: String?) async throws -> BlueskyList
     func deleteList(list: BlueskyList, account: AppAccount, appPassword: String?) async throws
+    func reportList(_ list: BlueskyList, reason: String?, account: AppAccount, appPassword: String?) async throws
+    func reportList(_ list: BlueskyList, selectedReason: ModerationReportReasonType?, reason: String?, account: AppAccount, appPassword: String?) async throws
 }
