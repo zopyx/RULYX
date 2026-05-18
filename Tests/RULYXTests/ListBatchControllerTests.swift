@@ -65,7 +65,7 @@ final class ListBatchControllerTests: XCTestCase {
             makeActor(did: "did:plc:2", handle: "b.bsky.social"),
         ]
         var progressUpdates: [BatchProgress] = []
-        let result = await controller.performBatch(
+        await controller.performBatch(
             title: "Test",
             actors: actors,
             operation: .block,

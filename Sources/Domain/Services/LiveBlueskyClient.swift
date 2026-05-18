@@ -89,6 +89,36 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    func fetchActorLists(actor: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
+        let response: GetListsResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            try await requestExecutor.send(
+                path: "app.bsky.graph.getLists",
+                method: "GET",
+                queryItems: [
+                    URLQueryItem(name: "actor", value: actor),
+                    URLQueryItem(name: "limit", value: "100"),
+                ],
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+
+        return response.lists.map { item in
+            BlueskyList(
+                id: item.uri,
+                name: item.name,
+                description: item.description ?? item.purpose.displayTitle,
+                memberCount: item.listItemCount,
+                kind: item.purpose.kind,
+                avatarURL: URL(string: item.avatar ?? ""),
+                cid: item.cid
+            )
+        }
+    }
+
     func fetchList(uri: String, account: AppAccount, appPassword: String?) async throws -> BlueskyList? {
         let lists = try await fetchLists(for: account, appPassword: appPassword)
         return lists.first { $0.id == uri }

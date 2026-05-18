@@ -4,6 +4,11 @@ import Foundation
 final class AccountStore: ObservableObject {
     @Published private(set) var accounts: [AppAccount] = []
     @Published private(set) var activeAccountID: AppAccount.ID?
+    @Published var preferredSearchAccountID: AppAccount.ID? {
+        didSet {
+            defaults.set(preferredSearchAccountID?.uuidString, forKey: preferredSearchKey)
+        }
+    }
     @Published var errorMessage: String?
     @Published private(set) var isAddingAccount = false
 
@@ -15,6 +20,7 @@ final class AccountStore: ObservableObject {
     private let keychain: KeychainServicing
     private let accountsKey = "bluesky.savedAccounts"
     private let activeAccountKey = "bluesky.activeAccountID"
+    private let preferredSearchKey = "bluesky.preferredSearchAccountID"
     private let passwordService = "com.ajung.RULYX.password"
 
     init(
@@ -31,6 +37,7 @@ final class AccountStore: ObservableObject {
                 AppAccount(handle: "safety-lab.bsky.social", displayName: "Safety Lab"),
             ]
             activeAccountID = accounts.first?.id
+            preferredSearchAccountID = accounts.first?.id
             return
         }
 
@@ -110,6 +117,10 @@ final class AccountStore: ObservableObject {
 
         if activeAccountID == account.id {
             activeAccountID = accounts.first?.id
+        }
+
+        if preferredSearchAccountID == account.id {
+            preferredSearchAccountID = accounts.first?.id
         }
 
         persist()
@@ -210,6 +221,12 @@ final class AccountStore: ObservableObject {
                 activeAccountID = activeID
             } else {
                 activeAccountID = accounts.first?.id
+            }
+            if let prefIDString = defaults.string(forKey: preferredSearchKey),
+               let prefID = UUID(uuidString: prefIDString),
+               accounts.contains(where: { $0.id == prefID })
+            {
+                preferredSearchAccountID = prefID
             }
         } catch {
             errorMessage = loc("account.error.failed_to_restore")

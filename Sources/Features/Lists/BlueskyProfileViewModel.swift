@@ -22,6 +22,19 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published var showReportSheet = false
     @Published var isReporting = false
     @Published var selectedReportReason = ModerationReportReasonType.simplifiedDefault
+    @Published private(set) var ownedLists: [BlueskyList]?
+    @Published private(set) var isFetchingOwnedLists = false
+
+    func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        isFetchingOwnedLists = true
+        do {
+            ownedLists = try await client.fetchActorLists(actor: did, account: account, appPassword: appPassword)
+        } catch {
+            AppLogger.moderation.error("Owned lists fetch failed: \(error.localizedDescription, privacy: .public)")
+            ownedLists = []
+        }
+        isFetchingOwnedLists = false
+    }
 
     func fetchClearskyLists(handle: String, using client: LiveBlueskyClient) async {
         isFetchingLists = true
