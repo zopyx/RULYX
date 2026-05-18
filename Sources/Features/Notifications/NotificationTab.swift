@@ -4,7 +4,6 @@ struct NotificationTab: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @StateObject private var viewModel = NotificationViewModel()
-    @State private var selectedPostURI: String?
     @State private var selectedActor: BlueskyActor?
 
     var body: some View {
@@ -48,11 +47,6 @@ struct NotificationTab: View {
                     }
                 }
             }
-            .sheet(item: $selectedPostURI) { uri in
-                ThreadView(postURI: uri)
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-            }
             .sheet(item: $selectedActor) { actor in
                 NavigationStack {
                     BlueskyProfileView(
@@ -86,11 +80,13 @@ struct NotificationTab: View {
     private var listContent: some View {
         List {
             ForEach(viewModel.entries) { entry in
-                NotificationRow(notification: entry.notification, relatedPost: entry.relatedPost)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        handleTap(entry)
+                NotificationRow(
+                    notification: entry.notification,
+                    relatedPost: entry.relatedPost,
+                    onAuthorTap: {
+                        openProfile(for: entry)
                     }
+                )
                     .onAppear {
                         if entry.id == viewModel.entries.last?.id {
                             loadMore()
@@ -104,19 +100,13 @@ struct NotificationTab: View {
         }
     }
 
-    private func handleTap(_ entry: NotificationEntry) {
-        if let relatedPostURI = entry.relatedPostURI,
-           entry.notification.reason != "follow"
-        {
-            selectedPostURI = relatedPostURI
-        } else {
-            selectedActor = BlueskyActor(
-                did: entry.notification.author.did,
-                handle: entry.notification.author.handle,
-                displayName: entry.notification.author.displayName,
-                avatarURL: URL(string: entry.notification.author.avatar ?? "")
-            )
-        }
+    private func openProfile(for entry: NotificationEntry) {
+        selectedActor = BlueskyActor(
+            did: entry.notification.author.did,
+            handle: entry.notification.author.handle,
+            displayName: entry.notification.author.displayName,
+            avatarURL: URL(string: entry.notification.author.avatar ?? "")
+        )
     }
 
     private var skeletonContent: some View {
