@@ -5,9 +5,11 @@ private let chatProxyHeader = "did:web:api.bsky.chat#bsky_chat"
 @MainActor
 final class ChatService: ChatServicing {
     private let sessionService: BlueskySessionServicing
+    private let httpClient: HTTPClient
 
-    init(requestExecutor _: BlueskyRequestExecuting, sessionService: BlueskySessionServicing) {
+    init(requestExecutor _: BlueskyRequestExecuting, sessionService: BlueskySessionServicing, httpClient: HTTPClient = HTTPClient()) {
         self.sessionService = sessionService
+        self.httpClient = httpClient
     }
 
     // MARK: - Conversations
@@ -209,7 +211,6 @@ final class ChatService: ChatServicing {
             var request = URLRequest(url: url)
             request.httpMethod = method
             request.setValue("application/json", forHTTPHeaderField: "Accept")
-            request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
             request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
             request.setValue(chatProxyHeader, forHTTPHeaderField: "atproto-proxy")
 
@@ -218,10 +219,7 @@ final class ChatService: ChatServicing {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             }
 
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw BlueskyAPIError.invalidResponse
-            }
+            let (data, httpResponse) = try await httpClient.data(for: request)
 
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {

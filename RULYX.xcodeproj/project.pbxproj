@@ -78,6 +78,7 @@
 		4D48D7D859AAFE4387F32475 /* ListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB7156B625C3C42F5686FD3 /* ListRowView.swift */; };
 		4E81B016540C892D59425D58 /* ActionQueueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2A9EDCEB9A1DCC7D7C6EDC /* ActionQueueStore.swift */; };
 		4F060B75DD1BC5659B129BDF /* BlueskyAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7A39B45AC0B961A32846F08 /* BlueskyAppDelegate.swift */; };
+		4F4E4FFE865AF3A433374141 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD4F7B93B1E43DEBED9DEAD /* HTTPClient.swift */; };
 		5043E1772DC501CB27526957 /* ListDetailSnapshotSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F2B32F67505F907D71DF45 /* ListDetailSnapshotSection.swift */; };
 		505926AD7125E4D717E21305 /* ListBatchProgressState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CEE7DD0F436622A1FCE2280 /* ListBatchProgressState.swift */; };
 		51AD62FAE4EFA38F74FC5206 /* ListsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0008AF4B031B579FCE8038B1 /* ListsViewModel.swift */; };
@@ -342,6 +343,7 @@
 		8A24CB1932E074FF2C29EDDF /* ProfileInspectorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInspectorViewModel.swift; sourceTree = "<group>"; };
 		8BAAC75DDAF11E645160CB3A /* MediaBrowserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaBrowserViewModel.swift; sourceTree = "<group>"; };
 		8BF19F809D7257F3A28C4907 /* BlueskyProfileServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileServiceTests.swift; sourceTree = "<group>"; };
+		8CD4F7B93B1E43DEBED9DEAD /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		8EC9A5632CEB61E2631C4FD9 /* BlueskyListMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyListMember.swift; sourceTree = "<group>"; };
 		92CEAE4AD39AE6EDCA63D598 /* ModerationRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModerationRulesView.swift; sourceTree = "<group>"; };
 		94BB725A8F6B3EFC048C931E /* ListBatchControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListBatchControllerTests.swift; sourceTree = "<group>"; };
@@ -723,6 +725,7 @@
 				7158A7BD407EDF04FA392FA1 /* DashboardCache.swift */,
 				B1EFF3E877712C5E630AEDA1 /* FeedStore.swift */,
 				5B101505E9595E890CB20647 /* GIFService.swift */,
+				8CD4F7B93B1E43DEBED9DEAD /* HTTPClient.swift */,
 				EC580DC3F10BD6A84D6818B1 /* KeychainService.swift */,
 				99DCCD6F249A47E302111597 /* LiveBlueskyClient.swift */,
 				3CEA45DA64E24BAFE36B62C8 /* MediaDownloadService.swift */,
@@ -1090,6 +1093,7 @@
 				47CB701956751D8A606925EE /* GIFPickerView.swift in Sources */,
 				3DB486679FEFC46E16A11AE7 /* GIFService.swift in Sources */,
 				2951ED986F755DF6DEB781C6 /* GlassSupport.swift in Sources */,
+				4F4E4FFE865AF3A433374141 /* HTTPClient.swift in Sources */,
 				E3E7C1EF16DC3C8583CE66F9 /* ImageCarouselView.swift in Sources */,
 				38F4E7A125D61296FACDD4AA /* InfoView.swift in Sources */,
 				72AE3429DAE8E71E3FF46DD7 /* InlineAnimatedMediaView.swift in Sources */,
@@ -1317,7 +1321,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1335,7 +1339,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};

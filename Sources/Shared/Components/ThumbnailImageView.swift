@@ -6,12 +6,12 @@ private actor ThumbnailPipeline {
     static let shared = ThumbnailPipeline()
 
     private let cache = NSCache<NSString, UIImage>()
-    private let session: URLSession = {
+    private let httpClient: HTTPClient = {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy
         config.urlCache = URLCache.shared
         config.waitsForConnectivity = true
-        return URLSession(configuration: config)
+        return HTTPClient(session: URLSession(configuration: config))
     }()
 
     func image(for url: URL, maxPixelSize: CGFloat, scale: CGFloat) async throws -> UIImage {
@@ -20,10 +20,8 @@ private actor ThumbnailPipeline {
             return cached
         }
 
-        let (data, response) = try await session.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200 ..< 300).contains(httpResponse.statusCode)
-        else {
+        let (data, httpResponse) = try await httpClient.data(from: url)
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw URLError(.badServerResponse)
         }
 

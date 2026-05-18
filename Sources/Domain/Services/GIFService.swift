@@ -46,7 +46,7 @@ enum GIFError: LocalizedError {
 final class GIFService: Sendable {
     static let shared = GIFService()
 
-    private var session: URLSession { URLSession.shared }
+    private let httpClient = HTTPClient()
 
     func search(query: String, provider: GIFProvider) async throws -> [GIFResult] {
         switch provider {
@@ -68,7 +68,7 @@ final class GIFService: Sendable {
         guard let apiKey = apiKey(for: .giphy) else { throw GIFError.missingAPIKey("GIPHY") }
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let url = URL(string: "https://api.giphy.com/v1/gifs/search?api_key=\(apiKey)&q=\(encoded)&limit=25&rating=pg13")!
-        let (data, _) = try await session.data(from: url)
+        let (data, _) = try await httpClient.data(from: url)
         let decoded = try JSONDecoder().decode(GIPHYResponse.self, from: data)
         return decoded.data.map { gif in
             GIFResult(
@@ -85,7 +85,7 @@ final class GIFService: Sendable {
     private func trendingGIPHY() async throws -> [GIFResult] {
         guard let apiKey = apiKey(for: .giphy) else { throw GIFError.missingAPIKey("GIPHY") }
         let url = URL(string: "https://api.giphy.com/v1/gifs/trending?api_key=\(apiKey)&limit=25&rating=pg13")!
-        let (data, _) = try await session.data(from: url)
+        let (data, _) = try await httpClient.data(from: url)
         let decoded = try JSONDecoder().decode(GIPHYResponse.self, from: data)
         return decoded.data.map { gif in
             GIFResult(
@@ -103,7 +103,7 @@ final class GIFService: Sendable {
         guard let apiKey = apiKey(for: .tenor) else { throw GIFError.missingAPIKey("Tenor") }
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let url = URL(string: "https://tenor.googleapis.com/v2/search?q=\(encoded)&key=\(apiKey)&limit=25")!
-        let (data, _) = try await session.data(from: url)
+        let (data, _) = try await httpClient.data(from: url)
         let decoded = try JSONDecoder().decode(TenorResponse.self, from: data)
         return decoded.results?.map { gif in
             let mp4 = gif.mediaFormats?.first(where: { $0.url?.hasSuffix(".mp4") == true }) ?? gif.mediaFormats?.first
@@ -122,7 +122,7 @@ final class GIFService: Sendable {
     private func trendingTenor() async throws -> [GIFResult] {
         guard let apiKey = apiKey(for: .tenor) else { throw GIFError.missingAPIKey("Tenor") }
         let url = URL(string: "https://tenor.googleapis.com/v2/featured?key=\(apiKey)&limit=25")!
-        let (data, _) = try await session.data(from: url)
+        let (data, _) = try await httpClient.data(from: url)
         let decoded = try JSONDecoder().decode(TenorResponse.self, from: data)
         return decoded.results?.map { gif in
             let mp4 = gif.mediaFormats?.first(where: { $0.url?.hasSuffix(".mp4") == true }) ?? gif.mediaFormats?.first
@@ -144,7 +144,7 @@ final class GIFService: Sendable {
         let url = URL(string: "https://api.imgur.com/3/gallery/search/time/all/0?q=\(encoded)")!
         var request = URLRequest(url: url)
         request.setValue("Client-ID \(clientID)", forHTTPHeaderField: "Authorization")
-        let (data, _) = try await session.data(for: request)
+        let (data, _) = try await httpClient.data(for: request)
         let decoded = try JSONDecoder().decode(ImgurGalleryResponse.self, from: data)
         return decoded.data?.compactMap { item in
             guard !(item.isAlbum ?? false), let id = item.id, let link = item.mp4 ?? item.link, !link.isEmpty else { return nil }
@@ -164,7 +164,7 @@ final class GIFService: Sendable {
         let url = URL(string: "https://api.imgur.com/3/gallery/hot/viral/0.json")!
         var request = URLRequest(url: url)
         request.setValue("Client-ID \(clientID)", forHTTPHeaderField: "Authorization")
-        let (data, _) = try await session.data(for: request)
+        let (data, _) = try await httpClient.data(for: request)
         let decoded = try JSONDecoder().decode(ImgurGalleryResponse.self, from: data)
         return decoded.data?.compactMap { item in
             guard !(item.isAlbum ?? false), let id = item.id, let link = item.mp4 ?? item.link, !link.isEmpty else { return nil }
@@ -181,7 +181,7 @@ final class GIFService: Sendable {
 
     func downloadGIF(url: String) async throws -> Data {
         guard let url = URL(string: url) else { throw GIFError.networkError("Invalid URL") }
-        let (data, _) = try await session.data(from: url)
+        let (data, _) = try await httpClient.data(from: url)
         return data
     }
 

@@ -16,7 +16,7 @@ final class LiveBlueskyClientTests: XCTestCase {
         config.protocolClasses = [MockURLProtocol.self]
         mockSession = URLSession(configuration: config)
         client = LiveBlueskyClient(
-            session: mockSession,
+            httpClient: HTTPClient(session: mockSession),
             requestExecutor: requestExecutor,
             sessionService: sessionService
         )
@@ -36,7 +36,7 @@ final class LiveBlueskyClientTests: XCTestCase {
         }
         let auditedClient = try LiveBlueskyClient(
             baseURL: XCTUnwrap(URL(string: "https://bsky.social")),
-            session: mockSession
+            httpClient: HTTPClient(session: mockSession)
         )
 
         let entries = try await auditedClient.fetchPLCAuditLog(did: "did:plc:test")

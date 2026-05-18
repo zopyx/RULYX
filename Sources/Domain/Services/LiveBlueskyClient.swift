@@ -8,20 +8,23 @@ struct ClearskyBlocklistResult {
 @MainActor
 class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting {
     private let baseURL: URL
+    private let httpClient: HTTPClient
     private let session: URLSession
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
 
     init(
         baseURL: URL = .bskySocial,
-        session: URLSession = .shared,
+        httpClient: HTTPClient? = nil,
         keychain: KeychainServicing = KeychainService(),
         requestExecutor: BlueskyRequestExecuting? = nil,
         sessionService: BlueskySessionServicing? = nil
     ) {
         self.baseURL = baseURL
-        self.session = session
-        let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, session: session)
+        let clientSession = URLSession.shared
+        self.session = clientSession
+        self.httpClient = httpClient ?? HTTPClient(session: clientSession)
+        let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, httpClient: self.httpClient)
         self.requestExecutor = executor
         self.sessionService = sessionService ?? BlueskySessionService(
             baseURL: baseURL,
@@ -480,10 +483,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
             var request = URLRequest(url: url)
             request.setValue("application/json", forHTTPHeaderField: "Accept")
-            request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
             request.timeoutInterval = 30
-            let (data, response) = try await session.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+            let (data, httpResponse) = try await httpClient.data(for: request)
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 return ClearskyBlocklistResult(actors: [], totalCount: 0)
             }
             guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
@@ -523,10 +525,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         guard let url = components.url else { throw BlueskyAPIError.invalidURL }
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 30
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else { throw BlueskyAPIError.invalidResponse }
+        let (data, httpResponse) = try await httpClient.data(for: request)
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             if let body = String(data: data, encoding: .utf8) {
                 AppLogger.performance.error("Clearsky lists API returned \(httpResponse.statusCode): \(body, privacy: .public)")
@@ -540,14 +540,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     // MARK: - DID Resolution & PLC Audit
 
     private func resolveProfiles(dids: [String]) async throws -> [BlueskyActor] {
-        let urlSession = session
         return try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
             var offset = 0
             while offset < dids.count {
                 let chunk = dids[offset ..< min(offset + 25, dids.count)]
                 offset += 25
-                group.addTask {
-                    try await Self.fetchProfileBatch(identifiers: Array(chunk), session: urlSession)
+                group.addTask { [httpClient] in
+                    try await Self.fetchProfileBatch(identifiers: Array(chunk), httpClient: httpClient)
                 }
             }
             var actors: [BlueskyActor] = []
@@ -559,10 +558,10 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     func fetchProfileBatch(identifiers: [String]) async throws -> [BlueskyActor] {
-        try await Self.fetchProfileBatch(identifiers: identifiers, session: session)
+        try await Self.fetchProfileBatch(identifiers: identifiers, httpClient: httpClient)
     }
 
-    static func fetchProfileBatch(identifiers: [String], session: URLSession) async throws -> [BlueskyActor] {
+    static func fetchProfileBatch(identifiers: [String], httpClient: HTTPClient) async throws -> [BlueskyActor] {
         let actorsParam = identifiers.map { URLQueryItem(name: "actors", value: $0) }
         guard let profilesURL = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles") else {
             throw BlueskyAPIError.invalidURL
@@ -572,10 +571,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
         var req = URLRequest(url: finalURL)
         req.setValue("application/json", forHTTPHeaderField: "Accept")
-        req.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
         req.timeoutInterval = 30
-        let (data, response) = try await session.data(for: req)
-        guard let httpResponse = response as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+        let (data, httpResponse) = try await httpClient.data(for: req)
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw BlueskyAPIError.invalidResponse
         }
         let decoded = try JSONDecoder().decode(GetProfilesResponse.self, from: data)
@@ -586,7 +584,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     nonisolated static func fetchProfileStats(dids: [String], onProgress: (@Sendable (Int, Int) -> Void)? = nil) async throws -> [String: (followers: Int, following: Int, posts: Int, description: String)] {
         var result: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]
-        let session = URLSession.shared
+        let httpClient = HTTPClient()
         let totalBatches = (dids.count + 24) / 25
         var batchIndex = 0
 
@@ -603,10 +601,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
             var req = URLRequest(url: finalURL)
             req.setValue("application/json", forHTTPHeaderField: "Accept")
-            req.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
             req.timeoutInterval = 30
-            let (data, response) = try await session.data(for: req)
-            guard let httpResponse = response as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+            let (data, httpResponse) = try await httpClient.data(for: req)
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 throw BlueskyAPIError.invalidResponse
             }
             let decoded = try JSONDecoder().decode(GetProfilesResponse.self, from: data)
@@ -628,10 +625,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 30
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+        let (data, httpResponse) = try await httpClient.data(for: request)
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw BlueskyAPIError.invalidResponse
         }
         struct ClearskyDIDResponse: Decodable {
@@ -743,10 +739,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         guard let url = URL(string: "https://plc.directory/\(did)/log/audit") else {
             throw BlueskyAPIError.invalidURL
         }
-        var request = URLRequest(url: url)
-        request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+        let request = URLRequest(url: url)
+        let (data, httpResponse) = try await httpClient.data(for: request)
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw BlueskyAPIError.invalidResponse
         }
         return try JSONDecoder().decode([PLCAuditLogEntry].self, from: data)
