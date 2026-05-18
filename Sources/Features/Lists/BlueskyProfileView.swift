@@ -124,6 +124,7 @@ struct BlueskyProfileView: View {
                     selectedReason: $viewModel.selectedReportReason,
                     evidenceText: $reportReasonText,
                     isSubmitting: viewModel.isReporting,
+                    makeSupportDraft: { makeProfileSupportDraft(for: viewModel.profile) },
                     onCancel: {
                         viewModel.showReportSheet = false
                     },
@@ -360,15 +361,6 @@ struct BlueskyProfileView: View {
                             .disabled(viewModel.isUpdatingModeration)
                             .accessibilityHint(viewerState.muted ? loc("profile.unmute.hint") : loc("profile.mute.hint"))
 
-                            Button {
-                                viewModel.selectedReportReason = .simplifiedDefault
-                                reportReasonText = ""
-                                viewModel.showReportSheet = true
-                            } label: {
-                                Label { Text(verbatim: loc("profile.report")) } icon: { Image(systemName: "exclamationmark.shield") }
-                            }
-                            .disabled(viewModel.isReporting)
-                            .accessibilityHint(loc("profile.report.hint"))
                         }
 
                         if let statusMessage = viewModel.statusMessage {
@@ -518,6 +510,16 @@ struct BlueskyProfileView: View {
 
                 if !isOwnProfile {
                     Section {
+                        Button {
+                            viewModel.selectedReportReason = .simplifiedDefault
+                            reportReasonText = ""
+                            viewModel.showReportSheet = true
+                        } label: {
+                            Label { Text(verbatim: loc("profile.report")) } icon: { Image(systemName: "exclamationmark.shield") }
+                        }
+                        .disabled(viewModel.isReporting)
+                        .accessibilityHint(loc("profile.report.hint"))
+
                         if viewModel.isBlockingFollowers {
                             if let progress = viewModel.blockFollowersProgress {
                                 BatchProgressCard(
@@ -739,6 +741,24 @@ struct BlueskyProfileView: View {
                 Text(loc("profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
+    }
+
+    private func makeProfileSupportDraft(for profile: BlueskyProfile?) -> SupportEmailDraft {
+        let reason = viewModel.selectedReportReason.localizedTitle
+        let lines = [
+            loc("report.support.body.account"),
+            "\(loc("profile.stats.handle")): \(profile?.handle ?? member.actor.handle)",
+            "\(loc("profile.stats.did")): \(profile?.did ?? member.actor.did)",
+            "\(loc("report.support.body.display_name")): \(profile?.title ?? member.actor.displayName ?? member.actor.handle)",
+            "\(loc("profile.report.reason")): \(reason)",
+            "\(loc("profile.report.evidence")): \(reportReasonText.nilIfBlank ?? "-")",
+            "\(loc("profile.open_bluesky")): \(profile?.profileURL?.absoluteString ?? "https://bsky.app/profile/\(member.actor.handle)")",
+        ]
+
+        return SupportEmailDraft(
+            subject: loc("report.support.subject.account"),
+            body: lines.joined(separator: "\n")
+        )
     }
 
     private func profileAvatar(for profile: BlueskyProfile) -> some View {

@@ -372,6 +372,7 @@ struct ProfileInspectorView: View {
                         selectedReason: $selectedReportReason,
                         evidenceText: $reportEvidenceText,
                         isSubmitting: isSubmittingReport,
+                        makeSupportDraft: { makeProfileSupportDraft(from: inspection.profile) },
                         onCancel: {
                             isShowingReportSheet = false
                         },
@@ -447,6 +448,23 @@ struct ProfileInspectorView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             isShowingAccountManagement = true
         }
+    }
+
+    private func makeProfileSupportDraft(from profile: BlueskyProfile) -> SupportEmailDraft {
+        let lines = [
+            loc("report.support.body.account"),
+            "\(loc("profile.stats.handle")): \(profile.handle)",
+            "\(loc("profile.stats.did")): \(profile.did)",
+            "\(loc("report.support.body.display_name")): \(profile.title)",
+            "\(loc("profile.report.reason")): \(selectedReportReason.localizedTitle)",
+            "\(loc("profile.report.evidence")): \(reportEvidenceText.nilIfBlank ?? "-")",
+            "\(loc("profile.open_bluesky")): \(profile.profileURL?.absoluteString ?? "https://bsky.app/profile/\(profile.handle)")",
+        ]
+
+        return SupportEmailDraft(
+            subject: loc("report.support.subject.account"),
+            body: lines.joined(separator: "\n")
+        )
     }
 
     private func submitSimplifiedReport(did: String, account: AppAccount, appPassword: String) async {

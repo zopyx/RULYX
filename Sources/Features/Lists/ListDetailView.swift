@@ -87,6 +87,7 @@ struct ListDetailView: View {
                         selectedReason: $selectedReportReason,
                         evidenceText: $reportEvidenceText,
                         isSubmitting: isReportingList,
+                        makeSupportDraft: makeListSupportDraft,
                         onCancel: {
                             isShowingReportSheet = false
                         },
@@ -765,6 +766,24 @@ struct ListDetailView: View {
         } catch {
             viewModel.errorMessage = AppError.userMessage(from: error)
         }
+    }
+
+    private func makeListSupportDraft() -> SupportEmailDraft {
+        let lines = [
+            loc("report.support.body.list"),
+            "\(loc("report.support.body.name")): \(currentList.name)",
+            "\(loc("report.support.body.list_id")): \(currentList.id)",
+            "\(loc("report.support.body.list_cid")): \(currentList.cid ?? "-")",
+            "\(loc("report.support.body.list_kind")): \(currentList.kind.title)",
+            "\(loc("report.support.body.description")): \(currentList.description.isEmpty ? "-" : currentList.description)",
+            "\(loc("profile.report.reason")): \(selectedReportReason.localizedTitle)",
+            "\(loc("profile.report.evidence")): \(reportEvidenceText.nilIfBlank ?? "-")",
+        ]
+
+        return SupportEmailDraft(
+            subject: loc("report.support.subject.list"),
+            body: lines.joined(separator: "\n")
+        )
     }
 }
 
