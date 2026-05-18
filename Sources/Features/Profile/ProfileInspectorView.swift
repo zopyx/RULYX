@@ -451,19 +451,21 @@ struct ProfileInspectorView: View {
     }
 
     private func makeProfileSupportDraft(from profile: BlueskyProfile) -> SupportEmailDraft {
-        let lines = [
-            loc("report.support.body.account"),
-            "\(loc("profile.stats.handle")): \(profile.handle)",
-            "\(loc("profile.stats.did")): \(profile.did)",
-            "\(loc("report.support.body.display_name")): \(profile.title)",
-            "\(loc("profile.report.reason")): \(selectedReportReason.localizedTitle)",
-            "\(loc("profile.report.evidence")): \(reportEvidenceText.nilIfBlank ?? "-")",
-            "\(loc("profile.open_bluesky")): \(profile.profileURL?.absoluteString ?? "https://bsky.app/profile/\(profile.handle)")",
-        ]
-
+        let profileURL = profile.profileURL?.absoluteString ?? "https://bsky.app/profile/\(profile.handle)"
         return SupportEmailDraft(
-            subject: loc("report.support.subject.account"),
-            body: lines.joined(separator: "\n")
+            subject: "Bluesky Account Report — \(profile.handle)",
+            body: SupportEmailDraft.htmlBody(
+                intro: "I am reporting the following Bluesky account for review.",
+                fields: [
+                    ("Handle", "@\(profile.handle)"),
+                    ("Display Name", profile.title),
+                    ("DID", profile.did),
+                    ("Profile URL", profileURL),
+                    ("Reason", selectedReportReason.localizedTitle),
+                    ("Additional Details", reportEvidenceText.nilIfBlank ?? "—"),
+                ],
+                footer: "Evidence screenshot attached below if provided."
+            )
         )
     }
 
