@@ -3,80 +3,43 @@ import SwiftUI
 struct NotificationRow: View {
     let notification: NotificationItem
     let relatedPost: RichPost?
+    let onAuthorTap: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            iconCircle
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .center, spacing: 6) {
-                    avatarView
-                        .frame(width: 32, height: 32)
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(spacing: 4) {
-                            Text(notification.author.displayName ?? notification.author.handle)
-                                .font(.subheadline.weight(.semibold))
-                                .lineLimit(1)
-                            Text(reasonText)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                            if !notification.isRead {
-                                Circle()
-                                    .fill(Color.skyPrimary)
-                                    .frame(width: 8, height: 8)
-                            }
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center, spacing: 6) {
+                avatarView
+                    .frame(width: 32, height: 32)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 4) {
+                        Text(notification.author.displayName ?? notification.author.handle)
+                            .font(.subheadline.weight(.semibold))
+                            .lineLimit(1)
+                        Text(reasonText)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                        if !notification.isRead {
+                            Circle()
+                                .fill(Color.skyPrimary)
+                                .frame(width: 8, height: 8)
                         }
-                        Text(relativeTime)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
                     }
+                    Text(relativeTime)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onAuthorTap)
 
-                if let relatedPost {
-                    relatedPostCard(relatedPost)
-                        .padding(.leading, 44)
-                }
+            if let relatedPost {
+                relatedPostCard(relatedPost)
+                    .padding(.leading, 38)
             }
         }
         .padding(.vertical, 4)
         .opacity(notification.isRead ? 0.7 : 1)
-    }
-
-    private var iconCircle: some View {
-        ZStack {
-            Circle()
-                .fill(iconColor.opacity(0.15))
-                .frame(width: 36, height: 36)
-            Image(systemName: iconName)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(iconColor)
-        }
-    }
-
-    private var iconName: String {
-        switch notification.reason {
-        case "like": "heart.fill"
-        case "repost": "arrow.trianglehead.2.counterclockwise"
-        case "follow": "person.fill"
-        case "reply": "arrowshape.turn.up.left.fill"
-        case "quote": "quote.bubble.fill"
-        case "mention": "at"
-        case "starterpack_joined": "square.and.arrow.down.fill"
-        default: "bell.fill"
-        }
-    }
-
-    private var iconColor: Color {
-        switch notification.reason {
-        case "like": .red
-        case "repost": .green
-        case "follow": .blue
-        case "reply": Color.skyPrimary
-        case "quote": .purple
-        case "mention": .orange
-        case "starterpack_joined": .teal
-        default: .secondary
-        }
     }
 
     private var avatarView: some View {

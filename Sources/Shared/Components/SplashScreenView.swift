@@ -67,7 +67,7 @@ struct SplashScreenView: View {
                     .shadow(color: .purple.opacity(logoGlow * 0.25), radius: logoGlow * 70)
                     .shadow(color: .cyan.opacity(logoGlow * 0.15), radius: logoGlow * 90)
 
-                Spacer().frame(height: 16)
+                Spacer().frame(height: 8)
 
                 Text(verbatim: loc("splash.tagline"))
                     .font(.body.weight(.medium))
@@ -75,7 +75,7 @@ struct SplashScreenView: View {
                     .offset(y: taglineOffset)
                     .opacity(taglineOpacity)
 
-                Spacer().frame(height: 16)
+                Spacer().frame(height: 24)
 
                 Text(verbatim: loc("splash.subtagline"))
                     .font(.caption.weight(.regular))
