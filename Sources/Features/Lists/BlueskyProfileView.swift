@@ -29,6 +29,7 @@ struct BlueskyProfileView: View {
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
     @State private var showClearskyLists = false
+    @State private var showOwnedLists = false
     @State private var reportReasonText = ""
 
     private var unblockedBlockers: Int? {
@@ -115,6 +116,32 @@ struct BlueskyProfileView: View {
             ClearskyListsView(entries: viewModel.clearskyLists)
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
+        }
+        .sheet(isPresented: $showOwnedLists) {
+            NavigationStack {
+                if let ownedLists = viewModel.ownedLists {
+                    if ownedLists.isEmpty {
+                        ContentUnavailableView(loc("profile.stats.owned_lists.empty"), systemImage: "list.bullet", description: Text(loc("profile.stats.owned_lists.empty_desc")))
+                    } else {
+                        List {
+                            ForEach(ownedLists) { list in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(list.name).font(.subheadline.weight(.semibold))
+                                    Text(list.kind.title).font(.caption).foregroundStyle(.secondary)
+                                    if let count = list.memberCount {
+                                        Text("\(count) members").font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
+                                .padding(.vertical, 2)
+                            }
+                        }
+                        .listStyle(.insetGrouped)
+                    }
+                } else {
+                    ProgressView()
+                }
+            }
+            .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             if let account = accountStore.activeAccount,
@@ -294,6 +321,29 @@ struct BlueskyProfileView: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    Button {
+                        showOwnedLists = true
+                    } label: {
+                        HStack {
+                            Text(loc("profile.stats.owned_lists"))
+                            Spacer()
+                            if viewModel.isFetchingOwnedLists {
+                                ProgressView()
+                                    .scaleEffect(0.6)
+                            } else if let owned = viewModel.ownedLists {
+                                Text("\(owned.count)")
+                                    .foregroundStyle(.secondary)
+                                Image(systemName: "chevron.right")
+                                    .appFont(.subheading)
+                                    .foregroundStyle(.tertiary)
+                            } else if !viewModel.isLoading {
+                                ProgressView()
+                                    .scaleEffect(0.6)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+
                     if let error = viewModel.listError {
                         HStack {
                             Spacer()
@@ -520,48 +570,6 @@ struct BlueskyProfileView: View {
                         .disabled(viewModel.isReporting)
                         .accessibilityHint(loc("profile.report.hint"))
 
-                        if viewModel.isBlockingFollowers {
-                            if let progress = viewModel.blockFollowersProgress {
-                                BatchProgressCard(
-                                    title: progress.title,
-                                    completedCount: progress.completedCount,
-                                    totalCount: progress.totalCount,
-                                    currentHandle: progress.currentHandle
-                                )
-                            }
-                        } else {
-                            Button(role: .destructive) {
-                                runModeration {
-                                    await viewModel.blockAllFollowers(
-                                        account: account,
-                                        appPassword: appPassword,
-                                        using: blueskyClient,
-                                        queue: workspaceStore.actionQueue
-                                    )
-                                }
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "hand.raised.slash")
-                                    Text(verbatim: loc("profile.block_all"))
-                                    Text(verbatim: loc("profile.beta"))
-                                        .font(.caption2.weight(.bold))
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 5)
-                                        .padding(.vertical, 2)
-                                        .background(Capsule().fill(.orange))
-                                }
-                            }
-                            .disabled(true)
-                            .accessibilityHint(loc("profile.block_all.hint"))
-                            HStack(spacing: 8) {
-                                Image(systemName: "hand.raised.slash")
-                                    .hidden()
-                                Text(verbatim: loc("profile.block_all_warning"))
-                                    .font(.caption)
-                                    .foregroundStyle(.red)
-                            }
-                        }
-
                         if let list {
                             Label { Text(verbatim: loc("profile.member_of").replacingOccurrences(of: "{list}", with: list.name)) } icon: { Image(systemName: "person.2.badge.gearshape") }
                                 .foregroundStyle(.secondary)
@@ -712,9 +720,10 @@ struct BlueskyProfileView: View {
         }
         .task(id: viewModel.profile?.did) {
             async let blocks = fetchBlockCounts()
-            if let handle = viewModel.profile?.handle {
+            if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
                 async let lists = viewModel.fetchClearskyLists(handle: handle, using: blueskyClient)
-                _ = await (blocks, lists)
+                async let owned = viewModel.fetchOwnedLists(did: did, account: account, appPassword: appPassword, using: blueskyClient)
+                _ = await (blocks, lists, owned)
             } else {
                 await blocks
             }

@@ -388,6 +388,36 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         )
     }
 
+    override func fetchActorLists(actor: String, account _: AppAccount, appPassword _: String?) async throws -> [BlueskyList] {
+        try await Task.sleep(for: .milliseconds(80))
+        return [
+            BlueskyList(
+                id: "\(actor)-mod-1",
+                name: "Spam Watch",
+                description: "Accounts frequently reported for spam patterns.",
+                memberCount: 120,
+                kind: .moderation,
+                cid: "cid-mod-1"
+            ),
+            BlueskyList(
+                id: "\(actor)-mod-2",
+                name: "Reply Filters",
+                description: "Aggressive reply actors tracked for moderation review.",
+                memberCount: 42,
+                kind: .moderation,
+                cid: "cid-mod-2"
+            ),
+            BlueskyList(
+                id: "\(actor)-list-1",
+                name: "Trusted Sources",
+                description: "Accounts curated for signal over noise.",
+                memberCount: 65,
+                kind: .regular,
+                cid: "cid-list-1"
+            ),
+        ]
+    }
+
     override func fetchList(
         uri: String,
         account: AppAccount,

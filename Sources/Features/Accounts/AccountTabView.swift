@@ -49,6 +49,21 @@ struct AccountTabView: View {
                             }
                         }
                     }
+
+                    Section {
+                        Picker(loc("account.preferred_search"), selection: $accountStore.preferredSearchAccountID) {
+                            ForEach(accountStore.accounts) { account in
+                                Text(account.displayName ?? account.handle)
+                                    .tag(account.id as AppAccount.ID?)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        Text(loc("account.preferred_search.hint"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } header: {
+                        Text(loc("account.preferred_search.section"))
+                    }
                 }
             }
             .navigationTitle(loc("account.manage.title"))

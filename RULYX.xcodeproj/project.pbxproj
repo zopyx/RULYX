@@ -104,6 +104,7 @@
 		635D2FE45B4C7D1F764FCEB9 /* FeedTimelineViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F5D16EA42B34C5B2C92680D /* FeedTimelineViewModelTests.swift */; };
 		645653A99CD1D0035946DA31 /* de.json in Resources */ = {isa = PBXBuildFile; fileRef = C431E0ABAA44E52485D1C443 /* de.json */; };
 		6509B9F31479FBE5F089B659 /* BlueskyAPIDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCEF8AED13F2B79D85FD49B9 /* BlueskyAPIDTOs.swift */; };
+		6520ACA09FE4F0A2018F8418 /* NotificationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21101CBB5C669FA99A2EB0AF /* NotificationViewModelTests.swift */; };
 		65951C3773F1703732A7EE8B /* BlueskyAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5316102E1628DF01DEDFC7D /* BlueskyAPIError.swift */; };
 		6654AD69966815BC0537ECBA /* ru.json in Resources */ = {isa = PBXBuildFile; fileRef = 044C3DCEEDFB53575670FFAF /* ru.json */; };
 		67CAE58679130123ECB4F1AB /* RelationshipCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123EC6941CBDC43FA504ECE3 /* RelationshipCacheTests.swift */; };
@@ -258,6 +259,7 @@
 		19C77449D3B4F3E98039767B /* MediaDownloadServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDownloadServiceTests.swift; sourceTree = "<group>"; };
 		1BBB4C29BFA4AA62888A0E8A /* ListMembersControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListMembersControllerTests.swift; sourceTree = "<group>"; };
 		1D6074E85CF3C29BB4A21262 /* MediaBrowserViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaBrowserViewModelTests.swift; sourceTree = "<group>"; };
+		21101CBB5C669FA99A2EB0AF /* NotificationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModelTests.swift; sourceTree = "<group>"; };
 		21C0E880D68C8BB1AD361910 /* RULYX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RULYX.entitlements; sourceTree = "<group>"; };
 		25A3D9D7D1C417EE9C245AFC /* zh.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = zh.json; sourceTree = "<group>"; };
 		25AB98A8E4D161637E0E252B /* tr.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tr.json; sourceTree = "<group>"; };
@@ -317,7 +319,7 @@
 		64E0E9C888D2514617D3E9C0 /* nl.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = nl.json; sourceTree = "<group>"; };
 		6578B3A3E0D7B991826A37B9 /* ProfileInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInspectorView.swift; sourceTree = "<group>"; };
 		678D0031FC923D1451B284B2 /* GIFServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFServiceTests.swift; sourceTree = "<group>"; };
-		67BAF95DBA686753FF29171E /* RULYXUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RULYXUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		67BAF95DBA686753FF29171E /* RULYXUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RULYXUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		68C97F905D78C83E4BE674AB /* FeedPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPickerView.swift; sourceTree = "<group>"; };
 		6985787B48F34828FA3F53BD /* ModerationAuditStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModerationAuditStore.swift; sourceTree = "<group>"; };
 		69F8F1371F6F8074F5048F5A /* ChatMessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageBubble.swift; sourceTree = "<group>"; };
@@ -411,7 +413,7 @@
 		C41E829F613E298B97C97821 /* UserPostsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostsViewModel.swift; sourceTree = "<group>"; };
 		C431E0ABAA44E52485D1C443 /* de.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = de.json; sourceTree = "<group>"; };
 		C60EF9274EAA9F75C645B6C2 /* NetworkGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkGraphView.swift; sourceTree = "<group>"; };
-		C72440FC5EC00BE6F3145ECE /* RULYXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RULYXTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C72440FC5EC00BE6F3145ECE /* RULYXTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RULYXTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8DB2630E3CFC2DFA4B6A431 /* FollowerDiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDiffView.swift; sourceTree = "<group>"; };
 		C97F1C64A2434A71ED6D5D5E /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		C9C15F3EC6473AAFBE5DF3E8 /* ListDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailViewModel.swift; sourceTree = "<group>"; };
@@ -516,6 +518,7 @@
 				547649B68D511304DB5515F5 /* ModelTests.swift */,
 				52463180B718A02DC76271D5 /* ModerationAuditStoreTests.swift */,
 				E9F02CAA88181DA9F722C790 /* ModerationWorkspaceStoreTests.swift */,
+				21101CBB5C669FA99A2EB0AF /* NotificationViewModelTests.swift */,
 				C30715AF6695593A0B1C986D /* ProfileInspectorViewModelTests.swift */,
 				123EC6941CBDC43FA504ECE3 /* RelationshipCacheTests.swift */,
 				8C6580FDFEE12BF203E463AC /* ServiceTests.swift */,
@@ -1053,6 +1056,7 @@
 				5386C33152EAF5D1A2248DCB /* ModelTests.swift in Sources */,
 				DD6DAD575A71ACC33E77C95A /* ModerationAuditStoreTests.swift in Sources */,
 				AF8EEAD318A3119A31C8B66C /* ModerationWorkspaceStoreTests.swift in Sources */,
+				6520ACA09FE4F0A2018F8418 /* NotificationViewModelTests.swift in Sources */,
 				7E857B988FB37D68B7CCCC9F /* ProfileInspectorViewModelTests.swift in Sources */,
 				67CAE58679130123ECB4F1AB /* RelationshipCacheTests.swift in Sources */,
 				1645D38F36D0283350DC05D1 /* ServiceTests.swift in Sources */,
@@ -1254,11 +1258,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYXUITests;
 				PRODUCT_NAME = RULYXUITests;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = RULYX;
 			};
 			name = Release;
@@ -1333,11 +1333,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYXTests;
 				PRODUCT_NAME = RULYXTests;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RULYX.app/RULYX";
 			};
 			name = Debug;
@@ -1355,11 +1351,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYXTests;
 				PRODUCT_NAME = RULYXTests;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RULYX.app/RULYX";
 			};
 			name = Release;
@@ -1372,8 +1364,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4PC9Z56E47;
 				INFOPLIST_FILE = Sources/App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = RULYX;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1381,11 +1371,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1397,8 +1383,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4PC9Z56E47;
 				INFOPLIST_FILE = Sources/App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = RULYX;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1406,11 +1390,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1427,11 +1407,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYXUITests;
 				PRODUCT_NAME = RULYXUITests;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = RULYX;
 			};
 			name = Debug;
