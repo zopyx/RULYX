@@ -119,7 +119,7 @@ final class MockSessionService: BlueskySessionServicing {
     }
 }
 
-struct MockRequestExecutor: BlueskyRequestExecuting {
+final class MockRequestExecutor: @unchecked Sendable, BlueskyRequestExecuting {
     var onSend: (@Sendable (String, String, [URLQueryItem], Any?, String?, URL?) async throws -> Any)?
 
     func send<Response: Decodable, Body: Encodable>(
