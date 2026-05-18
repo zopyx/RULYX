@@ -764,19 +764,22 @@ struct BlueskyProfileView: View {
 
     private func makeProfileSupportDraft(for profile: BlueskyProfile?) -> SupportEmailDraft {
         let reason = viewModel.selectedReportReason.localizedTitle
-        let lines = [
-            loc("report.support.body.account"),
-            "\(loc("profile.stats.handle")): \(profile?.handle ?? member.actor.handle)",
-            "\(loc("profile.stats.did")): \(profile?.did ?? member.actor.did)",
-            "\(loc("report.support.body.display_name")): \(profile?.title ?? member.actor.displayName ?? member.actor.handle)",
-            "\(loc("profile.report.reason")): \(reason)",
-            "\(loc("profile.report.evidence")): \(reportReasonText.nilIfBlank ?? "-")",
-            "\(loc("profile.open_bluesky")): \(profile?.profileURL?.absoluteString ?? "https://bsky.app/profile/\(member.actor.handle)")",
-        ]
-
+        let handle = profile?.handle ?? member.actor.handle
+        let profileURL = profile?.profileURL?.absoluteString ?? "https://bsky.app/profile/\(member.actor.handle)"
         return SupportEmailDraft(
-            subject: loc("report.support.subject.account"),
-            body: lines.joined(separator: "\n")
+            subject: "Bluesky Account Report — \(handle)",
+            body: SupportEmailDraft.htmlBody(
+                intro: "I am reporting the following Bluesky account for review.",
+                fields: [
+                    ("Handle", "@\(handle)"),
+                    ("Display Name", profile?.title ?? member.actor.displayName ?? member.actor.handle),
+                    ("DID", profile?.did ?? member.actor.did),
+                    ("Profile URL", profileURL),
+                    ("Reason", reason),
+                    ("Additional Details", reportReasonText.nilIfBlank ?? "—"),
+                ],
+                footer: "Evidence screenshot attached below if provided."
+            )
         )
     }
 

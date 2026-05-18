@@ -380,6 +380,50 @@ struct SupportEmailDraft: Identifiable {
     let body: String
 
     var id: String { subject + body }
+
+    static func htmlBody(intro: String, fields: [(String, String)], footer: String = "") -> String {
+        let fieldRows = fields.map { label, value in
+            let safeValue = value
+                .replacingOccurrences(of: "&", with: "&amp;")
+                .replacingOccurrences(of: "<", with: "&lt;")
+                .replacingOccurrences(of: ">", with: "&gt;")
+                .replacingOccurrences(of: "\n", with: "<br>")
+            return """
+            <tr>
+                <td style="padding: 8px 16px; font-weight: 600; color: #555; white-space: nowrap; vertical-align: top; border-bottom: 1px solid #eee; width: 120px;">\(label)</td>
+                <td style="padding: 8px 16px; color: #333; vertical-align: top; border-bottom: 1px solid #eee;">\(safeValue)</td>
+            </tr>
+            """
+        }.joined()
+
+        let footerBlock = footer.isEmpty ? "" : """
+            <p style="font-size: 15px; color: #555; line-height: 1.5; margin: 0 0 8px 0;">\(footer)</p>
+        """
+
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+        <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f4f4f7;margin:0;padding:24px;">
+        <table style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.08);" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:28px 24px 0 24px;">
+        <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 16px 0;">Hello Bluesky Support,</p>
+        <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 16px 0;">\(intro)</p>
+        </td></tr>
+        <tr><td style="padding:0 24px;">
+        <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">\(fieldRows)</table>
+        </td></tr>
+        <tr><td style="padding:20px 24px 28px 24px;">
+        \(footerBlock)
+        <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 8px 0;">Thank you for your help.</p>
+        <p style="font-size:15px;color:#333;line-height:1.6;margin:0;">Best regards,<br>RULYX User</p>
+        </td></tr>
+        <tr><td style="padding:14px 24px;background:#f8f8fa;border-top:1px solid #eee;">
+        <p style="font-size:11px;color:#999;margin:0;text-align:center;">Sent from RULYX — Bluesky Moderation Tool for iOS</p>
+        </td></tr>
+        </table></body></html>
+        """
+    }
 }
 
 private struct SupportMailComposeView: UIViewControllerRepresentable {
@@ -397,7 +441,7 @@ private struct SupportMailComposeView: UIViewControllerRepresentable {
         controller.mailComposeDelegate = context.coordinator
         controller.setToRecipients(["support@bluesky.com"])
         controller.setSubject(draft.subject)
-        controller.setMessageBody(draft.body, isHTML: false)
+        controller.setMessageBody(draft.body, isHTML: true)
         if let attachmentImage,
            let data = attachmentImage.jpegData(compressionQuality: 0.9)
         {
