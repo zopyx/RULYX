@@ -8,7 +8,6 @@ struct GIFPickerView: View {
     @State private var results: [GIFResult] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var selectedProvider: GIFProvider = .giphy
     @State private var hasLoadedTrending = false
 
     private let columns = [
@@ -24,16 +23,7 @@ struct GIFPickerView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Picker("Provider", selection: $selectedProvider) {
-                    ForEach(GIFProvider.allCases) { provider in
-                        Text(provider.rawValue).tag(provider)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-
-                if !hasAPIKey(for: selectedProvider) {
+                if !hasAPIKey {
                     ContentUnavailableView(
                         loc("gif.missing_key_title"),
                         systemImage: "key.slash",
@@ -99,13 +89,6 @@ struct GIFPickerView: View {
                     await search(trimmed)
                 }
             }
-            .onChange(of: selectedProvider) { _, _ in
-                results = []
-                hasLoadedTrending = false
-                if isSearching {
-                    Task { await search(searchText) }
-                }
-            }
             .onAppear {
                 if !hasLoadedTrending, !isSearching {
                     Task { await loadTrending() }
@@ -114,8 +97,8 @@ struct GIFPickerView: View {
         }
     }
 
-    private func hasAPIKey(for provider: GIFProvider) -> Bool {
-        let key = UserDefaults.standard.string(forKey: provider.apiKeyUserDefaultsKey)
+    private var hasAPIKey: Bool {
+        let key = UserDefaults.standard.string(forKey: "klipyAPIKey")
         return key?.isEmpty == false
     }
 
@@ -123,7 +106,7 @@ struct GIFPickerView: View {
         isLoading = true
         errorMessage = nil
         do {
-            results = try await GIFService.shared.search(query: query, provider: selectedProvider)
+            results = try await GIFService.shared.search(query: query)
         } catch let error as GIFError {
             errorMessage = error.localizedDescription
         } catch {
@@ -137,7 +120,7 @@ struct GIFPickerView: View {
         isLoading = true
         errorMessage = nil
         do {
-            results = try await GIFService.shared.trending(provider: selectedProvider)
+            results = try await GIFService.shared.trending()
             hasLoadedTrending = true
         } catch {
             errorMessage = error.localizedDescription

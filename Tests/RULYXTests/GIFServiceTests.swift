@@ -12,24 +12,8 @@ final class GIFServiceModelTests: XCTestCase {
         XCTAssertEqual(set.count, 2)
     }
 
-    func testGIFProviderAllCases() {
-        XCTAssertEqual(GIFProvider.allCases, [.giphy, .tenor, .imgur])
-    }
-
-    func testGIFProviderAPIKeyUserDefaultsKey() {
-        XCTAssertEqual(GIFProvider.giphy.apiKeyUserDefaultsKey, "gifProviderAPIKey_giphy")
-        XCTAssertEqual(GIFProvider.tenor.apiKeyUserDefaultsKey, "gifProviderAPIKey_tenor")
-        XCTAssertEqual(GIFProvider.imgur.apiKeyUserDefaultsKey, "gifProviderAPIKey_imgur")
-    }
-
-    func testGIFProviderID() {
-        XCTAssertEqual(GIFProvider.giphy.id, "GIPHY")
-        XCTAssertEqual(GIFProvider.tenor.id, "Tenor")
-        XCTAssertEqual(GIFProvider.imgur.id, "Imgur")
-    }
-
     func testGIFErrorDescriptions() {
-        XCTAssertEqual(GIFError.missingAPIKey("GIPHY").errorDescription, "GIPHY API key not configured. Add it in Settings.")
+        XCTAssertEqual(GIFError.missingAPIKey.errorDescription, "KLIPY API key not configured. Add it in Settings.")
         XCTAssertEqual(GIFError.networkError("Timed out").errorDescription, "Timed out")
         XCTAssertEqual(GIFError.noResults.errorDescription, "No GIFs found")
     }
