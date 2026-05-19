@@ -251,25 +251,25 @@ struct ModerationSplitView: View {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading) {
                     sidebarRelationshipButton(
                         icon: "person.3",
-                        label: loc("lists.followers"),
+                        label: String(localized: "lists.followers"),
                         count: viewModel.activeProfile?.followersCount,
                         action: { showFollowers = true }
                     )
                     sidebarRelationshipButton(
                         icon: "person.3.fill",
-                        label: loc("lists.following"),
+                        label: String(localized: "lists.following"),
                         count: viewModel.activeProfile?.followsCount,
                         action: { showFollowing = true }
                     )
                     sidebarRelationshipButton(
                         icon: "hand.raised",
-                        label: loc("lists.blocking"),
+                        label: String(localized: "lists.blocking"),
                         count: viewModel.blockingCount,
                         action: { showBlocking = true }
                     )
                     sidebarRelationshipButton(
                         icon: "hand.raised.slash",
-                        label: loc("lists.blocked_by"),
+                        label: String(localized: "lists.blocked_by"),
                         count: viewModel.blockedByCount,
                         action: { showBlockedBy = true }
                     )
@@ -292,7 +292,7 @@ struct ModerationSplitView: View {
                     }
                 } header: {
                     sectionHeader(
-                        title: loc("lists.moderation_lists"),
+                        title: String(localized: "lists.moderation_lists"),
                         icon: "checklist.checked",
                         kind: .moderation
                     )
@@ -316,7 +316,7 @@ struct ModerationSplitView: View {
                     }
                 } header: {
                     sectionHeader(
-                        title: loc("lists.moderation_lists"),
+                        title: String(localized: "lists.moderation_lists"),
                         icon: "checklist.checked",
                         kind: .moderation
                     )
@@ -333,7 +333,7 @@ struct ModerationSplitView: View {
                     }
                 } header: {
                     sectionHeader(
-                        title: loc("lists.lists"),
+                        title: String(localized: "lists.lists"),
                         icon: "list.bullet",
                         kind: .regular
                     )
@@ -357,7 +357,7 @@ struct ModerationSplitView: View {
                     }
                 } header: {
                     sectionHeader(
-                        title: loc("lists.lists"),
+                        title: String(localized: "lists.lists"),
                         icon: "list.bullet",
                         kind: .regular
                     )

@@ -3,6 +3,7 @@ import SwiftUI
 struct FollowerDiffView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var followers: [BlueskyActor] = []
     @State private var previousFollowers: [BlueskyActor] = []
     @State private var isLoading = false
@@ -34,7 +35,7 @@ struct FollowerDiffView: View {
                         Label(actor.handle, systemImage: "person.fill.badge.plus").foregroundStyle(.green)
                     }
                 } header: {
-                    Text(verbatim: loc("follower_diff.new").replacingOccurrences(of: "{count}", with: "\(newFollowers.count)"))
+                    Text(verbatim: String(localized: "follower_diff.new").replacingOccurrences(of: "{count}", with: "\(newFollowers.count)"))
                 }
             }
 
@@ -44,12 +45,12 @@ struct FollowerDiffView: View {
                         Label(actor.handle, systemImage: "person.fill.badge.minus").foregroundStyle(.red)
                     }
                 } header: {
-                    Text(verbatim: loc("follower_diff.unfollowed").replacingOccurrences(of: "{count}", with: "\(unfollowed.count)"))
+                    Text(verbatim: String(localized: "follower_diff.unfollowed").replacingOccurrences(of: "{count}", with: "\(unfollowed.count)"))
                 }
             }
 
             if !isLoading, newFollowers.isEmpty, unfollowed.isEmpty, !followers.isEmpty {
-                ContentUnavailableView(loc("follower_diff.no_changes"), systemImage: "person.3", description: Text(loc("follower_diff.no_changes_desc")))
+                ContentUnavailableView("follower_diff.no_changes", systemImage: "person.3", description: Text("follower_diff.no_changes_desc"))
             }
 
             if let statusMessage {
@@ -57,12 +58,12 @@ struct FollowerDiffView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("follower_diff.title"))
+        .navigationTitle("follower_diff.title")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(loc("follower_diff.refresh")) { Task { await load() } }
+                Button("follower_diff.refresh") { Task { await load() } }
                     .disabled(isLoading)
-                    .accessibilityHint(loc("follower_diff.refresh.hint"))
+                    .accessibilityHint("follower_diff.refresh.hint")
             }
         }
         .task { await load() }
@@ -81,7 +82,7 @@ struct FollowerDiffView: View {
         do {
             followers = try await blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             RelationshipCache.save(followers, forKey: cacheKey)
-            statusMessage = previousFollowers.isEmpty ? loc("follower_diff.baseline") : nil
+            statusMessage = previousFollowers.isEmpty ? String(localized: "follower_diff.baseline") : nil
         } catch {
             if !previousFollowers.isEmpty { followers = previousFollowers }
             statusMessage = AppError.userMessage(from: error)

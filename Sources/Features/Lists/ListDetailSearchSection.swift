@@ -16,6 +16,7 @@ extension ListDetailView {
         @EnvironmentObject var accountStore: AccountStore
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
         var body: some View {
             searchSection
@@ -25,10 +26,10 @@ extension ListDetailView {
 
         private var searchSection: some View {
             Section {
-                TextField(loc("list.search.placeholder"), text: $searchQuery)
+                TextField("list.search.placeholder", text: $searchQuery)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .accessibilityLabel(loc("list.search.field.label"))
+                    .accessibilityLabel("list.search.field.label")
                     .focused($searchFieldFocused)
 
                 if !viewModel.searchResults.isEmpty || viewModel.hasMoreSearchResults {
@@ -42,11 +43,11 @@ extension ListDetailView {
                 }
 
                 if viewModel.isSearching {
-                    LoadingPanel(message: loc("list.search.searching"))
+                    LoadingPanel(message: String(localized: "list.search.searching"))
                 } else if !searchQuery.isEmpty, searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 {
                     EmptyStatePanel(
-                        title: loc("list.search.keep_typing"),
-                        message: loc("list.search.keep_typing_desc")
+                        title: String(localized: "list.search.keep_typing"),
+                        message: String(localized: "list.search.keep_typing_desc")
                     )
                 } else if !viewModel.searchResults.isEmpty {
                     ForEach(viewModel.searchResults) { actor in
@@ -73,11 +74,11 @@ extension ListDetailView {
                     if viewModel.isLoadingMoreSearchResults {
                         HStack {
                             ProgressView()
-                            Text(verbatim: loc("list.search.loading_more"))
+                            Text("list.search.loading_more")
                                 .foregroundStyle(.secondary)
                         }
                     } else if viewModel.hasMoreSearchResults {
-                        Button(loc("list.search.load_more")) {
+                        Button("list.search.load_more") {
                             Task {
                                 await viewModel.loadMoreSearchResults(
                                     account: account,
@@ -86,8 +87,8 @@ extension ListDetailView {
                                 )
                             }
                         }
-                        .accessibilityLabel(loc("list.search.load_more.label"))
-                        .accessibilityHint(loc("list.search.load_more.hint"))
+                        .accessibilityLabel("list.search.load_more.label")
+                        .accessibilityHint("list.search.load_more.hint")
                     }
                 } else if !searchQuery.isEmpty, !viewModel.isSearching {
                     if let errorMsg = viewModel.searchErrorMessage {
@@ -103,20 +104,20 @@ extension ListDetailView {
                         }
                     } else {
                         EmptyStatePanel(
-                            title: loc("list.search.no_results"),
-                            message: loc("list.search.no_results_desc")
+                            title: String(localized: "list.search.no_results"),
+                            message: String(localized: "list.search.no_results_desc")
                         )
                     }
                 }
             } header: {
-                Text(verbatim: loc("list.search.section"))
+                Text("list.search.section")
             }
         }
 
         private var bulkAddToolbar: some View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Button(viewModel.selectedSearchActorIDs.count == viewModel.searchResults.count && !viewModel.searchResults.isEmpty ? loc("list.search.clear_selection") : loc("list.search.select_all")) {
+                    Button(viewModel.selectedSearchActorIDs.count == viewModel.searchResults.count && !viewModel.searchResults.isEmpty ? String(localized: "list.search.clear_selection") : String(localized: "list.search.select_all")) {
                         if viewModel.selectedSearchActorIDs.count == viewModel.searchResults.count, !viewModel.searchResults.isEmpty {
                             viewModel.clearSearchSelection()
                         } else {
@@ -124,12 +125,12 @@ extension ListDetailView {
                         }
                     }
                     .disabled(batchState.isPerformingBulkAction)
-                    .accessibilityHint(viewModel.selectedSearchActorIDs.count == viewModel.searchResults.count && !viewModel.searchResults.isEmpty ? loc("list.search.deselect_all.hint") : loc("list.search.select_all.hint"))
+                    .accessibilityHint(viewModel.selectedSearchActorIDs.count == viewModel.searchResults.count && !viewModel.searchResults.isEmpty ? String(localized: "list.search.deselect_all.hint") : String(localized: "list.search.select_all.hint"))
 
                     Spacer()
 
                     if !viewModel.selectedSearchActorIDs.isEmpty {
-                        Text(verbatim: loc("list.search.selected").replacingOccurrences(of: "{count}", with: "\(viewModel.selectedSearchActorIDs.count)"))
+                        Text(verbatim: String(localized: "list.search.selected").replacingOccurrences(of: "{count}", with: "\(viewModel.selectedSearchActorIDs.count)"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -146,37 +147,37 @@ extension ListDetailView {
                         syncSnapshot()
                     }
                 } label: {
-                    Label { Text(verbatim: loc("list.search.add_selected")) } icon: { Image(systemName: "person.crop.circle.badge.plus") }
+                    Label { Text("list.search.add_selected") } icon: { Image(systemName: "person.crop.circle.badge.plus") }
                 }
                 .disabled(viewModel.selectedSearchActorIDs.isEmpty || batchState.isPerformingBulkAction)
-                .accessibilityHint(loc("list.search.add_selected.hint"))
+                .accessibilityHint("list.search.add_selected.hint")
             }
         }
 
         private var workflowToolsSection: some View {
-            DisclosureGroup(loc("list.search.tools")) {
+            DisclosureGroup("list.search.tools") {
                 Button {
                     isShowingImportSheet = true
                 } label: {
-                    Label { Text(verbatim: loc("list.search.paste")) } icon: { Image(systemName: "square.and.pencil") }
+                    Label { Text("list.search.paste") } icon: { Image(systemName: "square.and.pencil") }
                 }
-                .accessibilityLabel(loc("list.search.paste.label"))
-                .accessibilityHint(loc("list.search.paste.hint"))
+                .accessibilityLabel("list.search.paste.label")
+                .accessibilityHint("list.search.paste.hint")
 
                 Button {
                     isShowingImportFilePicker = true
                 } label: {
-                    Label { Text(verbatim: loc("list.search.import_file")) } icon: { Image(systemName: "arrow.down.doc") }
+                    Label { Text("list.search.import_file") } icon: { Image(systemName: "arrow.down.doc") }
                 }
-                .accessibilityLabel(loc("list.search.import_file.label"))
-                .accessibilityHint(loc("list.search.import_file.hint"))
+                .accessibilityLabel("list.search.import_file.label")
+                .accessibilityHint("list.search.import_file.hint")
 
                 if let exportFileURL {
                     ShareLink(item: exportFileURL) {
-                        Label { Text(verbatim: loc("list.search.export_csv")) } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text("list.search.export_csv") } icon: { Image(systemName: "arrow.down.doc") }
                     }
-                    .accessibilityLabel(loc("list.search.export_csv.label"))
-                    .accessibilityHint(loc("list.search.export_csv.hint"))
+                    .accessibilityLabel("list.search.export_csv.label")
+                    .accessibilityHint("list.search.export_csv.hint")
                 }
             }
         }

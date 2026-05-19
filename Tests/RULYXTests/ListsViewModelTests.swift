@@ -3,13 +3,13 @@ import XCTest
 
 @MainActor
 final class ListsViewModelTests: XCTestCase {
-    private var viewModel: ListsViewModel!
-    private var client: MockListsClient!
+    nonisolated(unsafe) private var viewModel: ListsViewModel!
+    nonisolated(unsafe) private var client: MockListsClient!
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
-        viewModel = ListsViewModel()
-        client = MockListsClient()
+        viewModel = MainActor.assumeIsolated { ListsViewModel() }
+        client = MainActor.assumeIsolated { MockListsClient() }
         DashboardCache.clear(forKey: "did:plc:test")
         DashboardCache.clear(forKey: "test.bsky.social")
     }

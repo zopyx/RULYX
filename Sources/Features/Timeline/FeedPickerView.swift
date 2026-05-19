@@ -5,6 +5,7 @@ struct FeedPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var feedURIInput = ""
     @State private var feedNameInput = ""
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
@@ -18,32 +19,32 @@ struct FeedPickerView: View {
                             Image(systemName: "checkmark")
                                 .opacity(!feedStore.isUsingCustomFeed ? 1 : 0)
                             VStack(alignment: .leading) {
-                                Text(loc("timeline.following"))
+                                Text("timeline.following")
                                     .foregroundStyle(.primary)
                             }
                         }
                     }
                 } header: {
-                    Text(verbatim: loc("timeline.picker_default"))
+                    Text("timeline.picker_default")
                 }
 
                 Section {
-                    TextField(loc("timeline.feed_uri_placeholder"), text: $feedURIInput)
+                    TextField("timeline.feed_uri_placeholder", text: $feedURIInput)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .font(.caption.monospaced())
-                    TextField(loc("timeline.feed_name_placeholder"), text: $feedNameInput)
+                    TextField("timeline.feed_name_placeholder", text: $feedNameInput)
                     Button {
                         guard !feedURIInput.isEmpty else { return }
-                        let name = feedNameInput.isEmpty ? loc("timeline.custom_feed") : feedNameInput
+                        let name = feedNameInput.isEmpty ? String(localized: "timeline.custom_feed") : feedNameInput
                         feedStore.setFeed(uri: feedURIInput, name: name)
                         dismiss()
                     } label: {
-                        Text(verbatim: loc("timeline.picker_apply"))
+                        Text("timeline.picker_apply")
                     }
                     .disabled(feedURIInput.isEmpty)
                 } header: {
-                    Text(verbatim: loc("timeline.picker_custom"))
+                    Text("timeline.picker_custom")
                 }
 
                 if !feedStore.recentFeeds.isEmpty {
@@ -70,14 +71,14 @@ struct FeedPickerView: View {
                             }
                         }
                     } header: {
-                        Text(verbatim: loc("timeline.picker_recent"))
+                        Text("timeline.picker_recent")
                     }
                 }
 
                 if feedStore.isUsingCustomFeed {
                     Section {
                         HStack {
-                            Text(loc("timeline.current_feed"))
+                            Text("timeline.current_feed")
                             Spacer()
                             Text(feedStore.customFeedName)
                                 .foregroundStyle(.secondary)
@@ -88,11 +89,11 @@ struct FeedPickerView: View {
                     }
                 }
             }
-            .navigationTitle(loc("timeline.picker_title"))
+            .navigationTitle("timeline.picker_title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.close")) { dismiss() }
+                    Button("actions.close") { dismiss() }
                 }
             }
         }

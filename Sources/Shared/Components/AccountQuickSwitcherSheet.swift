@@ -9,6 +9,7 @@ struct AccountQuickSwitcherSheet: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var switchingAccountID: AppAccount.ID?
 
     var body: some View {
@@ -36,7 +37,7 @@ struct AccountQuickSwitcherSheet: View {
                         .accessibilityHint("Switches to \(account.label ?? account.handle)")
                     }
                 } header: {
-                    Text(loc("account.switcher.accounts_section"))
+                    Text("account.switcher.accounts_section")
                 }
 
                 Section {
@@ -47,12 +48,12 @@ struct AccountQuickSwitcherSheet: View {
                             onManageAccounts()
                         }
                     } label: {
-                        Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
+                        Label("account.switcher.manage", systemImage: "slider.horizontal.3")
                     }
                     .accessibilityHint("Opens the full account management screen")
                 }
             }
-            .navigationTitle(loc("account.switcher.title"))
+            .navigationTitle("account.switcher.title")
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.height(360), .medium])

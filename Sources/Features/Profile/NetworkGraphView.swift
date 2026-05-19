@@ -3,6 +3,7 @@ import SwiftUI
 struct NetworkGraphView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var accountA: BlueskyActor?
     @State private var accountB: BlueskyActor?
     @State private var aFollowers: Set<String> = []
@@ -43,7 +44,7 @@ struct NetworkGraphView: View {
                     Label(a.handle, systemImage: "person.fill")
                 }
             } header: {
-                Text(verbatim: loc("network.account_a"))
+                Text("network.account_a")
             }
 
             Section {
@@ -55,17 +56,17 @@ struct NetworkGraphView: View {
                     Label(b.handle, systemImage: "person.fill")
                 }
             } header: {
-                Text(verbatim: loc("network.account_b"))
+                Text("network.account_b")
             }
 
             if let a = accountA, let b = accountB {
                 Section {
-                    LabeledContent(loc("network.mutual_followers"), value: "\(mutualFollowers.count)")
-                    LabeledContent(loc("network.mutual_following"), value: "\(mutualFollowing.count)")
-                    LabeledContent(loc("network.follows_relationship").replacingOccurrences(of: "{handle1}", with: a.handle).replacingOccurrences(of: "{handle2}", with: b.handle), value: aFollowsB ? loc("network.yes") : loc("network.no"))
-                    LabeledContent(loc("network.follows_relationship").replacingOccurrences(of: "{handle1}", with: b.handle).replacingOccurrences(of: "{handle2}", with: a.handle), value: bFollowsA ? loc("network.yes") : loc("network.no"))
+                    LabeledContent("network.mutual_followers", value: "\(mutualFollowers.count)")
+                    LabeledContent("network.mutual_following", value: "\(mutualFollowing.count)")
+                    LabeledContent("network.follows_relationship".replacingOccurrences(of: "{handle1}", with: a.handle).replacingOccurrences(of: "{handle2}", with: b.handle), value: aFollowsB ? String(localized: "network.yes") : String(localized: "network.no"))
+                    LabeledContent("network.follows_relationship".replacingOccurrences(of: "{handle1}", with: b.handle).replacingOccurrences(of: "{handle2}", with: a.handle), value: bFollowsA ? String(localized: "network.yes") : String(localized: "network.no"))
                 } header: {
-                    Text(verbatim: loc("network.overlap"))
+                    Text("network.overlap")
                 }
 
                 if !mutualFollowers.isEmpty {
@@ -74,19 +75,19 @@ struct NetworkGraphView: View {
                             Text(did).font(.caption.monospaced())
                         }
                         if mutualFollowers.count > 20 {
-                            Text(verbatim: loc("network.more_count").replacingOccurrences(of: "{count}", with: "\(mutualFollowers.count - 20)")).font(.caption).foregroundStyle(.secondary)
+                            Text(verbatim: String(localized: "network.more_count").replacingOccurrences(of: "{count}", with: "\(mutualFollowers.count - 20)")).font(.caption).foregroundStyle(.secondary)
                         }
                     } header: {
-                        Text(verbatim: loc("network.following_both"))
+                        Text("network.following_both")
                     }
                 }
             }
 
             Section {
-                Button(loc("network.analyze")) { Task { await analyze() } }
+                Button("network.analyze") { Task { await analyze() } }
                     .disabled(accountA == nil || accountB == nil || isLoading)
                     .foregroundStyle(Color.skyPrimary)
-                    .accessibilityHint(loc("network.analyze.hint"))
+                    .accessibilityHint("network.analyze.hint")
             }
 
             if isLoading {
@@ -102,7 +103,7 @@ struct NetworkGraphView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("network.title"))
+        .navigationTitle("network.title")
     }
 
     private func analyze() async {
@@ -137,7 +138,7 @@ private struct SearchField: View {
     let blueskyClient: LiveBlueskyClient
 
     var body: some View {
-        TextField(loc("network.search_placeholder"), text: $query)
+        TextField("network.search_placeholder", text: $query)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .task(id: query) {
@@ -159,7 +160,7 @@ private struct SearchField: View {
                 } label: {
                     Label(actor.handle, systemImage: "person").foregroundStyle(.primary)
                 }
-                .accessibilityHint(loc("network.select.hint"))
+                .accessibilityHint("network.select.hint")
             }
         }
     }

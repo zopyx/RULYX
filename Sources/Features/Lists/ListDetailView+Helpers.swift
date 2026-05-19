@@ -103,12 +103,12 @@ extension ListDetailView {
 
     func comparisonSummary(report: ListComparisonReport) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(loc("list.compare.compared_with").replacingOccurrences(of: "{name}", with: report.otherList.name))
+            Text(String(localized: "list.compare.compared_with").replacingOccurrences(of: "{name}", with: report.otherList.name))
                 .font(.subheadline.weight(.semibold))
 
-            Text(loc("list.compare.overlap_count").replacingOccurrences(of: "{count}", with: "\(report.overlap.count)"))
-            Text(loc("list.compare.only_current").replacingOccurrences(of: "{name}", with: currentList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInCurrent.count)"))
-            Text(loc("list.compare.only_other").replacingOccurrences(of: "{name}", with: report.otherList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInOther.count)"))
+            Text(String(localized: "list.compare.overlap_count").replacingOccurrences(of: "{count}", with: "\(report.overlap.count)"))
+            Text(String(localized: "list.compare.only_current").replacingOccurrences(of: "{name}", with: currentList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInCurrent.count)"))
+            Text(String(localized: "list.compare.only_other").replacingOccurrences(of: "{name}", with: report.otherList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInOther.count)"))
         }
     }
 
@@ -116,14 +116,14 @@ extension ListDetailView {
         VStack(alignment: .leading, spacing: 8) {
             if summary.hasChanges {
                 if !summary.addedMembers.isEmpty {
-                    Text(verbatim: loc("list.snapshot.added").replacingOccurrences(of: "{handles}", with: summary.addedMembers.map(\.handle).joined(separator: ", ")))
+                    Text(verbatim: String(localized: "list.snapshot.added").replacingOccurrences(of: "{handles}", with: summary.addedMembers.map(\.handle).joined(separator: ", ")))
                 }
 
                 if !summary.removedMembers.isEmpty {
-                    Text(verbatim: loc("list.snapshot.removed").replacingOccurrences(of: "{handles}", with: summary.removedMembers.map(\.handle).joined(separator: ", ")))
+                    Text(verbatim: String(localized: "list.snapshot.removed").replacingOccurrences(of: "{handles}", with: summary.removedMembers.map(\.handle).joined(separator: ", ")))
                 }
             } else {
-                Text(verbatim: loc("list.snapshot.no_changes"))
+                Text("list.snapshot.no_changes")
                     .foregroundStyle(.secondary)
             }
         }
@@ -165,6 +165,6 @@ extension ListDetailView {
             .map { "\($0.actor.handle): \($0.message)" }
             .joined(separator: "\n")
 
-        return "\(result.summaryText)\n\n\(loc("activity.failed_format").replacingOccurrences(of: "{handles}", with: failureDetails))"
+        return "\(result.summaryText)\n\n\(String(localized: "activity.failed_format").replacingOccurrences(of: "{handles}", with: failureDetails))"
     }
 }

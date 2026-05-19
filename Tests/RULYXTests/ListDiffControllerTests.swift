@@ -3,11 +3,12 @@ import XCTest
 
 @MainActor
 final class ListDiffControllerTests: XCTestCase {
-    private var controller: ListDiffController!
+    nonisolated(unsafe) private var controller: ListDiffController!
 
-    override func setUp() async throws {
+    nonisolated override func setUp() async throws {
         try await super.setUp()
-        controller = ListDiffController()
+        let c = await MainActor.run { ListDiffController() }
+        controller = c
     }
 
     func testComparisonMembersForOverlapBucket() {

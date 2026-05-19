@@ -33,6 +33,14 @@ final class LocalizationManager: ObservableObject {
         ("vi", "Tiếng Việt"),
     ]
 
+    var locale: Locale {
+        Locale(identifier: currentLanguage)
+    }
+
+    var layoutDirection: LayoutDirection {
+        currentLanguage == "ar" ? .rightToLeft : .leftToRight
+    }
+
     private init() {
         let saved = UserDefaults.standard.string(forKey: "selectedLanguage")
         let preferred = Locale.current.language.languageCode?.identifier
@@ -44,18 +52,6 @@ final class LocalizationManager: ObservableObject {
 
     func localized(_ key: String) -> String {
         bundle[key] ?? allBundles["en"]?[key] ?? key
-    }
-
-    func localizedPlural(_ key: String, count: Int) -> String {
-        let language = currentLanguage
-        let pluralKey: String = if language == "en" || language == "de" || language == "fr" || language == "it" {
-            count == 1 ? "\(key)_one" : "\(key)_other"
-        } else {
-            // Default to English-style plural rules
-            count == 1 ? "\(key)_one" : "\(key)_other"
-        }
-        let format = bundle[pluralKey] ?? allBundles["en"]?[pluralKey] ?? bundle[key] ?? allBundles["en"]?[key] ?? key
-        return format.replacingOccurrences(of: "{count}", with: "\(count)")
     }
 
     private func loadAll() {

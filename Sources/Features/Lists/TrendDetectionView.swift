@@ -3,6 +3,7 @@ import SwiftUI
 struct TrendDetectionView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var flaggedAccounts: [(BlueskyActor, String)] = []
     @State private var isLoading = false
 
@@ -17,7 +18,7 @@ struct TrendDetectionView: View {
             }
 
             if flaggedAccounts.isEmpty, !isLoading {
-                ContentUnavailableView(loc("trend.no_trends"), systemImage: "chart.line.flatten.circle", description: Text(loc("trend.no_trends_desc")))
+                ContentUnavailableView("trend.no_trends", systemImage: "chart.line.flatten.circle", description: Text("trend.no_trends_desc"))
             }
 
             ForEach(flaggedAccounts.indices, id: \.self) { index in
@@ -36,10 +37,10 @@ struct TrendDetectionView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("trend.title"))
+        .navigationTitle("trend.title")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(loc("trend.scan")) { Task { await scan() } }.disabled(isLoading)
+                Button("trend.scan") { Task { await scan() } }.disabled(isLoading)
             }
         }
         .task { await scan() }
@@ -56,7 +57,7 @@ struct TrendDetectionView: View {
             let followers = try await blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             for actor in followers {
                 var reasons: [String] = []
-                if actor.isNew { reasons.append(loc("trend.new_account")) }
+                if actor.isNew { reasons.append(String(localized: "trend.new_account")) }
                 if !reasons.isEmpty {
                     flaggedAccounts.append((actor, reasons.joined(separator: " · ")))
                 }

@@ -22,6 +22,7 @@ struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     @State private var handle = ""
     @State private var appPassword = ""
@@ -35,59 +36,59 @@ struct AddAccountView: View {
                     Picker(selection: $selectedProvider) {
                         ForEach(ProviderOption.allCases) { option in
                             if option == .bluesky {
-                                Text(verbatim: loc("account.add.bluesky")).tag(option)
+                                Text("account.add.bluesky").tag(option)
                             } else if option == .eurosky {
-                                Text(verbatim: loc("account.add.eurosky")).tag(option)
+                                Text("account.add.eurosky").tag(option)
                             } else {
-                                Text(verbatim: loc("account.add.other")).tag(option)
+                                Text("account.add.other").tag(option)
                             }
                         }
                     } label: {
-                        Text(verbatim: loc("account.add.provider"))
+                        Text("account.add.provider")
                     }
-                    .accessibilityHint(loc("account.select_pds.hint"))
+                    .accessibilityHint("account.select_pds.hint")
 
                     if selectedProvider == .other {
-                        TextField(loc("account.add.placeholder.url"), text: $customPDS)
+                        TextField("account.add.placeholder.url", text: $customPDS)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.URL)
                     }
                 } header: {
-                    Text(verbatim: loc("account.add.provider"))
+                    Text("account.add.provider")
                 }
 
                 Section {
-                    TextField(loc("account.add.placeholder.handle"), text: $handle)
+                    TextField("account.add.placeholder.handle", text: $handle)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
 
-                    SecureField(loc("account.add.placeholder.password"), text: $appPassword)
+                    SecureField("account.add.placeholder.password", text: $appPassword)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 } header: {
-                    Text(verbatim: loc("account.add.credentials"))
+                    Text("account.add.credentials")
                 }
 
                 Section {
-                    Text(verbatim: loc("account.add.password_hint"))
+                    Text("account.add.password_hint")
                         .foregroundStyle(.secondary)
                 } header: {
-                    Text(verbatim: loc("account.add.why_password"))
+                    Text("account.add.why_password")
                 }
             }
-            .navigationTitle(Text(verbatim: loc("account.add.title")))
+            .navigationTitle(Text("account.add.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("account.add.cancel")) {
+                    Button("account.add.cancel") {
                         dismiss()
                     }
-                    .accessibilityHint(loc("account.discard_add.hint"))
+                    .accessibilityHint("account.discard_add.hint")
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("account.add.save")) {
+                    Button("account.add.save") {
                         Task {
                             let entrywayURL: URL?
                             if selectedProvider == .other && !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -112,14 +113,14 @@ struct AddAccountView: View {
                             appPassword.isEmpty ||
                             accountStore.isAddingAccount
                     )
-                    .accessibilityHint(loc("account.validate.hint"))
+                    .accessibilityHint("account.validate.hint")
                 }
             }
             .overlay {
                 if accountStore.isAddingAccount {
                     ZStack {
                         Color.black.opacity(0.08).ignoresSafeArea()
-                        ProgressView(loc("account.add.validating"))
+                        ProgressView("account.add.validating")
                             .padding(20)
                             .background {
                                 if #available(iOS 26, *) {

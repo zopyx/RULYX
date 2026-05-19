@@ -12,6 +12,7 @@ struct NewConversationSheet: View {
     @State private var isCreating = false
 
     let onComplete: (ChatConversation?) -> Void
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
@@ -20,7 +21,7 @@ struct NewConversationSheet: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(.secondary)
-                        TextField(loc("chat.new.search_placeholder"), text: $searchQuery)
+                        TextField("chat.new.search_placeholder", text: $searchQuery)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                             .onSubmit { Task { await search() } }
@@ -38,7 +39,7 @@ struct NewConversationSheet: View {
                 }
 
                 if !searchResults.isEmpty {
-                    Section(loc("chat.new.results")) {
+                    Section("chat.new.results") {
                         ForEach(searchResults) { actor in
                             ActorSearchRow(actor: actor, isSelected: selectedActor?.did == actor.did)
                                 .contentShape(Rectangle())
@@ -47,18 +48,18 @@ struct NewConversationSheet: View {
                     }
                 }
             }
-            .navigationTitle(loc("chat.new.title"))
+            .navigationTitle("chat.new.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) {
+                    Button("actions.cancel") {
                         dismiss()
                         onComplete(nil)
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if let selectedActor {
-                        Button(loc("chat.new.start")) {
+                        Button("chat.new.start") {
                             Task { await startConversation(actor: selectedActor) }
                         }
                         .disabled(isCreating)

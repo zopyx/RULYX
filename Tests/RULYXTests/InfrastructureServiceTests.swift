@@ -171,9 +171,9 @@ final class BlueskyPushNotificationServiceTests: XCTestCase {
 
 @MainActor
 final class AppLockManagerTests: XCTestCase {
-    private let manager = AppLockManager.shared
+    nonisolated(unsafe) private let manager = AppLockManager.shared
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: "appLockEnabled")
         UserDefaults.standard.removeObject(forKey: "appLockTimeout")
@@ -220,7 +220,7 @@ final class AppLockManagerTests: XCTestCase {
 
 @MainActor
 final class iCloudAccountSyncTests: XCTestCase {
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: "iCloudSyncEnabled")
     }

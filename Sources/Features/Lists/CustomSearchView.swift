@@ -17,11 +17,12 @@ struct CustomSearchView: View {
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var hasAppeared = false
     @FocusState private var searchFocused: Bool
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         listContent
             .listStyle(.insetGrouped)
-            .navigationTitle(loc("customsearch.title"))
+            .navigationTitle("customsearch.title")
             .navigationBarTitleDisplayMode(.inline)
             .modifier(SearchSheetsModifier(
                 selectedPostURI: $selectedPostURI,
@@ -107,7 +108,7 @@ struct CustomSearchView: View {
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(loc("customsearch.searching_as"))
+                Text("customsearch.searching_as")
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.primary)
                 HStack(spacing: 6) {
@@ -141,7 +142,7 @@ struct CustomSearchView: View {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.tertiary)
-                TextField(loc("customsearch.placeholder"), text: $viewModel.query)
+                TextField("customsearch.placeholder", text: $viewModel.query)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .focused($searchFocused)
@@ -168,7 +169,7 @@ struct CustomSearchView: View {
     }
 
     private var recentSearchesSection: some View {
-        Section(loc("customsearch.recent")) {
+        Section("customsearch.recent") {
             ForEach(viewModel.searchHistory, id: \.self) { query in
                 HStack {
                     Button {
@@ -203,7 +204,7 @@ struct CustomSearchView: View {
 
     private var tabPickerSection: some View {
         Section {
-            Picker(loc("customsearch.tab"), selection: $selectedTab) {
+            Picker("customsearch.tab", selection: $selectedTab) {
                 ForEach(CustomSearchViewModel.Tab.allCases, id: \.self) { tab in
                     Text(verbatim: tabLabel(tab)).tag(tab)
                 }
@@ -254,7 +255,7 @@ struct CustomSearchView: View {
     private var loadingRow: some View {
         HStack {
             Spacer()
-            ProgressView(loc("customsearch.loading"))
+            ProgressView("customsearch.loading")
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -265,7 +266,7 @@ struct CustomSearchView: View {
         HStack {
             Spacer()
             ContentUnavailableView(
-                loc("list.detail.alert_title"),
+                String(localized: "list.detail.alert_title"),
                 systemImage: "exclamationmark.bubble",
                 description: Text(error)
             )
@@ -279,9 +280,9 @@ struct CustomSearchView: View {
         HStack {
             Spacer()
             ContentUnavailableView(
-                loc("customsearch.empty"),
+                String(localized: "customsearch.empty"),
                 systemImage: "magnifyingglass",
-                description: Text(verbatim: loc("customsearch.empty_desc"))
+                description: Text("customsearch.empty_desc")
             )
             Spacer()
         }
@@ -304,7 +305,7 @@ struct CustomSearchView: View {
             .listRowSeparator(.hidden)
         }
         if !hasMore, !entries.isEmpty {
-            Text(verbatim: loc("customsearch.end"))
+            Text("customsearch.end")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: .infinity)
@@ -330,7 +331,7 @@ struct CustomSearchView: View {
         if viewModel.isLoadingUsers {
             HStack {
                 Spacer()
-                ProgressView(loc("customsearch.loading"))
+                ProgressView("customsearch.loading")
                 Spacer()
             }
             .listRowSeparator(.hidden)
@@ -339,9 +340,9 @@ struct CustomSearchView: View {
             HStack {
                 Spacer()
                 ContentUnavailableView(
-                    loc("customsearch.empty_users"),
+                    String(localized: "customsearch.empty_users"),
                     systemImage: "person.slash",
-                    description: Text(verbatim: loc("customsearch.empty_users_desc"))
+                    description: Text("customsearch.empty_users_desc")
                 )
                 Spacer()
             }
@@ -363,9 +364,9 @@ struct CustomSearchView: View {
 
     private func tabLabel(_ tab: CustomSearchViewModel.Tab) -> String {
         switch tab {
-        case .top: loc("customsearch.tab.top")
-        case .newest: loc("customsearch.tab.newest")
-        case .users: loc("customsearch.tab.users")
+        case .top: String(localized: "customsearch.tab.top")
+        case .newest: String(localized: "customsearch.tab.newest")
+        case .users: String(localized: "customsearch.tab.users")
         }
     }
 

@@ -4,6 +4,7 @@ struct UserSearchSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     @State private var searchQuery = ""
     @State private var results: [BlueskyActor] = []
@@ -15,7 +16,7 @@ struct UserSearchSheet: View {
         NavigationStack {
             List {
                 Section {
-                    TextField(loc("usersearch.placeholder"), text: $searchQuery)
+                    TextField("usersearch.placeholder", text: $searchQuery)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .focused($searchFocused)
@@ -23,9 +24,9 @@ struct UserSearchSheet: View {
 
                 if results.isEmpty, !searchQuery.isEmpty, !isSearching {
                     ContentUnavailableView(
-                        loc("usersearch.no_results"),
+                        String(localized: "usersearch.no_results"),
                         systemImage: "magnifyingglass",
-                        description: Text(verbatim: loc("usersearch.no_results_desc"))
+                        description: Text("usersearch.no_results_desc")
                     )
                 }
 
@@ -51,11 +52,11 @@ struct UserSearchSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle(loc("usersearch.title"))
+            .navigationTitle("usersearch.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.close")) { dismiss() }
+                    Button("actions.close") { dismiss() }
                 }
             }
         }

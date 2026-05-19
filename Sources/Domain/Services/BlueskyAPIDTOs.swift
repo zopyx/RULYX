@@ -306,7 +306,7 @@ func relativeTimeString(from date: Date) -> String {
     let hours = minutes / 60
     let days = hours / 24
 
-    if minutes < 1 { return loc("time.just_now") }
+    if minutes < 1 { return String(localized: "time.just_now") }
     if minutes < 60 {
         let key = minutes == 1 ? "time.minute_ago" : "time.minutes_ago"
         return loc(key).replacingOccurrences(of: "{n}", with: "\(minutes)")

@@ -3,7 +3,7 @@ import XCTest
 
 @MainActor
 final class ViewModelTests: XCTestCase {
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         DashboardCache.clear(forKey: "")
         DashboardCache.clear(forKey: "did:plc:test")

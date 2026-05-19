@@ -12,6 +12,7 @@ struct AccountRowView: View {
         return host
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         HStack(spacing: 12) {
             avatarView
@@ -59,7 +60,7 @@ struct AccountRowView: View {
             Spacer()
 
             if isActive {
-                Text(loc("account.active"))
+                Text("account.active")
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)

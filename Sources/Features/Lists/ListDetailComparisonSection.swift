@@ -24,23 +24,24 @@ extension ListDetailView {
             }
         }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
         var body: some View {
             DisclosureGroup {
                 if viewModel.isLoadingAvailableLists {
-                    LoadingPanel(message: loc("list.compare.loading"))
+                    LoadingPanel(message: String(localized: "list.compare.loading"))
                 } else if viewModel.availableLists.isEmpty {
                     EmptyStatePanel(
-                        title: loc("list.compare.no_lists"),
-                        message: loc("list.compare.no_lists_desc")
+                        title: String(localized: "list.compare.no_lists"),
+                        message: String(localized: "list.compare.no_lists_desc")
                     )
                 } else {
-                    Picker(loc("list.compare.picker_label"), selection: $selectedComparisonListID) {
-                        Text(verbatim: loc("list.compare.select_list")).tag("")
+                    Picker("list.compare.picker_label", selection: $selectedComparisonListID) {
+                        Text("list.compare.select_list").tag("")
                         ForEach(viewModel.availableLists) { list in
                             Text(list.name).tag(list.id)
                         }
                     }
-                    .accessibilityHint(loc("list.compare.picker.hint"))
+                    .accessibilityHint("list.compare.picker.hint")
 
                     Button {
                         if let comparisonList {
@@ -55,10 +56,10 @@ extension ListDetailView {
                             }
                         }
                     } label: {
-                        Label { Text(verbatim: loc("list.compare.button")) } icon: { Image(systemName: "rectangle.split.3x1") }
+                        Label { Text("list.compare.button") } icon: { Image(systemName: "rectangle.split.3x1") }
                     }
                     .disabled(comparisonList == nil || viewModel.isComparingLists)
-                    .accessibilityHint(loc("list.compare.calculate.hint"))
+                    .accessibilityHint("list.compare.calculate.hint")
 
                     Button {
                         if let comparisonList {
@@ -74,10 +75,10 @@ extension ListDetailView {
                             }
                         }
                     } label: {
-                        Label { Text(verbatim: loc("list.compare.copy")) } icon: { Image(systemName: "square.on.square") }
+                        Label { Text("list.compare.copy") } icon: { Image(systemName: "square.on.square") }
                     }
                     .disabled(comparisonList == nil || viewModel.selectedMemberIDs.isEmpty || batchState.isPerformingBulkAction)
-                    .accessibilityHint(loc("list.compare.copy.hint"))
+                    .accessibilityHint("list.compare.copy.hint")
 
                     Button {
                         if let comparisonList {
@@ -93,10 +94,10 @@ extension ListDetailView {
                             }
                         }
                     } label: {
-                        Label { Text(verbatim: loc("list.compare.move")) } icon: { Image(systemName: "arrow.right.square") }
+                        Label { Text("list.compare.move") } icon: { Image(systemName: "arrow.right.square") }
                     }
                     .disabled(comparisonList == nil || viewModel.selectedMemberIDs.isEmpty || batchState.isPerformingBulkAction)
-                    .accessibilityHint(loc("list.compare.move.hint"))
+                    .accessibilityHint("list.compare.move.hint")
 
                     Button {
                         if let comparisonList {
@@ -113,7 +114,7 @@ extension ListDetailView {
                             }
                         }
                     } label: {
-                        Label { Text(verbatim: loc("list.compare.move")) } icon: { Image(systemName: "arrow.right.square") }
+                        Label { Text("list.compare.move") } icon: { Image(systemName: "arrow.right.square") }
                     }
                     .disabled(comparisonList == nil || viewModel.selectedMemberIDs.isEmpty || batchState.isPerformingBulkAction)
 
@@ -127,47 +128,47 @@ extension ListDetailView {
                     }
                 }
             } label: {
-                Text(verbatim: loc("list.compare.title"))
+                Text("list.compare.title")
                     .functionHelpInteractive(
-                        title: loc("list.compare.help_title"),
-                        text: loc("list.compare.help_tooltip")
+                        title: String(localized: "list.compare.help_title"),
+                        text: String(localized: "list.compare.help_tooltip")
                     )
             }
         }
 
         private func comparisonSummary(report: ListComparisonReport) -> some View {
             VStack(alignment: .leading, spacing: 10) {
-                Text(loc("list.compare.compared_with").replacingOccurrences(of: "{name}", with: report.otherList.name))
+                Text(String(localized: "list.compare.compared_with").replacingOccurrences(of: "{name}", with: report.otherList.name))
                     .font(.subheadline.weight(.semibold))
 
-                Text(loc("list.compare.overlap_count").replacingOccurrences(of: "{count}", with: "\(report.overlap.count)"))
-                Text(loc("list.compare.only_current").replacingOccurrences(of: "{name}", with: currentList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInCurrent.count)"))
-                Text(loc("list.compare.only_other").replacingOccurrences(of: "{name}", with: report.otherList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInOther.count)"))
+                Text(String(localized: "list.compare.overlap_count").replacingOccurrences(of: "{count}", with: "\(report.overlap.count)"))
+                Text(String(localized: "list.compare.only_current").replacingOccurrences(of: "{name}", with: currentList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInCurrent.count)"))
+                Text(String(localized: "list.compare.only_other").replacingOccurrences(of: "{name}", with: report.otherList.name).replacingOccurrences(of: "{count}", with: "\(report.onlyInOther.count)"))
             }
         }
 
         private var comparisonToolbar: some View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Menu(loc("list.compare.menu_bucket")) {
+                    Menu("list.compare.menu_bucket") {
                         ForEach(ComparisonBucket.allCases, id: \.self) { bucket in
                             Button(loc(bucketLocKey(bucket))) {
                                 viewModel.selectComparisonBucket(bucket)
                             }
                         }
                     }
-                    .accessibilityHint(loc("list.compare.filter_bucket.hint"))
+                    .accessibilityHint("list.compare.filter_bucket.hint")
 
-                    Button(loc("list.compare.clear_diff")) {
+                    Button("list.compare.clear_diff") {
                         viewModel.clearComparisonSelection()
                     }
                     .disabled(viewModel.selectedComparisonActorDIDs.isEmpty)
-                    .accessibilityHint(loc("list.compare.clear_diff.hint"))
+                    .accessibilityHint("list.compare.clear_diff.hint")
 
                     Spacer()
 
                     if !viewModel.selectedComparisonActorDIDs.isEmpty {
-                        Text(verbatim: loc("list.members.selected_count").replacingOccurrences(of: "{count}", with: "\(viewModel.selectedComparisonActorDIDs.count)"))
+                        Text(verbatim: String(localized: "list.members.selected_count").replacingOccurrences(of: "{count}", with: "\(viewModel.selectedComparisonActorDIDs.count)"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -184,16 +185,16 @@ extension ListDetailView {
                         syncSnapshot()
                     }
                 } label: {
-                    Label { Text(verbatim: loc("list.compare.add_here")) } icon: { Image(systemName: "arrow.down.left.and.arrow.up.right") }
+                    Label { Text("list.compare.add_here") } icon: { Image(systemName: "arrow.down.left.and.arrow.up.right") }
                 }
                 .disabled(viewModel.selectedComparisonActorDIDs.isEmpty || batchState.isPerformingBulkAction)
-                .accessibilityHint(loc("list.compare.add_here.hint"))
+                .accessibilityHint("list.compare.add_here.hint")
 
                 if let diffExportFileURL {
                     ShareLink(item: diffExportFileURL) {
-                        Label { Text(verbatim: loc("list.compare.export_csv")) } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text("list.compare.export_csv") } icon: { Image(systemName: "arrow.down.doc") }
                     }
-                    .accessibilityHint(loc("list.compare.export_csv.hint"))
+                    .accessibilityHint("list.compare.export_csv.hint")
                 }
             }
             .padding(.vertical, 4)
@@ -218,10 +219,10 @@ extension ListDetailView {
                             .buttonStyle(.plain)
                             .accessibilityLabel(
                                 viewModel.selectedComparisonActorDIDs.contains(member.actor.did)
-                                    ? loc("list.compare.deselect_actor.label").replacingOccurrences(of: "{handle}", with: member.actor.handle)
-                                    : loc("list.compare.select_actor.label").replacingOccurrences(of: "{handle}", with: member.actor.handle)
+                                    ? String(localized: "list.compare.deselect_actor.label").replacingOccurrences(of: "{handle}", with: member.actor.handle)
+                                    : String(localized: "list.compare.select_actor.label").replacingOccurrences(of: "{handle}", with: member.actor.handle)
                             )
-                            .accessibilityHint(loc("list.compare.toggle_actor.hint"))
+                            .accessibilityHint("list.compare.toggle_actor.hint")
                         }
                     } header: {
                         Text(verbatim: loc(bucketLocKey(bucket)))

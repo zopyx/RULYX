@@ -3,15 +3,17 @@ import XCTest
 
 @MainActor
 final class BlueskyListServiceTests: XCTestCase {
-    private var requestExecutor: MockRequestExecutor!
-    private var sessionService: MockSessionService!
-    private var service: BlueskyListService!
+    nonisolated(unsafe) private var requestExecutor: MockRequestExecutor!
+    nonisolated(unsafe) private var sessionService: MockSessionService!
+    nonisolated(unsafe) private var service: BlueskyListService!
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         requestExecutor = MockRequestExecutor()
         sessionService = MockSessionService()
-        service = BlueskyListService(requestExecutor: requestExecutor, sessionService: sessionService)
+        let re = requestExecutor
+        let ss = sessionService
+        service = MainActor.assumeIsolated { BlueskyListService(requestExecutor: re, sessionService: ss) }
     }
 
     func testFetchListsSuccess() async throws {

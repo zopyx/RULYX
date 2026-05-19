@@ -22,6 +22,7 @@ struct MediaBrowserView: View {
         _viewModel = StateObject(wrappedValue: MediaBrowserViewModel(did: did))
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -45,7 +46,7 @@ struct MediaBrowserView: View {
                 if !viewModel.items.isEmpty || viewModel.isScanning {
                     if viewModel.availableFilters.count > 1 {
                         HStack(spacing: 8) {
-                            Picker(loc("media.filter_label"), selection: $viewModel.filter) {
+                            Picker("media.filter_label", selection: $viewModel.filter) {
                                 ForEach(viewModel.availableFilters, id: \.self) { f in
                                     Text(filterLabel(f, count: f == .images ? viewModel.imageCount : viewModel.videoCount))
                                         .tag(f)
@@ -62,7 +63,7 @@ struct MediaBrowserView: View {
                             if viewModel.isScanning {
                                 ProgressView()
                                     .scaleEffect(0.6)
-                                Text(verbatim: loc("profile.media.scanning"))
+                                Text("profile.media.scanning")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
                             }
@@ -78,7 +79,7 @@ struct MediaBrowserView: View {
                             if viewModel.isScanning {
                                 ProgressView()
                                     .scaleEffect(0.6)
-                                Text(verbatim: loc("profile.media.scanning"))
+                                Text("profile.media.scanning")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
                             }
@@ -90,7 +91,7 @@ struct MediaBrowserView: View {
                 }
 
                 if !viewModel.items.isEmpty {
-                    Text(verbatim: loc("media.instruction"))
+                    Text("media.instruction")
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -102,27 +103,27 @@ struct MediaBrowserView: View {
                 Group {
                     if viewModel.isLoading, viewModel.items.isEmpty {
                         Spacer()
-                        LoadingPanel(message: loc("profile.posts.loading"))
+                        LoadingPanel(message: String(localized: "profile.posts.loading"))
                         Spacer()
                     } else if let error = viewModel.errorMessage, viewModel.items.isEmpty {
                         if error.localizedCaseInsensitiveContains("blocked") {
                             ContentUnavailableView(
-                                loc("profile.blocked.title"),
+                                String(localized: "profile.blocked.title"),
                                 systemImage: "hand.raised.slash.fill",
-                                description: Text(verbatim: loc("profile.blocked.media_desc"))
+                                description: Text("profile.blocked.media_desc")
                             )
                         } else {
                             ContentUnavailableView(
-                                loc("list.detail.alert_title"),
+                                String(localized: "list.detail.alert_title"),
                                 systemImage: "exclamationmark.bubble",
                                 description: Text(error)
                             )
                         }
                     } else if viewModel.items.isEmpty {
                         ContentUnavailableView(
-                            loc("profile.media.empty"),
+                            String(localized: "profile.media.empty"),
                             systemImage: "photo.on.rectangle",
-                            description: Text(verbatim: loc("profile.media.empty_desc"))
+                            description: Text("profile.media.empty_desc")
                         )
                     } else {
                         ScrollView {
@@ -145,11 +146,11 @@ struct MediaBrowserView: View {
                     }
                 }
             }
-            .navigationTitle(loc("profile.media.title"))
+            .navigationTitle("profile.media.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.close")) { dismiss() }
+                    Button("actions.close") { dismiss() }
                 }
             }
             .sheet(isPresented: $isShowingFolderPicker) {
@@ -164,13 +165,13 @@ struct MediaBrowserView: View {
                 NavigationStack {
                     List {
                         Section {
-                            LabeledContent(loc("profile.media.download_total"), value: "\(summary.total)")
-                            LabeledContent(loc("profile.media.download_succeeded"), value: "\(summary.succeeded)")
+                            LabeledContent("profile.media.download_total", value: "\(summary.total)")
+                            LabeledContent("profile.media.download_succeeded", value: "\(summary.succeeded)")
                             if summary.failed > 0 {
-                                LabeledContent(loc("profile.media.download_failed"), value: "\(summary.failed)")
+                                LabeledContent("profile.media.download_failed", value: "\(summary.failed)")
                                     .foregroundStyle(.red)
                             }
-                            LabeledContent(loc("profile.media.download_folder"), value: summary.directory.lastPathComponent)
+                            LabeledContent("profile.media.download_folder", value: summary.directory.lastPathComponent)
                         }
                         if !summary.errors.isEmpty {
                             Section {
@@ -180,15 +181,15 @@ struct MediaBrowserView: View {
                                         .foregroundStyle(.red)
                                 }
                             } header: {
-                                Text(verbatim: loc("profile.media.download_errors"))
+                                Text("profile.media.download_errors")
                             }
                         }
                     }
-                    .navigationTitle(loc("profile.media.download_complete"))
+                    .navigationTitle("profile.media.download_complete")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button(loc("actions.done")) {
+                            Button("actions.done") {
                                 viewModel.clearDownloadSummary()
                             }
                         }
@@ -223,7 +224,7 @@ struct MediaBrowserView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: viewModel.selectAll ? "checkmark.circle.fill" : "circle")
-                        Text(loc("profile.media.select_all"))
+                        Text("profile.media.select_all")
                     }
                     .font(.body.weight(.medium))
                     .padding(.vertical, 6)
@@ -242,7 +243,7 @@ struct MediaBrowserView: View {
                     guard !viewModel.selectedIDs.isEmpty else { return }
                     isShowingFolderPicker = true
                 } label: {
-                    Label(loc("profile.media.download_selected"), systemImage: "arrow.down.circle")
+                    Label("profile.media.download_selected", systemImage: "arrow.down.circle")
                         .font(.body.weight(.medium))
                         .lineLimit(1)
                         .padding(.vertical, 6)

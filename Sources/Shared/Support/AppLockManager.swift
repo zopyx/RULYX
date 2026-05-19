@@ -84,11 +84,11 @@ final class AppLockManager: ObservableObject {
         isAuthenticating = true
         defer { isAuthenticating = false }
         let context = LAContext()
-        context.localizedReason = "Authenticate to access your accounts and moderation data."
+        context.localizedReason = String(localized: "biometric.auth_reason")
         do {
             let success = try await context.evaluatePolicy(
                 .deviceOwnerAuthenticationWithBiometrics,
-                localizedReason: "Authenticate to access your accounts and moderation data."
+                localizedReason: String(localized: "biometric.auth_reason")
             )
             if success {
                 isLocked = false

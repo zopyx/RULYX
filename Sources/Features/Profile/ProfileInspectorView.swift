@@ -18,11 +18,11 @@ struct ProfileInspectorView: View {
         NavigationStack {
             List {
                 Section {
-                    TextField(loc("profile.search.placeholder"), text: $viewModel.query)
+                    TextField("profile.search.placeholder", text: $viewModel.query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                        .accessibilityLabel(loc("profile.search.label"))
-                        .accessibilityHint(loc("profile.search.hint"))
+                        .accessibilityLabel("profile.search.label")
+                        .accessibilityHint("profile.search.hint")
 
                     if viewModel.isSearching {
                         LoadingPanel(message: localizationManager.localized("profile.searching"))
@@ -86,8 +86,8 @@ struct ProfileInspectorView: View {
                         }
                     }
                     .disabled(viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityLabel(loc("profile.save_search.label"))
-                    .accessibilityHint(loc("profile.save_search.hint"))
+                    .accessibilityLabel("profile.save_search.label")
+                    .accessibilityHint("profile.save_search.hint")
 
                     if let activeAccount = accountStore.activeAccount {
                         Text(verbatim: localizationManager.localized("profile.using_account").replacingOccurrences(of: "{handle}", with: activeAccount.handle))
@@ -136,13 +136,13 @@ struct ProfileInspectorView: View {
                                         .foregroundStyle(Color.skyPrimary)
                                 }
                             }
-                            .accessibilityLabel(loc("profile.saved_search.label").replacingOccurrences(of: "{query}", with: search.query))
+                            .accessibilityLabel("profile.saved_search.label".replacingOccurrences(of: "{query}", with: search.query))
                             .buttonStyle(.plain)
                             .swipeActions {
                                 Button(role: .destructive) {
                                     workspaceStore.deleteSavedSearch(search)
                                 } label: {
-                                    Label(loc("actions.delete"), systemImage: "trash")
+                                    Label("actions.delete", systemImage: "trash")
                                 }
                             }
                         }
@@ -165,7 +165,7 @@ struct ProfileInspectorView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
-                            .accessibilityLabel(loc("profile.recent_search.label").replacingOccurrences(of: "{query}", with: search.query))
+                            .accessibilityLabel("profile.recent_search.label".replacingOccurrences(of: "{query}", with: search.query))
                             .buttonStyle(.plain)
                         }
                     } header: {
@@ -199,7 +199,7 @@ struct ProfileInspectorView: View {
                                 RelationshipsView(mode: .followers, initialCount: inspection.profile.followersCount)
                             } label: {
                                 HStack {
-                                    Text(verbatim: loc("profile.stats.followers"))
+                                    Text("profile.stats.followers")
                                     Spacer()
                                     Text(countText(inspection.profile.followersCount))
                                         .foregroundStyle(.secondary)
@@ -209,21 +209,21 @@ struct ProfileInspectorView: View {
                                 RelationshipsView(mode: .following, initialCount: inspection.profile.followsCount)
                             } label: {
                                 HStack {
-                                    Text(verbatim: loc("profile.stats.following"))
+                                    Text("profile.stats.following")
                                     Spacer()
                                     Text(countText(inspection.profile.followsCount))
                                         .foregroundStyle(.secondary)
                                 }
                             }
                         } else {
-                            LabeledContent(loc("profile.stats.followers"), value: countText(inspection.profile.followersCount))
-                            LabeledContent(loc("profile.stats.following"), value: countText(inspection.profile.followsCount))
+                            LabeledContent("profile.stats.followers", value: countText(inspection.profile.followersCount))
+                            LabeledContent("profile.stats.following", value: countText(inspection.profile.followsCount))
                         }
-                        LabeledContent(loc("profile.stats.posts"), value: countText(inspection.profile.postsCount))
-                        LabeledContent(loc("profile.stats.lists"), value: countText(inspection.profile.listsCount))
-                        LabeledContent(loc("profile.stats.starter_packs"), value: countText(inspection.profile.starterPacksCount))
+                        LabeledContent("profile.stats.posts", value: countText(inspection.profile.postsCount))
+                        LabeledContent("profile.stats.lists", value: countText(inspection.profile.listsCount))
+                        LabeledContent("profile.stats.starter_packs", value: countText(inspection.profile.starterPacksCount))
                     } header: {
-                        Text(verbatim: loc("profile.stats"))
+                        Text("profile.stats")
                     }
 
                     Section {
@@ -233,7 +233,7 @@ struct ProfileInspectorView: View {
                             isShowingReportSheet = true
                         } label: {
                             Label {
-                                Text(verbatim: loc("profile.report"))
+                                Text("profile.report")
                             } icon: {
                                 Image(systemName: "exclamationmark.shield")
                             }
@@ -255,15 +255,15 @@ struct ProfileInspectorView: View {
                             )
                         } label: {
                             Label {
-                                Text(verbatim: loc("profile.open_controls"))
+                                Text("profile.open_controls")
                             } icon: {
                                 Image(systemName: "slider.horizontal.3")
                             }
                         }
-                        .accessibilityLabel(loc("profile.open_controls.label"))
-                        .accessibilityHint(loc("profile.open_controls.hint"))
+                        .accessibilityLabel("profile.open_controls.label")
+                        .accessibilityHint("profile.open_controls.hint")
                     } header: {
-                        Text(verbatim: loc("profile.moderation_actions"))
+                        Text("profile.moderation_actions")
                     }
 
                     if !inspection.profile.labels.isEmpty {
@@ -272,13 +272,13 @@ struct ProfileInspectorView: View {
                                 Text(label)
                             }
                         } header: {
-                            Text(verbatim: loc("profile.labels_section"))
+                            Text("profile.labels_section")
                         }
                     }
 
                     Section {
                         if inspection.listMemberships.isEmpty {
-                            Text(verbatim: loc("profile.no_lists"))
+                            Text("profile.no_lists")
                                 .foregroundStyle(.secondary)
                         } else {
                             ForEach(inspection.listMemberships) { item in
@@ -290,19 +290,19 @@ struct ProfileInspectorView: View {
                                             .foregroundStyle(.secondary)
                                     }
                                     Spacer()
-                                    Text(item.isMember ? loc("profile.member_status") : loc("profile.not_in_list_status"))
+                                    Text(item.isMember ? String(localized: "profile.member_status") : String(localized: "profile.not_in_list_status"))
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(item.isMember ? .green : .secondary)
                                 }
                             }
                         }
                     } header: {
-                        Text(verbatim: loc("profile.your_lists_section"))
+                        Text("profile.your_lists_section")
                     }
 
                     Section {
                         if inspection.starterPackMemberships.isEmpty {
-                            Text(verbatim: loc("profile.no_starter_packs"))
+                            Text("profile.no_starter_packs")
                                 .foregroundStyle(.secondary)
                         } else {
                             ForEach(inspection.starterPackMemberships) { item in
@@ -310,40 +310,40 @@ struct ProfileInspectorView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(item.name)
                                         if let joined = item.joinedAllTimeCount {
-                                            Text(verbatim: loc("profile.joined_all_time").replacingOccurrences(of: "{count}", with: "\(joined)"))
+                                            Text(verbatim: String(localized: "profile.joined_all_time").replacingOccurrences(of: "{count}", with: "\(joined)"))
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
                                         }
                                     }
                                     Spacer()
-                                    Text(item.isMember ? loc("profile.included_status") : loc("profile.not_included_status"))
+                                    Text(item.isMember ? String(localized: "profile.included_status") : String(localized: "profile.not_included_status"))
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(item.isMember ? .green : .secondary)
                                 }
                             }
                         }
                     } header: {
-                        Text(verbatim: loc("profile.your_starter_packs_section"))
+                        Text("profile.your_starter_packs_section")
                     }
 
                     if let profileURL = inspection.profile.profileURL {
                         Section {
                             Link(destination: profileURL) {
                                 Label {
-                                    Text(verbatim: loc("profile.open_bluesky"))
+                                    Text("profile.open_bluesky")
                                 } icon: {
                                     Image(systemName: "arrow.up.right.square")
                                 }
                             }
-                            .accessibilityLabel(loc("profile.open_bluesky.label"))
-                            .accessibilityHint(loc("profile.open_bluesky.hint"))
+                            .accessibilityLabel("profile.open_bluesky.label")
+                            .accessibilityHint("profile.open_bluesky.hint")
                         } header: {
-                            Text(verbatim: loc("profile.open_section"))
+                            Text("profile.open_section")
                         }
                     }
                 }
             }
-            .navigationTitle(loc("profile.title"))
+            .navigationTitle("profile.title")
             .toolbar {
                 if horizontalSizeClass == .compact {
                     accountSwitcherToolbar(isPresented: $isShowingQuickAccountSwitcher, accountStore: accountStore, localizationManager: localizationManager)
@@ -368,7 +368,7 @@ struct ProfileInspectorView: View {
                    let appPassword = activePassword
                 {
                     SimplifiedReportSheet(
-                        title: loc("profile.report"),
+                        title: String(localized: "profile.report"),
                         selectedReason: $selectedReportReason,
                         evidenceText: $reportEvidenceText,
                         isSubmitting: isSubmittingReport,

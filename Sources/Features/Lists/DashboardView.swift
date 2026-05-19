@@ -4,14 +4,15 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         List {
             Section {
-                LabeledContent(loc("dashboard.accounts"), value: "\(accountStore.accounts.count)")
-                LabeledContent(loc("dashboard.total_ops"), value: "\(workspaceStore.operationLog.count)")
+                LabeledContent("dashboard.accounts", value: "\(accountStore.accounts.count)")
+                LabeledContent("dashboard.total_ops", value: "\(workspaceStore.operationLog.count)")
             } header: {
-                Text(verbatim: loc("dashboard.overview"))
+                Text("dashboard.overview")
             }
 
             if !workspaceStore.operationLog.isEmpty {
@@ -23,7 +24,7 @@ struct DashboardView: View {
                     .frame(height: 180)
                     .chartXAxis { AxisMarks { AxisValueLabel() } }
                 } header: {
-                    Text(verbatim: loc("dashboard.by_type"))
+                    Text("dashboard.by_type")
                 }
 
                 Section {
@@ -39,13 +40,13 @@ struct DashboardView: View {
                         .padding(.vertical, 2)
                     }
                 } header: {
-                    Text(verbatim: loc("dashboard.recent"))
+                    Text("dashboard.recent")
                 }
 
                 Section {
                     let top = topModeratedAccounts()
                     if top.isEmpty {
-                        Text(verbatim: loc("dashboard.no_data_yet")).foregroundStyle(.secondary)
+                        Text("dashboard.no_data_yet").foregroundStyle(.secondary)
                     } else {
                         ForEach(top.prefix(10), id: \.0) { handle, count in
                             HStack {
@@ -56,14 +57,14 @@ struct DashboardView: View {
                         }
                     }
                 } header: {
-                    Text(verbatim: loc("dashboard.top_moderated"))
+                    Text("dashboard.top_moderated")
                 }
             } else {
-                ContentUnavailableView(loc("dashboard.no_data"), systemImage: "chart.bar", description: Text(loc("dashboard.no_data_desc")))
+                ContentUnavailableView("dashboard.no_data", systemImage: "chart.bar", description: Text("dashboard.no_data_desc"))
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("dashboard.title"))
+        .navigationTitle("dashboard.title")
     }
 
     private var operationCounts: [(String, Int)] {

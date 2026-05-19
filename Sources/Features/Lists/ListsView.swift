@@ -49,7 +49,7 @@ struct ListsView: View {
                                 presentationState.showFollowers = true
                             } label: {
                                 relationshipRow(
-                                    label: loc("lists.followers"),
+                                    label: String(localized: "lists.followers"),
                                     count: viewModel.activeProfile?.followersCount
                                 )
                             }
@@ -59,7 +59,7 @@ struct ListsView: View {
                                 presentationState.showFollowing = true
                             } label: {
                                 relationshipRow(
-                                    label: loc("lists.following"),
+                                    label: String(localized: "lists.following"),
                                     count: viewModel.activeProfile?.followsCount
                                 )
                             }
@@ -69,7 +69,7 @@ struct ListsView: View {
                                 presentationState.showBlocking = true
                             } label: {
                                 relationshipRow(
-                                    label: loc("lists.blocking"),
+                                    label: String(localized: "lists.blocking"),
                                     count: viewModel.blockingCount
                                 )
                             }
@@ -79,7 +79,7 @@ struct ListsView: View {
                                 presentationState.showBlockedBy = true
                             } label: {
                                 relationshipRow(
-                                    label: loc("lists.blocked_by"),
+                                    label: String(localized: "lists.blocked_by"),
                                     count: viewModel.blockedByCount
                                 )
                             }
@@ -98,7 +98,7 @@ struct ListsView: View {
                                         }
                                     } label: {
                                         ListRowView(list: list)
-                                            .accessibilityLabel(loc("list.row.label").replacingOccurrences(of: "{name}", with: list.name).replacingOccurrences(of: "{count}", with: "\(list.memberCount ?? 0)"))
+                                            .accessibilityLabel("list.row.label".replacingOccurrences(of: "{name}", with: list.name).replacingOccurrences(of: "{count}", with: "\(list.memberCount ?? 0)"))
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -111,7 +111,7 @@ struct ListsView: View {
                                         Image(systemName: "plus.circle.fill")
                                             .font(.title3)
                                             .foregroundStyle(.secondary)
-                                        Text(loc("lists.create_first_mod"))
+                                        Text("lists.create_first_mod")
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                         Spacer()
@@ -121,10 +121,10 @@ struct ListsView: View {
                             }
                         } header: {
                             HStack {
-                                Text(loc("lists.moderation_lists"))
+                                Text("lists.moderation_lists")
                                     .functionHelp(
-                                        title: loc("lists.moderation_lists"),
-                                        text: loc("lists.moderation_lists.help")
+                                        title: String(localized: "lists.moderation_lists"),
+                                        text: String(localized: "lists.moderation_lists.help")
                                     )
                                 Spacer()
                                 Button {
@@ -145,7 +145,7 @@ struct ListsView: View {
                                         }
                                     } label: {
                                         ListRowView(list: list)
-                                            .accessibilityLabel(loc("list.row.label").replacingOccurrences(of: "{name}", with: list.name).replacingOccurrences(of: "{count}", with: "\(list.memberCount ?? 0)"))
+                                            .accessibilityLabel("list.row.label".replacingOccurrences(of: "{name}", with: list.name).replacingOccurrences(of: "{count}", with: "\(list.memberCount ?? 0)"))
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -158,7 +158,7 @@ struct ListsView: View {
                                         Image(systemName: "plus.circle.fill")
                                             .font(.title3)
                                             .foregroundStyle(.secondary)
-                                        Text(loc("lists.create_first"))
+                                        Text("lists.create_first")
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                         Spacer()
@@ -168,10 +168,10 @@ struct ListsView: View {
                             }
                         } header: {
                             HStack {
-                                Text(loc("lists.lists"))
+                                Text("lists.lists")
                                     .functionHelp(
-                                        title: loc("lists.lists"),
-                                        text: loc("lists.lists.help")
+                                        title: String(localized: "lists.lists"),
+                                        text: String(localized: "lists.lists.help")
                                     )
                                 Spacer()
                                 Button {
@@ -189,7 +189,7 @@ struct ListsView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "at")
-                                    Text(loc("lists.advanced.mentions_button"))
+                                    Text("lists.advanced.mentions_button")
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .font(.subheadline)
@@ -202,7 +202,7 @@ struct ListsView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "magnifyingglass")
-                                    Text(loc("lists.advanced.customsearch_button"))
+                                    Text("lists.advanced.customsearch_button")
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .font(.subheadline)
@@ -211,10 +211,10 @@ struct ListsView: View {
                                 .padding(.vertical, 4)
                             }
                         } header: {
-                            Text(loc("lists.advanced"))
+                            Text("lists.advanced")
                                 .functionHelp(
-                                    title: loc("lists.advanced"),
-                                    text: loc("lists.advanced.help")
+                                    title: String(localized: "lists.advanced"),
+                                    text: String(localized: "lists.advanced.help")
                                 )
                         }
 
@@ -255,7 +255,7 @@ struct ListsView: View {
                             Image(systemName: "arrow.clockwise")
                         }
                     }
-                    .accessibilityLabel(loc("lists.refresh.label"))
+                    .accessibilityLabel("lists.refresh.label")
                     .disabled(accountStore.activeAccount == nil || viewModel.isRefreshing)
                 }
             }
@@ -426,7 +426,7 @@ struct ListsView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
         }
-        .appButtonAccessibility(label: label, hint: loc("rel.view.hint"))
+        .appButtonAccessibility(label: label, hint: String(localized: "rel.view.hint"))
     }
 
     private func activeAccountMember(_ account: AppAccount) -> BlueskyListMember {
@@ -451,9 +451,9 @@ struct ListsView: View {
             List {
                 if lists.isEmpty {
                     ContentUnavailableView(
-                        loc("lists.export.no_members"),
+                        String(localized: "lists.export.no_members"),
                         systemImage: "arrow.down.doc",
-                        description: Text(verbatim: loc("lists.export.no_members_desc"))
+                        description: Text("lists.export.no_members_desc")
                     )
                 }
                 ForEach(lists) { list in
@@ -499,11 +499,11 @@ struct ListsView: View {
                     .padding(.vertical, 8)
                 }
             }
-            .navigationTitle(loc("lists.export.title"))
+            .navigationTitle("lists.export.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) { isShowingListPicker = false }
+                    Button("actions.cancel") { isShowingListPicker = false }
                         .disabled(isExporting)
                 }
             }

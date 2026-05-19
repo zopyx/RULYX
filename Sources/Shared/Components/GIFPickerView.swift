@@ -20,30 +20,31 @@ struct GIFPickerView: View {
         !searchText.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 if !hasAPIKey {
                     ContentUnavailableView(
-                        loc("gif.missing_key_title"),
+                        String(localized: "gif.missing_key_title"),
                         systemImage: "key.slash",
-                        description: Text(verbatim: loc("gif.missing_key_desc"))
+                        description: Text("gif.missing_key_desc")
                     )
                 } else if let errorMessage {
                     ContentUnavailableView(
-                        loc("list.detail.alert_title"),
+                        String(localized: "list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(errorMessage)
                     )
                 } else if isLoading, results.isEmpty {
                     Spacer()
-                    ProgressView(loc("state.loading"))
+                    ProgressView("state.loading")
                     Spacer()
                 } else if results.isEmpty, !isLoading {
                     ContentUnavailableView(
-                        loc("gif.empty_title"),
+                        String(localized: "gif.empty_title"),
                         systemImage: "magnifyingglass",
-                        description: Text(verbatim: isSearching ? loc("gif.no_results_desc") : loc("gif.search_hint"))
+                        description: Text(verbatim: isSearching ? String(localized: "gif.no_results_desc") : String(localized: "gif.search_hint"))
                     )
                 } else {
                     ScrollView {
@@ -70,14 +71,14 @@ struct GIFPickerView: View {
                     }
                 }
             }
-            .navigationTitle(loc("gif.title"))
+            .navigationTitle("gif.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.close")) { dismiss() }
+                    Button("actions.close") { dismiss() }
                 }
             }
-            .searchable(text: $searchText, prompt: loc("gif.search_placeholder"))
+            .searchable(text: $searchText, prompt: "gif.search_placeholder")
             .onChange(of: searchText) { _, newValue in
                 let trimmed = newValue.trimmingCharacters(in: .whitespaces)
                 guard !trimmed.isEmpty else {

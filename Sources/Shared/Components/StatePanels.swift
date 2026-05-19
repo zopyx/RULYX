@@ -4,6 +4,7 @@ import SwiftUI
 
 struct LoadingPanel: View {
     let message: String
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         VStack(spacing: 12) {
@@ -64,11 +65,11 @@ struct ErrorRetryBanner: View {
             }
 
             Button(action: retry) {
-                Label(loc("actions.retry"), systemImage: "arrow.clockwise")
+                Label("actions.retry", systemImage: "arrow.clockwise")
             }
             .buttonStyle(.bordered)
             .glassBorderedButton()
-            .accessibilityHint(loc("common.retry.hint"))
+            .accessibilityHint("common.retry.hint")
         }
         .padding()
         .appCardStyle(cornerRadius: 12, style: .subtle)
@@ -113,11 +114,11 @@ struct BatchProgressCard: View {
                 HStack {
                     Spacer()
                     Button(role: .destructive, action: onCancel) {
-                        Label(loc("actions.cancel"), systemImage: "xmark.circle")
+                        Label("actions.cancel", systemImage: "xmark.circle")
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .accessibilityLabel(loc("actions.cancel"))
+                    .accessibilityLabel("actions.cancel")
                 }
             }
         }
@@ -125,7 +126,7 @@ struct BatchProgressCard: View {
         .appCardStyle(cornerRadius: 12, style: .subtle)
         .padding(.horizontal)
         .accessibilityElement(children: .combine)
-        .accessibilityHint(loc("common.progress.hint"))
+        .accessibilityHint("common.progress.hint")
     }
 }
 
@@ -229,7 +230,7 @@ struct OnboardingRow: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityHint(loc("common.status.hint"))
+        .accessibilityHint("common.status.hint")
         .padding(.vertical, 8)
     }
 }
@@ -252,7 +253,7 @@ struct SimplifiedReportSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Picker(loc("profile.report.reason"), selection: $selectedReason) {
+                    Picker("profile.report.reason", selection: $selectedReason) {
                         ForEach(ModerationReportReasonType.allCases) { reason in
                             Text(reason.localizedTitle)
                                 .tag(reason)
@@ -260,13 +261,13 @@ struct SimplifiedReportSheet: View {
                     }
                     .pickerStyle(.navigationLink)
                 } header: {
-                    Text(loc("profile.report.reason"))
+                    Text("profile.report.reason")
                 }
 
                 Section {
                     ZStack(alignment: .topLeading) {
                         if evidenceText.isEmpty {
-                            Text(loc("profile.report.evidence_placeholder"))
+                            Text("profile.report.evidence_placeholder")
                                 .foregroundStyle(.tertiary)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 8)
@@ -276,7 +277,7 @@ struct SimplifiedReportSheet: View {
                             .foregroundStyle(.primary)
                     }
                 } header: {
-                    Text(loc("profile.report.evidence"))
+                    Text("profile.report.evidence")
                 }
 
                 Section {
@@ -287,7 +288,7 @@ struct SimplifiedReportSheet: View {
                                 ProgressView()
                                     .tint(.white)
                             } else {
-                                Text(loc("profile.report.submit"))
+                                Text("profile.report.submit")
                                     .fontWeight(.semibold)
                             }
                             Spacer()
@@ -300,7 +301,7 @@ struct SimplifiedReportSheet: View {
 
                 Section {
                     PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                        Label(loc("report.support.attachment.add"), systemImage: "paperclip")
+                        Label("report.support.attachment.add", systemImage: "paperclip")
                     }
 
                     if let supportImage {
@@ -312,13 +313,13 @@ struct SimplifiedReportSheet: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text(loc("report.support.attachment"))
+                                Text("report.support.attachment")
                                     .appFont(.subheading)
                                 Button(role: .destructive) {
                                     selectedPhotoItem = nil
                                     self.supportImage = nil
                                 } label: {
-                                    Label(loc("report.support.attachment.remove"), systemImage: "trash")
+                                    Label("report.support.attachment.remove", systemImage: "trash")
                                 }
                                 .buttonStyle(.borderless)
                             }
@@ -332,18 +333,18 @@ struct SimplifiedReportSheet: View {
                         }
                         mailDraft = makeSupportDraft()
                     } label: {
-                        Label(loc("report.support.email"), systemImage: "envelope")
+                        Label("report.support.email", systemImage: "envelope")
                     }
                     .disabled(isSubmitting)
                 } header: {
-                    Text(loc("report.support.section"))
+                    Text("report.support.section")
                 }
             }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel"), action: onCancel)
+                    Button(String(localized: "actions.cancel"), action: onCancel)
                         .disabled(isSubmitting)
                 }
             }
@@ -368,8 +369,8 @@ struct SimplifiedReportSheet: View {
                     attachmentImage: supportImage
                 )
             }
-            .alert(loc("report.support.mail_unavailable"), isPresented: $isShowingMailUnavailableAlert) {
-                Button(loc("actions.ok")) {}
+            .alert("report.support.mail_unavailable", isPresented: $isShowingMailUnavailableAlert) {
+                Button("actions.ok") {}
             }
         }
     }
@@ -485,15 +486,15 @@ extension ModerationReportReasonType {
     var localizedTitle: String {
         switch self {
         case .harassmentTargeted:
-            loc("profile.report.reason.harassment_targeted")
+            String(localized: "profile.report.reason.harassment_targeted")
         case .harassmentHateSpeech:
-            loc("profile.report.reason.harassment_hate_speech")
+            String(localized: "profile.report.reason.harassment_hate_speech")
         case .harassmentDoxxing:
-            loc("profile.report.reason.harassment_doxxing")
+            String(localized: "profile.report.reason.harassment_doxxing")
         case .harassmentTroll:
-            loc("profile.report.reason.harassment_troll")
+            String(localized: "profile.report.reason.harassment_troll")
         case .harassmentOther:
-            loc("profile.report.reason.harassment_other")
+            String(localized: "profile.report.reason.harassment_other")
         }
     }
 }

@@ -23,14 +23,14 @@ final class FeedStore: ObservableObject {
     init(did: String? = nil) {
         self.did = did ?? ""
         customFeedURI = UserDefaults.standard.string(forKey: key("customFeedURI"))
-        customFeedName = UserDefaults.standard.string(forKey: key("customFeedName")) ?? loc("timeline.following")
+        customFeedName = UserDefaults.standard.string(forKey: key("customFeedName")) ?? String(localized: "timeline.following")
         recentFeeds = loadRecentFeeds()
     }
 
     func setAccount(did: String?) {
         self.did = did ?? ""
         customFeedURI = UserDefaults.standard.string(forKey: key("customFeedURI"))
-        customFeedName = UserDefaults.standard.string(forKey: key("customFeedName")) ?? loc("timeline.following")
+        customFeedName = UserDefaults.standard.string(forKey: key("customFeedName")) ?? String(localized: "timeline.following")
         recentFeeds = loadRecentFeeds()
     }
 
@@ -54,7 +54,7 @@ final class FeedStore: ObservableObject {
 
     func resetToFollowing() {
         customFeedURI = nil
-        customFeedName = loc("timeline.following")
+        customFeedName = String(localized: "timeline.following")
         save()
     }
 

@@ -5,6 +5,7 @@ struct NotificationTab: View {
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @StateObject private var viewModel = NotificationViewModel()
     @State private var selectedActor: BlueskyActor?
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
@@ -14,13 +15,13 @@ struct NotificationTab: View {
                     skeletonContent
                 case .empty:
                     ContentUnavailableView(
-                        loc("notifications.empty"),
+                        String(localized: "notifications.empty"),
                         systemImage: "bell.slash",
-                        description: Text(loc("tab.notifications"))
+                        description: Text("tab.notifications")
                     )
                 case let .failed(msg):
                     ContentUnavailableView(
-                        loc("list.detail.alert_title"),
+                        String(localized: "list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(msg)
                     )
@@ -28,7 +29,7 @@ struct NotificationTab: View {
                     listContent
                 }
             }
-            .navigationTitle(loc("notifications.title"))
+            .navigationTitle("notifications.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -39,11 +40,11 @@ struct NotificationTab: View {
                             else { return }
                             Task { await viewModel.markAllRead(account: account, appPassword: appPassword, using: blueskyClient) }
                         } label: {
-                            Text(loc("notifications.mark_read"))
+                            Text("notifications.mark_read")
                                 .font(.subheadline)
                         }
                         .disabled(viewModel.unreadCount == 0)
-                        .accessibilityHint(loc("notifications.mark_read.hint"))
+                        .accessibilityHint("notifications.mark_read.hint")
                     }
                 }
             }
@@ -58,7 +59,7 @@ struct NotificationTab: View {
                     )
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button(loc("actions.close")) { selectedActor = nil }
+                            Button("actions.close") { selectedActor = nil }
                         }
                     }
                 }

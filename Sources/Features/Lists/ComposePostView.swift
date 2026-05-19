@@ -27,6 +27,7 @@ struct ComposePostView: View {
     @State private var isDownloadingGIF = false
 
     private let maxImages = 4
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
@@ -39,13 +40,13 @@ struct ComposePostView: View {
                             HStack {
                                 ProgressView()
                                     .scaleEffect(0.8)
-                                Text(verbatim: loc("timeline.loading"))
+                                Text("timeline.loading")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
                             }
                         }
                     } header: {
-                        Text(verbatim: replyTo != nil ? loc("profile.posts.replying_to") : loc("compose.quoting"))
+                        Text(verbatim: replyTo != nil ? String(localized: "profile.posts.replying_to") : String(localized: "compose.quoting"))
                     }
                 }
 
@@ -60,7 +61,7 @@ struct ComposePostView: View {
                             .foregroundStyle(postText.count > 300 ? .red : .green)
                     }
                 } header: {
-                    Text(verbatim: loc("compose.text_section"))
+                    Text("compose.text_section")
                 }
 
                 if let previewURL = selectedGIFPreviewURL, !previewURL.isEmpty {
@@ -87,12 +88,12 @@ struct ComposePostView: View {
                                 selectedGIFPreviewURL = nil
                                 selectedGIFTitle = ""
                             } label: {
-                                Label(loc("actions.remove"), systemImage: "xmark.circle.fill")
+                                Label("actions.remove", systemImage: "xmark.circle.fill")
                                     .font(.caption)
                             }
                         }
                     } header: {
-                        Text(verbatim: loc("compose.gif_selected"))
+                        Text("compose.gif_selected")
                     }
                 }
 
@@ -113,7 +114,7 @@ struct ComposePostView: View {
                                                 .frame(width: 100, height: 100)
                                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                                         }
-                                        TextField(loc("compose.alt_placeholder"), text: altBinding)
+                                        TextField("compose.alt_placeholder", text: altBinding)
                                             .font(.caption)
                                             .textFieldStyle(.plain)
                                             .frame(width: 100)
@@ -121,7 +122,7 @@ struct ComposePostView: View {
                                             selectedImages.remove(at: index)
                                             imageAlts.remove(at: index)
                                         } label: {
-                                            Label { Text(verbatim: loc("actions.remove")) } icon: { Image(systemName: "xmark.circle.fill") }
+                                            Label { Text("actions.remove") } icon: { Image(systemName: "xmark.circle.fill") }
                                                 .font(.caption)
                                                 .foregroundStyle(.red)
                                         }
@@ -132,13 +133,13 @@ struct ComposePostView: View {
                             .padding(.vertical, 4)
                         }
                     } header: {
-                        Text(verbatim: loc("compose.images_section"))
+                        Text("compose.images_section")
                     }
                 }
 
                 Section {
                     PhotosPicker(selection: $selectedItems, maxSelectionCount: maxImages, matching: .images) {
-                        Label { Text(verbatim: loc("compose.add_images")) } icon: { Image(systemName: "photo.on.rectangle.angled") }
+                        Label { Text("compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
                     }
                     .disabled(selectedImages.count >= maxImages || videoAttachment != nil)
                     .onChange(of: selectedItems) { _, items in
@@ -149,7 +150,7 @@ struct ComposePostView: View {
                         showGIFPicker = true
                     } label: {
                         HStack {
-                            Label { Text(verbatim: loc("compose.add_gif")) } icon: { Image(systemName: "play.rectangle") }
+                            Label { Text("compose.add_gif") } icon: { Image(systemName: "play.rectangle") }
                             Spacer()
                             if isDownloadingGIF {
                                 ProgressView()
@@ -161,21 +162,21 @@ struct ComposePostView: View {
                     .foregroundStyle(videoAttachment != nil ? Color.skyPrimary : .primary)
                 }
             }
-            .navigationTitle(replyTo != nil ? loc("compose.reply_title") : (quote != nil ? loc("compose.quote_title") : loc("compose.title")))
+            .navigationTitle(replyTo != nil ? String(localized: "compose.reply_title") : (quote != nil ? String(localized: "compose.quote_title") : String(localized: "compose.title")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) { dismiss() }
+                    Button("actions.cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("compose.post")) {
+                    Button("compose.post") {
                         Task { await post() }
                     }
                     .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                 }
             }
-            .alert(loc("compose.error"), isPresented: .constant(errorMessage != nil)) {
-                Button(loc("actions.ok")) { errorMessage = nil }
+            .alert("compose.error", isPresented: .constant(errorMessage != nil)) {
+                Button("actions.ok") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
             }

@@ -96,6 +96,8 @@ struct RootView: View {
         }
         .tint(.skyPrimary)
         .preferredColorScheme(preferredScheme)
+        .environment(\.locale, localizationManager.locale)
+        .environment(\.layoutDirection, localizationManager.layoutDirection)
         .gesture(
             DragGesture()
                 .onEnded { value in
@@ -170,7 +172,7 @@ struct RootView: View {
                         Button(localizationManager.localized("onboarding.close")) {
                             hasSeenOnboarding = true
                         }
-                        .accessibilityLabel(loc("onboarding.close.label"))
+                        .accessibilityLabel("onboarding.close.label")
                     }
                 }
             }

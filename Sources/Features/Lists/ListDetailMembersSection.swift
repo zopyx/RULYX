@@ -13,6 +13,7 @@ extension ListDetailView {
         @EnvironmentObject var accountStore: AccountStore
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
         var body: some View {
             findMembersSection
@@ -23,10 +24,10 @@ extension ListDetailView {
 
         private var findMembersSection: some View {
             Section {
-                TextField(loc("list.members.filter_placeholder"), text: $memberSearchQuery)
+                TextField("list.members.filter_placeholder", text: $memberSearchQuery)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .accessibilityLabel(loc("list.members.filter.label"))
+                    .accessibilityLabel("list.members.filter.label")
                     .focused($memberFilterFocused)
 
                 if !viewModel.members.isEmpty {
@@ -36,19 +37,19 @@ extension ListDetailView {
                 }
 
                 if !memberSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text(verbatim: loc("list.members.matching").replacingOccurrences(of: "{count}", with: "\(viewModel.filteredMembers.count)"))
+                    Text(verbatim: String(localized: "list.members.matching").replacingOccurrences(of: "{count}", with: "\(viewModel.filteredMembers.count)"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             } header: {
-                Text(verbatim: loc("list.members.find"))
+                Text("list.members.find")
             }
         }
 
         private var membersSection: some View {
             Section {
                 if viewModel.isLoadingMembers, viewModel.members.isEmpty {
-                    LoadingPanel(message: loc("list.members.loading"))
+                    LoadingPanel(message: String(localized: "list.members.loading"))
                 } else if let errorMsg = viewModel.membersErrorMessage, viewModel.members.isEmpty {
                     ErrorRetryBanner(message: errorMsg) {
                         Task {
@@ -62,13 +63,13 @@ extension ListDetailView {
                     }
                 } else if viewModel.members.isEmpty {
                     EmptyStatePanel(
-                        title: loc("list.members.no_members"),
-                        message: loc("list.members.no_members_desc")
+                        title: String(localized: "list.members.no_members"),
+                        message: String(localized: "list.members.no_members_desc")
                     )
                 } else if viewModel.filteredMembers.isEmpty {
                     EmptyStatePanel(
-                        title: loc("list.members.no_matches"),
-                        message: loc("list.members.no_matches_desc")
+                        title: String(localized: "list.members.no_matches"),
+                        message: String(localized: "list.members.no_matches_desc")
                     )
                 } else {
                     ForEach(viewModel.filteredMembers) { member in
@@ -89,21 +90,21 @@ extension ListDetailView {
                                     syncSnapshot()
                                 }
                             } label: {
-                                Label { Text(verbatim: loc("actions.remove")) } icon: { Image(systemName: "person.crop.circle.badge.minus") }
+                                Label { Text("actions.remove") } icon: { Image(systemName: "person.crop.circle.badge.minus") }
                             }
                             .disabled(viewModel.isRemoving(member) || batchState.isPerformingBulkAction)
-                            .accessibilityHint(loc("list.members.remove.hint"))
+                            .accessibilityHint("list.members.remove.hint")
                         }
                     }
 
                     if viewModel.isLoadingMoreMembers {
                         HStack {
                             ProgressView()
-                            Text(verbatim: loc("list.members.loading_more"))
+                            Text("list.members.loading_more")
                                 .foregroundStyle(.secondary)
                         }
                     } else if viewModel.hasMoreMembers {
-                        Button(loc("list.members.load_more_button")) {
+                        Button("list.members.load_more_button") {
                             Task {
                                 await viewModel.loadMoreMembersIfNeeded(
                                     currentMember: viewModel.filteredMembers.last,
@@ -114,12 +115,12 @@ extension ListDetailView {
                                 )
                             }
                         }
-                        .accessibilityLabel(loc("list.members.load_more.label"))
-                        .accessibilityHint(loc("list.members.load_more.hint"))
+                        .accessibilityLabel("list.members.load_more.label")
+                        .accessibilityHint("list.members.load_more.hint")
                     }
                 }
             } header: {
-                Text(verbatim: loc("list.members.title"))
+                Text("list.members.title")
             }
         }
     }

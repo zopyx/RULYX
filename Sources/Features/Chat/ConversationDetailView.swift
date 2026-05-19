@@ -5,6 +5,7 @@ struct ConversationDetailView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var messageText = ""
     @State private var showProfile = false
     @State private var mentionProfileHandle: String?
@@ -28,7 +29,7 @@ struct ConversationDetailView: View {
         if let member = otherMember {
             return member.displayName ?? member.handle
         }
-        return conversation.members.first?.handle ?? loc("chat.unknown")
+        return conversation.members.first?.handle ?? String(localized: "chat.unknown")
     }
 
     var body: some View {
@@ -42,7 +43,7 @@ struct ConversationDetailView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                    Button(loc("state.error.retry")) {
+                    Button("state.error.retry") {
                         Task { await chatStore.loadMessages(convoId: conversation.id) }
                     }
                     .buttonStyle(.bordered)
@@ -94,25 +95,25 @@ struct ConversationDetailView: View {
                         Button {
                             Task { await chatStore.unmute(convoId: conversation.id) }
                         } label: {
-                            Label(loc("chat.unmute"), systemImage: "bell")
+                            Label("chat.unmute", systemImage: "bell")
                         }
                     } else {
                         Button {
                             Task { await chatStore.mute(convoId: conversation.id) }
                         } label: {
-                            Label(loc("chat.mute"), systemImage: "bell.slash")
+                            Label("chat.mute", systemImage: "bell.slash")
                         }
                     }
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         Task { await chatStore.loadMessages(convoId: conversation.id) }
                     } label: {
-                        Label(loc("chat.reload"), systemImage: "arrow.clockwise")
+                        Label("chat.reload", systemImage: "arrow.clockwise")
                     }
                     Button(role: .destructive) {
                         Task { await chatStore.leave(convoId: conversation.id) }
                     } label: {
-                        Label(loc("chat.delete"), systemImage: "trash")
+                        Label("chat.delete", systemImage: "trash")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -139,7 +140,7 @@ struct ConversationDetailView: View {
                     .environmentObject(workspaceStore)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button(loc("actions.done")) {
+                            Button("actions.done") {
                                 showProfile = false
                             }
                         }
@@ -167,7 +168,7 @@ struct ConversationDetailView: View {
                 .environmentObject(workspaceStore)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button(loc("actions.done")) {
+                        Button("actions.done") {
                             mentionProfileHandle = nil
                         }
                     }
@@ -196,7 +197,7 @@ struct ConversationDetailView: View {
                             if chatStore.isLoadingMoreMessages {
                                 ProgressView()
                             } else {
-                                Button(loc("chat.load_older")) {
+                                Button("chat.load_older") {
                                     Task { await chatStore.loadMoreMessages(convoId: conversation.id) }
                                 }
                                 .font(.subheadline)
@@ -254,7 +255,7 @@ struct ConversationDetailView: View {
 
     private var sendBar: some View {
         HStack(spacing: 8) {
-            TextField(loc("chat.message.placeholder"), text: $messageText)
+            TextField("chat.message.placeholder", text: $messageText)
                 .textFieldStyle(.roundedBorder)
                 .focused($isFocused)
                 .disabled(chatStore.isSendingMessage)
@@ -320,7 +321,7 @@ struct ConversationDetailView: View {
     private func deletedMessageView(_: ChatDeletedMessage) -> some View {
         HStack {
             Spacer()
-            Text(loc("chat.message.deleted"))
+            Text("chat.message.deleted")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .padding(.vertical, 8)
@@ -344,14 +345,14 @@ struct ConversationDetailView: View {
 
     private func systemText(_ data: ChatSystemMessageData) -> String {
         switch data {
-        case .addMember: loc("chat.system.added")
-        case .removeMember: loc("chat.system.removed")
-        case .memberJoin: loc("chat.system.joined")
-        case .memberLeave: loc("chat.system.left")
-        case .lockConvo: loc("chat.system.locked")
-        case .unlockConvo: loc("chat.system.unlocked")
-        case .lockConvoPermanently: loc("chat.system.locked_permanent")
-        case .editGroup: loc("chat.system.group_updated")
+        case .addMember: String(localized: "chat.system.added")
+        case .removeMember: String(localized: "chat.system.removed")
+        case .memberJoin: String(localized: "chat.system.joined")
+        case .memberLeave: String(localized: "chat.system.left")
+        case .lockConvo: String(localized: "chat.system.locked")
+        case .unlockConvo: String(localized: "chat.system.unlocked")
+        case .lockConvoPermanently: String(localized: "chat.system.locked_permanent")
+        case .editGroup: String(localized: "chat.system.group_updated")
         case .unknown: ""
         }
     }
