@@ -37,8 +37,8 @@ struct PendingActionsSheet: View {
                                         ]
                                     )
                                 )
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                             case let .completed(succeeded, failed):
                                 if failed > 0 {
                                     Text(verbatim: String.localized("pending.succeeded_failed", replacements: ["succeeded": "\(succeeded)", "failed": "\(failed)"]))

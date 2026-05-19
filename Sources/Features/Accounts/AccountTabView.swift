@@ -71,7 +71,8 @@ struct AccountTabView: View {
                             }
                         } label: {
                             if let prefID = accountStore.preferredSearchAccountID,
-                               let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+                               let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+                            {
                                 AccountRowView(
                                     account: prefAccount,
                                     isActive: prefAccount.id == accountStore.activeAccountID

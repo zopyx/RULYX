@@ -101,10 +101,10 @@ final class ActionQueueStore: ObservableObject {
             )
 
             await MainActor.run { [weak self] in
-                guard let self, let i = self.actions.firstIndex(where: { $0.id == actionID }) else { return }
-                self.actions[i].status = .completed(result.succeededActors.count, result.failures.count)
-                self.processingTask = nil
-                self.processNext()
+                guard let self, let i = actions.firstIndex(where: { $0.id == actionID }) else { return }
+                actions[i].status = .completed(result.succeededActors.count, result.failures.count)
+                processingTask = nil
+                processNext()
             }
         }
     }

@@ -38,7 +38,7 @@ final class AnalyticsStore: ObservableObject {
     }
 
     func likeTrend(for postURI: String) -> String {
-        let history = self.history(for: postURI)
+        let history = history(for: postURI)
         guard history.count >= 2 else { return "" }
         let first = history.first!.likeCount
         let last = history.last!.likeCount

@@ -5,7 +5,9 @@ struct NotificationEntry: Identifiable {
     let relatedPostURI: String?
     let relatedPost: RichPost?
 
-    var id: String { notification.id }
+    var id: String {
+        notification.id
+    }
 }
 
 @MainActor
@@ -149,13 +151,13 @@ final class NotificationViewModel: ObservableObject {
     private func postURI(for notification: NotificationItem) -> String? {
         switch notification.reason {
         case "like", "repost":
-            return notification.reasonSubject
+            notification.reasonSubject
         case "reply", "quote", "mention":
-            return notification.uri
+            notification.uri
         case "follow":
-            return nil
+            nil
         default:
-            return notification.reasonSubject ?? notification.uri
+            notification.reasonSubject ?? notification.uri
         }
     }
 }

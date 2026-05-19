@@ -9,6 +9,7 @@ final class AccountStore: ObservableObject {
             defaults.set(preferredSearchAccountID?.uuidString, forKey: preferredSearchKey)
         }
     }
+
     @Published var errorMessage: String?
     @Published private(set) var isAddingAccount = false
 

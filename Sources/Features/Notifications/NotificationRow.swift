@@ -97,7 +97,6 @@ struct NotificationRow: View {
         return relativeTimeString(from: date)
     }
 
-    @ViewBuilder
     private func relatedPostCard(_ post: RichPost) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -116,7 +115,8 @@ struct NotificationRow: View {
                 }
                 Spacer()
                 if let createdAt = post.safeRecord.createdAt,
-                   let createdDate = parseDate(createdAt) {
+                   let createdDate = parseDate(createdAt)
+                {
                     Text(relativeTimeString(from: createdDate))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)

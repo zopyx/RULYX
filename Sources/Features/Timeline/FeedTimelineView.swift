@@ -28,7 +28,7 @@ struct FeedTimelineView: View {
                 switch viewModel.state {
                 case .initialLoading:
                     skeletonContent
-                case .failed(let msg):
+                case let .failed(msg):
                     ContentUnavailableView(
                         String(localized: "list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
@@ -146,7 +146,7 @@ struct FeedTimelineView: View {
                     Task { await deletePost(post) }
                 }
                 Button(String(localized: "actions.cancel"), role: .cancel) {}
-            } message: { post in
+            } message: { _ in
                 Text("post.delete.message")
             }
             .task {
@@ -180,47 +180,47 @@ struct FeedTimelineView: View {
     private var listContent: some View {
         List {
             ForEach(viewModel.visibleEntries, id: \.post.uri) { entry in
-                    PostRowView(
-                        entry: entry,
-                        onTapThread: {
-                            selectedPostURI = entry.post.uri
-                        },
-                        onTapImage: { index in
-                            let allImages = entry.post.embed?.images ?? []
-                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                            guard index < urls.count else { return }
-                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                        },
-                        onPlayVideo: {
-                            if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
-                                videoPreviewURL = url
-                            }
-                        },
-                        onReply: { handleReply(entry) },
-                        onLike: { handleLike(entry) },
-                        onShowLikes: { showLikesForURI = entry.post.uri },
-                        isLiked: entry.post.isLikedByMe,
-                        isReposted: entry.post.isRepostedByMe,
-                        onRepost: { handleRepost(entry) },
-                        onQuote: { handleQuote(entry) },
-                        onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
-                        onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
-                        onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
-                        onOpenProfile: { handle in openProfile(handle) }
-                    )
-                    .contextMenu {
-                        if let word = muteWord(from: entry) {
-                            Button {
-                                viewModel.mutedWords.add(word)
-                            } label: {
-                                Label {
-                                    Text(verbatim: String(localized: "timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
-                                } icon: {
-                                    Image(systemName: "eye.slash")
-                                }
+                PostRowView(
+                    entry: entry,
+                    onTapThread: {
+                        selectedPostURI = entry.post.uri
+                    },
+                    onTapImage: { index in
+                        let allImages = entry.post.embed?.images ?? []
+                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                        guard index < urls.count else { return }
+                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                    },
+                    onPlayVideo: {
+                        if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
+                            videoPreviewURL = url
+                        }
+                    },
+                    onReply: { handleReply(entry) },
+                    onLike: { handleLike(entry) },
+                    onShowLikes: { showLikesForURI = entry.post.uri },
+                    isLiked: entry.post.isLikedByMe,
+                    isReposted: entry.post.isRepostedByMe,
+                    onRepost: { handleRepost(entry) },
+                    onQuote: { handleQuote(entry) },
+                    onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
+                    onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
+                    onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
+                    onOpenProfile: { handle in openProfile(handle) }
+                )
+                .contextMenu {
+                    if let word = muteWord(from: entry) {
+                        Button {
+                            viewModel.mutedWords.add(word)
+                        } label: {
+                            Label {
+                                Text(verbatim: String(localized: "timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
+                            } icon: {
+                                Image(systemName: "eye.slash")
                             }
                         }
                     }
+                }
             }
             if viewModel.state.hasMore {
                 Color.clear
@@ -246,7 +246,7 @@ struct FeedTimelineView: View {
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }
-            if case .loadMoreFailed(let msg) = viewModel.state {
+            if case let .loadMoreFailed(msg) = viewModel.state {
                 VStack(spacing: 8) {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle")

@@ -931,7 +931,9 @@ enum ModerationReportReasonType: String, CaseIterable, Identifiable {
     case harassmentTroll = "tools.ozone.report.defs#reasonHarassmentTroll"
     case harassmentOther = "tools.ozone.report.defs#reasonHarassmentOther"
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     static let simplifiedDefault = ModerationReportReasonType.harassmentOther
 }
@@ -952,7 +954,9 @@ struct NotificationItem: Decodable, Identifiable {
     var isRead: Bool
     let indexedAt: String
 
-    var id: String { uri }
+    var id: String {
+        uri
+    }
 }
 
 struct UpdateSeenRequest: Encodable {

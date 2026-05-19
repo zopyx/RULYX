@@ -21,7 +21,7 @@ final class ListMergeController {
         appPassword: String,
         using client: LiveBlueskyClient
     ) async -> ListBulkActionResult {
-        let actors = Set(members.map(\.actor)).map { $0 }
+        let actors = Set(members.map(\.actor)).map(\.self)
         let controller = ListBatchController()
         return await controller.performBatch(
             title: "Merge into \(targetList.name)",

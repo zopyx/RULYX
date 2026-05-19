@@ -50,6 +50,7 @@ final class WorkspacePreferencesStore: ObservableObject {
             defaults.set(selectedTab.rawValue, forKey: selectedTabKey)
         }
     }
+
     @Published var lastProfileQuery = "" {
         didSet {
             defaults.set(lastProfileQuery, forKey: lastProfileQueryKey)

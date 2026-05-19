@@ -13,7 +13,7 @@ extension ListDetailView {
         @EnvironmentObject var accountStore: AccountStore
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
-    @EnvironmentObject private var localizationManager: LocalizationManager
+        @EnvironmentObject private var localizationManager: LocalizationManager
 
         var body: some View {
             findMembersSection

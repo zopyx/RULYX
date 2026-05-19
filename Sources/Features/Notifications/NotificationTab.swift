@@ -88,11 +88,11 @@ struct NotificationTab: View {
                         openProfile(for: entry)
                     }
                 )
-                    .onAppear {
-                        if entry.id == viewModel.entries.last?.id {
-                            loadMore()
-                        }
+                .onAppear {
+                    if entry.id == viewModel.entries.last?.id {
+                        loadMore()
                     }
+                }
             }
         }
         .listStyle(.plain)

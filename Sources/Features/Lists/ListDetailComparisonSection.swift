@@ -24,7 +24,7 @@ extension ListDetailView {
             }
         }
 
-    @EnvironmentObject private var localizationManager: LocalizationManager
+        @EnvironmentObject private var localizationManager: LocalizationManager
         var body: some View {
             DisclosureGroup {
                 if viewModel.isLoadingAvailableLists {
