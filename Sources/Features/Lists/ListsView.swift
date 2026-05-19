@@ -98,7 +98,7 @@ struct ListsView: View {
                                         }
                                     } label: {
                                         ListRowView(list: list)
-                                            .accessibilityLabel("list.row.label".replacingOccurrences(of: "{name}", with: list.name).replacingOccurrences(of: "{count}", with: "\(list.memberCount ?? 0)"))
+                                            .accessibilityLabel(String.localized("list.row.label", replacements: ["name": list.name, "count": "\(list.memberCount ?? 0)"]))
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -145,7 +145,7 @@ struct ListsView: View {
                                         }
                                     } label: {
                                         ListRowView(list: list)
-                                            .accessibilityLabel("list.row.label".replacingOccurrences(of: "{name}", with: list.name).replacingOccurrences(of: "{count}", with: "\(list.memberCount ?? 0)"))
+                                            .accessibilityLabel(String.localized("list.row.label", replacements: ["name": list.name, "count": "\(list.memberCount ?? 0)"]))
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -466,7 +466,12 @@ struct ListsView: View {
                                     .font(.body.weight(.semibold))
                                     .foregroundStyle(.primary)
                                 if let count = list.memberCount {
-                                    Text("\(count) members")
+                                    Text(
+                                        verbatim: String.localized(
+                                            count == 1 ? "members_count_one" : "members_count_other",
+                                            replacements: ["count": "\(count)"]
+                                        )
+                                    )
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }

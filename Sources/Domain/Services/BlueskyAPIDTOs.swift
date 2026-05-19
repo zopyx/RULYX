@@ -306,7 +306,7 @@ func relativeTimeString(from date: Date) -> String {
     let hours = minutes / 60
     let days = hours / 24
 
-    if minutes < 1 { return String(localized: "time.just_now") }
+    if minutes < 1 { return String.localized("time.just_now") }
     if minutes < 60 {
         let key = minutes == 1 ? "time.minute_ago" : "time.minutes_ago"
         return loc(key).replacingOccurrences(of: "{n}", with: "\(minutes)")
@@ -890,6 +890,25 @@ struct ModerationReportSubject: Encodable {
     let did: String?
     let uri: String?
     let cid: String?
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if let did, uri == nil {
+            try container.encode("com.atproto.admin.defs#repoRef", forKey: .type)
+            try container.encode(did, forKey: .did)
+        } else {
+            try container.encode("com.atproto.repo.strongRef", forKey: .type)
+            try container.encode(uri, forKey: .uri)
+            try container.encode(cid, forKey: .cid)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case did
+        case uri
+        case cid
+    }
 }
 
 struct ModerationReportTool: Encodable {

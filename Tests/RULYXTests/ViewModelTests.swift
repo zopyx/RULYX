@@ -5,9 +5,11 @@ import XCTest
 final class ViewModelTests: XCTestCase {
     nonisolated override func setUp() {
         super.setUp()
-        DashboardCache.clear(forKey: "")
-        DashboardCache.clear(forKey: "did:plc:test")
-        DashboardCache.clear(forKey: "test.bsky.social")
+        MainActor.assumeIsolated {
+            DashboardCache.clear(forKey: "")
+            DashboardCache.clear(forKey: "did:plc:test")
+            DashboardCache.clear(forKey: "test.bsky.social")
+        }
     }
 
     // MARK: - ListsViewModel

@@ -63,8 +63,14 @@ struct NetworkGraphView: View {
                 Section {
                     LabeledContent("network.mutual_followers", value: "\(mutualFollowers.count)")
                     LabeledContent("network.mutual_following", value: "\(mutualFollowing.count)")
-                    LabeledContent("network.follows_relationship".replacingOccurrences(of: "{handle1}", with: a.handle).replacingOccurrences(of: "{handle2}", with: b.handle), value: aFollowsB ? String(localized: "network.yes") : String(localized: "network.no"))
-                    LabeledContent("network.follows_relationship".replacingOccurrences(of: "{handle1}", with: b.handle).replacingOccurrences(of: "{handle2}", with: a.handle), value: bFollowsA ? String(localized: "network.yes") : String(localized: "network.no"))
+                    LabeledContent(
+                        String.localized("network.follows_relationship", replacements: ["handle1": a.handle, "handle2": b.handle]),
+                        value: aFollowsB ? String(localized: "network.yes") : String(localized: "network.no")
+                    )
+                    LabeledContent(
+                        String.localized("network.follows_relationship", replacements: ["handle1": b.handle, "handle2": a.handle]),
+                        value: bFollowsA ? String(localized: "network.yes") : String(localized: "network.no")
+                    )
                 } header: {
                     Text("network.overlap")
                 }

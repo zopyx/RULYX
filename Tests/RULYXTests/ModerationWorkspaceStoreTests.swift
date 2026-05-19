@@ -8,17 +8,21 @@ final class ModerationWorkspaceStoreTests: XCTestCase {
 
     nonisolated override func setUp() async throws {
         try await super.setUp()
-        suiteName = "ModerationWorkspaceStoreTests.\(UUID().uuidString)"
-        defaults = UserDefaults(suiteName: suiteName)!
+        let suiteName = "ModerationWorkspaceStoreTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
+        self.suiteName = suiteName
+        self.defaults = defaults
     }
 
     nonisolated override func tearDown() async throws {
+        let suiteName = suiteName
+        let defaults = defaults
         if let suiteName {
-            defaults.removePersistentDomain(forName: suiteName)
+            defaults?.removePersistentDomain(forName: suiteName)
         }
-        defaults = nil
-        suiteName = nil
+        self.defaults = nil
+        self.suiteName = nil
         try await super.tearDown()
     }
 

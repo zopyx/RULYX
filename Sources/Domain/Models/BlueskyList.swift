@@ -9,9 +9,9 @@ struct BlueskyList: Identifiable, Hashable, Codable {
         var title: String {
             switch self {
             case .moderation:
-                String(localized: "list.kind.moderation")
+                String.localized("list.kind.moderation")
             case .regular:
-                String(localized: "list.kind.regular")
+                String.localized("list.kind.regular")
             }
         }
 

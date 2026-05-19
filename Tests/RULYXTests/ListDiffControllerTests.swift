@@ -7,8 +7,7 @@ final class ListDiffControllerTests: XCTestCase {
 
     nonisolated override func setUp() async throws {
         try await super.setUp()
-        let c = await MainActor.run { ListDiffController() }
-        controller = c
+        controller = await MainActor.run { ListDiffController() }
     }
 
     func testComparisonMembersForOverlapBucket() {
