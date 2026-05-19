@@ -107,26 +107,30 @@ struct ComposePostView: View {
                                         set: { if index < imageAlts.count { imageAlts[index] = $0 } }
                                     )
                                     VStack(spacing: 4) {
-                                        if let uiImage = UIImage(data: image.data) {
-                                            Image(uiImage: uiImage)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 100, height: 100)
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        ZStack(alignment: .topTrailing) {
+                                            if let uiImage = UIImage(data: image.data) {
+                                                Image(uiImage: uiImage)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 100, height: 100)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            }
+                                            Button {
+                                                selectedImages.remove(at: index)
+                                                imageAlts.remove(at: index)
+                                            } label: {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .font(.title3)
+                                                    .foregroundStyle(.red)
+                                                    .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .offset(x: 4, y: -4)
                                         }
                                         TextField("compose.alt_placeholder", text: altBinding)
                                             .font(.caption)
                                             .textFieldStyle(.plain)
                                             .frame(width: 100)
-                                        Button {
-                                            selectedImages.remove(at: index)
-                                            imageAlts.remove(at: index)
-                                        } label: {
-                                            Label { Text("actions.remove") } icon: { Image(systemName: "xmark.circle.fill") }
-                                                .font(.caption)
-                                                .foregroundStyle(.red)
-                                        }
-                                        .buttonStyle(.plain)
                                     }
                                 }
                             }
@@ -249,7 +253,7 @@ struct ComposePostView: View {
         for item in items {
             if let data = try? await item.loadTransferable(type: Data.self) {
                 let mimeType = item.supportedContentTypes.first?.preferredMIMEType ?? "image/jpeg"
-                newImages.append((data, mimeType))
+                newImages.append((data.strippingLocationMetadata(), mimeType))
                 newAlts.append("")
             }
         }
@@ -369,5 +373,23 @@ private struct WritingToolsTextView: UIViewRepresentable {
 private extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil
+    }
+}
+
+private extension Data {
+    func strippingLocationMetadata() -> Data {
+        guard let source = CGImageSourceCreateWithData(self as CFData, nil),
+              let type = CGImageSourceGetType(source),
+              let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any],
+              metadata.keys.contains(kCGImagePropertyGPSDictionary as String)
+        else { return self }
+        let mutableMetadata = NSMutableDictionary(dictionary: metadata)
+        mutableMetadata.removeObject(forKey: kCGImagePropertyGPSDictionary)
+        let destinationData = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(destinationData as CFMutableData, type, 1, nil)
+        else { return self }
+        CGImageDestinationAddImageFromSource(destination, source, 0, mutableMetadata as CFDictionary)
+        guard CGImageDestinationFinalize(destination) else { return self }
+        return destinationData as Data
     }
 }
