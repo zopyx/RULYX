@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1035,
+    "total_keys": 1036,
     "total_languages": 16,
-    "untranslated_total": 30
+    "untranslated_total": 31
   },
   "keys": {
     "account.active": {
@@ -11675,6 +11675,69 @@
       },
       "vi": {
         "text": "总操作数 (VI)",
+        "untranslated": false
+      }
+    },
+    "debug.diagnostics": {
+      "en": "Diagnostics",
+      "de": {
+        "text": "Diagnose",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Diagnostics",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Diagnostica",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "診断",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "诊断",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Diagnóstico",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Diagnóstico",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "진단",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Диагностика",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "التشخيص",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Diagnostiek",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Diagnostyka",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Tanılama",
+        "untranslated": false
+      },
+      "th": {
+        "text": "การวินิจฉัย",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Chẩn đoán",
         "untranslated": false
       }
     },
