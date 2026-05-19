@@ -6,13 +6,13 @@ enum KeychainError: Error {
     case invalidData
 }
 
-protocol KeychainServicing {
+protocol KeychainServicing: Sendable {
     func save(_ value: String, service: String, account: String) throws
     func read(service: String, account: String) throws -> String?
     func delete(service: String, account: String) throws
 }
 
-final class KeychainService: KeychainServicing {
+final class KeychainService: KeychainServicing, @unchecked Sendable {
     func save(_ value: String, service: String, account: String) throws {
         let data = Data(value.utf8)
         let query: [String: Any] = [

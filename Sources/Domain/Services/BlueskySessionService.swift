@@ -94,16 +94,22 @@ final class BlueskySessionService: BlueskySessionServicing {
     ) async throws -> Response {
         var authSession = try await cachedSession(for: account, appPassword: appPassword)
 
-        do {
-            return try await operation(authSession)
-        } catch BlueskyAPIError.unauthorized {
-            authSession = try await recoverSession(
-                currentSession: authSession,
-                for: account,
-                appPassword: appPassword
-            )
-            return try await operation(authSession)
+        for attempt in 0 ..< 3 {
+            do {
+                return try await operation(authSession)
+            } catch BlueskyAPIError.unauthorized {
+                guard attempt < 2 else { throw BlueskyAPIError.unauthorized }
+                authSession = try await recoverSession(
+                    currentSession: authSession,
+                    for: account,
+                    appPassword: appPassword
+                )
+                let delay = pow(2.0, Double(attempt)) * Double.random(in: 0.8 ..< 1.2)
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            }
         }
+
+        throw BlueskyAPIError.unauthorized
     }
 
     private func cachedSession(

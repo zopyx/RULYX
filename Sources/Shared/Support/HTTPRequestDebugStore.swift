@@ -74,13 +74,14 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     }
 
     func fail(id: UUID, statusCode: Int? = nil, errorMessage: String?, errorResponseJSON: String? = nil) async {
+        let sanitizedJSON = Self.sanitizeErrorResponseJSON(errorResponseJSON)
         await MainActor.run {
             update(id: id) { entry in
                 entry.state = .failed
                 entry.statusCode = statusCode
                 entry.duration = Date().timeIntervalSince(entry.startedAt)
                 entry.errorMessage = errorMessage
-                entry.errorResponseJSON = errorResponseJSON
+                entry.errorResponseJSON = sanitizedJSON
             }
         }
     }
@@ -101,8 +102,30 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     }
 
     private static func sanitizeURL(_ url: String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: "(https?://api\\.klipy\\.com/api/v1/)[A-Za-z0-9]{50,}(/|$)") else { return url }
-        let range = NSRange(url.startIndex..., in: url)
-        return regex.stringByReplacingMatches(in: url, range: range, withTemplate: "$1[REDACTED]$2")
+        let patterns: [(NSRegularExpression, String)] = [
+            (try! NSRegularExpression(pattern: "(https?://api\\.klipy\\.com/api/v1/)[A-Za-z0-9]{50,}(/|$)"), "$1[REDACTED]$2"),
+            (try! NSRegularExpression(pattern: "accessJwt=[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+"), "accessJwt=[REDACTED]"),
+            (try! NSRegularExpression(pattern: "refreshJwt=[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+"), "refreshJwt=[REDACTED]"),
+        ]
+        var result = url
+        let nsRange = NSRange(result.startIndex..., in: result)
+        for (regex, template) in patterns {
+            result = regex.stringByReplacingMatches(in: result, range: nsRange, withTemplate: template)
+        }
+        return result
+    }
+
+    static func sanitizeErrorResponseJSON(_ json: String?) -> String? {
+        guard let json else { return nil }
+        let patterns: [(NSRegularExpression, String)] = [
+            (try! NSRegularExpression(pattern: "\"(accessJwt|refreshJwt|authorization)\"\\s*:\\s*\"[^\"]+\""), "\"$1\":\"[REDACTED]\""),
+            (try! NSRegularExpression(pattern: "\"(accessJwt|refreshJwt|authorization)\"\\s*:\\s*\"[^\"]+\""), "\"$1\":\"[REDACTED]\""),
+        ]
+        var result = json
+        let nsRange = NSRange(result.startIndex..., in: result)
+        for (regex, template) in patterns {
+            result = regex.stringByReplacingMatches(in: result, range: nsRange, withTemplate: template)
+        }
+        return result
     }
 }
