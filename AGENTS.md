@@ -93,10 +93,15 @@ Every completed task MUST include an accurate description rendered as a table:
 ## Blocking / Blocked-By List Item Layout
 In `RelationshipsView`, each blocking/blocked-by list item uses this two-row layout:
 
-## Blocking / Blocked-By List Item Layout
-In `RelationshipsView`, each blocking/blocked-by list item uses this two-row layout:
-
 ```
 Row 1: Display Name_____________3 days ago
 Row 2: @handle
 ```
+
+## Preferred Search Account
+- **Storage**: `AccountStore.preferredSearchAccountID` (`UUID?`) persisted in UserDefaults under `bluesky.preferredSearchAccountID`
+- **Setting UI**: `AccountTabView` (Accounts tab) — displays a `Menu` listing all accounts; selection sets `accountStore.preferredSearchAccountID = account.id`
+- **Fallback**: When no preference is set or the preferred account is deleted → falls back to `accountStore.activeAccount`
+- **Deletion handling**: When the preferred account is removed, `AccountStore.removeAccount()` resets it to `accounts.first?.id`
+- **Search views** (`CustomSearchView`, `MentionsSearchView`): On first appearance, read `preferredSearchAccountID` and set local `searchAccount` state. No inline account switching UI — the search account is purely driven by the global preference set in the Accounts tab
+- **Account row in search forms**: Displays the preferred search account's **avatar** and display name as a static info row (not interactive), showing which account is being used for searches
