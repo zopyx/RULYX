@@ -14,7 +14,7 @@ swiftformat Sources Tests
 ```
 
 ## Platform Constraints
-- **iPhone + iPad** — TARGETED_DEVICE_FAMILY = "1,2"
+- **iPhone only** — TARGETED_DEVICE_FAMILY = "1" (runs in iPhone compatibility mode on iPad)
 - **No macOS** — no Mac target, no Mac Catalyst
 - Do not add `#if os(macOS)` code paths
 
