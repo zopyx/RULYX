@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Nessun utente trovato",
   "usersearch.no_results_desc": "Prova un nome o un handle diverso",
   "usersearch.placeholder": "Nome, handle o descrizione...",
-  "usersearch.title": "Cerca utenti"
+  "usersearch.title": "Cerca utenti",
+  "debug.http.title": "Richieste HTTP",
+  "debug.http.empty": "Nessuna richiesta ancora registrata.",
+  "debug.http.clear": "Cancella registro",
+  "debug.http.state.running": "Corsa",
+  "debug.http.state.succeeded": "Successo",
+  "debug.http.state.failed": "Fallito"
 }

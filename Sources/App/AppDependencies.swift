@@ -13,8 +13,10 @@ final class AppDependencies: ObservableObject {
     let analyticsStore: AnalyticsStore
     let chatStore: ChatStore
     let pushNotificationCoordinator: PushNotificationCoordinator
+    let httpRequestDebugStore: HTTPRequestDebugStore
 
     init() {
+        httpRequestDebugStore = HTTPRequestDebugStore.shared
         if CommandLine.arguments.contains("--uitesting") {
             UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
             UserDefaults.standard.set("en", forKey: "selectedLanguage")

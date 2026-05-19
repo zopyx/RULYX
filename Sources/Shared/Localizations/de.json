@@ -1026,5 +1026,11 @@
   "usersearch.no_results": "Keine Benutzer gefunden",
   "usersearch.no_results_desc": "Versuchen Sie es mit einem anderen Namen oder Handle",
   "usersearch.placeholder": "Name, Handle oder Beschreibung...",
-  "usersearch.title": "Benutzer suchen"
+  "usersearch.title": "Benutzer suchen",
+  "debug.http.title": "HTTP-Anfragen",
+  "debug.http.empty": "Es wurden noch keine Anfragen erfasst.",
+  "debug.http.clear": "Protokoll löschen",
+  "debug.http.state.running": "Läuft",
+  "debug.http.state.succeeded": "Erfolg",
+  "debug.http.state.failed": "Fehlgeschlagen"
 }

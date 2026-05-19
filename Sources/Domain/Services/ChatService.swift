@@ -219,7 +219,7 @@ final class ChatService: ChatServicing {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             }
 
-            let (data, httpResponse) = try await httpClient.data(for: request)
+            let (data, httpResponse) = try await httpClient.data(for: request, source: "Chat")
 
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {

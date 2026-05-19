@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Nie znaleziono żadnych użytkowników",
   "usersearch.no_results_desc": "Wypróbuj inną nazwę lub uchwyt",
   "usersearch.placeholder": "Nazwa, uchwyt lub opis...",
-  "usersearch.title": "Wyszukaj użytkowników"
+  "usersearch.title": "Wyszukaj użytkowników",
+  "debug.http.title": "Żądania HTTP",
+  "debug.http.empty": "Nie zarejestrowano jeszcze żadnych żądań.",
+  "debug.http.clear": "Wyczyść dziennik",
+  "debug.http.state.running": "Działanie",
+  "debug.http.state.succeeded": "Sukces",
+  "debug.http.state.failed": "Przegrany"
 }

@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "没有找到用户",
   "usersearch.no_results_desc": "尝试使用不同的名称或句柄",
   "usersearch.placeholder": "名称、句柄或描述...",
-  "usersearch.title": "搜索用户"
+  "usersearch.title": "搜索用户",
+  "debug.http.title": "HTTP 请求",
+  "debug.http.empty": "尚未记录任何请求。",
+  "debug.http.clear": "清除日志",
+  "debug.http.state.running": "跑步",
+  "debug.http.state.succeeded": "成功",
+  "debug.http.state.failed": "失败的"
 }

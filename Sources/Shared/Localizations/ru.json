@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Пользователи не найдены",
   "usersearch.no_results_desc": "Попробуйте другое имя или дескриптор",
   "usersearch.placeholder": "Имя, дескриптор или описание...",
-  "usersearch.title": "Поиск пользователей"
+  "usersearch.title": "Поиск пользователей",
+  "debug.http.title": "HTTP-запросы",
+  "debug.http.empty": "Запросов пока не зарегистрировано.",
+  "debug.http.clear": "Очистить журнал",
+  "debug.http.state.running": "Бег",
+  "debug.http.state.succeeded": "Успех",
+  "debug.http.state.failed": "Неуспешный"
 }

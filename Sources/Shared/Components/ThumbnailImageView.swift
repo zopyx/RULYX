@@ -20,7 +20,7 @@ private actor ThumbnailPipeline {
             return cached
         }
 
-        let (data, httpResponse) = try await httpClient.data(from: url)
+        let (data, httpResponse) = try await httpClient.data(from: url, source: "Thumbnail Image")
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw URLError(.badServerResponse)
         }

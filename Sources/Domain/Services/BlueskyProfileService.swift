@@ -4,10 +4,12 @@ import Foundation
 final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
+    private let httpClient: HTTPClient
 
-    init(requestExecutor: BlueskyRequestExecuting, sessionService: BlueskySessionServicing) {
+    init(requestExecutor: BlueskyRequestExecuting, sessionService: BlueskySessionServicing, httpClient: HTTPClient = HTTPClient()) {
         self.requestExecutor = requestExecutor
         self.sessionService = sessionService
+        self.httpClient = httpClient
     }
 
     func searchActors(
@@ -485,8 +487,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
             request.setValue("\(Self.bskyLabelerDID)#atproto_labeler", forHTTPHeaderField: "atproto-proxy")
             request.httpBody = try JSONEncoder().encode(body)
-            let (data, urlResponse) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = urlResponse as? HTTPURLResponse, (200 ..< 300).contains(httpResponse.statusCode) else {
+            let (data, httpResponse) = try await httpClient.data(for: request, source: "Moderation Report")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
                     throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Report failed.")
                 }
