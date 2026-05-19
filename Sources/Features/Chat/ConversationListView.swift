@@ -386,10 +386,7 @@ struct ConversationListView: View {
             if diff < 3600 { return "\(Int(diff / 60))m" }
             if diff < 86400 { return "\(Int(diff / 3600))h" }
             if diff < 604_800 { return "\(Int(diff / 86400))d" }
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            formatter.timeStyle = .none
-            return formatter.string(from: date)
+            return date.formatted(date: .numeric, time: .omitted)
         }
     }
 }

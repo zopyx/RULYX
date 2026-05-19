@@ -88,12 +88,7 @@ struct NotificationRow: View {
     }
 
     private var relativeTime: String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        guard let date = formatter.date(from: notification.indexedAt) ?? {
-            formatter.formatOptions = [.withInternetDateTime]
-            return formatter.date(from: notification.indexedAt)
-        }() else { return "" }
+        guard let date = SharedDateFormatters.parseISO8601(notification.indexedAt) else { return "" }
         return relativeTimeString(from: date)
     }
 

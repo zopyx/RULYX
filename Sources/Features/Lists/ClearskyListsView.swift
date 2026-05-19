@@ -102,12 +102,7 @@ struct ClearskyListsView: View {
     }
 
     private func formatDateRelative(dateString: String) -> String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        guard let date = formatter.date(from: dateString) ?? {
-            formatter.formatOptions = [.withInternetDateTime]
-            return formatter.date(from: dateString)
-        }() else { return dateString }
+        guard let date = SharedDateFormatters.parseISO8601(dateString) else { return dateString }
 
         let daysSince = Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0
         if daysSince < 28 {
@@ -120,12 +115,7 @@ struct ClearskyListsView: View {
     }
 
     private func date(from string: String) -> Date {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: string) { return date }
-        formatter.formatOptions = [.withInternetDateTime]
-        if let date = formatter.date(from: string) { return date }
-        return .distantPast
+        SharedDateFormatters.parseISO8601(string) ?? .distantPast
     }
 }
 
