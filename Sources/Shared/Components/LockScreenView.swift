@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LockScreenView: View {
     @EnvironmentObject private var appLockManager: AppLockManager
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         VStack(spacing: 24) {
@@ -25,7 +26,7 @@ struct LockScreenView: View {
                 Button {
                     Task { await appLockManager.authenticate() }
                 } label: {
-                    Label(loc("lock_screen.unlock"), systemImage: icon)
+                    Label("lock_screen.unlock", systemImage: icon)
                         .font(.headline)
                         .frame(maxWidth: 200)
                         .padding()
@@ -48,17 +49,17 @@ struct LockScreenView: View {
 
     private var title: String {
         switch appLockManager.biometricType {
-        case .faceID: loc("lock_screen.face_id_title")
-        case .touchID: loc("lock_screen.touch_id_title")
-        default: loc("lock_screen.app_locked")
+        case .faceID: String(localized: "lock_screen.face_id_title")
+        case .touchID: String(localized: "lock_screen.touch_id_title")
+        default: String(localized: "lock_screen.app_locked")
         }
     }
 
     private var subtitle: String {
         if appLockManager.isBiometricsAvailable {
-            loc("lock_screen.biometric_subtitle").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel)
+            String(localized: "lock_screen.biometric_subtitle").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel)
         } else {
-            loc("lock_screen.biometric_unavailable")
+            String(localized: "lock_screen.biometric_unavailable")
         }
     }
 }

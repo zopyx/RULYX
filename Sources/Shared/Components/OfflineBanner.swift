@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct OfflineBanner: View {
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "wifi.slash")
                 .font(.subheadline)
-            Text(loc("offline.title"))
+            Text("offline.title")
                 .font(.subheadline.weight(.semibold))
         }
         .frame(maxWidth: .infinity)

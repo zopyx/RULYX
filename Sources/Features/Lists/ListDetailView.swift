@@ -47,6 +47,7 @@ struct ListDetailView: View {
         _currentList = State(initialValue: list)
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         rootContent
             .navigationTitle("")
@@ -83,7 +84,7 @@ struct ListDetailView: View {
                    let appPassword = accountStore.appPassword(for: account)
                 {
                     SimplifiedReportSheet(
-                        title: loc("actions.report"),
+                        title: String(localized: "actions.report"),
                         selectedReason: $selectedReportReason,
                         evidenceText: $reportEvidenceText,
                         isSubmitting: isReportingList,
@@ -116,30 +117,30 @@ struct ListDetailView: View {
                     ShareSheet(activityItems: [url])
                 }
             }
-            .alert(loc("list.detail.alert_title"), isPresented: .constant(viewModel.errorMessage != nil), actions: {
-                Button(loc("actions.ok")) {
+            .alert("list.detail.alert_title", isPresented: .constant(viewModel.errorMessage != nil), actions: {
+                Button("actions.ok") {
                     viewModel.errorMessage = nil
                 }
-                .accessibilityHint(loc("list.detail.dismiss_error.hint"))
-                .accessibilityInputLabels([loc("actions.ok")])
+                .accessibilityHint("list.detail.dismiss_error.hint")
+                .accessibilityInputLabels(["actions.ok"])
             }, message: {
                 Text(viewModel.errorMessage ?? "")
             })
             .alert(
-                viewModel.bulkActionResult?.operation.title ?? loc("list.detail.bulk_update"),
+                viewModel.bulkActionResult?.operation.title ?? String(localized: "list.detail.bulk_update"),
                 isPresented: bulkResultPresentedBinding
             ) {
-                Button(loc("actions.ok")) {
+                Button("actions.ok") {
                     viewModel.bulkActionResult = nil
                 }
-                .accessibilityHint(loc("list.detail.dismiss_bulk.hint"))
+                .accessibilityHint("list.detail.dismiss_bulk.hint")
 
                 if let account = accountStore.activeAccount,
                    let appPassword = accountStore.appPassword(for: account),
                    let result = viewModel.bulkActionResult,
                    !result.failures.isEmpty
                 {
-                    Button(loc("list.detail.retry_failed")) {
+                    Button("list.detail.retry_failed") {
                         Task {
                             await viewModel.retryFailures(
                                 from: result,
@@ -152,7 +153,7 @@ struct ListDetailView: View {
                             syncSnapshot()
                         }
                     }
-                    .accessibilityHint(loc("list.detail.retry_failed.hint"))
+                    .accessibilityHint("list.detail.retry_failed.hint")
                 }
             } message: {
                 if let result = viewModel.bulkActionResult {
@@ -160,11 +161,11 @@ struct ListDetailView: View {
                 }
             }
             .confirmationDialog(
-                loc("list.detail.delete_confirm"),
+                String(localized: "list.detail.delete_confirm"),
                 isPresented: $isShowingDeleteConfirmation,
                 titleVisibility: .visible
             ) {
-                Button(loc("actions.delete"), role: .destructive) {
+                Button(String(localized: "actions.delete"), role: .destructive) {
                     if let account = accountStore.activeAccount,
                        let appPassword = accountStore.appPassword(for: account)
                     {
@@ -183,13 +184,13 @@ struct ListDetailView: View {
                         }
                     }
                 }
-                .accessibilityHint(loc("list.detail.delete_list.hint"))
-                .accessibilityInputLabels([loc("actions.delete")])
-                Button(loc("actions.cancel"), role: .cancel) {}
-                    .accessibilityHint(loc("list.detail.cancel_delete.hint"))
-                    .accessibilityInputLabels([loc("actions.cancel")])
+                .accessibilityHint("list.detail.delete_list.hint")
+                .accessibilityInputLabels(["actions.delete"])
+                Button(String(localized: "actions.cancel"), role: .cancel) {}
+                    .accessibilityHint("list.detail.cancel_delete.hint")
+                    .accessibilityInputLabels(["actions.cancel"])
             } message: {
-                Text(verbatim: loc("list.detail.delete_message"))
+                Text("list.detail.delete_message")
             }
             .onChange(of: viewModel.bulkActionResult) { _, newResult in
                 guard let newResult else { return }
@@ -211,9 +212,9 @@ struct ListDetailView: View {
                 content(account: account, appPassword: appPassword)
             } else {
                 ContentUnavailableView(
-                    loc("list.detail.missing_creds"),
+                    String(localized: "list.detail.missing_creds"),
                     systemImage: "key.slash",
-                    description: Text(verbatim: loc("list.detail.missing_creds.desc"))
+                    description: Text("list.detail.missing_creds.desc")
                 )
             }
         }
@@ -235,18 +236,18 @@ struct ListDetailView: View {
                 Button(role: .destructive) {
                     isShowingDeleteConfirmation = true
                 } label: {
-                    Label { Text(verbatim: loc("list.detail.delete")) } icon: { Image(systemName: "trash") }
+                    Label { Text("list.detail.delete") } icon: { Image(systemName: "trash") }
                 }
-                .accessibilityHint(loc("list.detail.delete_list.hint"))
+                .accessibilityHint("list.detail.delete_list.hint")
             }
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     importState.isShowingEditSheet = true
                 } label: {
-                    Label { Text(verbatim: loc("list.detail.edit")) } icon: { Image(systemName: "pencil") }
+                    Label { Text("list.detail.edit") } icon: { Image(systemName: "pencil") }
                 }
-                .accessibilityHint(loc("list.detail.edit_list.hint"))
+                .accessibilityHint("list.detail.edit_list.hint")
             }
         }
 
@@ -257,28 +258,28 @@ struct ListDetailView: View {
                         isExporting = true
                         Task { await exportList(format: .csv) }
                     } label: {
-                        Label { Text(verbatim: loc("list.search.export_csv_all")) } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text("list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
                     }
 
                     Button {
                         isExporting = true
                         Task { await exportList(format: .json) }
                     } label: {
-                        Label { Text(verbatim: loc("list.search.export_json_all")) } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text("list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
                     }
 
                     Button {
                         isExporting = true
                         Task { await exportList(format: .xlsx) }
                     } label: {
-                        Label { Text(verbatim: loc("list.export.excel")) } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text("list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
                     }
 
                     Button {
                         isExporting = true
                         Task { await exportList(format: .ods) }
                     } label: {
-                        Label { Text(verbatim: loc("list.export.ods")) } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text("list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
                     }
                 } label: {
                     if isExporting {
@@ -325,7 +326,7 @@ struct ListDetailView: View {
                 Task {
                     await viewModel.prepareImportPreview(
                         from: rawInput,
-                        sourceDescription: loc("list.import.pasted_input"),
+                        sourceDescription: String(localized: "list.import.pasted_input"),
                         account: account,
                         appPassword: appPassword,
                         using: blueskyClient
@@ -452,9 +453,9 @@ struct ListDetailView: View {
                                 .font(.title3)
                                 .foregroundStyle(subscriptionRecordURI != nil ? .red : .blue)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(verbatim: subscriptionRecordURI != nil ? loc("list.detail.subscribed") : loc("list.detail.subscribe"))
+                                Text(verbatim: subscriptionRecordURI != nil ? String(localized: "list.detail.subscribed") : String(localized: "list.detail.subscribe"))
                                     .font(.subheadline.weight(.semibold))
-                                Text(verbatim: loc("list.detail.subscribe.desc"))
+                                Text("list.detail.subscribe.desc")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -503,9 +504,9 @@ struct ListDetailView: View {
                                     ProgressView()
                                         .tint(.white)
                                 } else if subscriptionRecordURI != nil {
-                                    Label(loc("list.detail.unsubscribe"), systemImage: "bell.slash.fill")
+                                    Label("list.detail.unsubscribe", systemImage: "bell.slash.fill")
                                 } else {
-                                    Text(loc("list.detail.subscribe"))
+                                    Text("list.detail.subscribe")
                                         .fontWeight(.semibold)
                                 }
                                 Spacer()
@@ -514,7 +515,7 @@ struct ListDetailView: View {
                         .disabled(isSubscribing)
                         .buttonStyle(.borderedProminent)
                         .tint(subscriptionRecordURI != nil ? .red : .blue)
-                        .accessibilityHint(loc("list.detail.subscribe.hint"))
+                        .accessibilityHint("list.detail.subscribe.hint")
                     }
                     .padding(.vertical, 4)
                 }
@@ -525,7 +526,7 @@ struct ListDetailView: View {
                         reportEvidenceText = ""
                         isShowingReportSheet = true
                     } label: {
-                        Label(loc("actions.report"), systemImage: "exclamationmark.shield")
+                        Label("actions.report", systemImage: "exclamationmark.shield")
                     }
                     .disabled(isReportingList)
                 }
@@ -559,9 +560,9 @@ struct ListDetailView: View {
             )
 
             Section {
-                LabeledContent(loc("list.detail.members"), value: "\(currentList.memberCount ?? viewModel.members.count)")
+                LabeledContent("list.detail.members", value: "\(currentList.memberCount ?? viewModel.members.count)")
             } header: {
-                Text(verbatim: loc("list.detail.stats_section"))
+                Text("list.detail.stats_section")
             }
         }
         .listStyle(.insetGrouped)
@@ -810,7 +811,7 @@ extension ListDetailView {
                         onCancel: { batchState.cancelBatch() }
                     )
                 } header: {
-                    Text(verbatim: loc("list.detail.bulk_operation"))
+                    Text("list.detail.bulk_operation")
                 }
             }
         }

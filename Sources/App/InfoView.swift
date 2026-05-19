@@ -172,8 +172,8 @@ struct InfoView: View {
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
         .tint(.primary)
-        .accessibilityLabel(loc("info.github.label"))
-        .accessibilityHint(loc("info.github.hint"))
+        .accessibilityLabel("info.github.label")
+        .accessibilityHint("info.github.hint")
     }
 
     private var securityNote: some View {
@@ -208,10 +208,10 @@ struct InfoView: View {
                 color: .skyPrimary,
                 title: localizationManager.localized("info.feature.lists"),
                 items: [
-                    loc("info.feature.lists.browse"),
-                    loc("info.feature.lists.bulk"),
-                    loc("info.feature.lists.import"),
-                    loc("info.feature.lists.export"),
+                    String(localized: "info.feature.lists.browse"),
+                    String(localized: "info.feature.lists.bulk"),
+                    String(localized: "info.feature.lists.import"),
+                    String(localized: "info.feature.lists.export"),
                 ]
             )
 
@@ -220,9 +220,9 @@ struct InfoView: View {
                 color: .skyOrange,
                 title: localizationManager.localized("info.feature.export"),
                 items: [
-                    loc("info.feature.export.posts"),
-                    loc("info.feature.export.media"),
-                    loc("info.feature.export.download"),
+                    String(localized: "info.feature.export.posts"),
+                    String(localized: "info.feature.export.media"),
+                    String(localized: "info.feature.export.download"),
                 ]
             )
 
@@ -231,9 +231,9 @@ struct InfoView: View {
                 color: .skyAccent,
                 title: localizationManager.localized("info.feature.moderation"),
                 items: [
-                    loc("info.feature.moderation.block"),
-                    loc("info.feature.moderation.block_all"),
-                    loc("info.feature.moderation.membership"),
+                    String(localized: "info.feature.moderation.block"),
+                    String(localized: "info.feature.moderation.block_all"),
+                    String(localized: "info.feature.moderation.membership"),
                 ]
             )
         }
@@ -249,22 +249,22 @@ struct InfoView: View {
                 legalRow(icon: "globe", title: localizationManager.localized("info.legal.website"), value: "py-consultant.com", link: true)
             }
             .tint(.primary)
-            .accessibilityLabel(loc("info.website.label"))
-            .accessibilityHint(loc("info.website.hint"))
+            .accessibilityLabel("info.website.label")
+            .accessibilityHint("info.website.hint")
 
             Link(destination: URL(string: "https://www.py-consultant.com/imprint-privacy.html")!) {
                 legalRow(icon: "doc.text", title: localizationManager.localized("info.legal.imprint"), link: true)
             }
             .tint(.primary)
-            .accessibilityLabel(loc("info.imprint.label"))
-            .accessibilityHint(loc("info.imprint.hint"))
+            .accessibilityLabel("info.imprint.label")
+            .accessibilityHint("info.imprint.hint")
 
             Link(destination: URL(string: "https://www.py-consultant.com/imprint-privacy.html")!) {
                 legalRow(icon: "hand.raised", title: localizationManager.localized("info.legal.privacy"), link: true)
             }
             .tint(.primary)
-            .accessibilityLabel(loc("info.privacy.label"))
-            .accessibilityHint(loc("info.privacy.hint"))
+            .accessibilityLabel("info.privacy.label")
+            .accessibilityHint("info.privacy.hint")
 
             legalRow(icon: "doc.text.magnifyingglass", title: localizationManager.localized("info.legal.license"), value: localizationManager.localized("info.legal.license_value"))
 
@@ -272,8 +272,8 @@ struct InfoView: View {
                 legalRow(icon: "chevron.left.forwardslash.chevron.right", title: localizationManager.localized("info.view_github"), value: "github.com/zopyx/RULYX", link: true)
             }
             .tint(.primary)
-            .accessibilityLabel(loc("info.github.label"))
-            .accessibilityHint(loc("info.github.hint"))
+            .accessibilityLabel("info.github.label")
+            .accessibilityHint("info.github.hint")
 
             legalDivider
 
@@ -286,15 +286,15 @@ struct InfoView: View {
                     legalRow(icon: "cloud", title: localizationManager.localized("info.legal.clearsky"), value: "clearsky.app", link: true)
                 }
                 .tint(.primary)
-                .accessibilityLabel(loc("info.clearsky.label"))
-                .accessibilityHint(loc("info.clearsky.hint"))
+                .accessibilityLabel("info.clearsky.label")
+                .accessibilityHint("info.clearsky.hint")
 
                 Link(destination: URL(string: "https://github.com/ClearskyApp06/clearskyservices")!) {
                     legalRow(icon: "chevron.left.forwardslash.chevron.right", title: localizationManager.localized("info.legal.clearsky_github"), value: "github.com/ClearskyApp06", link: true)
                 }
                 .tint(.primary)
-                .accessibilityLabel(loc("info.clearsky_github.label"))
-                .accessibilityHint(loc("info.clearsky_github.hint"))
+                .accessibilityLabel("info.clearsky_github.label")
+                .accessibilityHint("info.clearsky_github.hint")
 
                 Text(verbatim: localizationManager.localized("info.clearsky.desc"))
                     .appFont(.label)

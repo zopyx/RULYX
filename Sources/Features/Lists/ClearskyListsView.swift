@@ -5,6 +5,7 @@ struct ClearskyListsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var ownerHandles: [String: String] = [:]
 
     private var sortedEntries: [ClearskyListEntry] {
@@ -31,7 +32,7 @@ struct ClearskyListsView: View {
                     }
                 }
             }
-            .navigationTitle(loc("lists.lists_on_profile"))
+            .navigationTitle("lists.lists_on_profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

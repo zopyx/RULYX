@@ -38,6 +38,7 @@ struct PostRowView: View {
         availableLikerTargetLists.filter { $0.kind == .regular }
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -113,7 +114,7 @@ struct PostRowView: View {
                 }
                 .padding(8)
                 .background(Color.skyPrimary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
-                Text(verbatim: "\(loc("profile.posts.replying_to")) \(parentAuthor.displayName ?? parentAuthor.handle ?? "")")
+                Text(verbatim: "\(String(localized: "profile.posts.replying_to")) \(parentAuthor.displayName ?? parentAuthor.handle ?? "")")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                     .lineLimit(1)
@@ -265,13 +266,13 @@ struct PostRowView: View {
                         Button {
                             onBlockAllLikers()
                         } label: {
-                            Label(loc("post.block_likers"), systemImage: "hand.raised.slash")
+                            Label("post.block_likers", systemImage: "hand.raised.slash")
                         }
                     }
                     if let onAddAllLikersToList, !availableLikerTargetLists.isEmpty {
                         Menu {
                             if !moderationLikerTargetLists.isEmpty {
-                                Menu(loc("lists.moderation_lists")) {
+                                Menu("lists.moderation_lists") {
                                     ForEach(moderationLikerTargetLists) { list in
                                         Button {
                                             onAddAllLikersToList(list)
@@ -282,7 +283,7 @@ struct PostRowView: View {
                                 }
                             }
                             if !regularLikerTargetLists.isEmpty {
-                                Menu(loc("lists.lists")) {
+                                Menu("lists.lists") {
                                     ForEach(regularLikerTargetLists) { list in
                                         Button {
                                             onAddAllLikersToList(list)
@@ -293,23 +294,23 @@ struct PostRowView: View {
                                 }
                             }
                         } label: {
-                            Label(loc("post.add_likers_to_list"), systemImage: "text.badge.plus")
+                            Label("post.add_likers_to_list", systemImage: "text.badge.plus")
                         }
                     }
                     if let onCopy {
                         Button(action: onCopy) {
-                            Label(loc("post.copy"), systemImage: "doc.on.doc")
+                            Label("post.copy", systemImage: "doc.on.doc")
                         }
                     }
                     if let onTranslate {
                         Button(action: onTranslate) {
-                            Label(loc("post.translate"), systemImage: "globe")
+                            Label("post.translate", systemImage: "globe")
                         }
                     }
                     if let onDeletePost {
                         Divider()
                         Button(role: .destructive, action: onDeletePost) {
-                            Label(loc("post.delete"), systemImage: "trash")
+                            Label("post.delete", systemImage: "trash")
                         }
                     }
                 } label: {

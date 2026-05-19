@@ -6,6 +6,7 @@ struct ActorSearchResultRow: View {
     let isAdding: Bool
     let toggleSelection: () -> Void
     let addAction: () -> Void
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         HStack(spacing: 12) {
@@ -16,7 +17,7 @@ struct ActorSearchResultRow: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(isSelected ? "Deselect \(actor.handle)" : "Select \(actor.handle)")
-            .accessibilityHint(loc("actor_search.toggle.hint"))
+            .accessibilityHint("actor_search.toggle.hint")
 
             BlueskyActorRow(actor: actor)
 
@@ -34,8 +35,8 @@ struct ActorSearchResultRow: View {
             }
             .buttonStyle(.plain)
             .disabled(isAdding)
-            .accessibilityLabel(loc("actor_search.add"))
-            .accessibilityHint(loc("actor_search.add_to_list.hint"))
+            .accessibilityLabel("actor_search.add")
+            .accessibilityHint("actor_search.add_to_list.hint")
         }
     }
 }

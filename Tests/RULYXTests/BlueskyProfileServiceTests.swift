@@ -3,15 +3,17 @@ import XCTest
 
 @MainActor
 final class BlueskyProfileServiceTests: XCTestCase {
-    private var requestExecutor: MockRequestExecutor!
-    private var sessionService: MockSessionService!
-    private var service: BlueskyProfileService!
+    nonisolated(unsafe) private var requestExecutor: MockRequestExecutor!
+    nonisolated(unsafe) private var sessionService: MockSessionService!
+    nonisolated(unsafe) private var service: BlueskyProfileService!
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         requestExecutor = MockRequestExecutor()
         sessionService = MockSessionService()
-        service = BlueskyProfileService(requestExecutor: requestExecutor, sessionService: sessionService)
+        let re = requestExecutor
+        let ss = sessionService
+        service = MainActor.assumeIsolated { BlueskyProfileService(requestExecutor: re, sessionService: ss) }
     }
 
     func testFetchProfileSuccess() async throws {

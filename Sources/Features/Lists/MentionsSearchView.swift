@@ -47,6 +47,7 @@ struct MentionsSearchView: View {
         _viewModel = StateObject(wrappedValue: MentionsSearchViewModel(did: did, handle: handle))
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         List {
             accountPickerSection
@@ -62,7 +63,7 @@ struct MentionsSearchView: View {
             if isFetchingLikers {
                 HStack {
                     Spacer()
-                    ProgressView(loc("post.block_likers.fetching"))
+                    ProgressView("post.block_likers.fetching")
                     Spacer()
                 }
                 .listRowSeparator(.hidden)
@@ -72,7 +73,7 @@ struct MentionsSearchView: View {
             if viewModel.isLoading, viewModel.entries.isEmpty {
                 HStack {
                     Spacer()
-                    LoadingPanel(message: loc("mentions.loading"))
+                    LoadingPanel(message: String(localized: "mentions.loading"))
                     Spacer()
                 }
                 .listRowSeparator(.hidden)
@@ -81,7 +82,7 @@ struct MentionsSearchView: View {
                 HStack {
                     Spacer()
                     ContentUnavailableView(
-                        loc("list.detail.alert_title"),
+                        String(localized: "list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(error)
                     )
@@ -93,9 +94,9 @@ struct MentionsSearchView: View {
                 HStack {
                     Spacer()
                     ContentUnavailableView(
-                        loc("mentions.empty"),
+                        String(localized: "mentions.empty"),
                         systemImage: "at",
-                        description: Text(verbatim: loc("mentions.empty_desc"))
+                        description: Text("mentions.empty_desc")
                     )
                     Spacer()
                 }
@@ -149,7 +150,7 @@ struct MentionsSearchView: View {
                     .listRowSeparator(.hidden)
                 }
                 if !viewModel.hasMore, !viewModel.entries.isEmpty {
-                    Text(verbatim: loc("mentions.end"))
+                    Text("mentions.end")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity)
@@ -161,7 +162,7 @@ struct MentionsSearchView: View {
         .refreshable {
             await refresh()
         }
-        .navigationTitle(loc("mentions.title"))
+        .navigationTitle("mentions.title")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedPostURI) { uri in
             ThreadView(postURI: uri)
@@ -191,13 +192,13 @@ struct MentionsSearchView: View {
             .environmentObject(accountStore)
             .environmentObject(blueskyClient)
         }
-        .alert(loc("post.block_likers.confirm_title").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)"), isPresented: $showBlockLikersConfirmation) {
-            Button(loc("post.block_likers.confirm_block"), role: .destructive) {
+        .alert("post.block_likers.confirm_title".replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)"), isPresented: $showBlockLikersConfirmation) {
+            Button(String(localized: "post.block_likers.confirm_block"), role: .destructive) {
                 let targets = pendingLikerTargets
                 showBlockLikersConfirmation = false
                 Task { await blockLikers(targets) }
             }
-            Button(loc("actions.cancel"), role: .cancel) {
+            Button(String(localized: "actions.cancel"), role: .cancel) {
                 resetPendingLikerTargets()
             }
         } message: {
@@ -208,24 +209,24 @@ struct MentionsSearchView: View {
                 return target.did
             }.joined(separator: "\n")
             let remainder = pendingLikerTargets.count > 5 ? "\n…and \(pendingLikerTargets.count - 5) more" : ""
-            Text(verbatim: loc("post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
+            Text(verbatim: String(localized: "post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
         }
-        .alert(loc("post.block_likers.done_title"), isPresented: .init(get: { blockSuccessCount != nil }, set: { if !$0 { blockSuccessCount = nil } })) {
-            Button(loc("actions.ok")) { blockSuccessCount = nil }
+        .alert("post.block_likers.done_title", isPresented: .init(get: { blockSuccessCount != nil }, set: { if !$0 { blockSuccessCount = nil } })) {
+            Button("actions.ok") { blockSuccessCount = nil }
         } message: {
             if let count = blockSuccessCount {
-                Text(verbatim: loc("post.block_likers.done").replacingOccurrences(of: "{count}", with: "\(count)"))
+                Text(verbatim: String(localized: "post.block_likers.done").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
-        .alert(loc("post.add_likers.done_title"), isPresented: .init(get: { addSuccessMessage != nil }, set: { if !$0 { addSuccessMessage = nil } })) {
-            Button(loc("actions.ok")) { addSuccessMessage = nil }
+        .alert("post.add_likers.done_title", isPresented: .init(get: { addSuccessMessage != nil }, set: { if !$0 { addSuccessMessage = nil } })) {
+            Button("actions.ok") { addSuccessMessage = nil }
         } message: {
             if let addSuccessMessage {
                 Text(verbatim: addSuccessMessage)
             }
         }
-        .alert(loc("list.detail.alert_title"), isPresented: .init(get: { blockError != nil }, set: { if !$0 { blockError = nil } })) {
-            Button(loc("actions.ok")) { blockError = nil }
+        .alert("list.detail.alert_title", isPresented: .init(get: { blockError != nil }, set: { if !$0 { blockError = nil } })) {
+            Button("actions.ok") { blockError = nil }
         } message: {
             if let error = blockError {
                 Text(error)
@@ -294,7 +295,7 @@ struct MentionsSearchView: View {
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(loc("mentions.searching_as"))
+                Text("mentions.searching_as")
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.primary)
                 HStack(spacing: 6) {
@@ -326,7 +327,7 @@ struct MentionsSearchView: View {
     private var blockingProgressSection: some View {
         VStack(spacing: 12) {
             HStack {
-                Text(loc("post.block_likers.blocking_title"))
+                Text("post.block_likers.blocking_title")
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 Text("\(blockedCount)/\(totalToBlock)")
@@ -357,7 +358,7 @@ struct MentionsSearchView: View {
     private var addingProgressSection: some View {
         VStack(spacing: 12) {
             HStack {
-                Text(loc("post.add_likers.adding_title"))
+                Text("post.add_likers.adding_title")
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 Text("\(addedCount)/\(totalToAdd)")
@@ -418,7 +419,7 @@ struct MentionsSearchView: View {
             isFetchingLikers = false
             let targets = collectPendingLikerTargets(from: allLikes)
             if targets.isEmpty {
-                blockError = loc("post.block_likers.no_likers")
+                blockError = String(localized: "post.block_likers.no_likers")
                 return nil
             }
             return targets
@@ -488,7 +489,7 @@ struct MentionsSearchView: View {
         }
         let filteredTargets = targets.filter { !memberDIDs.contains($0.did) }
         guard !filteredTargets.isEmpty else {
-            addSuccessMessage = loc("post.add_likers.done")
+            addSuccessMessage = String(localized: "post.add_likers.done")
                 .replacingOccurrences(of: "{count}", with: "0")
                 .replacingOccurrences(of: "{list}", with: list.name)
             return
@@ -513,7 +514,7 @@ struct MentionsSearchView: View {
         currentAddingHandle = nil
         isAddingLikersToList = false
         if addedCount > 0 {
-            addSuccessMessage = loc("post.add_likers.done")
+            addSuccessMessage = String(localized: "post.add_likers.done")
                 .replacingOccurrences(of: "{count}", with: "\(addedCount)")
                 .replacingOccurrences(of: "{list}", with: list.name)
         }

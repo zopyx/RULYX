@@ -3,20 +3,21 @@ import SwiftUI
 struct BulkProfileLookupView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var viewModel = BulkProfileLookupViewModel()
 
     var body: some View {
         List {
             Section {
-                TextField(loc("bulk.input_placeholder"), text: $viewModel.rawInput)
+                TextField("bulk.input_placeholder", text: $viewModel.rawInput)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .lineLimit(5 ... 15)
                     .font(.body.monospaced())
             } header: {
-                Text(verbatim: loc("bulk.input"))
+                Text("bulk.input")
             } footer: {
-                Text(verbatim: loc("bulk.input_footer"))
+                Text("bulk.input_footer")
             }
 
             if !viewModel.results.isEmpty {
@@ -46,7 +47,7 @@ struct BulkProfileLookupView: View {
                     }
                 } header: {
                     HStack {
-                        Text(verbatim: loc("bulk.results"))
+                        Text("bulk.results")
                         Spacer()
                         let resolved = viewModel.results.filter(\.isResolved).count
                         Text("\(resolved)/\(viewModel.results.count) resolved")
@@ -63,7 +64,7 @@ struct BulkProfileLookupView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("bulk.title"))
+        .navigationTitle("bulk.title")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.isLoading {
@@ -72,7 +73,7 @@ struct BulkProfileLookupView: View {
                     Button {
                         Task { await runLookup() }
                     } label: {
-                        Text(verbatim: loc("bulk.lookup"))
+                        Text("bulk.lookup")
                     }
                     .disabled(viewModel.rawInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .accessibilityHint("Looks up the entered handles or DIDs")
@@ -81,7 +82,7 @@ struct BulkProfileLookupView: View {
 
             ToolbarItem(placement: .topBarLeading) {
                 if !viewModel.results.isEmpty {
-                    Button(loc("bulk.clear")) { viewModel.clear() }
+                    Button("bulk.clear") { viewModel.clear() }
                         .accessibilityHint("Clears all lookup results")
                 }
             }

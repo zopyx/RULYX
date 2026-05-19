@@ -11,6 +11,7 @@ struct BlueskyActorRow<Extra: View>: View {
         self.extra = extra()
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         HStack(spacing: 12) {
             avatarView
@@ -36,7 +37,7 @@ struct BlueskyActorRow<Extra: View>: View {
             Spacer()
         }
         .padding(.vertical, 10)
-        .accessibilityLabel(loc("actor_row.label").replacingOccurrences(of: "{title}", with: actor.title).replacingOccurrences(of: "{handle}", with: actor.handle))
+        .accessibilityLabel("actor_row.label".replacingOccurrences(of: "{title}", with: actor.title).replacingOccurrences(of: "{handle}", with: actor.handle))
     }
 
     @ViewBuilder

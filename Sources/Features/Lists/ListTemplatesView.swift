@@ -20,6 +20,7 @@ private let templates: [ListTemplate] = [
 struct ListTemplatesView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @Environment(\.dismiss) private var dismiss
     let onListCreated: (BlueskyList) -> Void
     @State private var isCreating = false
@@ -41,12 +42,12 @@ struct ListTemplatesView: View {
             }
             .disabled(isCreating)
             .buttonStyle(.plain)
-            .accessibilityHint(loc("list_templates.create.hint"))
+            .accessibilityHint("list_templates.create.hint")
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("list_templates.title"))
+        .navigationTitle("list_templates.title")
         .overlay {
-            if isCreating { ProgressView(loc("list_templates.creating")) }
+            if isCreating { ProgressView("list_templates.creating") }
         }
     }
 

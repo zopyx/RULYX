@@ -8,7 +8,7 @@ final class FeedStoreTests: XCTestCase {
         return store
     }
 
-    override func tearDown() {
+    nonisolated override func tearDown() {
         super.tearDown()
         UserDefaults.standard.removePersistentDomain(forName: #function)
     }
@@ -16,7 +16,7 @@ final class FeedStoreTests: XCTestCase {
     func testInitialState() {
         let store = makeStore()
         XCTAssertNil(store.customFeedURI)
-        XCTAssertEqual(store.customFeedName, loc("timeline.following"))
+        XCTAssertEqual(store.customFeedName, String(localized: "timeline.following"))
         XCTAssertTrue(store.recentFeeds.isEmpty)
     }
 
@@ -79,7 +79,7 @@ final class FeedStoreTests: XCTestCase {
         store.setFeed(uri: "at://feed/1", name: "Custom")
         store.resetToFollowing()
         XCTAssertNil(store.customFeedURI)
-        XCTAssertEqual(store.customFeedName, loc("timeline.following"))
+        XCTAssertEqual(store.customFeedName, String(localized: "timeline.following"))
     }
 
     func testPersistenceAcrossInstances() {
@@ -108,12 +108,12 @@ final class FeedStoreTests: XCTestCase {
 final class MutedWordsStoreTests: XCTestCase {
     private let defaultsKey = "mutedWords"
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: defaultsKey)
     }
 
-    override func tearDown() {
+    nonisolated override func tearDown() {
         super.tearDown()
         UserDefaults.standard.removeObject(forKey: defaultsKey)
     }
@@ -184,9 +184,9 @@ final class MutedWordsStoreTests: XCTestCase {
 
 @MainActor
 final class AnalyticsStoreTests: XCTestCase {
-    private static let saveKey = "engagementSnapshots"
+    private nonisolated(unsafe) static let saveKey = "engagementSnapshots"
 
-    override func tearDown() {
+    nonisolated override func tearDown() {
         super.tearDown()
         UserDefaults.standard.removeObject(forKey: Self.saveKey)
     }
@@ -345,16 +345,16 @@ final class BlueskySessionServiceTests: XCTestCase {
 
 @MainActor
 final class HTTPClientTests: XCTestCase {
-    private var session: URLSession!
+    nonisolated(unsafe) private var session: URLSession!
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         session = URLSession(configuration: config)
     }
 
-    override func tearDown() {
+    nonisolated override func tearDown() {
         super.tearDown()
         MockURLProtocol.requestHandler = nil
         session = nil

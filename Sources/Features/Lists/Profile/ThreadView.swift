@@ -22,14 +22,15 @@ struct ThreadView: View {
         }
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         NavigationStack {
             Group {
                 if viewModel.isLoading {
-                    LoadingPanel(message: loc("profile.posts.loading"))
+                    LoadingPanel(message: String(localized: "profile.posts.loading"))
                 } else if let error = viewModel.errorMessage {
                     ContentUnavailableView(
-                        loc("list.detail.alert_title"),
+                        String(localized: "list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(error)
                     )
@@ -46,7 +47,7 @@ struct ThreadView: View {
                                     ancestorRow(ancestor, isFirst: index == 0, isLast: index == ancestors.count - 1)
                                 }
                             } header: {
-                                Text(verbatim: loc("profile.posts.replying_to"))
+                                Text("profile.posts.replying_to")
                             }
                         }
 
@@ -56,18 +57,18 @@ struct ThreadView: View {
                                     replyThreadRow(reply, depth: 0, isLast: index == replies.count - 1)
                                 }
                             } header: {
-                                Text(verbatim: loc("profile.posts.replies"))
+                                Text("profile.posts.replies")
                             }
                         }
                     }
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle(loc("profile.posts.thread"))
+            .navigationTitle("profile.posts.thread")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.close")) { dismiss() }
+                    Button("actions.close") { dismiss() }
                 }
             }
             .fullScreenCover(item: $imagePreview) { preview in
@@ -576,12 +577,12 @@ struct ThreadView: View {
             Button {
                 UIPasteboard.general.string = text
             } label: {
-                Label(loc("post.copy"), systemImage: "doc.on.doc")
+                Label("post.copy", systemImage: "doc.on.doc")
             }
             Button {
                 translateText(text ?? "")
             } label: {
-                Label(loc("post.translate"), systemImage: "globe")
+                Label("post.translate", systemImage: "globe")
             }
         } label: {
             Image(systemName: "ellipsis")
@@ -733,7 +734,7 @@ final class ThreadViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     func handleMissingCredentials() {
-        errorMessage = loc("list.detail.missing_creds")
+        errorMessage = String(localized: "list.detail.missing_creds")
         isLoading = false
     }
 

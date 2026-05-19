@@ -3,21 +3,19 @@ import XCTest
 
 @MainActor
 final class FeedTimelineViewModelTests: XCTestCase {
-    private var viewModel: FeedTimelineViewModel!
-    private var client: MockTimelineClient!
+    nonisolated(unsafe) private var viewModel: FeedTimelineViewModel!
+    nonisolated(unsafe) private var client: MockTimelineClient!
     private let account = AppAccount(handle: "test.bsky.social")
     private let appPassword = "password"
 
-    @MainActor
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
-        client = MockTimelineClient()
-        viewModel = FeedTimelineViewModel()
+        client = MainActor.assumeIsolated { MockTimelineClient() }
+        viewModel = MainActor.assumeIsolated { FeedTimelineViewModel() }
         UserDefaults.standard.removeObject(forKey: "mutedWords")
     }
 
-    @MainActor
-    override func tearDown() {
+    nonisolated override func tearDown() {
         super.tearDown()
         viewModel.stopPolling()
         client = nil

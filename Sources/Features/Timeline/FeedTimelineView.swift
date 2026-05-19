@@ -20,6 +20,7 @@ struct FeedTimelineView: View {
     @State private var showMuteConfirmation = false
     @State private var postToDelete: RichFeedEntry?
     @State private var profileToShow: BlueskyActor?
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
@@ -29,7 +30,7 @@ struct FeedTimelineView: View {
                     skeletonContent
                 case .failed(let msg):
                     ContentUnavailableView(
-                        loc("list.detail.alert_title"),
+                        String(localized: "list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(msg)
                     )
@@ -39,7 +40,7 @@ struct FeedTimelineView: View {
                     listContent
                 }
             }
-            .navigationTitle(loc("timeline.title"))
+            .navigationTitle("timeline.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -125,7 +126,7 @@ struct FeedTimelineView: View {
                     )
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button(loc("actions.close")) { profileToShow = nil }
+                            Button("actions.close") { profileToShow = nil }
                         }
                     }
                     .environmentObject(accountStore)
@@ -136,17 +137,17 @@ struct FeedTimelineView: View {
                 }
             }
             .confirmationDialog(
-                loc("post.delete.confirm"),
+                String(localized: "post.delete.confirm"),
                 isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
                 titleVisibility: .visible,
                 presenting: postToDelete
             ) { post in
-                Button(loc("post.delete"), role: .destructive) {
+                Button(String(localized: "post.delete"), role: .destructive) {
                     Task { await deletePost(post) }
                 }
-                Button(loc("actions.cancel"), role: .cancel) {}
+                Button(String(localized: "actions.cancel"), role: .cancel) {}
             } message: { post in
-                Text(verbatim: loc("post.delete.message"))
+                Text("post.delete.message")
             }
             .task {
                 await loadInitial()
@@ -213,7 +214,7 @@ struct FeedTimelineView: View {
                                 viewModel.mutedWords.add(word)
                             } label: {
                                 Label {
-                                    Text(verbatim: loc("timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
+                                    Text(verbatim: String(localized: "timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
                                 } icon: {
                                     Image(systemName: "eye.slash")
                                 }
@@ -239,7 +240,7 @@ struct FeedTimelineView: View {
                 .listRowSeparator(.hidden)
             }
             if viewModel.state == .exhausted {
-                Text(verbatim: loc("timeline.end"))
+                Text("timeline.end")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity)
@@ -254,7 +255,7 @@ struct FeedTimelineView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Button(loc("actions.retry")) {
+                    Button("actions.retry") {
                         Task { await loadMore() }
                     }
                     .buttonStyle(.bordered)
@@ -289,9 +290,9 @@ struct FeedTimelineView: View {
     private var emptyStateContent: some View {
         let isCustomFeed = viewModel.feedStore.isUsingCustomFeed
         return ContentUnavailableView {
-            Label(isCustomFeed ? loc("timeline.empty_custom") : loc("timeline.empty"), systemImage: "bubble.left.and.bubble.right")
+            Label(isCustomFeed ? String(localized: "timeline.empty_custom") : String(localized: "timeline.empty"), systemImage: "bubble.left.and.bubble.right")
         } description: {
-            Text(verbatim: isCustomFeed ? loc("timeline.empty_custom_desc") : loc("timeline.empty_desc"))
+            Text(verbatim: isCustomFeed ? String(localized: "timeline.empty_custom_desc") : String(localized: "timeline.empty_desc"))
         }
     }
 
@@ -418,7 +419,7 @@ struct FeedTimelineView: View {
     }
 
     private var newPostsBanner: some View {
-        Text(loc("timeline.new_posts").replacingOccurrences(of: "{n}", with: "\(viewModel.newPostCount)"))
+        Text(String(localized: "timeline.new_posts").replacingOccurrences(of: "{n}", with: "\(viewModel.newPostCount)"))
             .font(.subheadline.weight(.medium))
             .foregroundStyle(.white)
             .padding(.horizontal, 16)

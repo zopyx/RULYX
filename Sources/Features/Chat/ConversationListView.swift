@@ -20,23 +20,24 @@ struct ConversationListView: View {
         }
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         NavigationStack(path: $navPath) {
             Group {
                 if chatStore.isLoadingConvos, chatStore.conversations.isEmpty {
-                    LoadingPanel(message: loc("chat.loading"))
+                    LoadingPanel(message: String(localized: "chat.loading"))
                 } else if let chatError = chatStore.error, chatStore.conversations.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 48))
                             .foregroundStyle(.orange)
-                        Text(loc("chat.error.title"))
+                        Text("chat.error.title")
                             .font(.headline)
                         Text(chatError.localizedDescription)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
-                        Button(loc("state.error.retry")) {
+                        Button("state.error.retry") {
                             Task { await chatStore.loadConvos() }
                         }
                         .buttonStyle(.bordered)
@@ -47,9 +48,9 @@ struct ConversationListView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .font(.system(size: 48))
                             .foregroundStyle(.tertiary)
-                        Text(loc("chat.empty.title"))
+                        Text("chat.empty.title")
                             .font(.headline)
-                        Text(loc("chat.empty.desc"))
+                        Text("chat.empty.desc")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -66,21 +67,21 @@ struct ConversationListView: View {
                                     Button {
                                         Task { await chatStore.unmute(convoId: convo.id) }
                                     } label: {
-                                        Label(loc("chat.unmute"), systemImage: "bell")
+                                        Label("chat.unmute", systemImage: "bell")
                                     }
                                     .tint(.orange)
                                 } else {
                                     Button {
                                         Task { await chatStore.mute(convoId: convo.id) }
                                     } label: {
-                                        Label(loc("chat.mute"), systemImage: "bell.slash")
+                                        Label("chat.mute", systemImage: "bell.slash")
                                     }
                                     .tint(.orange)
                                 }
                                 Button(role: .destructive) {
                                     Task { await chatStore.leave(convoId: convo.id) }
                                 } label: {
-                                    Label(loc("chat.delete"), systemImage: "trash")
+                                    Label("chat.delete", systemImage: "trash")
                                 }
                             }
                         }
@@ -92,7 +93,7 @@ struct ConversationListView: View {
                         }
                     }
                     .listStyle(.plain)
-                    .searchable(text: $searchText, prompt: loc("chat.search.placeholder"))
+                    .searchable(text: $searchText, prompt: "chat.search.placeholder")
                     .environment(\.editMode, $editMode)
                 }
             }
@@ -101,7 +102,7 @@ struct ConversationListView: View {
                     .environmentObject(chatStore)
                     .environmentObject(accountStore)
             }
-            .navigationTitle(loc("tab.chat"))
+            .navigationTitle("tab.chat")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -113,13 +114,13 @@ struct ConversationListView: View {
                             Image(systemName: "arrow.clockwise")
                         }
                     }
-                    .accessibilityLabel(loc("chat.reload"))
+                    .accessibilityLabel("chat.reload")
                     .disabled(chatStore.isLoadingConvos)
                 }
 
                 ToolbarItem(placement: .primaryAction) {
                     if editMode.isEditing {
-                        Button(loc("chat.select_all")) {
+                        Button("chat.select_all") {
                             let allIDs = Set(filteredConvos.map(\.id))
                             if selectedConvos == allIDs {
                                 selectedConvos = []
@@ -133,12 +134,12 @@ struct ConversationListView: View {
                         } label: {
                             Image(systemName: "square.and.pencil")
                         }
-                        .accessibilityLabel(loc("chat.new"))
+                        .accessibilityLabel("chat.new")
                     }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(editMode.isEditing ? loc("actions.done") : loc("chat.edit")) {
+                    Button(editMode.isEditing ? String(localized: "actions.done") : String(localized: "chat.edit")) {
                         withAnimation {
                             if editMode.isEditing {
                                 selectedConvos = []
@@ -158,7 +159,7 @@ struct ConversationListView: View {
                             }
                             withAnimation { selectedConvos = [] }
                         } label: {
-                            Label(loc("chat.mute"), systemImage: "bell.slash")
+                            Label("chat.mute", systemImage: "bell.slash")
                         }
                         .buttonStyle(.bordered)
 
@@ -169,7 +170,7 @@ struct ConversationListView: View {
                             }
                             withAnimation { selectedConvos = [] }
                         } label: {
-                            Label(loc("chat.unmute"), systemImage: "bell")
+                            Label("chat.unmute", systemImage: "bell")
                         }
                         .buttonStyle(.bordered)
 
@@ -181,7 +182,7 @@ struct ConversationListView: View {
                             }
                             withAnimation { selectedConvos = [] }
                         } label: {
-                            Label(loc("chat.delete"), systemImage: "trash")
+                            Label("chat.delete", systemImage: "trash")
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
@@ -202,7 +203,7 @@ struct ConversationListView: View {
                 .environmentObject(accountStore)
                 .environmentObject(chatStore)
             }
-            .alert(loc("chat.error.title"), isPresented: Binding(
+            .alert("chat.error.title", isPresented: Binding(
                 get: { chatStore.error != nil },
                 set: { isPresented in
                     if !isPresented {
@@ -210,7 +211,7 @@ struct ConversationListView: View {
                     }
                 }
             )) {
-                Button(loc("actions.ok")) {
+                Button("actions.ok") {
                     chatStore.error = nil
                 }
             } message: {
@@ -291,7 +292,7 @@ struct ConversationListView: View {
             guard let last = conversation.lastMessage else { return "" }
             switch last {
             case let .message(m): return m.text
-            case .deleted: return loc("chat.message.deleted")
+            case .deleted: return String(localized: "chat.message.deleted")
             case let .system(s): return systemMessageText(s)
             }
         }
@@ -367,21 +368,21 @@ struct ConversationListView: View {
 
         private func systemMessageText(_ msg: ChatSystemMessage) -> String {
             switch msg.data {
-            case .addMember: loc("chat.system.added")
-            case .removeMember: loc("chat.system.removed")
-            case .memberJoin: loc("chat.system.joined")
-            case .memberLeave: loc("chat.system.left")
-            case .lockConvo: loc("chat.system.locked")
-            case .unlockConvo: loc("chat.system.unlocked")
-            case .lockConvoPermanently: loc("chat.system.locked_permanent")
-            case .editGroup: loc("chat.system.group_updated")
+            case .addMember: String(localized: "chat.system.added")
+            case .removeMember: String(localized: "chat.system.removed")
+            case .memberJoin: String(localized: "chat.system.joined")
+            case .memberLeave: String(localized: "chat.system.left")
+            case .lockConvo: String(localized: "chat.system.locked")
+            case .unlockConvo: String(localized: "chat.system.unlocked")
+            case .lockConvoPermanently: String(localized: "chat.system.locked_permanent")
+            case .editGroup: String(localized: "chat.system.group_updated")
             case .unknown: ""
             }
         }
 
         private func formatRelativeTime(_ date: Date) -> String {
             let diff = Date().timeIntervalSince(date)
-            if diff < 60 { return loc("time.just_now") }
+            if diff < 60 { return String(localized: "time.just_now") }
             if diff < 3600 { return "\(Int(diff / 60))m" }
             if diff < 86400 { return "\(Int(diff / 3600))h" }
             if diff < 604_800 { return "\(Int(diff / 86400))d" }

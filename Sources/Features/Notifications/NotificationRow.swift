@@ -4,6 +4,7 @@ struct NotificationRow: View {
     let notification: NotificationItem
     let relatedPost: RichPost?
     let onAuthorTap: () -> Void
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -75,13 +76,13 @@ struct NotificationRow: View {
 
     private var reasonText: String {
         switch notification.reason {
-        case "like": loc("notifications.reason.like")
-        case "repost": loc("notifications.reason.repost")
-        case "follow": loc("notifications.reason.follow")
-        case "reply": loc("notifications.reason.reply")
-        case "quote": loc("notifications.reason.quote")
-        case "mention": loc("notifications.reason.mention")
-        case "starterpack_joined": loc("notifications.reason.starterpack_joined")
+        case "like": String(localized: "notifications.reason.like")
+        case "repost": String(localized: "notifications.reason.repost")
+        case "follow": String(localized: "notifications.reason.follow")
+        case "reply": String(localized: "notifications.reason.reply")
+        case "quote": String(localized: "notifications.reason.quote")
+        case "mention": String(localized: "notifications.reason.mention")
+        case "starterpack_joined": String(localized: "notifications.reason.starterpack_joined")
         default: ""
         }
     }
@@ -156,7 +157,7 @@ struct NotificationRow: View {
                 HStack(spacing: 8) {
                     Image(systemName: "play.rectangle.fill")
                         .foregroundStyle(Color.skyPrimary)
-                    Text(loc("media.filter.videos"))
+                    Text("media.filter.videos")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

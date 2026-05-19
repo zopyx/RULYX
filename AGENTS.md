@@ -44,14 +44,47 @@ Every completed task MUST include an accurate description rendered as a table:
 - Models in `Sources/Domain/Models/`
 - Timeline state managed via `TimelineState` enum (not boolean flags)
 
-## Internationalization (i18n)
+## Internationalization (i18n) Architecture
+
+### Core — `LocalizationManager` (`Sources/Shared/Localizations/LocalizationManager.swift`)
+- `@MainActor` `ObservableObject` singleton accessed via `LocalizationManager.shared`
+- Global free function `loc(_ key: String) -> String` calls `LocalizationManager.shared.localized(key)`
+- All views inject it as `@EnvironmentObject private var localizationManager: LocalizationManager`
+- `AppDependencies` sets `localizationManager = LocalizationManager.shared`
+
+### How it works
+- **16 JSON files** in `Sources/Shared/Localizations/` (`en.json`, `de.json`, `fr.json`, `it.json`, `ja.json`, `zh.json`, `es.json`, `pt.json`, `ko.json`, `ru.json`, `ar.json`, `nl.json`, `pl.json`, `tr.json`, `th.json`, `vi.json`)
+- All bundles are loaded eagerly in `init()` via `loadAll()` — reads each JSON file from `Bundle.main`, decodes as `[String: String]`, stored in `allBundles: [String: [String: String]]`
+- Active language bundle held in `bundle: [String: String]`, swapped by `loadCurrentBundle()`
+
+### Language selection & fallback chain
+1. **User-selected** language stored in `UserDefaults.standard.string(forKey: "selectedLanguage")`
+2. If no saved selection → **preferred device language** (if in `supportedLanguages`)
+3. If no match → **English** (`"en"`)
+4. If key missing in active bundle → **English bundle** (100% coverage guaranteed)
+5. If missing in English bundle → **raw key string** returned
+
+### RTL support
+- Arabic (`"ar"`) sets `layoutDirection: LayoutDirection = .rightToLeft`
+- All other languages use `.leftToRight`
+- Used by views to flip layout via `.environment(\.layoutDirection, localizationManager.layoutDirection)`
+
+### String parameters
+- **No Swift-native `String(format:)` or `String.LocalizationValue` interpolation** — uses manual `replacingOccurrences(of: "{n}")` pattern
+- Example: JSON key `"time.minutes_ago": "{n} minutes ago"` → `loc(key).replacingOccurrences(of: "{n}", with: "\(minutes)")`
+
+### Relative dates
+- Relative date formatting for older items (≥28 days) uses `DateFormatter` with `.medium` date style
+- No locale override — defaults to system locale; relative formatters in some views explicitly use `Locale(identifier: LocalizationManager.shared.currentLanguage)`
+
+### Key naming convention
+- Dot-notation: `screen.component.description` (e.g., `"onboarding.moderation.desc"`, `"settings.language"`)
+- Key-value pairs flat in JSON (no nesting)
+
+### Adding new keys
 - All user-facing strings MUST use `loc("key")` — never hardcode English text
-- Translation keys follow dot-notation: `screen.component.description`
-- All 16 language files must be updated when adding new keys:
-  `en.json`, `de.json`, `fr.json`, `it.json`, `ja.json`, `zh.json`,
-  `es.json`, `pt.json`, `ko.json`, `ru.json`, `ar.json`, `nl.json`,
-  `pl.json`, `tr.json`, `th.json`, `vi.json`
-- New keys in non-English files require native translation — do not leave English fallback
+- Every new key must be added to **all 16 language files**
+- New keys in non-English files require **native translation** — do not leave English fallback
 
 ## Blocking / Blocked-By Consistency
 - Dashboard blocking count (`fetchBlockingCount`/`fetchBlockedByCount`) and detail view count (`fetchBlockedActors`/`fetchBlockedByActors`) MUST come from the **same source** — the paginated Clearsky API (`fetchClearskyActors`), NOT the `/total/` endpoint

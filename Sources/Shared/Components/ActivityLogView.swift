@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ActivityLogView: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var searchQuery = ""
     @State private var selectedType: String?
 
@@ -24,7 +25,7 @@ struct ActivityLogView: View {
     var body: some View {
         List {
             Section {
-                TextField(loc("activity.search"), text: $searchQuery)
+                TextField("activity.search", text: $searchQuery)
                     .textInputAutocapitalization(.never)
             }
 
@@ -32,7 +33,7 @@ struct ActivityLogView: View {
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            FilterChip(title: loc("activity.all"), isSelected: selectedType == nil) { selectedType = nil }
+                            FilterChip(title: String(localized: "activity.all"), isSelected: selectedType == nil) { selectedType = nil }
                                 .accessibilityHint("Shows all activity types")
                             ForEach(types, id: \.self) { type in
                                 FilterChip(title: type, isSelected: selectedType == type) { selectedType = type }
@@ -44,12 +45,12 @@ struct ActivityLogView: View {
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                 } header: {
-                    Text(verbatim: loc("activity.filter_by_type"))
+                    Text("activity.filter_by_type")
                 }
             }
 
             if filtered.isEmpty {
-                ContentUnavailableView(loc("activity.no_matches"), systemImage: "magnifyingglass", description: Text(verbatim: loc("activity.no_matches_desc")))
+                ContentUnavailableView("activity.no_matches", systemImage: "magnifyingglass", description: Text("activity.no_matches_desc"))
             } else {
                 ForEach(filtered) { entry in
                     VStack(alignment: .leading, spacing: 6) {
@@ -60,7 +61,7 @@ struct ActivityLogView: View {
                         }
                         Text(entry.summary).font(.caption).foregroundStyle(.secondary)
                         if !entry.failedHandles.isEmpty {
-                            Text(verbatim: loc("activity.failed_format").replacingOccurrences(of: "{handles}", with: entry.failedHandles.joined(separator: ", ")))
+                            Text(verbatim: String(localized: "activity.failed_format").replacingOccurrences(of: "{handles}", with: entry.failedHandles.joined(separator: ", ")))
                                 .font(.caption2).foregroundStyle(.red)
                         }
                     }
@@ -69,7 +70,7 @@ struct ActivityLogView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("activity.title"))
+        .navigationTitle("activity.title")
     }
 }
 

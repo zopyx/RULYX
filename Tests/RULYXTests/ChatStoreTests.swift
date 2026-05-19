@@ -3,20 +3,19 @@ import XCTest
 
 @MainActor
 final class ChatStoreTests: XCTestCase {
-    private var store: ChatStore!
-    private var service: MockChatService!
+    nonisolated(unsafe) private var store: ChatStore!
+    nonisolated(unsafe) private var service: MockChatService!
     private let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
 
-    @MainActor
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
-        service = MockChatService()
-        store = ChatStore(chatService: service)
+        service = MainActor.assumeIsolated { MockChatService() }
+        let s = service
+        store = MainActor.assumeIsolated { ChatStore(chatService: s) }
         store.setAccount(account, appPassword: "password")
     }
 
-    @MainActor
-    override func tearDown() {
+    nonisolated override func tearDown() {
         super.tearDown()
         store.stopPolling()
         store.setAccount(nil, appPassword: nil)

@@ -31,6 +31,7 @@ struct SplashScreenView: View {
         return "Unknown"
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         ZStack {
             SplashBackground()
@@ -69,7 +70,7 @@ struct SplashScreenView: View {
 
                 Spacer().frame(height: 8)
 
-                Text(verbatim: loc("splash.tagline"))
+                Text("splash.tagline")
                     .font(.body.weight(.medium))
                     .foregroundStyle(.white.opacity(0.7))
                     .offset(y: taglineOffset)
@@ -77,7 +78,7 @@ struct SplashScreenView: View {
 
                 Spacer().frame(height: 24)
 
-                Text(verbatim: loc("splash.subtagline"))
+                Text("splash.subtagline")
                     .font(.caption.weight(.regular))
                     .foregroundStyle(.white.opacity(0.5))
                     .offset(y: subtaglineOffset)

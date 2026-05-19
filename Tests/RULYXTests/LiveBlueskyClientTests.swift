@@ -3,26 +3,29 @@ import XCTest
 
 @MainActor
 final class LiveBlueskyClientTests: XCTestCase {
-    private var client: LiveBlueskyClient!
-    private var sessionService: MockSessionService!
-    private var requestExecutor: MockRequestExecutor!
-    private var mockSession: URLSession!
+    nonisolated(unsafe) private var client: LiveBlueskyClient!
+    nonisolated(unsafe) private var sessionService: MockSessionService!
+    nonisolated(unsafe) private var requestExecutor: MockRequestExecutor!
+    nonisolated(unsafe) private var mockSession: URLSession!
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
-        sessionService = MockSessionService()
         requestExecutor = MockRequestExecutor()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         mockSession = URLSession(configuration: config)
-        client = LiveBlueskyClient(
-            httpClient: HTTPClient(session: mockSession),
-            requestExecutor: requestExecutor,
-            sessionService: sessionService
-        )
+        let re = requestExecutor
+        let ms = mockSession
+        let ss = MainActor.assumeIsolated { MockSessionService() }
+        sessionService = ss
+        client = MainActor.assumeIsolated { LiveBlueskyClient(
+            httpClient: HTTPClient(session: ms!),
+            requestExecutor: re,
+            sessionService: ss
+        ) }
     }
 
-    override func tearDown() {
+    nonisolated override func tearDown() {
         MockURLProtocol.requestHandler = nil
     }
 

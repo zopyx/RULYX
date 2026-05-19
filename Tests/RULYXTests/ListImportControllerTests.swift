@@ -3,11 +3,12 @@ import XCTest
 
 @MainActor
 final class ListImportControllerTests: XCTestCase {
-    private var controller: ListImportController!
+    nonisolated(unsafe) private var controller: ListImportController!
 
-    override func setUp() async throws {
+    nonisolated override func setUp() async throws {
         try await super.setUp()
-        controller = ListImportController()
+        let c = await MainActor.run { ListImportController() }
+        controller = c
     }
 
     func testPreparePreviewClassifiesReadyItems() async throws {

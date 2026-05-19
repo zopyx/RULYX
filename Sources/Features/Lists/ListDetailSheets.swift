@@ -4,6 +4,7 @@ struct ImportHandlesSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var rawInput = ""
     let importAction: (String) -> Void
+    @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
@@ -12,41 +13,41 @@ struct ImportHandlesSheet: View {
                     TextEditor(text: $rawInput)
                         .frame(minHeight: 180)
                 } header: {
-                    Text(verbatim: loc("list.import.paste_section"))
+                    Text("list.import.paste_section")
                 }
 
                 Section {
                     HelpSection(
-                        title: loc("list.import.help_title"),
+                        title: String(localized: "list.import.help_title"),
                         bulletPoints: [
-                            loc("list.import.help_1"),
-                            loc("list.import.help_2"),
-                            loc("list.import.help_3"),
-                            loc("list.import.help_4"),
-                            loc("list.import.help_5"),
+                            String(localized: "list.import.help_1"),
+                            String(localized: "list.import.help_2"),
+                            String(localized: "list.import.help_3"),
+                            String(localized: "list.import.help_4"),
+                            String(localized: "list.import.help_5"),
                         ]
                     )
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                 }
             }
-            .navigationTitle(loc("list.import.title"))
+            .navigationTitle("list.import.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) {
+                    Button("actions.cancel") {
                         dismiss()
                     }
-                    .accessibilityHint(loc("list.import.dismiss.hint"))
+                    .accessibilityHint("list.import.dismiss.hint")
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("list.import.review")) {
+                    Button("list.import.review") {
                         importAction(rawInput)
                         dismiss()
                     }
                     .disabled(rawInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityHint(loc("list.import.review.hint"))
+                    .accessibilityHint("list.import.review.hint")
                 }
             }
         }
@@ -68,7 +69,7 @@ struct ImportPreviewSheet: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(
-                        verbatim: loc("list.import_preview.summary_text")
+                        verbatim: String(localized: "list.import_preview.summary_text")
                             .replacingOccurrences(of: "{ready}", with: "\(preview.readyItems.count)")
                             .replacingOccurrences(of: "{already}", with: "\(preview.alreadyPresentItems.count)")
                             .replacingOccurrences(of: "{duplicates}", with: "\(preview.duplicateItems.count)")
@@ -76,28 +77,28 @@ struct ImportPreviewSheet: View {
                     )
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    Text(verbatim: loc("list.import_preview.skip_note"))
+                    Text("list.import_preview.skip_note")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } header: {
-                    Text(verbatim: loc("list.import_preview.summary"))
+                    Text("list.import_preview.summary")
                 }
 
-                previewSection(loc("list.import_preview.ready"), items: preview.readyItems)
-                previewSection(loc("list.import_preview.already"), items: preview.alreadyPresentItems)
-                previewSection(loc("list.import_preview.duplicate"), items: preview.duplicateItems)
-                previewSection(loc("list.import_preview.unresolved"), items: preview.unresolvedItems)
+                previewSection(String(localized: "list.import_preview.ready"), items: preview.readyItems)
+                previewSection(String(localized: "list.import_preview.already"), items: preview.alreadyPresentItems)
+                previewSection(String(localized: "list.import_preview.duplicate"), items: preview.duplicateItems)
+                previewSection(String(localized: "list.import_preview.unresolved"), items: preview.unresolvedItems)
 
                 if !isImporting {
                     Section {
                         HelpSection(
-                            title: loc("list.import_preview.help_title"),
+                            title: String(localized: "list.import_preview.help_title"),
                             bulletPoints: [
-                                loc("list.import_preview.help_ready"),
-                                loc("list.import_preview.help_already"),
-                                loc("list.import_preview.help_duplicate"),
-                                loc("list.import_preview.help_unresolved"),
-                                loc("list.import_preview.help_write"),
+                                String(localized: "list.import_preview.help_ready"),
+                                String(localized: "list.import_preview.help_already"),
+                                String(localized: "list.import_preview.help_duplicate"),
+                                String(localized: "list.import_preview.help_unresolved"),
+                                String(localized: "list.import_preview.help_write"),
                             ]
                         )
                         .listRowInsets(EdgeInsets())
@@ -105,24 +106,24 @@ struct ImportPreviewSheet: View {
                     }
                 }
             }
-            .navigationTitle(loc("list.import_preview.title"))
+            .navigationTitle("list.import_preview.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.close")) {
+                    Button("actions.close") {
                         dismissAction()
                         dismiss()
                     }
                     .disabled(isImporting)
-                    .accessibilityHint(loc("list.import.close_preview.hint"))
+                    .accessibilityHint("list.import.close_preview.hint")
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isImporting ? loc("list.import_preview.importing") : loc("list.import_preview.import_button")) {
+                    Button(isImporting ? String(localized: "list.import_preview.importing") : String(localized: "list.import_preview.import_button")) {
                         importAction()
                     }
                     .disabled(isImporting || preview.readyItems.isEmpty)
-                    .accessibilityHint(loc("list.import.import_items.hint"))
+                    .accessibilityHint("list.import.import_items.hint")
                 }
             }
         }
@@ -194,7 +195,7 @@ struct ListMetadataSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField(loc("list.edit.name_placeholder"), text: $title)
+                    TextField("list.edit.name_placeholder", text: $title)
                         .onChange(of: title) { _, newValue in
                             if newValue.count > Self.maxTitleLength {
                                 title = String(newValue.prefix(Self.maxTitleLength))
@@ -203,11 +204,11 @@ struct ListMetadataSheet: View {
                     counterBadge(count: title.count, max: Self.maxTitleLength)
                         .font(.caption)
                 } header: {
-                    Text(verbatim: loc("list.edit.name_label"))
+                    Text("list.edit.name_label")
                 }
 
                 Section {
-                    TextField(loc("list.edit.desc_placeholder"), text: $description, axis: .vertical)
+                    TextField("list.edit.desc_placeholder", text: $description, axis: .vertical)
                         .lineLimit(3 ... 6)
                         .onChange(of: description) { _, newValue in
                             if newValue.count > Self.maxDescriptionLength {
@@ -217,7 +218,7 @@ struct ListMetadataSheet: View {
                     counterBadge(count: description.count, max: Self.maxDescriptionLength)
                         .font(.caption)
                 } header: {
-                    Text(verbatim: loc("list.edit.desc_label"))
+                    Text("list.edit.desc_label")
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -229,20 +230,20 @@ struct ListMetadataSheet: View {
                 }
 
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) {
+                    Button("actions.cancel") {
                         dismiss()
                     }
                     .disabled(isSaving)
-                    .accessibilityHint(isCreating ? loc("list.create.discard.hint") : loc("list.edit.discard.hint"))
+                    .accessibilityHint(isCreating ? String(localized: "list.create.discard.hint") : String(localized: "list.edit.discard.hint"))
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isCreating ? loc("list.create.create") : loc("actions.save")) {
+                    Button(isCreating ? String(localized: "list.create.create") : String(localized: "actions.save")) {
                         onConfirm(title, description, kind)
                         dismiss()
                     }
                     .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
-                    .accessibilityHint(isCreating ? loc("list.create.create.hint") : loc("list.edit.save.hint"))
+                    .accessibilityHint(isCreating ? String(localized: "list.create.create.hint") : String(localized: "list.edit.save.hint"))
                 }
             }
         }
@@ -251,9 +252,9 @@ struct ListMetadataSheet: View {
     private var navigationTitle: String {
         switch mode {
         case .create(let k):
-            return k == .moderation ? loc("list.create.moderation_title") : loc("list.create.title")
+            return k == .moderation ? String(localized: "list.create.moderation_title") : String(localized: "list.create.title")
         case .edit:
-            return loc("list.edit.title")
+            return String(localized: "list.edit.title")
         }
     }
 

@@ -3,11 +3,11 @@ import XCTest
 
 @MainActor
 final class ListBatchControllerTests: XCTestCase {
-    private var controller: ListBatchController!
+    nonisolated(unsafe) private var controller: ListBatchController!
 
-    override func setUp() {
+    nonisolated override func setUp() {
         super.setUp()
-        controller = ListBatchController()
+        controller = MainActor.assumeIsolated { ListBatchController() }
     }
 
     func testPerformBatchAllSucceed() async {

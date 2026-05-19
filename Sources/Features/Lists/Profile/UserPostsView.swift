@@ -34,40 +34,41 @@ struct UserPostsView: View {
         _viewModel = StateObject(wrappedValue: UserPostsViewModel(did: did))
     }
 
+    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         NavigationStack {
             Group {
                 if viewModel.isLoading, viewModel.posts.isEmpty {
-                    LoadingPanel(message: loc("profile.posts.loading"))
+                    LoadingPanel(message: String(localized: "profile.posts.loading"))
                 } else if let error = viewModel.errorMessage, viewModel.posts.isEmpty {
                     if error.localizedCaseInsensitiveContains("blocked") {
                         ContentUnavailableView(
-                            loc("profile.blocked.title"),
+                            String(localized: "profile.blocked.title"),
                             systemImage: "hand.raised.slash.fill",
-                            description: Text(verbatim: loc("profile.blocked.posts_desc"))
+                            description: Text("profile.blocked.posts_desc")
                         )
                     } else {
                         ContentUnavailableView(
-                            loc("list.detail.alert_title"),
+                            String(localized: "list.detail.alert_title"),
                             systemImage: "exclamationmark.bubble",
                             description: Text(error)
                         )
                     }
                 } else if viewModel.posts.isEmpty {
                     ContentUnavailableView(
-                        loc("profile.posts.empty"),
+                        String(localized: "profile.posts.empty"),
                         systemImage: "bubble.left",
-                        description: Text(verbatim: loc("profile.posts.empty_desc"))
+                        description: Text("profile.posts.empty_desc")
                     )
                 } else {
                     listContent
                 }
             }
-            .navigationTitle(loc("profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
+            .navigationTitle(String(localized: "profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.close")) { dismiss() }
+                    Button("actions.close") { dismiss() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if !viewModel.posts.isEmpty {
@@ -147,14 +148,14 @@ struct UserPostsView: View {
                 .listRowSeparator(.hidden)
             }
             if !viewModel.hasMore, !viewModel.posts.isEmpty {
-                Text(verbatim: loc("profile.posts.end"))
+                Text("profile.posts.end")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }
             if !viewModel.searchText.isEmpty, viewModel.sortedFilteredPosts.isEmpty {
-                Text(loc("profile.posts.no_matches"))
+                Text("profile.posts.no_matches")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -173,7 +174,7 @@ struct UserPostsView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.tertiary)
                     .font(.subheadline)
-                TextField(loc("profile.posts.search"), text: $viewModel.searchText)
+                TextField("profile.posts.search", text: $viewModel.searchText)
                     .textFieldStyle(.plain)
                     .font(.subheadline)
                 if !viewModel.searchText.isEmpty {
@@ -216,7 +217,7 @@ struct UserPostsView: View {
     private var dateFilterPickers: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(loc("profile.posts.from_date"))
+                Text("profile.posts.from_date")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                 DatePicker(
@@ -232,7 +233,7 @@ struct UserPostsView: View {
                 .datePickerStyle(.compact)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(loc("profile.posts.to_date"))
+                Text("profile.posts.to_date")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                 DatePicker(
@@ -259,7 +260,7 @@ struct UserPostsView: View {
                 try? csv.write(to: url, atomically: true, encoding: .utf8)
                 shareFileURL = url
             } label: {
-                Label { Text(verbatim: loc("profile.export.csv")) } icon: { Image(systemName: "arrow.down.doc") }
+                Label { Text("profile.export.csv") } icon: { Image(systemName: "arrow.down.doc") }
             }
             Button {
                 let json = viewModel.exportJSON()
@@ -267,7 +268,7 @@ struct UserPostsView: View {
                 try? json.write(to: url, options: .atomic)
                 shareFileURL = url
             } label: {
-                Label { Text(verbatim: loc("profile.export.json")) } icon: { Image(systemName: "arrow.down.doc") }
+                Label { Text("profile.export.json") } icon: { Image(systemName: "arrow.down.doc") }
             }
         } label: {
             Image(systemName: "arrow.down.doc")
