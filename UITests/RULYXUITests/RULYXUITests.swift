@@ -134,4 +134,88 @@ final class RULYXUITests: XCTestCase {
         XCTAssertTrue(tabBar.waitForExistence(timeout: 3),
                       "Tab bar should remain visible after navigating to Info")
     }
+
+    // MARK: - Account Detail Navigation
+
+    /// Verifies tapping an account in the Accounts tab navigates to the Moderation tab
+    /// (via switchToAccount → returnToModerationRoot flow).
+    func testAccountDetailNavigation() {
+        app.tabBars.firstMatch.buttons["Accounts"].tap()
+
+        let accountRow = app.staticTexts["team-alpha.bsky.social"]
+        XCTAssertTrue(accountRow.waitForExistence(timeout: 3),
+                      "Preview account 'team-alpha.bsky.social' should be visible")
+
+        accountRow.tap()
+
+        // Tapping an account activates it and navigates to Moderation tab
+        let refreshButton = app.buttons["Refresh lists"]
+        XCTAssertTrue(refreshButton.waitForExistence(timeout: 3),
+                      "Should navigate to Moderation tab after tapping account row")
+    }
+
+    // MARK: - Settings Lock Toggle
+
+    /// Verifies the biometric lock toggle in Settings can be toggled on/off.
+    func testSettingsLockToggle() {
+        app.tabBars.firstMatch.buttons["Settings"].tap()
+
+        // The lock toggle label depends on biometric type (Face ID / Touch ID)
+        let lockToggle: XCUIElement
+        if app.switches["Face ID Lock"].waitForExistence(timeout: 3) {
+            lockToggle = app.switches["Face ID Lock"]
+        } else if app.switches["Touch ID Lock"].waitForExistence(timeout: 3) {
+            lockToggle = app.switches["Touch ID Lock"]
+        } else {
+            XCTFail("No biometric lock toggle found in Settings")
+            return
+        }
+
+        let initialValue = lockToggle.value as? String
+        lockToggle.tap()
+
+        let newValue = lockToggle.value as? String
+        XCTAssertNotEqual(initialValue, newValue,
+                          "Lock toggle should change state after tap")
+
+        // Reset toggle back to original state
+        lockToggle.tap()
+    }
+
+    // MARK: - Language Picker
+
+    /// Verifies the language picker exists in the Settings preferences section.
+    func testLanguageSwitch() {
+        app.tabBars.firstMatch.buttons["Settings"].tap()
+
+        // The language picker in a List renders as a tappable row with label "Language"
+        let languageRow = app.buttons["Language"]
+        XCTAssertTrue(languageRow.waitForExistence(timeout: 3),
+                      "Language picker should be present in Settings")
+    }
+
+    // MARK: - Tab Persistence
+
+    /// Verifies that switching tabs preserves content: navigating to a non-default tab,
+    /// switching to another, then returning shows the original tab's content.
+    func testTabPersistence() {
+        let tabBar = app.tabBars.firstMatch
+
+        // Navigate to Info tab (non-default)
+        tabBar.buttons["Info"].tap()
+        let overviewSegment = app.buttons["Overview"]
+        XCTAssertTrue(overviewSegment.waitForExistence(timeout: 3),
+                      "Info tab should show Overview segment after tapping Info")
+
+        // Switch to Settings tab
+        tabBar.buttons["Settings"].tap()
+        let languageRow = app.buttons["Language"]
+        XCTAssertTrue(languageRow.waitForExistence(timeout: 3),
+                      "Settings tab should show after tapping Settings")
+
+        // Return to Info tab
+        tabBar.buttons["Info"].tap()
+        XCTAssertTrue(overviewSegment.waitForExistence(timeout: 3),
+                      "Info tab should still show content after switching away and back")
+    }
 }
