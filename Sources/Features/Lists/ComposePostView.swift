@@ -332,6 +332,7 @@ private struct WritingToolsTextView: UIViewRepresentable {
         tv.delegate = context.coordinator
         tv.isScrollEnabled = false
         tv.textContainerInset = UIEdgeInsets(top: 8, left: 4, bottom: 8, right: 4)
+        tv.textContainer.lineBreakMode = .byWordWrapping
         return tv
     }
 
@@ -344,6 +345,13 @@ private struct WritingToolsTextView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator {
         Coordinator(text: $text)
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
+        guard let width = proposal.width, width > 0 else { return nil }
+        let fittingSize = CGSize(width: width, height: UIView.layoutFittingExpandedSize.height)
+        let size = uiView.sizeThatFits(fittingSize)
+        return CGSize(width: width, height: max(size.height, 120))
     }
 
     final class Coordinator: NSObject, UITextViewDelegate {
