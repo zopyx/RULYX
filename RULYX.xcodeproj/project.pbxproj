@@ -181,6 +181,7 @@
 		BC76BF1B09E270F8E2C82297 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC510A8C26A27895D9F18C91 /* ConversationListView.swift */; };
 		BDC3DF6F1B30A99EDB60D233 /* CustomSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BC1B1C6F11B6ECB47B7C38 /* CustomSearchViewModel.swift */; };
 		C4F19EFE40D63950CE3C7C0E /* ListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 741E2169946E95FC95D9281A /* ListDetailView.swift */; };
+		C58EBE66DA3EB174DC1681F3 /* ListsView+Export.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4214910379FF69F2EC530EF /* ListsView+Export.swift */; };
 		C7FDB21508B3D003F05F7029 /* FunctionHelpModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */; };
 		CB294FA1201E62383542BE8E /* FeedTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BE169952D43B0D6F3941A5 /* FeedTimelineView.swift */; };
 		CB8463BEB64EF9484278166C /* ja.json in Resources */ = {isa = PBXBuildFile; fileRef = 83B3F04F6B6A8D971735B290 /* ja.json */; };
@@ -442,8 +443,9 @@
 		D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileViewModel.swift; sourceTree = "<group>"; };
 		D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
 		D19F8289064A8E2ED734F301 /* AccountSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSummaryCard.swift; sourceTree = "<group>"; };
-		D258AE6157132481DC5BCF92 /* RULYX.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RULYX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D258AE6157132481DC5BCF92 /* RULYX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RULYX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2AA2C4EF26C742918C3B0D4 /* AnalyticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsStore.swift; sourceTree = "<group>"; };
+		D4214910379FF69F2EC530EF /* ListsView+Export.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsView+Export.swift"; sourceTree = "<group>"; };
 		D444B3DE1BA8C8E335576B00 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		D495EFD4FEF70FB5C0D7BA2B /* String+CSV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+CSV.swift"; sourceTree = "<group>"; };
 		D4F6D1DF0921A11BEE1A9854 /* AppLockManagerTimeoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockManagerTimeoutTests.swift; sourceTree = "<group>"; };
@@ -473,7 +475,7 @@
 		F94186D084104DD1FB229672 /* BlueskySessionService401RetryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskySessionService401RetryTests.swift; sourceTree = "<group>"; };
 		FA2AD2BB8C1CC0559D0272C9 /* ListTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTemplatesView.swift; sourceTree = "<group>"; };
 		FA90BEDAA32D87A0E65875AC /* LiveBlueskyClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBlueskyClientTests.swift; sourceTree = "<group>"; };
-		FFDF59404421F648A8D1C3E6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FFDF59404421F648A8D1C3E6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -846,6 +848,7 @@
 				08CE015156B945A36C256CBF /* ListMergeController.swift */,
 				5CB7156B625C3C42F5686FD3 /* ListRowView.swift */,
 				05EE9A3DB3795A38B8300D38 /* ListsView.swift */,
+				D4214910379FF69F2EC530EF /* ListsView+Export.swift */,
 				83AB5243A902E67DBF19206E /* ListsView+Presentation.swift */,
 				0008AF4B031B579FCE8038B1 /* ListsViewModel.swift */,
 				FA2AD2BB8C1CC0559D0272C9 /* ListTemplatesView.swift */,
@@ -981,9 +984,6 @@
 					A316716A453D53B4C0EEAC04 = {
 						DevelopmentTeam = "";
 						TestTargetID = CEBD426283199691B9AB7DA5;
-					};
-					CEBD426283199691B9AB7DA5 = {
-						DevelopmentTeam = "";
 					};
 				};
 			};
@@ -1213,6 +1213,7 @@
 				352D15AE1E1C94E052DF549D /* ListMergeController.swift in Sources */,
 				4D48D7D859AAFE4387F32475 /* ListRowView.swift in Sources */,
 				3AB59CC9F1BE330684FEDBCD /* ListTemplatesView.swift in Sources */,
+				C58EBE66DA3EB174DC1681F3 /* ListsView+Export.swift in Sources */,
 				60818976997EB79EF0F84EC2 /* ListsView+Presentation.swift in Sources */,
 				72EA1BB49CFCC686C2D3C572 /* ListsView.swift in Sources */,
 				51AD62FAE4EFA38F74FC5206 /* ListsViewModel.swift in Sources */,
@@ -1409,6 +1410,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4PC9Z56E47;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1427,6 +1429,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4PC9Z56E47;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
