@@ -30,44 +30,60 @@ struct GIFPickerView: View {
                         systemImage: "key.slash",
                         description: Text("gif.missing_key_desc")
                     )
-                } else if let errorMessage {
-                    ContentUnavailableView(
-                        String(localized: "list.detail.alert_title"),
-                        systemImage: "exclamationmark.bubble",
-                        description: Text(errorMessage)
-                    )
-                } else if isLoading, results.isEmpty {
-                    Spacer()
-                    ProgressView("state.loading")
-                    Spacer()
-                } else if results.isEmpty, !isLoading {
-                    ContentUnavailableView(
-                        String(localized: "gif.empty_title"),
-                        systemImage: "magnifyingglass",
-                        description: Text(verbatim: isSearching ? String(localized: "gif.no_results_desc") : String(localized: "gif.search_hint"))
-                    )
                 } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(results) { gif in
-                                Button {
-                                    onSelect(gif)
-                                    dismiss()
-                                } label: {
-                                    AsyncImage(url: URL(string: gif.previewURL)) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    } placeholder: {
-                                        Rectangle()
-                                            .fill(.quaternary)
+                    HStack(spacing: 8) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.secondary)
+                        TextField("gif.search_placeholder", text: $searchText)
+                            .autocorrectionDisabled()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+
+                    if let errorMessage {
+                        ContentUnavailableView(
+                            String(localized: "list.detail.alert_title"),
+                            systemImage: "exclamationmark.bubble",
+                            description: Text(errorMessage)
+                        )
+                    } else if isLoading, results.isEmpty {
+                        Spacer()
+                        ProgressView("state.loading")
+                        Spacer()
+                    } else if results.isEmpty, !isLoading {
+                        ContentUnavailableView(
+                            String(localized: "gif.empty_title"),
+                            systemImage: "magnifyingglass",
+                            description: Text(verbatim: isSearching ? String(localized: "gif.no_results_desc") : String(localized: "gif.search_hint"))
+                        )
+                    } else {
+                        ScrollView {
+                            LazyVGrid(columns: columns, spacing: 8) {
+                                ForEach(results) { gif in
+                                    Button {
+                                        onSelect(gif)
+                                        dismiss()
+                                    } label: {
+                                        AsyncImage(url: URL(string: gif.previewURL)) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Rectangle()
+                                                .fill(.quaternary)
+                                        }
+                                        .aspectRatio(1, contentMode: .fill)
+                                        .frame(height: 120)
+                                        .clipped()
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
                                     }
-                                    .frame(height: 120)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
                             }
+                            .padding(.horizontal, 8)
                         }
-                        .padding(.horizontal, 8)
                     }
                 }
             }
@@ -78,7 +94,6 @@ struct GIFPickerView: View {
                     Button("actions.close") { dismiss() }
                 }
             }
-            .searchable(text: $searchText, prompt: "gif.search_placeholder")
             .onChange(of: searchText) { _, newValue in
                 let trimmed = newValue.trimmingCharacters(in: .whitespaces)
                 guard !trimmed.isEmpty else {
