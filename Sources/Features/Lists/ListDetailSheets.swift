@@ -226,7 +226,7 @@ struct ListMetadataSheet: View {
                 ToolbarItem(placement: .principal) {
                     Text(navigationTitle)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.5)
+                        .truncationMode(.tail)
                 }
 
                 ToolbarItem(placement: .cancellationAction) {

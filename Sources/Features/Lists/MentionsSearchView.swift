@@ -272,13 +272,10 @@ struct MentionsSearchView: View {
     private func searchAccountRow(_ account: AppAccount) -> some View {
         HStack(spacing: 14) {
             if let avatarURL = account.avatarURL {
-                AsyncImage(url: avatarURL) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
+                ThumbnailImageView(url: avatarURL, maxPixelSize: 64) {
                     avatarPlaceholder(for: account)
                 }
+                .scaledToFill()
                 .frame(width: 32, height: 32)
                 .clipShape(Circle())
             } else {

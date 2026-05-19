@@ -105,11 +105,17 @@ private struct ProfileLookupResultRow: View {
     var body: some View {
         HStack(spacing: 12) {
             if result.isResolved, let profile {
-                AsyncImage(url: profile.avatarURL) { image in
-                    image.resizable().scaledToFill()
-                } placeholder: {
-                    Circle().fill(Color.skyPrimary.opacity(0.16))
-                        .overlay { Text(profile.title.prefix(1).uppercased()).font(.headline).foregroundStyle(Color.skyPrimary) }
+                Group {
+                    if let avatarURL = profile.avatarURL {
+                        ThumbnailImageView(url: avatarURL, maxPixelSize: 80) {
+                            Circle().fill(Color.skyPrimary.opacity(0.16))
+                                .overlay { Text(profile.title.prefix(1).uppercased()).font(.headline).foregroundStyle(Color.skyPrimary) }
+                        }
+                        .scaledToFill()
+                    } else {
+                        Circle().fill(Color.skyPrimary.opacity(0.16))
+                            .overlay { Text(profile.title.prefix(1).uppercased()).font(.headline).foregroundStyle(Color.skyPrimary) }
+                    }
                 }
                 .frame(width: 40, height: 40)
                 .clipShape(Circle())
