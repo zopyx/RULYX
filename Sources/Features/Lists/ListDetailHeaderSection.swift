@@ -30,8 +30,7 @@ extension ListDetailView {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(currentList.name)
                             .appFont(.title)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.5)
+                            .lineLimit(3)
                         if !currentList.description.isEmpty, currentList.description != currentList.name {
                             Text(currentList.description)
                                 .font(.subheadline)

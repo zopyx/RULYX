@@ -208,11 +208,10 @@ struct ComposePostView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
                 if let avatarURL = post.author?.avatar, let url = URL(string: avatarURL) {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
+                    ThumbnailImageView(url: url, maxPixelSize: 48) {
                         Circle().fill(.quaternary)
                     }
+                    .scaledToFill()
                     .frame(width: 24, height: 24)
                     .clipShape(Circle())
                 } else {
