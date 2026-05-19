@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ProfileInspectorView: View {
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
@@ -97,16 +96,6 @@ struct ProfileInspectorView: View {
                         Text(verbatim: localizationManager.localized("profile.add_account_first"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                    }
-
-                    if horizontalSizeClass == .regular, accountStore.activeAccount != nil {
-                        Button {
-                            isShowingQuickAccountSwitcher = true
-                        } label: {
-                            Label(localizationManager.localized("account.switch"), systemImage: "person.crop.circle")
-                        }
-                        .accessibilityLabel(localizationManager.localized("account.switcher.label"))
-                        .accessibilityHint(localizationManager.localized("account.switcher.hint"))
                     }
                 }
 
@@ -345,9 +334,7 @@ struct ProfileInspectorView: View {
             }
             .navigationTitle("profile.title")
             .toolbar {
-                if horizontalSizeClass == .compact {
-                    accountSwitcherToolbar(isPresented: $isShowingQuickAccountSwitcher, accountStore: accountStore, localizationManager: localizationManager)
-                }
+                accountSwitcherToolbar(isPresented: $isShowingQuickAccountSwitcher, accountStore: accountStore, localizationManager: localizationManager)
             }
             .sheet(isPresented: $isShowingQuickAccountSwitcher) {
                 AccountQuickSwitcherSheet(
