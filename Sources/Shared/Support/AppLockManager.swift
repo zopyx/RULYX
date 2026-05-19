@@ -21,6 +21,8 @@ final class AppLockManager: ObservableObject {
     private var backgroundEntryTime: Date?
     private var didEnterBackground = false
 
+    var now: () -> Date = { Date() }
+
     private init() {
         if isEnabled {
             isLocked = true
@@ -51,7 +53,7 @@ final class AppLockManager: ObservableObject {
     }
 
     func appDidEnterBackground() {
-        backgroundEntryTime = Date()
+        backgroundEntryTime = now()
         didEnterBackground = true
         if isEnabled, timeoutMinutes == 0 {
             isLocked = true
@@ -66,7 +68,7 @@ final class AppLockManager: ObservableObject {
         }
         didEnterBackground = false
         if timeoutMinutes > 0, let entry = backgroundEntryTime {
-            let elapsed = Date().timeIntervalSince(entry)
+            let elapsed = now().timeIntervalSince(entry)
             if elapsed >= Double(timeoutMinutes) * 60.0 {
                 isLocked = true
             }

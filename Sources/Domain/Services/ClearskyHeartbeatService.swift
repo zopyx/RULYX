@@ -30,7 +30,7 @@ final class ClearskyHeartbeatService: ObservableObject {
         timerTask = nil
     }
 
-    private func ping() async {
+    func ping() async {
         guard let url = URL(string: heartbeatURL) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
