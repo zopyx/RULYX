@@ -104,26 +104,6 @@ struct RootView: View {
             .preferredColorScheme(preferredScheme)
             .environment(\.locale, localizationManager.locale)
             .environment(\.layoutDirection, localizationManager.layoutDirection)
-            .gesture(
-                DragGesture()
-                    .onEnded { value in
-                        let threshold: CGFloat = 60
-                        guard abs(value.translation.width) > threshold, abs(value.translation.height) < threshold * 2 else { return }
-                        let tabs = orderedTabs(showBeta: showBetaFeatures)
-                        guard let currentIndex = tabs.firstIndex(of: workspaceStore.selectedTab) else { return }
-                        if value.translation.width < -threshold {
-                            let nextIndex = currentIndex + 1
-                            if nextIndex < tabs.count {
-                                workspaceStore.selectedTab = tabs[nextIndex]
-                            }
-                        } else if value.translation.width > threshold {
-                            let prevIndex = currentIndex - 1
-                            if prevIndex >= 0 {
-                                workspaceStore.selectedTab = tabs[prevIndex]
-                            }
-                        }
-                    }
-            )
             .onChange(of: showBetaFeatures) { _, newValue in
                 if !newValue, workspaceStore.selectedTab == .timeline || workspaceStore.selectedTab == .notifications || workspaceStore.selectedTab == .chat {
                     workspaceStore.selectedTab = .moderation

@@ -3,10 +3,7 @@ import Foundation
 @MainActor
 final class AppDependencies: ObservableObject {
     let accountStore: AccountStore
-    let listService: BlueskyListService
-    let profileService: BlueskyProfileService
     let workspaceStore: ModerationWorkspaceStore
-    let actionPresetStore: ActionPresetStore
     let blueskyClient: LiveBlueskyClient
     let localizationManager: LocalizationManager
     let mutedWordsStore: MutedWordsStore
@@ -25,10 +22,7 @@ final class AppDependencies: ObservableObject {
             accountStore = AccountStore(preview: true)
             let requestExecutor = BlueskyRequestExecutor()
             let sessionService = BlueskySessionService(requestExecutor: requestExecutor, keychain: KeychainService())
-            listService = BlueskyListService(requestExecutor: requestExecutor, sessionService: sessionService)
-            profileService = BlueskyProfileService(requestExecutor: requestExecutor, sessionService: sessionService)
             workspaceStore = ModerationWorkspaceStore()
-            actionPresetStore = ActionPresetStore()
             blueskyClient = PreviewBlueskyClient()
             localizationManager = LocalizationManager.shared
             mutedWordsStore = MutedWordsStore()
@@ -46,10 +40,7 @@ final class AppDependencies: ObservableObject {
             let sessionService = BlueskySessionService(requestExecutor: requestExecutor, keychain: keychain)
 
             accountStore = AccountStore(keychain: keychain)
-            listService = BlueskyListService(requestExecutor: requestExecutor, sessionService: sessionService)
-            profileService = BlueskyProfileService(requestExecutor: requestExecutor, sessionService: sessionService)
             workspaceStore = ModerationWorkspaceStore()
-            actionPresetStore = ActionPresetStore()
             blueskyClient = LiveBlueskyClient(
                 requestExecutor: requestExecutor,
                 sessionService: sessionService
