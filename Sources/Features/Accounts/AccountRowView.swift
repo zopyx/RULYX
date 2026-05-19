@@ -60,18 +60,22 @@ struct AccountRowView: View {
             Spacer()
 
             if isActive {
-                Text("account.active")
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background {
-                        if #available(iOS 26, *) {
-                            Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
-                        } else {
-                            Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
-                        }
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption)
+                    Text("account.active")
+                        .font(.caption.weight(.semibold))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background {
+                    if #available(iOS 26, *) {
+                        Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
+                    } else {
+                        Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
                     }
-                    .foregroundStyle(.white)
+                }
+                .foregroundStyle(.white)
             }
         }
         .padding(.vertical, 4)
