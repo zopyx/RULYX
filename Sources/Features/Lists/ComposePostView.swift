@@ -351,7 +351,7 @@ private struct WritingToolsTextView: UIViewRepresentable {
         Coordinator(text: $text)
     }
 
-    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context _: Context) -> CGSize? {
         guard let width = proposal.width, width > 0 else { return nil }
         let fittingSize = CGSize(width: width, height: UIView.layoutFittingExpandedSize.height)
         let size = uiView.sizeThatFits(fittingSize)

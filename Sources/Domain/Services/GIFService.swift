@@ -37,10 +37,32 @@ final class GIFService: Sendable {
     private let httpClient = HTTPClient()
     private let baseURL = "https://api.klipy.com/api/v1"
     private let perPage = 24
+    private nonisolated(unsafe) let keychain: KeychainServicing
+
+    private let keychainService = "com.ajung.RULYX.klipy"
+    private let keychainAccount = "apiKey"
+
+    init(keychain: KeychainServicing = KeychainService()) {
+        self.keychain = keychain
+        seedKeyIfNeeded()
+        migrateFromUserDefaults()
+    }
+
+    private func seedKeyIfNeeded() {
+        guard (try? keychain.read(service: keychainService, account: keychainAccount)) == nil else { return }
+        try? keychain.save("W3FgVTePIgmlS4FEj8oF2xbMzXgwx3QGPX3pYEmrQZIvH4eRB0sin6PKqzun4f6R", service: keychainService, account: keychainAccount)
+    }
 
     private var apiKey: String? {
-        let key = UserDefaults.standard.string(forKey: "klipyAPIKey")
-        return key?.isEmpty == true ? nil : key
+        guard let key = try? keychain.read(service: keychainService, account: keychainAccount) else { return nil }
+        return key.isEmpty ? nil : key
+    }
+
+    private func migrateFromUserDefaults() {
+        if let oldKey = UserDefaults.standard.string(forKey: "klipyAPIKey"), !oldKey.isEmpty {
+            try? keychain.save(oldKey, service: keychainService, account: keychainAccount)
+            UserDefaults.standard.removeObject(forKey: "klipyAPIKey")
+        }
     }
 
     func search(query: String) async throws -> [GIFResult] {
@@ -64,6 +86,31 @@ final class GIFService: Sendable {
         guard let url = URL(string: url) else { throw GIFError.networkError("Invalid URL") }
         let (data, _) = try await httpClient.data(from: url, source: "GIF Download")
         return data
+    }
+}
+
+// MARK: - Keychain Helper
+
+enum KlipyKeychainHelper {
+    private static let service = "com.ajung.RULYX.klipy"
+    private static let account = "apiKey"
+    private nonisolated(unsafe) static let keychain: KeychainServicing = KeychainService()
+
+    static func read() -> String {
+        (try? keychain.read(service: service, account: account)) ?? ""
+    }
+
+    static func save(_ value: String) {
+        if value.isEmpty {
+            try? keychain.delete(service: service, account: account)
+        } else {
+            try? keychain.save(value, service: service, account: account)
+        }
+    }
+
+    static func exists() -> Bool {
+        guard let key = try? keychain.read(service: service, account: account) else { return false }
+        return !key.isEmpty
     }
 }
 
