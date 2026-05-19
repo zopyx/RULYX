@@ -56,10 +56,16 @@ struct ComposePostView: View {
 
                     HStack {
                         Spacer()
+                        if postText.count > 300 {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
                         Text("\(postText.count)/300")
                             .font(.caption)
                             .foregroundStyle(postText.count > 300 ? .red : .green)
                     }
+                    .accessibilityLabel(loc("compose.char_count").replacingOccurrences(of: "{n}", with: "\(postText.count)/300"))
                 } header: {
                     Text("compose.text_section")
                 }
@@ -125,6 +131,9 @@ struct ComposePostView: View {
                                                     .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
                                             }
                                             .buttonStyle(.plain)
+                                            .accessibilityLabel(loc("compose.remove_image"))
+                                            .frame(minWidth: 44, minHeight: 44)
+                                            .contentShape(Rectangle())
                                             .offset(x: 4, y: -4)
                                         }
                                         TextField("compose.alt_placeholder", text: altBinding)

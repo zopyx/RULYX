@@ -133,6 +133,7 @@ struct ListsView: View {
                                 } label: {
                                     Image(systemName: "plus")
                                 }
+                                .accessibilityLabel(loc("lists.create_moderation"))
                             }
                         }
 
@@ -180,6 +181,7 @@ struct ListsView: View {
                                 } label: {
                                     Image(systemName: "plus")
                                 }
+                                .accessibilityLabel(loc("lists.create_regular"))
                             }
                         }
 
@@ -242,6 +244,7 @@ struct ListsView: View {
                     } label: {
                         Image(systemName: "magnifyingglass")
                     }
+                    .accessibilityLabel(loc("lists.search.label"))
                     .disabled(accountStore.activeAccount == nil)
                 }
 
