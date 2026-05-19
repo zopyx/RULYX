@@ -392,7 +392,6 @@
   "list.import_preview.import_button": "Import (AR)",
   "list.import_preview.importing": "Importing (AR)",
   "list.edit.title": "Edit List (AR)",
-  "list.edit.metadata": "Metadata (AR)",
   "list.edit.name_placeholder": "Title (AR)",
   "list.edit.desc_placeholder": "Description (AR)",
   "list.edit.cancel": "Cancel (AR)",
@@ -1035,5 +1034,6 @@
   "debug.http.state.succeeded": "نجاح",
   "debug.http.state.failed": "فشل",
   "debug.http.close": "Close",
-  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load",
+  "debug.diagnostics": "التشخيص"
 }

@@ -1033,5 +1033,6 @@
   "debug.http.close": "Close",
   "debug.http.state.running": "Running",
   "debug.http.state.succeeded": "Success",
-  "debug.http.state.failed": "Failed"
+  "debug.http.state.failed": "Failed",
+  "debug.diagnostics": "Diagnostics"
 }

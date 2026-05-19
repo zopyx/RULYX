@@ -494,7 +494,7 @@ private struct DebugInfoView: View {
                         .font(.caption.monospaced())
                 }
             }
-            .navigationTitle("Diagnostics")
+            .navigationTitle(localizationManager.localized("debug.diagnostics"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

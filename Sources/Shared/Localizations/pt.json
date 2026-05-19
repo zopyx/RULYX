@@ -1035,5 +1035,6 @@
   "debug.http.state.succeeded": "Sucesso",
   "debug.http.state.failed": "Fracassado",
   "debug.http.close": "Close",
-  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load",
+  "debug.diagnostics": "Diagnóstico"
 }
