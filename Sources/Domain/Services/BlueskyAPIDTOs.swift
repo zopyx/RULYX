@@ -292,11 +292,7 @@ func parseATURI(_ uri: String) throws -> ATURIComponents {
 
 func parseDate(_ value: String?) -> Date? {
     guard let value else { return nil }
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    if let date = formatter.date(from: value) { return date }
-    formatter.formatOptions = [.withInternetDateTime]
-    return formatter.date(from: value)
+    return SharedDateFormatters.parseISO8601(value)
 }
 
 @MainActor
@@ -320,10 +316,7 @@ func relativeTimeString(from date: Date) -> String {
         return loc(key).replacingOccurrences(of: "{n}", with: "\(days)")
     }
 
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .none
-    return formatter.string(from: date)
+    return date.formatted(date: .abbreviated, time: .omitted)
 }
 
 func mapViewerState(_ viewer: ProfileViewerState?) -> BlueskyViewerState? {

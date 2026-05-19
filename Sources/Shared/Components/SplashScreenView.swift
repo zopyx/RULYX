@@ -19,14 +19,11 @@ struct SplashScreenView: View {
     @State private var showParticles = false
 
     private var buildDate: String {
-        let formatter = DateFormatter()
-        formatter.timeZone = TimeZone(abbreviation: "UTC")
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         if let url = Bundle.main.executableURL,
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
            let date = attrs[.modificationDate] as? Date
         {
-            return formatter.string(from: date)
+            return SharedDateFormatters.buildTimestampUTC.string(from: date)
         }
         return "Unknown"
     }
