@@ -41,6 +41,7 @@ struct ClearskyListsView: View {
                             .font(.title3)
                             .foregroundStyle(.tertiary)
                     }
+                    .accessibilityLabel("actions.close")
                 }
             }
             .task {
