@@ -36,6 +36,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     func begin(request: URLRequest, source: String? = nil, origin: String? = nil) async -> UUID {
         let entryID = UUID()
         let startedAt = Date()
+        let sanitizedURL = Self.sanitizeURL(request.url?.absoluteString ?? "about:blank")
         await MainActor.run {
             let entry = HTTPRequestDebugEntry(
                 id: entryID,
@@ -43,7 +44,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
                 source: source,
                 origin: origin,
                 method: request.httpMethod ?? "GET",
-                url: request.url?.absoluteString ?? "about:blank",
+                url: sanitizedURL,
                 startedAt: startedAt,
                 state: .running,
                 duration: nil,
@@ -97,5 +98,11 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
         var entry = entries[index]
         mutate(&entry)
         entries[index] = entry
+    }
+
+    private static func sanitizeURL(_ url: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: "(https?://api\\.klipy\\.com/api/v1/)[A-Za-z0-9]{50,}(/|$)") else { return url }
+        let range = NSRange(url.startIndex..., in: url)
+        return regex.stringByReplacingMatches(in: url, range: range, withTemplate: "$1[REDACTED]$2")
     }
 }
