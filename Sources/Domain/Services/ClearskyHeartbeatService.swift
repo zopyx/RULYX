@@ -16,10 +16,11 @@ final class ClearskyHeartbeatService: ObservableObject {
 
     func start() {
         guard timerTask == nil else { return }
+        let interval = pingInterval
         timerTask = Task { [weak self] in
             while !Task.isCancelled {
                 await self?.ping()
-                try? await Task.sleep(nanoseconds: UInt64(self?.pingInterval ?? 10 * 1_000_000_000))
+                try? await Task.sleep(for: .seconds(interval))
             }
         }
     }

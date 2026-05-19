@@ -9,7 +9,7 @@ func configureCache() {
 struct RULYXApp: App {
     @UIApplicationDelegateAdaptor(BlueskyAppDelegate.self) private var appDelegate
     @StateObject private var deps = AppDependencies()
-    @StateObject private var appLockManager = AppLockManager.shared
+    @ObservedObject private var appLockManager = AppLockManager.shared
     @State private var showSplash = true
 
     var body: some Scene {
@@ -28,17 +28,23 @@ struct RULYXApp: App {
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
                     .onAppear {
-                        configureCache()
+                        DispatchQueue.main.async {
+                            configureCache()
+                        }
                     }
                     .animation(UIAccessibility.isReduceMotionEnabled ? nil : .default, value: appLockManager.isLocked)
                     .task {
                         await deps.blueskyClient.restoreSessions(for: deps.accountStore.accounts)
                     }
                     .task {
-                        deps.pushNotificationCoordinator.start()
+                        DispatchQueue.main.async {
+                            deps.pushNotificationCoordinator.start()
+                        }
                     }
                     .task {
-                        deps.clearskyHeartbeat.start()
+                        DispatchQueue.main.async {
+                            deps.clearskyHeartbeat.start()
+                        }
                     }
                     .task(id: deps.accountStore.activeAccountID) {
                         let appPassword = deps.accountStore.activeAccount.flatMap { deps.accountStore.appPassword(for: $0) }
@@ -48,15 +54,21 @@ struct RULYXApp: App {
                         deps.pushNotificationCoordinator.syncAccounts()
                     }
                     .onReceive(deps.accountStore.$accounts) { _ in
-                        deps.pushNotificationCoordinator.syncAccounts()
+                        DispatchQueue.main.async {
+                            deps.pushNotificationCoordinator.syncAccounts()
+                        }
                     }
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
-                        appLockManager.appDidEnterBackground()
+                        DispatchQueue.main.async {
+                            appLockManager.appDidEnterBackground()
+                        }
                     }
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                        appLockManager.appDidBecomeActive()
-                        deps.pushNotificationCoordinator.start()
-                        deps.chatStore.startPolling()
+                        DispatchQueue.main.async {
+                            appLockManager.appDidBecomeActive()
+                            deps.pushNotificationCoordinator.start()
+                            deps.chatStore.startPolling()
+                        }
                     }
 
                 if showSplash {
@@ -68,3 +80,4 @@ struct RULYXApp: App {
         }
     }
 }
+
