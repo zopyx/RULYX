@@ -5,11 +5,16 @@ struct ChatMessageBubble: View {
     let isOutgoing: Bool
     var onOpenProfile: ((String) -> Void)?
 
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .none
+        f.timeStyle = .short
+        f.locale = Locale(identifier: LocalizationManager.shared.currentLanguage)
+        return f
+    }()
+
     private var timeString: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.timeStyle = .short
-        return formatter.string(from: message.sentAt)
+        Self.timeFormatter.string(from: message.sentAt)
     }
 
     var body: some View {

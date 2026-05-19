@@ -369,11 +369,7 @@ struct ListDetailView: View {
                         Button {
                             imagePreview = ImagePreviewCollection(urls: [avatarURL], initialIndex: 0)
                         } label: {
-                            AsyncImage(url: avatarURL) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            } placeholder: {
+                            ThumbnailImageView(url: avatarURL, maxPixelSize: 96) {
                                 avatarPlaceholder
                             }
                             .frame(width: 48, height: 48)
@@ -408,11 +404,7 @@ struct ListDetailView: View {
                             } label: {
                                 HStack(spacing: 10) {
                                     if let avatarURL = ownerActor.avatarURL {
-                                        AsyncImage(url: avatarURL) { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                        } placeholder: {
+                                        ThumbnailImageView(url: avatarURL, maxPixelSize: 56) {
                                             Circle()
                                                 .fill(Color.skyPrimary.opacity(0.16))
                                         }

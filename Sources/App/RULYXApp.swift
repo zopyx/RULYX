@@ -10,6 +10,7 @@ struct RULYXApp: App {
     @UIApplicationDelegateAdaptor(BlueskyAppDelegate.self) private var appDelegate
     @StateObject private var deps = AppDependencies()
     @ObservedObject private var appLockManager = AppLockManager.shared
+    @AppStorage("hasSplashed") private var hasSplashed = false
     @State private var showSplash = true
 
     var body: some Scene {
@@ -78,6 +79,14 @@ struct RULYXApp: App {
                     SplashScreenView(isActive: $showSplash)
                         .transition(.opacity)
                         .zIndex(100)
+                        .onAppear {
+                            if hasSplashed {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    withAnimation { showSplash = false }
+                                }
+                            }
+                            hasSplashed = true
+                        }
                 }
             }
         }
