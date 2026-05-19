@@ -472,8 +472,8 @@ struct ListsView: View {
                                             replacements: ["count": "\(count)"]
                                         )
                                     )
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                                 }
                             }
                             Spacer()

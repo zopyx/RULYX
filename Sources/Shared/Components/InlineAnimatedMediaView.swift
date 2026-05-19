@@ -20,7 +20,7 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
     let url: URL
     let allowsInteraction: Bool
 
-    func makeUIView(context: Context) -> WKWebView {
+    func makeUIView(context _: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.mediaTypesRequiringUserActionForPlayback = []
         config.allowsInlineMediaPlayback = true
@@ -36,7 +36,7 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
         return webView
     }
 
-    func updateUIView(_ webView: WKWebView, context: Context) {
+    func updateUIView(_ webView: WKWebView, context _: Context) {
         webView.isUserInteractionEnabled = allowsInteraction
         guard webView.url != url else { return }
         loadContent(in: webView)

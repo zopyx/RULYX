@@ -12,6 +12,7 @@ final class ModerationWorkspaceStore: ObservableObject {
             preferencesStore.selectedTab = selectedTab
         }
     }
+
     @Published private(set) var moderationNavigationResetToken = UUID()
     @Published var pendingChatConversation: ChatConversation?
     @Published var pendingChatConversationID: String?

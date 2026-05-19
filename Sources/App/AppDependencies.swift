@@ -14,9 +14,11 @@ final class AppDependencies: ObservableObject {
     let chatStore: ChatStore
     let pushNotificationCoordinator: PushNotificationCoordinator
     let httpRequestDebugStore: HTTPRequestDebugStore
+    let clearskyHeartbeat: ClearskyHeartbeatService
 
     init() {
         httpRequestDebugStore = HTTPRequestDebugStore.shared
+        clearskyHeartbeat = ClearskyHeartbeatService.shared
         if CommandLine.arguments.contains("--uitesting") {
             UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
             UserDefaults.standard.set("en", forKey: "selectedLanguage")

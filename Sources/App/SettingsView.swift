@@ -18,8 +18,8 @@ struct SettingsView: View {
                 Section {
                     Picker(
                         selection: Binding(
-                            get: { self.appearanceMode },
-                            set: { self.appearanceMode = $0 }
+                            get: { appearanceMode },
+                            set: { appearanceMode = $0 }
                         )
                     ) {
                         Text("settings.appearance.light").tag("light")
@@ -56,8 +56,8 @@ struct SettingsView: View {
                     }
                     .accessibilityHint("settings.language.hint")
                 } header: {
-                        Text(localizationManager.localized("settings.preferences"))
-                    }
+                    Text(localizationManager.localized("settings.preferences"))
+                }
 
                 if appLockManager.isBiometricsAvailable {
                     Section {
@@ -145,10 +145,12 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle(localizationManager.localized("settings.title"))
-            .navigationDestination(isPresented: $isShowingHTTPRequestDebugView) {
-                HTTPRequestDebugView()
-                    .environmentObject(httpRequestDebugStore)
-                    .environmentObject(localizationManager)
+            .sheet(isPresented: $isShowingHTTPRequestDebugView) {
+                NavigationStack {
+                    HTTPRequestDebugView()
+                        .environmentObject(httpRequestDebugStore)
+                        .environmentObject(localizationManager)
+                }
             }
             .confirmationDialog(
                 localizationManager.localized("settings.clear_cache.confirm"),
@@ -168,9 +170,9 @@ struct SettingsView: View {
 
     private var biometricIcon: String {
         switch appLockManager.biometricType {
-        case .faceID: return "faceid"
-        case .touchID: return "touchid"
-        default: return "lock.shield"
+        case .faceID: "faceid"
+        case .touchID: "touchid"
+        default: "lock.shield"
         }
     }
 }

@@ -156,7 +156,8 @@ struct BlueskyProfileView: View {
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account) {
+               let appPassword = accountStore.appPassword(for: account)
+            {
                 SimplifiedReportSheet(
                     title: String(localized: "profile.report"),
                     selectedReason: $viewModel.selectedReportReason,
@@ -421,7 +422,6 @@ struct BlueskyProfileView: View {
                             }
                             .disabled(viewModel.isUpdatingModeration)
                             .accessibilityHint(viewerState.muted ? String(localized: "profile.unmute.hint") : String(localized: "profile.mute.hint"))
-
                         }
 
                         if let statusMessage = viewModel.statusMessage {

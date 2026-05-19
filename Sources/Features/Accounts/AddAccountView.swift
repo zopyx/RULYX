@@ -11,9 +11,9 @@ enum ProviderOption: String, CaseIterable, Identifiable {
 
     var entrywayURL: URL {
         switch self {
-        case .bluesky: return URL(string: "https://bsky.social")!
-        case .eurosky: return URL(string: "https://eurosky.social")!
-        case .other: return URL(string: "https://bsky.social")!
+        case .bluesky: URL(string: "https://bsky.social")!
+        case .eurosky: URL(string: "https://eurosky.social")!
+        case .other: URL(string: "https://bsky.social")!
         }
     }
 }
@@ -90,11 +90,10 @@ struct AddAccountView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("account.add.save") {
                         Task {
-                            let entrywayURL: URL?
-                            if selectedProvider == .other && !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                entrywayURL = URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
+                            let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
                             } else {
-                                entrywayURL = selectedProvider.entrywayURL
+                                selectedProvider.entrywayURL
                             }
                             let added = await accountStore.addAccount(
                                 handle: handle,

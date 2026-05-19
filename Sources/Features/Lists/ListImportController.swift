@@ -6,8 +6,8 @@ final class ListImportController {
         from rawInput: String,
         sourceDescription: String,
         existingMemberDIDs: Set<String>,
-        account: AppAccount,
-        appPassword: String,
+        account _: AppAccount,
+        appPassword _: String,
         using client: LiveBlueskyClient
     ) async throws -> ImportPreview {
         let start = CFAbsoluteTimeGetCurrent()
@@ -49,7 +49,7 @@ final class ListImportController {
                     let batchIndices = Array(chunk)
                     group.addTask {
                         let batchTokens = batchIndices.map(\.token)
-                        let profiles = (try? await client.fetchProfileBatch(identifiers: batchTokens)) ?? []
+                        let profiles = await (try? client.fetchProfileBatch(identifiers: batchTokens)) ?? []
                         let byHandle: [String: BlueskyActor] = Dictionary(
                             uniqueKeysWithValues: profiles.map { ($0.handle.lowercased(), $0) }
                         )

@@ -43,11 +43,11 @@ final class ListDiffController {
     nonisolated func comparisonMembers(for bucket: ComparisonBucket, in report: ListComparisonReport) -> [BlueskyListMember] {
         switch bucket {
         case .overlap:
-            return report.overlap
+            report.overlap
         case .onlyInCurrent:
-            return report.onlyInCurrent
+            report.onlyInCurrent
         case .onlyInOther:
-            return report.onlyInOther
+            report.onlyInOther
         }
     }
 
@@ -64,7 +64,7 @@ final class ListDiffController {
     }
 
     nonisolated func selectComparisonBucket(_ bucket: ComparisonBucket, in report: ListComparisonReport) -> Set<String> {
-        Set(comparisonMembers(for: bucket, in: report).map { $0.actor.did })
+        Set(comparisonMembers(for: bucket, in: report).map(\.actor.did))
     }
 
     nonisolated func exportDiffRows(from report: ListComparisonReport) -> [String] {

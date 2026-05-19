@@ -1026,9 +1026,11 @@
   "customsearch.empty_users_desc": "No users match your search query",
   "customsearch.end": "No more results",
   "biometric.auth_reason": "Authenticate with your biometrics to access your accounts and moderation data.",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load",
   "debug.http.title": "HTTP Requests",
   "debug.http.empty": "No requests recorded yet.",
   "debug.http.clear": "Clear Log",
+  "debug.http.close": "Close",
   "debug.http.state.running": "Running",
   "debug.http.state.succeeded": "Success",
   "debug.http.state.failed": "Failed"

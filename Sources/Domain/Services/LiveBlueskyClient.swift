@@ -12,18 +12,21 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     private let session: URLSession
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
+    private let clearskyHeartbeat: ClearskyHeartbeatService
 
     init(
         baseURL: URL = .bskySocial,
         httpClient: HTTPClient? = nil,
         keychain: KeychainServicing = KeychainService(),
         requestExecutor: BlueskyRequestExecuting? = nil,
-        sessionService: BlueskySessionServicing? = nil
+        sessionService: BlueskySessionServicing? = nil,
+        clearskyHeartbeat: ClearskyHeartbeatService = .shared
     ) {
         self.baseURL = baseURL
         let clientSession = URLSession.shared
-        self.session = clientSession
+        session = clientSession
         self.httpClient = httpClient ?? HTTPClient(session: clientSession)
+        self.clearskyHeartbeat = clearskyHeartbeat
         let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, httpClient: self.httpClient)
         self.requestExecutor = executor
         self.sessionService = sessionService ?? BlueskySessionService(
@@ -582,6 +585,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Clearsky Integration
 
+    private func guardClearskyAvailable() throws {
+        guard clearskyHeartbeat.isClearskyAvailable else {
+            throw BlueskyAPIError.server("ClearSky is temporarily unavailable")
+        }
+    }
+
     func fetchBlockedActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
         try await fetchClearskyActors(account: account, endpoint: "blocklist")
     }
@@ -604,6 +613,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     private func fetchClearskyActors(account: AppAccount, endpoint: String) async throws -> ClearskyBlocklistResult {
+        try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
         var allDIDs = Set<String>()
@@ -650,6 +660,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
+        try guardClearskyAvailable()
         let urlString = "https://api.clearsky.app/csky/api/v1/get-list/\(handle)?identifier="
         AppLogger.performance.debug("Fetching Clearsky lists from: \(urlString, privacy: .public)")
         guard var components = URLComponents(string: urlString) else { throw BlueskyAPIError.invalidURL }
@@ -673,7 +684,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     // MARK: - DID Resolution & PLC Audit
 
     private func resolveProfiles(dids: [String]) async throws -> [BlueskyActor] {
-        return try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
+        try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
             var offset = 0
             while offset < dids.count {
                 let chunk = dids[offset ..< min(offset + 25, dids.count)]
@@ -753,6 +764,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     private func resolveHandleToDID(handle: String) async throws -> String {
+        try guardClearskyAvailable()
         guard let url = URL(string: "https://public.api.clearsky.services/api/v1/anon/get-did/\(handle)") else {
             throw BlueskyAPIError.invalidURL
         }
@@ -1170,18 +1182,30 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         guard let url = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts") else {
             throw BlueskyAPIError.invalidURL
         }
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-        components.queryItems = uris.map { URLQueryItem(name: "uris", value: $0) }
-        guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
-        var req = URLRequest(url: finalURL)
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-        req.timeoutInterval = 30
-        let (data, httpResponse) = try await httpClient.data(for: req, source: "Post Lookup")
-        guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            throw BlueskyAPIError.invalidResponse
+        let chunks = uris.chunked(maxLength: 25)
+        return try await withThrowingTaskGroup(of: [RichPost].self) { group in
+            for chunk in chunks {
+                group.addTask {
+                    var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+                    components.queryItems = chunk.map { URLQueryItem(name: "uris", value: $0) }
+                    guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
+                    var req = URLRequest(url: finalURL)
+                    req.setValue("application/json", forHTTPHeaderField: "Accept")
+                    req.timeoutInterval = 30
+                    let (data, httpResponse) = try await self.httpClient.data(for: req, source: "Post Lookup")
+                    guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                        throw BlueskyAPIError.invalidResponse
+                    }
+                    let decoded = try JSONDecoder().decode(GetPostsResponse.self, from: data)
+                    return decoded.posts
+                }
+            }
+            var allPosts: [RichPost] = []
+            for try await batch in group {
+                allPosts.append(contentsOf: batch)
+            }
+            return allPosts
         }
-        let decoded = try JSONDecoder().decode(GetPostsResponse.self, from: data)
-        return decoded.posts
     }
 
     func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {
@@ -1287,4 +1311,12 @@ struct PostVideoAttachment {
     let blob: UploadedBlob
     let alt: String
     let aspectRatio: (width: Int, height: Int)?
+}
+
+private extension Array {
+    func chunked(maxLength: Int) -> [[Element]] {
+        stride(from: 0, to: count, by: maxLength).map {
+            Array(self[$0 ..< Swift.min($0 + maxLength, count)])
+        }
+    }
 }

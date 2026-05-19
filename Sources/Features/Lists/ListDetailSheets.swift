@@ -175,11 +175,11 @@ struct ListMetadataSheet: View {
         self.mode = mode
         self.onConfirm = onConfirm
         switch mode {
-        case .create(let k):
+        case let .create(k):
             _title = State(initialValue: "")
             _description = State(initialValue: "")
             _kind = State(initialValue: k)
-        case .edit(let list, _):
+        case let .edit(list, _):
             _title = State(initialValue: list.name)
             _description = State(initialValue: list.description)
             _kind = State(initialValue: list.kind)
@@ -187,7 +187,7 @@ struct ListMetadataSheet: View {
     }
 
     private var isSaving: Bool {
-        if case .edit(_, let saving) = mode { return saving }
+        if case let .edit(_, saving) = mode { return saving }
         return false
     }
 
@@ -251,10 +251,10 @@ struct ListMetadataSheet: View {
 
     private var navigationTitle: String {
         switch mode {
-        case .create(let k):
-            return k == .moderation ? String(localized: "list.create.moderation_title") : String(localized: "list.create.title")
+        case let .create(k):
+            k == .moderation ? String(localized: "list.create.moderation_title") : String(localized: "list.create.title")
         case .edit:
-            return String(localized: "list.edit.title")
+            String(localized: "list.edit.title")
         }
     }
 

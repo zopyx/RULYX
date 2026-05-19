@@ -56,6 +56,7 @@
 		2D62F0DC9DC51FFDC4B29ED3 /* TimelineTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9BA969D52386356D4AD1C /* TimelineTab.swift */; };
 		2DF00A71562D916B2C7CADC0 /* TimelineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DC5D9D6263FDF264240662 /* TimelineState.swift */; };
 		30C6532847608A3368F1EF6D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8919369DD4F6A15D621740D0 /* AppLogger.swift */; };
+		33B496A58DA931824C864548 /* ClearskyHeartbeatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0230DA7EE94FF126CB5EF0B /* ClearskyHeartbeatService.swift */; };
 		34400D24383390F3F173D351 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6E935CDEF1D4A0995B5A76 /* TestHelpers.swift */; };
 		34B8EE7CCD12F6CCFB887305 /* tr.json in Resources */ = {isa = PBXBuildFile; fileRef = 25AB98A8E4D161637E0E252B /* tr.json */; };
 		352D15AE1E1C94E052DF549D /* ListMergeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08CE015156B945A36C256CBF /* ListMergeController.swift */; };
@@ -116,6 +117,7 @@
 		6BB42169303728BA73067AAE /* AccountSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19F8289064A8E2ED734F301 /* AccountSummaryCard.swift */; };
 		6C052B32660F20E8E8F04A54 /* BulkProfileLookupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACC01757A043BDAEEE26F55 /* BulkProfileLookupViewModel.swift */; };
 		6D6A697D4BDA1A7B6CAF985E /* ListDetailSearchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88F5400EB8D8AD12B3EF3DFD /* ListDetailSearchSection.swift */; };
+		6EA2CC9DCA4B500405B6081F /* ClearskyBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E92F175C3C35100F674497 /* ClearskyBanner.swift */; };
 		6F8EA08890F3AAF7EDB84A2F /* pl.json in Resources */ = {isa = PBXBuildFile; fileRef = BCCD30322305917D698AC804 /* pl.json */; };
 		72AE3429DAE8E71E3FF46DD7 /* InlineAnimatedMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B51EB3F99EB2D9290D1B37 /* InlineAnimatedMediaView.swift */; };
 		72EA1BB49CFCC686C2D3C572 /* ListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE9A3DB3795A38B8300D38 /* ListsView.swift */; };
@@ -311,6 +313,7 @@
 		547649B68D511304DB5515F5 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		54FF34256F3BD401009AD71A /* BlueskyListServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyListServicing.swift; sourceTree = "<group>"; };
 		57053C65176DBDA9C7D5E7E9 /* StatePanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePanels.swift; sourceTree = "<group>"; };
+		58E92F175C3C35100F674497 /* ClearskyBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearskyBanner.swift; sourceTree = "<group>"; };
 		5995EE83C727D765A13173CF /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		59BB4D904C184EB1F7BF2189 /* RelationshipCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipCache.swift; sourceTree = "<group>"; };
 		5A3437EF23B86025FCCAFEBF /* BlueskyListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyListService.swift; sourceTree = "<group>"; };
@@ -426,6 +429,7 @@
 		CC9175EDE69D7111DF25CC02 /* PreviewBlueskyClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewBlueskyClient.swift; sourceTree = "<group>"; };
 		CCEF8AED13F2B79D85FD49B9 /* BlueskyAPIDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPIDTOs.swift; sourceTree = "<group>"; };
 		CE27B69BC0BBFEAA05CBC8A7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		D0230DA7EE94FF126CB5EF0B /* ClearskyHeartbeatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearskyHeartbeatService.swift; sourceTree = "<group>"; };
 		D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileViewModel.swift; sourceTree = "<group>"; };
 		D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
 		D19F8289064A8E2ED734F301 /* AccountSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSummaryCard.swift; sourceTree = "<group>"; };
@@ -715,6 +719,7 @@
 				00247ABCA73D8B2603E8CDE3 /* ActorSearchResultRow.swift */,
 				4DDA82F772411DBDF26E3BB4 /* AppStyling.swift */,
 				7E73015FFF0E908DAB113970 /* BlueskyActorRow.swift */,
+				58E92F175C3C35100F674497 /* ClearskyBanner.swift */,
 				CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */,
 				7A5D7000E53B53FE6C003496 /* GIFPickerView.swift */,
 				0BA4021225B9BDA8F1BED731 /* ImageCarouselView.swift */,
@@ -769,6 +774,7 @@
 				393E4DF7A43F2925ACC71FF0 /* ChatService.swift */,
 				3501AD3D873E70893438CCB3 /* ChatServicing.swift */,
 				46306C493712AA4404E12EB9 /* ChatStore.swift */,
+				D0230DA7EE94FF126CB5EF0B /* ClearskyHeartbeatService.swift */,
 				7158A7BD407EDF04FA392FA1 /* DashboardCache.swift */,
 				B1EFF3E877712C5E630AEDA1 /* FeedStore.swift */,
 				5B101505E9595E890CB20647 /* GIFService.swift */,
@@ -1129,6 +1135,8 @@
 				FA9E21318F69F3D0236FBD91 /* ChatServicing.swift in Sources */,
 				9E0C71BA65E2D438907F7E96 /* ChatStore.swift in Sources */,
 				E9A18336F1F918BAB3ADE296 /* ChatTab.swift in Sources */,
+				6EA2CC9DCA4B500405B6081F /* ClearskyBanner.swift in Sources */,
+				33B496A58DA931824C864548 /* ClearskyHeartbeatService.swift in Sources */,
 				53CF4D186D1A18A0BF7B2BF2 /* ClearskyListsView.swift in Sources */,
 				9D3E4EF9ADB2BEC5CB0179B0 /* Color+RULYX.swift in Sources */,
 				7DFCF1F602BA762E14337448 /* ComposePostView.swift in Sources */,

@@ -24,6 +24,7 @@ struct RULYXApp: App {
                     .environmentObject(deps.analyticsStore)
                     .environmentObject(deps.chatStore)
                     .environmentObject(deps.httpRequestDebugStore)
+                    .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
                     .onAppear {
@@ -35,6 +36,9 @@ struct RULYXApp: App {
                     }
                     .task {
                         deps.pushNotificationCoordinator.start()
+                    }
+                    .task {
+                        deps.clearskyHeartbeat.start()
                     }
                     .task(id: deps.accountStore.activeAccountID) {
                         let appPassword = deps.accountStore.activeAccount.flatMap { deps.accountStore.appPassword(for: $0) }

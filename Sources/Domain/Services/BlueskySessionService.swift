@@ -34,11 +34,10 @@ final class BlueskySessionService: BlueskySessionServicing {
 
     func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil) async throws -> BlueskySession {
         let requestBody = CreateSessionRequest(identifier: handle, password: appPassword)
-        let authURL: URL
-        if let entrywayURL {
-            authURL = entrywayURL
+        let authURL: URL = if let entrywayURL {
+            entrywayURL
         } else {
-            authURL = try await authenticationURL(forHandle: handle)
+            try await authenticationURL(forHandle: handle)
         }
         let response: CreateSessionResponse = try await requestExecutor.send(
             path: "com.atproto.server.createSession",

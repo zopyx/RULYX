@@ -731,7 +731,6 @@ struct ListDetailView: View {
         return (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys])) ?? Data()
     }
 
-    @ViewBuilder
     private var avatarPlaceholder: some View {
         RoundedRectangle(cornerRadius: 12, style: .continuous)
             .fill(Color.skyPrimary.opacity(0.12))
@@ -770,7 +769,7 @@ struct ListDetailView: View {
     }
 
     private func makeListSupportDraft() -> SupportEmailDraft {
-        return SupportEmailDraft(
+        SupportEmailDraft(
             subject: "Bluesky List Report — \(currentList.name)",
             body: SupportEmailDraft.htmlBody(
                 intro: "I am reporting the following Bluesky list for review.",

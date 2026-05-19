@@ -380,7 +380,9 @@ struct SupportEmailDraft: Identifiable {
     let subject: String
     let body: String
 
-    var id: String { subject + body }
+    var id: String {
+        subject + body
+    }
 
     static func htmlBody(intro: String, fields: [(String, String)], footer: String = "") -> String {
         let fieldRows = fields.map { label, value in

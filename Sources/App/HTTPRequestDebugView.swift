@@ -3,6 +3,7 @@ import SwiftUI
 struct HTTPRequestDebugView: View {
     @EnvironmentObject private var debugStore: HTTPRequestDebugStore
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedFilter: HTTPRequestDebugFilter = .succeeded
     @State private var selectedErrorEntry: HTTPRequestDebugEntry?
 
@@ -44,6 +45,11 @@ struct HTTPRequestDebugView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(localizationManager.localized("debug.http.close")) {
+                    dismiss()
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(localizationManager.localized("debug.http.clear")) {
                     Task {
