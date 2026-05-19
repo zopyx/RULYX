@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Geen gebruikers gevonden",
   "usersearch.no_results_desc": "Probeer een andere naam of gebruikersnaam",
   "usersearch.placeholder": "Naam, handvat of beschrijving...",
-  "usersearch.title": "Zoek gebruikers"
+  "usersearch.title": "Zoek gebruikers",
+  "debug.http.title": "HTTP-verzoeken",
+  "debug.http.empty": "Nog geen verzoeken geregistreerd.",
+  "debug.http.clear": "Logboek wissen",
+  "debug.http.state.running": "Rennen",
+  "debug.http.state.succeeded": "Succes",
+  "debug.http.state.failed": "Mislukt"
 }

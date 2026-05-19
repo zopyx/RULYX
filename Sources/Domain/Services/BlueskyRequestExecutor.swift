@@ -67,7 +67,11 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
 
-        let (data, httpResponse) = try await httpClient.data(for: request)
+        let (data, httpResponse) = try await httpClient.data(
+            for: request,
+            source: Self.sourceLabel(for: path),
+            origin: Self.originLabel(for: path, method: method)
+        )
 
         if httpResponse.statusCode == 401 {
             throw BlueskyAPIError.unauthorized
@@ -109,6 +113,40 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
     }
 }
 
+private extension BlueskyRequestExecutor {
+    static func sourceLabel(for path: String) -> String {
+        if path.contains("chat.") {
+            return "Chat"
+        }
+        if path.contains(".graph.") {
+            return "Lists / Relationships"
+        }
+        if path.contains(".actor.") || path.contains(".identity.") {
+            return "Profiles / Search"
+        }
+        if path.contains(".feed.") {
+            return "Timeline / Posts"
+        }
+        if path.contains(".notification.") {
+            return "Notifications"
+        }
+        if path.contains(".repo.") {
+            return "Composer / Records"
+        }
+        if path.contains(".moderation.") {
+            return "Moderation"
+        }
+        if path.contains(".server.") {
+            return "Authentication / Session"
+        }
+        return "Bluesky API"
+    }
+
+    static func originLabel(for path: String, method: String) -> String {
+        "BlueskyRequestExecutor \(method) xrpc/\(path)"
+    }
+}
+
 private final class PinningDelegate: NSObject, URLSessionDelegate {
     private static let pinnedSPKIHashes = [
         "Va6hs2tSCkc4CWC91P6Bga2S05J/R2R+Tp4WPAv7Hlc=",
@@ -133,8 +171,11 @@ private final class PinningDelegate: NSObject, URLSessionDelegate {
             return
         }
 
-        guard let certificateChain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate],
-              let leafCertificate = certificateChain.first else {
+        guard let certificateChain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        guard let leafCertificate = certificateChain.first else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }

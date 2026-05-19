@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Nenhum usuário encontrado",
   "usersearch.no_results_desc": "Experimente um nome ou identificador diferente",
   "usersearch.placeholder": "Nome, identificador ou descrição...",
-  "usersearch.title": "Pesquisar usuários"
+  "usersearch.title": "Pesquisar usuários",
+  "debug.http.title": "Solicitações HTTP",
+  "debug.http.empty": "Nenhuma solicitação registrada ainda.",
+  "debug.http.clear": "Limpar registro",
+  "debug.http.state.running": "Correndo",
+  "debug.http.state.succeeded": "Sucesso",
+  "debug.http.state.failed": "Fracassado"
 }

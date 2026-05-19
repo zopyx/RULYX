@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Không tìm thấy người dùng nào",
   "usersearch.no_results_desc": "Hãy thử tên hoặc địa chỉ khác",
   "usersearch.placeholder": "Tên, địa chỉ hoặc mô tả...",
-  "usersearch.title": "Tìm kiếm người dùng"
+  "usersearch.title": "Tìm kiếm người dùng",
+  "debug.http.title": "Yêu cầu HTTP",
+  "debug.http.empty": "Chưa có yêu cầu nào được ghi lại.",
+  "debug.http.clear": "Xóa nhật ký",
+  "debug.http.state.running": "Đang chạy",
+  "debug.http.state.succeeded": "Thành công",
+  "debug.http.state.failed": "Thất bại"
 }

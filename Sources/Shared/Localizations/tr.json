@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "Kullanıcı bulunamadı",
   "usersearch.no_results_desc": "Farklı bir ad veya tanıtıcı deneyin",
   "usersearch.placeholder": "Ad, kullanıcı adı veya açıklama...",
-  "usersearch.title": "Kullanıcıları Ara"
+  "usersearch.title": "Kullanıcıları Ara",
+  "debug.http.title": "HTTP İstekleri",
+  "debug.http.empty": "Henüz hiçbir istek kaydedilmedi.",
+  "debug.http.clear": "Günlüğü Temizle",
+  "debug.http.state.running": "Koşma",
+  "debug.http.state.succeeded": "Başarı",
+  "debug.http.state.failed": "Arızalı"
 }

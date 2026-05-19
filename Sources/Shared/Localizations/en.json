@@ -1025,5 +1025,11 @@
   "customsearch.empty_users": "No users found",
   "customsearch.empty_users_desc": "No users match your search query",
   "customsearch.end": "No more results",
-  "biometric.auth_reason": "Authenticate with your biometrics to access your accounts and moderation data."
+  "biometric.auth_reason": "Authenticate with your biometrics to access your accounts and moderation data.",
+  "debug.http.title": "HTTP Requests",
+  "debug.http.empty": "No requests recorded yet.",
+  "debug.http.clear": "Clear Log",
+  "debug.http.state.running": "Running",
+  "debug.http.state.succeeded": "Success",
+  "debug.http.state.failed": "Failed"
 }

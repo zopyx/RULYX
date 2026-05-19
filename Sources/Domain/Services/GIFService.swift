@@ -47,7 +47,7 @@ final class GIFService: Sendable {
         guard let apiKey else { throw GIFError.missingAPIKey }
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let url = URL(string: "\(baseURL)/\(apiKey)/gifs/search?q=\(encoded)&per_page=\(perPage)&format_filter=mp4,gif")!
-        let (data, _) = try await httpClient.data(from: url)
+        let (data, _) = try await httpClient.data(from: url, source: "GIF Search")
         let decoded = try JSONDecoder().decode(KlipyResponse.self, from: data)
         return decoded.data.data.map { $0.toGIFResult() }
     }
@@ -55,14 +55,14 @@ final class GIFService: Sendable {
     func trending() async throws -> [GIFResult] {
         guard let apiKey else { throw GIFError.missingAPIKey }
         let url = URL(string: "\(baseURL)/\(apiKey)/gifs/trending?per_page=\(perPage)&format_filter=mp4,gif")!
-        let (data, _) = try await httpClient.data(from: url)
+        let (data, _) = try await httpClient.data(from: url, source: "GIF Trending")
         let decoded = try JSONDecoder().decode(KlipyResponse.self, from: data)
         return decoded.data.data.map { $0.toGIFResult() }
     }
 
     func downloadGIF(url: String) async throws -> Data {
         guard let url = URL(string: url) else { throw GIFError.networkError("Invalid URL") }
-        let (data, _) = try await httpClient.data(from: url)
+        let (data, _) = try await httpClient.data(from: url, source: "GIF Download")
         return data
     }
 }

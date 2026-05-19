@@ -23,6 +23,7 @@ struct RULYXApp: App {
                     .environmentObject(deps.mutedWordsStore)
                     .environmentObject(deps.analyticsStore)
                     .environmentObject(deps.chatStore)
+                    .environmentObject(deps.httpRequestDebugStore)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
                     .onAppear {

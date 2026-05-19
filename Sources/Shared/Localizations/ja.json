@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "ユーザーが見つかりませんでした",
   "usersearch.no_results_desc": "別の名前またはハンドルを試してください",
   "usersearch.placeholder": "名前、ハンドル名、または説明...",
-  "usersearch.title": "ユーザーの検索"
+  "usersearch.title": "ユーザーの検索",
+  "debug.http.title": "HTTPリクエスト",
+  "debug.http.empty": "まだリクエストは記録されていません。",
+  "debug.http.clear": "ログをクリアする",
+  "debug.http.state.running": "ランニング",
+  "debug.http.state.succeeded": "成功",
+  "debug.http.state.failed": "失敗した"
 }

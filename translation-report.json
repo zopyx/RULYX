@@ -18,7 +18,7 @@
       "th",
       "vi"
     ],
-    "total_keys": 1027,
+    "total_keys": 1033,
     "total_languages": 16,
     "untranslated_total": 0
   },
@@ -11612,6 +11612,384 @@
       },
       "vi": {
         "text": "总操作数 (VI)",
+        "untranslated": false
+      }
+    },
+    "debug.http.clear": {
+      "en": "Clear Log",
+      "de": {
+        "text": "Protokoll löschen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Effacer le journal",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Cancella registro",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "ログをクリアする",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "清除日志",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Borrar registro",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Limpar registro",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "로그 지우기",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Очистить журнал",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "مسح السجل",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Logboek wissen",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Wyczyść dziennik",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Günlüğü Temizle",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ล้างบันทึก",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Xóa nhật ký",
+        "untranslated": false
+      }
+    },
+    "debug.http.empty": {
+      "en": "No requests recorded yet.",
+      "de": {
+        "text": "Es wurden noch keine Anfragen erfasst.",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Aucune demande enregistrée pour l'instant.",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Nessuna richiesta ancora registrata.",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "まだリクエストは記録されていません。",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "尚未记录任何请求。",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Aún no se han registrado solicitudes.",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Nenhuma solicitação registrada ainda.",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "아직 기록된 요청이 없습니다.",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Запросов пока не зарегистрировано.",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "لم يتم تسجيل أي طلبات حتى الآن.",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Nog geen verzoeken geregistreerd.",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Nie zarejestrowano jeszcze żadnych żądań.",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Henüz hiçbir istek kaydedilmedi.",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ยังไม่มีการบันทึกคำขอ",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Chưa có yêu cầu nào được ghi lại.",
+        "untranslated": false
+      }
+    },
+    "debug.http.state.failed": {
+      "en": "Failed",
+      "de": {
+        "text": "Fehlgeschlagen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Échoué",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Fallito",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "失敗した",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "失败的",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Fallido",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Fracassado",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "실패한",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Неуспешный",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "فشل",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Mislukt",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Przegrany",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Arızalı",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ล้มเหลว",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Thất bại",
+        "untranslated": false
+      }
+    },
+    "debug.http.state.running": {
+      "en": "Running",
+      "de": {
+        "text": "Läuft",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "En cours d'exécution",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Corsa",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "ランニング",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "跑步",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Correr",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Correndo",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "달리기",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Бег",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "جري",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Rennen",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Działanie",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Koşma",
+        "untranslated": false
+      },
+      "th": {
+        "text": "วิ่ง",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đang chạy",
+        "untranslated": false
+      }
+    },
+    "debug.http.state.succeeded": {
+      "en": "Success",
+      "de": {
+        "text": "Erfolg",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Succès",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Successo",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "成功",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "成功",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Éxito",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Sucesso",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "성공",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Успех",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "نجاح",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Succes",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Sukces",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Başarı",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ความสำเร็จ",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Thành công",
+        "untranslated": false
+      }
+    },
+    "debug.http.title": {
+      "en": "HTTP Requests",
+      "de": {
+        "text": "HTTP-Anfragen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Requêtes HTTP",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Richieste HTTP",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "HTTPリクエスト",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "HTTP 请求",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Solicitudes HTTP",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Solicitações HTTP",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "HTTP 요청",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "HTTP-запросы",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "طلبات HTTP",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "HTTP-verzoeken",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Żądania HTTP",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "HTTP İstekleri",
+        "untranslated": false
+      },
+      "th": {
+        "text": "คำขอ HTTP",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Yêu cầu HTTP",
         "untranslated": false
       }
     },

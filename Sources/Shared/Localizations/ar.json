@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "لم يتم العثور على مستخدمين",
   "usersearch.no_results_desc": "جرّب اسمًا أو مقبضًا مختلفًا",
   "usersearch.placeholder": "الاسم أو المقبض أو الوصف...",
-  "usersearch.title": "بحث المستخدمين"
+  "usersearch.title": "بحث المستخدمين",
+  "debug.http.title": "طلبات HTTP",
+  "debug.http.empty": "لم يتم تسجيل أي طلبات حتى الآن.",
+  "debug.http.clear": "مسح السجل",
+  "debug.http.state.running": "جري",
+  "debug.http.state.succeeded": "نجاح",
+  "debug.http.state.failed": "فشل"
 }

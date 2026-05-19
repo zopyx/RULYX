@@ -346,6 +346,7 @@ final class BlueskySessionServiceTests: XCTestCase {
 @MainActor
 final class HTTPClientTests: XCTestCase {
     nonisolated(unsafe) private var session: URLSession!
+    private var debugStore: HTTPRequestDebugStore!
 
     nonisolated override func setUp() {
         super.setUp()
@@ -354,10 +355,16 @@ final class HTTPClientTests: XCTestCase {
         session = URLSession(configuration: config)
     }
 
-    nonisolated override func tearDown() {
+    override func tearDown() {
         super.tearDown()
         MockURLProtocol.requestHandler = nil
         session = nil
+        debugStore = nil
+    }
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        debugStore = HTTPRequestDebugStore(maxEntries: 20)
     }
 
     func testDataForRequestSuccess() async throws {
@@ -366,11 +373,21 @@ final class HTTPClientTests: XCTestCase {
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, expectedData)
         }
-        let client = HTTPClient(session: session)
+        let client = HTTPClient(session: session, debugStore: debugStore)
         let request = URLRequest(url: URL(string: "https://example.com/api")!)
         let (data, response) = try await client.data(for: request)
         XCTAssertEqual(data, expectedData)
         XCTAssertEqual(response.statusCode, 200)
+        let entry = try XCTUnwrap(debugStore.entries.first)
+        XCTAssertNil(entry.source)
+        XCTAssertEqual(entry.sequenceNumber, 1)
+        XCTAssertTrue((entry.origin ?? "").contains("Tests/RULYXTests/ServiceTests.swift"))
+        XCTAssertTrue((entry.origin ?? "").contains("testDataForRequestSuccess()"))
+        XCTAssertEqual(entry.method, "GET")
+        XCTAssertEqual(entry.url, "https://example.com/api")
+        XCTAssertEqual(entry.state, .succeeded)
+        XCTAssertEqual(entry.statusCode, 200)
+        XCTAssertNotNil(entry.duration)
     }
 
     func testDataForRequestUserAgentSet() async throws {
@@ -379,7 +396,7 @@ final class HTTPClientTests: XCTestCase {
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, Data())
         }
-        let client = HTTPClient(session: session)
+        let client = HTTPClient(session: session, debugStore: debugStore)
         let request = URLRequest(url: URL(string: "https://example.com/api")!)
         _ = try await client.data(for: request)
     }
@@ -388,7 +405,7 @@ final class HTTPClientTests: XCTestCase {
         MockURLProtocol.requestHandler = { _ in
             throw URLError(.badServerResponse)
         }
-        let client = HTTPClient(session: session)
+        let client = HTTPClient(session: session, debugStore: debugStore)
         let request = URLRequest(url: URL(string: "https://example.com/api")!)
         do {
             _ = try await client.data(for: request)
@@ -396,6 +413,10 @@ final class HTTPClientTests: XCTestCase {
         } catch {
             XCTAssertTrue(error is URLError)
         }
+        let entry = try XCTUnwrap(debugStore.entries.first)
+        XCTAssertEqual(entry.state, .failed)
+        XCTAssertNil(entry.statusCode)
+        XCTAssertFalse((entry.errorMessage ?? "").isEmpty)
     }
 
     func testDataFromURLSuccess() async throws {
@@ -404,8 +425,78 @@ final class HTTPClientTests: XCTestCase {
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, expectedData)
         }
-        let client = HTTPClient(session: session)
+        let client = HTTPClient(session: session, debugStore: debugStore)
         let (data, _) = try await client.data(from: URL(string: "https://example.com")!)
         XCTAssertEqual(String(data: data, encoding: .utf8), "test")
+    }
+
+    func testDataForRequestMarksNonSuccessStatusAsFailed() async throws {
+        let expectedData = Data("{}".utf8)
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 503, httpVersion: nil, headerFields: nil)!
+            return (response, expectedData)
+        }
+        let client = HTTPClient(session: session, debugStore: debugStore)
+        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        let (_, response) = try await client.data(for: request)
+        XCTAssertEqual(response.statusCode, 503)
+        let entry = try XCTUnwrap(debugStore.entries.first)
+        XCTAssertEqual(entry.state, .failed)
+        XCTAssertEqual(entry.statusCode, 503)
+        XCTAssertEqual(entry.errorMessage, HTTPURLResponse.localizedString(forStatusCode: 503))
+        XCTAssertNotNil(entry.errorResponseJSON)
+    }
+
+    func testDataForRequestStoresFailedResponseJSON() async throws {
+        let expectedData = Data("{\"error\":\"RateLimitExceeded\",\"message\":\"Too many requests\"}".utf8)
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 429, httpVersion: nil, headerFields: nil)!
+            return (response, expectedData)
+        }
+        let client = HTTPClient(session: session, debugStore: debugStore)
+        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        _ = try await client.data(for: request)
+        let entry = try XCTUnwrap(debugStore.entries.first)
+        XCTAssertEqual(entry.state, .failed)
+        XCTAssertEqual(
+            entry.errorResponseJSON,
+            """
+            {
+              "error" : "RateLimitExceeded",
+              "message" : "Too many requests"
+            }
+            """
+        )
+    }
+
+    func testDataForRequestRecordsSource() async throws {
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, Data())
+        }
+        let client = HTTPClient(session: session, debugStore: debugStore)
+        let request = URLRequest(url: URL(string: "https://example.com/source")!)
+        _ = try await client.data(for: request, source: "Unit Test Source")
+        let entry = try XCTUnwrap(debugStore.entries.first)
+        XCTAssertEqual(entry.source, "Unit Test Source")
+        XCTAssertTrue((entry.origin ?? "").contains("Tests/RULYXTests/ServiceTests.swift"))
+        XCTAssertTrue((entry.origin ?? "").contains("testDataForRequestRecordsSource()"))
+        XCTAssertEqual(entry.url, "https://example.com/source")
+    }
+
+    func testDataForRequestRecordsExplicitOrigin() async throws {
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, Data())
+        }
+        let client = HTTPClient(session: session, debugStore: debugStore)
+        let request = URLRequest(url: URL(string: "https://example.com/origin")!)
+        _ = try await client.data(
+            for: request,
+            source: "Unit Test Source",
+            origin: "UnitTest.performRequest"
+        )
+        let entry = try XCTUnwrap(debugStore.entries.first)
+        XCTAssertEqual(entry.origin, "UnitTest.performRequest")
     }
 }

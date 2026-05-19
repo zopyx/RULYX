@@ -1027,5 +1027,11 @@
   "usersearch.no_results": "ไม่พบผู้ใช้",
   "usersearch.no_results_desc": "ลองใช้ชื่อหรือชื่อเรียกอื่น",
   "usersearch.placeholder": "ชื่อ ที่จับ หรือคำอธิบาย...",
-  "usersearch.title": "ค้นหาผู้ใช้"
+  "usersearch.title": "ค้นหาผู้ใช้",
+  "debug.http.title": "คำขอ HTTP",
+  "debug.http.empty": "ยังไม่มีการบันทึกคำขอ",
+  "debug.http.clear": "ล้างบันทึก",
+  "debug.http.state.running": "วิ่ง",
+  "debug.http.state.succeeded": "ความสำเร็จ",
+  "debug.http.state.failed": "ล้มเหลว"
 }

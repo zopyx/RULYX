@@ -179,7 +179,7 @@ actor MediaDownloadService {
         request.timeoutInterval = 120
 
         try Task.checkCancellation()
-        let (temporaryURL, httpResponse) = try await httpClient.download(for: request)
+        let (temporaryURL, httpResponse) = try await httpClient.download(for: request, source: "Media Export Image")
         _ = try validate(httpResponse)
 
         let fileExtension = preferredExtension ?? fileExtension(for: httpResponse, fallbackURL: url, defaultValue: "jpg")
@@ -294,7 +294,7 @@ actor MediaDownloadService {
         request.timeoutInterval = 60
 
         try Task.checkCancellation()
-        let (data, httpResponse) = try await httpClient.data(for: request)
+        let (data, httpResponse) = try await httpClient.data(for: request, source: "Media Playlist")
         _ = try validate(httpResponse)
         guard let playlist = String(data: data, encoding: .utf8) else {
             throw URLError(.cannotDecodeContentData)
@@ -367,7 +367,7 @@ actor MediaDownloadService {
         request.timeoutInterval = 120
 
         try Task.checkCancellation()
-        let (temporaryURL, httpResponse) = try await httpClient.download(for: request)
+        let (temporaryURL, httpResponse) = try await httpClient.download(for: request, source: "Media Segment Download")
         _ = try validate(httpResponse)
 
         let fileURL = tempDirectory.appendingPathComponent(String(format: "%05d.ts", index))

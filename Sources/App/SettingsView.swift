@@ -4,10 +4,12 @@ struct SettingsView: View {
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var appLockManager: AppLockManager
+    @EnvironmentObject private var httpRequestDebugStore: HTTPRequestDebugStore
     @AppStorage("debugMode") private var debugMode = false
     @AppStorage("showBetaFeatures") private var showBetaFeatures = false
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
     @State private var isShowingClearCacheConfirmation = false
+    @State private var isShowingHTTPRequestDebugView = false
     @State private var cacheStatusMessage: String?
 
     var body: some View {
@@ -132,10 +134,22 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 } header: {
-                    Text(localizationManager.localized("settings.internal"))
+                    HStack {
+                        Text(localizationManager.localized("settings.internal"))
+                        Spacer()
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: 2) {
+                        isShowingHTTPRequestDebugView = true
+                    }
                 }
             }
             .navigationTitle(localizationManager.localized("settings.title"))
+            .navigationDestination(isPresented: $isShowingHTTPRequestDebugView) {
+                HTTPRequestDebugView()
+                    .environmentObject(httpRequestDebugStore)
+                    .environmentObject(localizationManager)
+            }
             .confirmationDialog(
                 localizationManager.localized("settings.clear_cache.confirm"),
                 isPresented: $isShowingClearCacheConfirmation,
@@ -163,4 +177,8 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+        .environmentObject(PreviewBlueskyClient())
+        .environmentObject(LocalizationManager.shared)
+        .environmentObject(AppLockManager.shared)
+        .environmentObject(HTTPRequestDebugStore.shared)
 }
