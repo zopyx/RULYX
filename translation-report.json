@@ -20,7 +20,7 @@
     ],
     "total_keys": 1035,
     "total_languages": 16,
-    "untranslated_total": 0
+    "untranslated_total": 30
   },
   "keys": {
     "account.active": {
@@ -8783,64 +8783,64 @@
     "clearsky.unavailable": {
       "en": "ClearSky API temporarily unavailable — some data may not load",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "ClearSky API temporarily unavailable — some data may not load",
+        "untranslated": true
       }
     },
     "common.progress.hint": {
@@ -11744,64 +11744,64 @@
     "debug.http.close": {
       "en": "Close",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Close",
+        "untranslated": true
       }
     },
     "debug.http.empty": {
