@@ -16,6 +16,7 @@ swiftformat Sources Tests
 ## Platform Constraints
 - **iPhone only** — TARGETED_DEVICE_FAMILY = "1" (runs in iPhone compatibility mode on iPad)
 - **No macOS** — no Mac target, no Mac Catalyst
+- **No iPad code paths** — do not use `horizontalSizeClass`, `NavigationSplitView`, or any iPad-adaptive layout branching; always use iPhone layout
 - Do not add `#if os(macOS)` code paths
 
 ## Key Architecture
@@ -97,6 +98,27 @@ In `RelationshipsView`, each blocking/blocked-by list item uses this two-row lay
 Row 1: Display Name_____________3 days ago
 Row 2: @handle
 ```
+
+## Secret Storage — Keychain over UserDefaults
+- **Bluesky passwords/sessions**: `KeychainService` (`Sources/Domain/Services/KeychainService.swift`) using Security framework
+- **Klipy API key**: Also stored in Keychain via `KeychainService` (same `com.ajung.RULYX.klipy` service, `apiKey` account)
+- **No secrets in UserDefaults** — the old `UserDefaults.standard.string(forKey: "klipyAPIKey")` pattern is deprecated; migration runs in `GIFService.init()` to move any leftover key to Keychain
+- **View helper**: `KlipyKeychainHelper` enum in `GIFService.swift` provides `read()`, `save(_:)`, `exists()` for views that need to check/display API key status
+
+## HTTP Debug & URL Sanitization
+- `HTTPRequestDebugStore` logs all HTTP request URLs for debugging in `HTTPRequestDebugView`
+- URLs containing API keys (Klipy pattern `https://api.klipy.com/api/v1/{key}/...`) are **automatically redacted** via `sanitizeURL()` in `HTTPRequestDebugStore.begin()` — the key segment is replaced with `[REDACTED]` before storage
+
+## GIF Service (Klipy)
+- `GIFService` (`Sources/Domain/Services/GIFService.swift`) singleton for GIF search/trending via Klipy API
+- API key embedded in URL path: `{baseURL}/{apiKey}/gifs/search?q=...`
+- Key stored in Keychain, seeded on first launch via `seedKeyIfNeeded()` in `init()`
+- No settings UI to configure the key — it's pre-seeded and hidden
+- `GIFPickerView` (`Sources/Shared/Components/GIFPickerView.swift`) uses a manual `TextField` search bar (not `.searchable()`) pinned above the image grid for always-visible search
+
+## ModerationSplitView
+- Now a thin wrapper that always delegates to `ListsView` — no `NavigationSplitView`, no `horizontalSizeClass` branching
+- Used from `RootView` TabView for the Moderation tab
 
 ## Preferred Search Account
 - **Storage**: `AccountStore.preferredSearchAccountID` (`UUID?`) persisted in UserDefaults under `bluesky.preferredSearchAccountID`
