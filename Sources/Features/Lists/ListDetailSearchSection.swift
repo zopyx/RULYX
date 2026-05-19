@@ -5,6 +5,7 @@ extension ListDetailView {
         @ObservedObject var viewModel: ListDetailViewModel
         @ObservedObject var batchState: ListBatchProgressState
         @Binding var searchQuery: String
+        let isSearching: Bool
         let currentList: BlueskyList
         let account: AppAccount
         let appPassword: String
@@ -26,11 +27,17 @@ extension ListDetailView {
 
         private var searchSection: some View {
             Section {
-                TextField("list.search.placeholder", text: $searchQuery)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .accessibilityLabel("list.search.field.label")
-                    .focused($searchFieldFocused)
+                HStack(spacing: 8) {
+                    TextField("list.search.placeholder", text: $searchQuery)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .accessibilityLabel("list.search.field.label")
+                        .focused($searchFieldFocused)
+                    if isSearching {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                    }
+                }
 
                 if !viewModel.searchResults.isEmpty || viewModel.hasMoreSearchResults {
                     Text(viewModel.searchResultSummary)

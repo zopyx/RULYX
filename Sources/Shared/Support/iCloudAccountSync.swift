@@ -15,7 +15,7 @@ final class iCloudAccountSync: ObservableObject {
     private let accountKey = "syncedAccounts"
 
     private init() {
-        isEnabled = UserDefaults.standard.object(forKey: "iCloudSyncEnabled") as? Bool ?? true
+        isEnabled = UserDefaults.standard.object(forKey: "iCloudSyncEnabled") as? Bool ?? false
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: store,

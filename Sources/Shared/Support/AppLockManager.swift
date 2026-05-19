@@ -20,6 +20,8 @@ final class AppLockManager: ObservableObject {
 
     private var backgroundEntryTime: Date?
     private var didEnterBackground = false
+    private var consecutiveFailedAttempts = 0
+    private var lockoutUntil: Date?
 
     var now: () -> Date = { Date() }
 
@@ -83,6 +85,11 @@ final class AppLockManager: ObservableObject {
             isLocked = false
             return true
         }
+
+        if let lockoutUntil, now() < lockoutUntil {
+            return false
+        }
+
         isAuthenticating = true
         defer { isAuthenticating = false }
         let context = LAContext()
@@ -94,9 +101,15 @@ final class AppLockManager: ObservableObject {
             )
             if success {
                 isLocked = false
+                consecutiveFailedAttempts = 0
+                lockoutUntil = nil
             }
             return success
         } catch {
+            consecutiveFailedAttempts += 1
+            if consecutiveFailedAttempts >= 5 {
+                lockoutUntil = now().addingTimeInterval(60)
+            }
             isLocked = true
             return false
         }
