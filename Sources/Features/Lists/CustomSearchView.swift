@@ -56,7 +56,7 @@ struct CustomSearchView: View {
     @ViewBuilder
     private var listContent: some View {
         List {
-            accountPickerSection
+            searchAccountSection
             searchFieldSection
             if viewModel.query.isEmpty, !viewModel.searchHistory.isEmpty {
                 recentSearchesSection
@@ -68,31 +68,10 @@ struct CustomSearchView: View {
         }
     }
 
-    private var accountPickerSection: some View {
+    private var searchAccountSection: some View {
         Group {
             if let searchAccount {
-                if accountStore.accounts.count > 1 {
-                    Menu {
-                        ForEach(accountStore.accounts) { account in
-                            Button {
-                                switchSearchAccount(to: account)
-                            } label: {
-                                let isSelected = account.id == searchAccount.id
-                                HStack {
-                                    Text(account.displayName)
-                                    if isSelected {
-                                        Spacer()
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
-                            }
-                        }
-                    } label: {
-                        accountRow(searchAccount)
-                    }
-                } else {
-                    accountRow(searchAccount)
-                }
+                searchAccountRow(searchAccount)
             }
         }
         .listRowInsets(EdgeInsets(top: -4, leading: 0, bottom: 0, trailing: 0))
@@ -100,27 +79,29 @@ struct CustomSearchView: View {
         .listRowSeparator(.hidden)
     }
 
-    private func accountRow(_ account: AppAccount) -> some View {
+    private func searchAccountRow(_ account: AppAccount) -> some View {
         HStack(spacing: 14) {
-            Image(systemName: "person.fill.questionmark")
-                .font(.body.weight(.medium))
-                .foregroundStyle(Color.skyPrimary)
-                .frame(width: 28)
+            if let avatarURL = account.avatarURL {
+                AsyncImage(url: avatarURL) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    avatarPlaceholder(for: account)
+                }
+                .frame(width: 32, height: 32)
+                .clipShape(Circle())
+            } else {
+                avatarPlaceholder(for: account)
+            }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("customsearch.searching_as")
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.primary)
-                HStack(spacing: 6) {
-                    Text(account.displayName)
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    if accountStore.accounts.count > 1 {
-                        Image(systemName: "chevron.down")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(.tertiary)
-                    }
-                }
+                Text(account.displayName)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.primary)
             }
 
             Spacer(minLength: 0)
@@ -135,6 +116,17 @@ struct CustomSearchView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
         )
+    }
+
+    private func avatarPlaceholder(for account: AppAccount) -> some View {
+        Circle()
+            .fill(Color.skyPrimary.opacity(0.25))
+            .frame(width: 32, height: 32)
+            .overlay {
+                Text(account.displayName.prefix(1).uppercased())
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white)
+            }
     }
 
     private var searchFieldSection: some View {
@@ -388,13 +380,6 @@ struct CustomSearchView: View {
         guard let searchAccount,
               let appPassword = accountStore.appPassword(for: searchAccount) else { return }
         await viewModel.loadMoreNewest(account: searchAccount, appPassword: appPassword, using: blueskyClient)
-    }
-
-    private func switchSearchAccount(to account: AppAccount) {
-        guard account.id != searchAccount?.id else { return }
-        searchAccount = account
-        viewModel.reset()
-        performSearch()
     }
 
     private func loadAvailableTargetLists() async {

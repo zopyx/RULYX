@@ -29,3 +29,12 @@ xcodebuild -project RULYX.xcodeproj -scheme RULYX -destination 'generic/platform
 - SwiftUI with NavigationStack
 - MVVM architecture with @EnvironmentObject DI
 - xcodegen for project generation
+
+## Preferred Search Account
+
+When you use **Custom Search** or **Mentions Search** on the Lists tab, searches run through a specific Bluesky account rather than the active session account. You can set which account to use from the **Accounts** tab under *Preferred Search Account* — the search forms display the selected account's avatar and name as a static info row.
+
+- Set globally in **Accounts tab** → *Preferred Search Account* menu
+- Falls back to the active account if no preference is set
+- If the preferred account is deleted, it resets to the first remaining account
+- Search results and rate limits apply to the selected account, not necessarily the one you're currently logged in as
