@@ -89,7 +89,7 @@ struct RelationshipsView: View {
 
                     if !actors.isEmpty {
                         Section {
-                            TextField("rel.search_placeholder".replacingOccurrences(of: "{mode}", with: modeLocalized.lowercased()), text: $searchQuery)
+                            TextField(String.localized("rel.search_placeholder", replacements: ["mode": modeLocalized.lowercased()]), text: $searchQuery)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled()
                             if let statusMessage {

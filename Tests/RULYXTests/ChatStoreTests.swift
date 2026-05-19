@@ -9,18 +9,26 @@ final class ChatStoreTests: XCTestCase {
 
     nonisolated override func setUp() {
         super.setUp()
-        service = MainActor.assumeIsolated { MockChatService() }
-        let s = service
-        store = MainActor.assumeIsolated { ChatStore(chatService: s) }
-        store.setAccount(account, appPassword: "password")
+        let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
+        let setup = MainActor.assumeIsolated { () -> (MockChatService, ChatStore) in
+            let mockService = MockChatService()
+            let store = ChatStore(chatService: mockService)
+            store.setAccount(account, appPassword: "password")
+            return (mockService, store)
+        }
+        service = setup.0
+        store = setup.1
     }
 
     nonisolated override func tearDown() {
-        super.tearDown()
-        store.stopPolling()
-        store.setAccount(nil, appPassword: nil)
+        let store = store
+        MainActor.assumeIsolated {
+            store?.stopPolling()
+            store?.setAccount(nil, appPassword: nil)
+        }
         service = nil
-        store = nil
+        self.store = nil
+        super.tearDown()
     }
 
     // MARK: - Account

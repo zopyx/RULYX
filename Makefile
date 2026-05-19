@@ -4,7 +4,7 @@ GENERIC_DESTINATION := generic/platform=iOS Simulator
 SIMULATOR_DESTINATION := platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5
 DERIVED_DATA_PATH := /private/tmp/RULYX-TestDerivedData
 
-.PHONY: help generate build build-for-testing test test-sim test-fresh lint format
+.PHONY: help generate build build-for-testing test test-sim test-fresh lint format translations-export translations-sync translations-repair translations-validate translations-validate-ci
 
 help:
 	@printf '%s\n' \
@@ -16,7 +16,9 @@ help:
 		'  make test-sim          Run tests on iPhone 16 Pro (iOS 18.5)' \
 		'  make test-fresh        Run tests on iPhone 16 Pro with a fresh derived data path' \
 		'  make lint              Run swiftformat --lint and swiftlint' \
-		'  make format            Format Sources and Tests with swiftformat'
+		'  make format            Format Sources and Tests with swiftformat' \
+		'  make translations-sync Sync JSON bundles into Localizable.xcstrings' \
+		'  make translations-repair Repair placeholder mismatches via English fallback'
 
 generate:
 	xcodegen generate
@@ -42,3 +44,20 @@ lint:
 
 format:
 	swiftformat Sources Tests
+
+translations-export:
+	python3 scripts/export-translations.py
+
+translations-sync:
+	python3 scripts/sync-xcstrings-from-json.py
+
+translations-repair:
+	python3 scripts/repair-placeholder-mismatches.py
+
+translations-validate:
+	@printf 'Validating translations...\n'
+	python3 scripts/sync-xcstrings-from-json.py
+	python3 scripts/validate-translations.py
+
+translations-validate-ci: translations-validate
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(GENERIC_DESTINATION)' test CODE_SIGNING_ALLOWED=NO -only-testing:RULYXTests/LocalizationCompletenessTests

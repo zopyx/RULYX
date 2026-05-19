@@ -86,7 +86,7 @@ struct ProfileInspectorView: View {
                         }
                     }
                     .disabled(viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityLabel("profile.save_search.label")
+                    .accessibilityLabel(String(localized: "profile.save_search.label"))
                     .accessibilityHint("profile.save_search.hint")
 
                     if let activeAccount = accountStore.activeAccount {
@@ -136,7 +136,7 @@ struct ProfileInspectorView: View {
                                         .foregroundStyle(Color.skyPrimary)
                                 }
                             }
-                            .accessibilityLabel("profile.saved_search.label".replacingOccurrences(of: "{query}", with: search.query))
+                            .accessibilityLabel(String.localized("profile.saved_search.label", replacements: ["query": search.query]))
                             .buttonStyle(.plain)
                             .swipeActions {
                                 Button(role: .destructive) {
@@ -165,7 +165,7 @@ struct ProfileInspectorView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
-                            .accessibilityLabel("profile.recent_search.label".replacingOccurrences(of: "{query}", with: search.query))
+                            .accessibilityLabel(String.localized("profile.recent_search.label", replacements: ["query": search.query]))
                             .buttonStyle(.plain)
                         }
                     } header: {

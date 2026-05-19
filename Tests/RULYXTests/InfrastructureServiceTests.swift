@@ -171,14 +171,16 @@ final class BlueskyPushNotificationServiceTests: XCTestCase {
 
 @MainActor
 final class AppLockManagerTests: XCTestCase {
-    nonisolated(unsafe) private let manager = AppLockManager.shared
+    private let manager = AppLockManager.shared
 
     nonisolated override func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: "appLockEnabled")
         UserDefaults.standard.removeObject(forKey: "appLockTimeout")
-        manager.isEnabled = false
-        manager.isLocked = false
+        MainActor.assumeIsolated {
+            AppLockManager.shared.isEnabled = false
+            AppLockManager.shared.isLocked = false
+        }
     }
 
     func testInitNotLockedWhenDisabled() {

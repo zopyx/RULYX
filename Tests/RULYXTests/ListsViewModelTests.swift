@@ -8,10 +8,13 @@ final class ListsViewModelTests: XCTestCase {
 
     nonisolated override func setUp() {
         super.setUp()
-        viewModel = MainActor.assumeIsolated { ListsViewModel() }
-        client = MainActor.assumeIsolated { MockListsClient() }
-        DashboardCache.clear(forKey: "did:plc:test")
-        DashboardCache.clear(forKey: "test.bsky.social")
+        let setup = MainActor.assumeIsolated { () -> (ListsViewModel, MockListsClient) in
+            DashboardCache.clear(forKey: "did:plc:test")
+            DashboardCache.clear(forKey: "test.bsky.social")
+            return (ListsViewModel(), MockListsClient())
+        }
+        viewModel = setup.0
+        client = setup.1
     }
 
     func testLoadWithNilAccountClearsState() async {

@@ -10,16 +10,24 @@ final class FeedTimelineViewModelTests: XCTestCase {
 
     nonisolated override func setUp() {
         super.setUp()
-        client = MainActor.assumeIsolated { MockTimelineClient() }
-        viewModel = MainActor.assumeIsolated { FeedTimelineViewModel() }
-        UserDefaults.standard.removeObject(forKey: "mutedWords")
+        let setup = MainActor.assumeIsolated { () -> (MockTimelineClient, FeedTimelineViewModel) in
+            let client = MockTimelineClient()
+            let viewModel = FeedTimelineViewModel()
+            UserDefaults.standard.removeObject(forKey: "mutedWords")
+            return (client, viewModel)
+        }
+        client = setup.0
+        viewModel = setup.1
     }
 
     nonisolated override func tearDown() {
-        super.tearDown()
-        viewModel.stopPolling()
+        let viewModel = viewModel
+        MainActor.assumeIsolated {
+            viewModel?.stopPolling()
+        }
         client = nil
-        viewModel = nil
+        self.viewModel = nil
+        super.tearDown()
     }
 
     func testInitialState() {

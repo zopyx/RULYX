@@ -9,11 +9,15 @@ final class BlueskyListServiceTests: XCTestCase {
 
     nonisolated override func setUp() {
         super.setUp()
-        requestExecutor = MockRequestExecutor()
-        sessionService = MockSessionService()
-        let re = requestExecutor
-        let ss = sessionService
-        service = MainActor.assumeIsolated { BlueskyListService(requestExecutor: re, sessionService: ss) }
+        let setup = MainActor.assumeIsolated { () -> (MockRequestExecutor, MockSessionService, BlueskyListService) in
+            let requestExecutor = MockRequestExecutor()
+            let sessionService = MockSessionService()
+            let service = BlueskyListService(requestExecutor: requestExecutor, sessionService: sessionService)
+            return (requestExecutor, sessionService, service)
+        }
+        requestExecutor = setup.0
+        sessionService = setup.1
+        service = setup.2
     }
 
     func testFetchListsSuccess() async throws {

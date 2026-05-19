@@ -1,35 +1,43 @@
 @testable import RULYX
 import XCTest
 
-@MainActor
 final class LiveBlueskyClientTests: XCTestCase {
     nonisolated(unsafe) private var client: LiveBlueskyClient!
     nonisolated(unsafe) private var sessionService: MockSessionService!
     nonisolated(unsafe) private var requestExecutor: MockRequestExecutor!
     nonisolated(unsafe) private var mockSession: URLSession!
 
-    nonisolated override func setUp() {
-        super.setUp()
-        requestExecutor = MockRequestExecutor()
-        let config = URLSessionConfiguration.ephemeral
-        config.protocolClasses = [MockURLProtocol.self]
-        mockSession = URLSession(configuration: config)
-        let re = requestExecutor
-        let ms = mockSession
-        let ss = MainActor.assumeIsolated { MockSessionService() }
-        sessionService = ss
-        client = MainActor.assumeIsolated { LiveBlueskyClient(
-            httpClient: HTTPClient(session: ms!),
-            requestExecutor: re,
-            sessionService: ss
-        ) }
+    override func setUp() async throws {
+        try await super.setUp()
+        let setup = await MainActor.run { () -> (MockRequestExecutor, URLSession, MockSessionService, LiveBlueskyClient) in
+            let requestExecutor = MockRequestExecutor()
+            let config = URLSessionConfiguration.ephemeral
+            config.protocolClasses = [MockURLProtocol.self]
+            let mockSession = URLSession(configuration: config)
+            let sessionService = MockSessionService()
+            let client = LiveBlueskyClient(
+                httpClient: HTTPClient(session: mockSession),
+                requestExecutor: requestExecutor,
+                sessionService: sessionService
+            )
+            return (requestExecutor, mockSession, sessionService, client)
+        }
+        requestExecutor = setup.0
+        mockSession = setup.1
+        sessionService = setup.2
+        client = setup.3
     }
 
-    nonisolated override func tearDown() {
+    override func tearDown() {
         MockURLProtocol.requestHandler = nil
+        client = nil
+        sessionService = nil
+        requestExecutor = nil
+        mockSession = nil
+        super.tearDown()
     }
 
-    func testFetchPLCAuditLog() async throws {
+    @MainActor func testFetchPLCAuditLog() async throws {
         let json = """
         [{"did": "did:plc:test", "operation": {"type": "plc_operation", "alsoKnownAs": ["at://handle.bsky.social"]}, "cid": "cid1", "nullified": false, "createdAt": "2024-01-01T00:00:00Z"}]
         """.data(using: .utf8)!
@@ -47,34 +55,34 @@ final class LiveBlueskyClientTests: XCTestCase {
         XCTAssertEqual(entries[0].did, "did:plc:test")
     }
 
-    func testClearCache() {
+    @MainActor func testClearCache() {
         client.clearCache()
     }
 
-    func testAuthenticateDelegates() async throws {
+    @MainActor func testAuthenticateDelegates() async throws {
         let session = makeSession()
         sessionService.sessionToReturn = session
         let result = try await client.authenticate(handle: "test.bsky.social", appPassword: "pass")
         XCTAssertEqual(result.did, session.did)
     }
 
-    func testPersistSessionDelegates() async throws {
+    @MainActor func testPersistSessionDelegates() async throws {
         let session = makeSession()
         let account = makeAccount()
         try await client.persistSession(session, for: account)
         XCTAssertEqual(sessionService.persistedSessions[account.id.uuidString]?.did, session.did)
     }
 
-    func testDeletePersistedSessionDelegates() throws {
+    @MainActor func testDeletePersistedSessionDelegates() throws {
         let account = makeAccount()
         try client.deletePersistedSession(for: account)
     }
 
-    func testRestoreSessionsDelegates() async {
+    @MainActor func testRestoreSessionsDelegates() async {
         await client.restoreSessions(for: [makeAccount()])
     }
 
-    func testFetchBlocks() async throws {
+    @MainActor func testFetchBlocks() async throws {
         MockURLProtocol.requestHandler = { request in
             let url = request.url!.absoluteString
             if url.contains("blocklist/") {
@@ -99,7 +107,7 @@ final class LiveBlueskyClientTests: XCTestCase {
         XCTAssertEqual(blocked.actors[0].handle, "blocked.bsky.social")
     }
 
-    func testFetchBlocksEmpty() async throws {
+    @MainActor func testFetchBlocksEmpty() async throws {
         MockURLProtocol.requestHandler = { request in
             let json = """
             {"data": {"blocklist": []}}
@@ -112,7 +120,7 @@ final class LiveBlueskyClientTests: XCTestCase {
         XCTAssertTrue(blocked.actors.isEmpty)
     }
 
-    func testReportListUsesListRecordSubject() async throws {
+    @MainActor func testReportListUsesListRecordSubject() async throws {
         let account = makeAccount()
         let list = BlueskyList(
             id: "at://did:plc:list/app.bsky.graph.list/abc123",

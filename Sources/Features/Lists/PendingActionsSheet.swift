@@ -27,16 +27,25 @@ struct PendingActionsSheet: View {
                                     .foregroundStyle(.secondary)
                             case let .running(done, total, handle):
                                 ProgressView(value: Double(done), total: Double(total))
-                                Text("\(done) of \(total)\(handle.map { " \u{2014} \($0)" } ?? "")")
+                                Text(
+                                    verbatim: String.localized(
+                                        "pending.progress",
+                                        replacements: [
+                                            "done": "\(done)",
+                                            "total": "\(total)",
+                                            "handle": handle.map { " \u{2014} \($0)" } ?? "",
+                                        ]
+                                    )
+                                )
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             case let .completed(succeeded, failed):
                                 if failed > 0 {
-                                    Text("\(succeeded) succeeded, \(failed) failed")
+                                    Text(verbatim: String.localized("pending.succeeded_failed", replacements: ["succeeded": "\(succeeded)", "failed": "\(failed)"]))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 } else {
-                                    Text("\(succeeded) completed")
+                                    Text(verbatim: String.localized("pending.completed", replacements: ["succeeded": "\(succeeded)"]))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }

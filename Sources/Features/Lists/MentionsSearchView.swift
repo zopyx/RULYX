@@ -4,7 +4,9 @@ private struct PendingLikerTarget: Identifiable {
     let did: String
     let handle: String?
 
-    var id: String { did }
+    var id: String {
+        did
+    }
 }
 
 struct MentionsSearchView: View {
@@ -192,7 +194,7 @@ struct MentionsSearchView: View {
             .environmentObject(accountStore)
             .environmentObject(blueskyClient)
         }
-        .alert("post.block_likers.confirm_title".replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)"), isPresented: $showBlockLikersConfirmation) {
+        .alert(String.localized("post.block_likers.confirm_title", replacements: ["count": "\(pendingLikerTargets.count)"]), isPresented: $showBlockLikersConfirmation) {
             Button(String(localized: "post.block_likers.confirm_block"), role: .destructive) {
                 let targets = pendingLikerTargets
                 showBlockLikersConfirmation = false
@@ -236,7 +238,8 @@ struct MentionsSearchView: View {
             if !hasAppeared {
                 hasAppeared = true
                 if let prefID = accountStore.preferredSearchAccountID,
-                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+                {
                     searchAccount = prefAccount
                 } else {
                     searchAccount = accountStore.activeAccount
@@ -541,7 +544,8 @@ struct MentionsSearchView: View {
 
     private func loadAvailableTargetLists() async {
         guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account) else {
+              let appPassword = accountStore.appPassword(for: account)
+        else {
             availableTargetLists = []
             return
         }

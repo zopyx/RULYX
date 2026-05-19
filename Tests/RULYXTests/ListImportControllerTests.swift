@@ -7,8 +7,7 @@ final class ListImportControllerTests: XCTestCase {
 
     nonisolated override func setUp() async throws {
         try await super.setUp()
-        let c = await MainActor.run { ListImportController() }
-        controller = c
+        controller = await MainActor.run { ListImportController() }
     }
 
     func testPreparePreviewClassifiesReadyItems() async throws {

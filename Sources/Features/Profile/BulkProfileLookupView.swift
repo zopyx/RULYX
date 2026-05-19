@@ -50,7 +50,7 @@ struct BulkProfileLookupView: View {
                         Text("bulk.results")
                         Spacer()
                         let resolved = viewModel.results.filter(\.isResolved).count
-                        Text("\(resolved)/\(viewModel.results.count) resolved")
+                        Text(verbatim: String.localized("bulk.resolved", replacements: ["resolved": "\(resolved)", "total": "\(viewModel.results.count)"]))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
