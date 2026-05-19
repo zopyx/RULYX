@@ -61,11 +61,14 @@ struct RULYXApp: App {
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
                         DispatchQueue.main.async {
                             appLockManager.appDidEnterBackground()
+                            deps.clearskyHeartbeat.stop()
+                            deps.chatStore.stopPolling()
                         }
                     }
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                         DispatchQueue.main.async {
                             appLockManager.appDidBecomeActive()
+                            deps.clearskyHeartbeat.start()
                             deps.pushNotificationCoordinator.start()
                             deps.chatStore.startPolling()
                         }
@@ -80,4 +83,3 @@ struct RULYXApp: App {
         }
     }
 }
-

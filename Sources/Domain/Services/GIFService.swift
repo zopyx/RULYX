@@ -37,7 +37,7 @@ final class GIFService: Sendable {
     private let httpClient = HTTPClient()
     private let baseURL = "https://api.klipy.com/api/v1"
     private let perPage = 24
-    private nonisolated(unsafe) let keychain: KeychainServicing
+    private let keychain: KeychainServicing
 
     private let keychainService = "com.ajung.RULYX.klipy"
     private let keychainAccount = "apiKey"
@@ -94,7 +94,7 @@ final class GIFService: Sendable {
 enum KlipyKeychainHelper {
     private static let service = "com.ajung.RULYX.klipy"
     private static let account = "apiKey"
-    private nonisolated(unsafe) static let keychain: KeychainServicing = KeychainService()
+    private static let keychain: KeychainServicing = KeychainService()
 
     static func read() -> String {
         (try? keychain.read(service: service, account: account)) ?? ""
