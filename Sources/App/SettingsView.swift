@@ -87,18 +87,6 @@ struct SettingsView: View {
                     }
                 }
 
-                if showBetaFeatures {
-                    Section {
-                        let key = Binding(
-                            get: { UserDefaults.standard.string(forKey: "klipyAPIKey") ?? "" },
-                            set: { UserDefaults.standard.set($0.isEmpty ? nil : $0, forKey: "klipyAPIKey") }
-                        )
-                        SecureField("settings.klipy_api_key", text: key)
-                    } header: {
-                        Text("settings.klipy_services")
-                    }
-                }
-
                 Section {
                     Toggle(isOn: $showBetaFeatures) {
                         Label {

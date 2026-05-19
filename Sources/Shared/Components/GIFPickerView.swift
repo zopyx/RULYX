@@ -99,8 +99,7 @@ struct GIFPickerView: View {
     }
 
     private var hasAPIKey: Bool {
-        let key = UserDefaults.standard.string(forKey: "klipyAPIKey")
-        return key?.isEmpty == false
+        KlipyKeychainHelper.exists()
     }
 
     private func search(_ query: String) async {
