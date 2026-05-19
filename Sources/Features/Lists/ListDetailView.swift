@@ -29,6 +29,7 @@ struct ListDetailView: View {
     @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault
     @State private var isShowingReportSheet = false
     @State private var isReportingList = false
+    @State private var isSearching = false
     @Environment(\.dismiss) private var dismiss
 
     private var ownerDID: String? {
@@ -363,154 +364,22 @@ struct ListDetailView: View {
 
     private func content(account: AppAccount, appPassword: String) -> some View {
         List {
-            Section {
-                HStack(alignment: .top, spacing: 14) {
-                    if let avatarURL = currentList.avatarURL {
-                        Button {
-                            imagePreview = ImagePreviewCollection(urls: [avatarURL], initialIndex: 0)
-                        } label: {
-                            ThumbnailImageView(url: avatarURL, maxPixelSize: 96) {
-                                avatarPlaceholder
-                            }
-                            .frame(width: 48, height: 48)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(Color.white.opacity(0.18), lineWidth: 1)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(currentList.name)
-                            .appFont(.title)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.5)
-                        if !currentList.description.isEmpty, currentList.description != currentList.name {
-                            Text(currentList.description)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        if !isOwnedList, let ownerActor {
-                            NavigationLink {
-                                BlueskyProfileView(
-                                    member: BlueskyListMember(
-                                        recordURI: "owner:\(ownerActor.did)",
-                                        actor: ownerActor
-                                    ),
-                                    list: nil
-                                )
-                            } label: {
-                                HStack(spacing: 10) {
-                                    if let avatarURL = ownerActor.avatarURL {
-                                        ThumbnailImageView(url: avatarURL, maxPixelSize: 56) {
-                                            Circle()
-                                                .fill(Color.skyPrimary.opacity(0.16))
-                                        }
-                                        .frame(width: 28, height: 28)
-                                        .clipShape(Circle())
-                                    } else {
-                                        Circle()
-                                            .fill(Color.skyPrimary.opacity(0.16))
-                                            .frame(width: 28, height: 28)
-                                            .overlay {
-                                                Text(ownerActor.displayName?.prefix(1).uppercased() ?? "?")
-                                                    .font(.caption.weight(.bold))
-                                                    .foregroundStyle(Color.skyPrimary)
-                                            }
-                                    }
-                                    VStack(alignment: .leading, spacing: 1) {
-                                        Text(ownerActor.displayName ?? ownerActor.handle)
-                                            .font(.subheadline.weight(.semibold))
-                                        Text("@\(ownerActor.handle)")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.top, 8)
-                        }
-                    }
-                }
-                .padding(.vertical, 4)
-            }
+            ListDetailHeaderSection(
+                currentList: currentList,
+                isOwnedList: isOwnedList,
+                ownerActor: ownerActor,
+                imagePreview: $imagePreview
+            )
 
             if !isOwnedList {
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 10) {
-                            Image(systemName: subscriptionRecordURI != nil ? "bell.slash.fill" : "bell.badge.fill")
-                                .font(.title3)
-                                .foregroundStyle(subscriptionRecordURI != nil ? .red : .blue)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(verbatim: subscriptionRecordURI != nil ? String(localized: "list.detail.subscribed") : String(localized: "list.detail.subscribe"))
-                                    .font(.subheadline.weight(.semibold))
-                                Text("list.detail.subscribe.desc")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-
-                        if let error = subscribeError {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                        }
-
-                        Button {
-                            guard let myDID = account.did else {
-                                subscribeError = "Account DID not available"
-                                return
-                            }
-                            isSubscribing = true
-                            subscribeError = nil
-                            Task {
-                                do {
-                                    if let recordURI = subscriptionRecordURI {
-                                        try await blueskyClient.removeMember(
-                                            recordURI: recordURI,
-                                            account: account,
-                                            appPassword: appPassword
-                                        )
-                                        subscriptionRecordURI = nil
-                                    } else {
-                                        let uri = try await blueskyClient.addActor(
-                                            did: myDID,
-                                            to: currentList,
-                                            account: account,
-                                            appPassword: appPassword
-                                        )
-                                        subscriptionRecordURI = uri
-                                    }
-                                } catch {
-                                    subscribeError = AppError.userMessage(from: error)
-                                }
-                                isSubscribing = false
-                            }
-                        } label: {
-                            HStack {
-                                Spacer()
-                                if isSubscribing {
-                                    ProgressView()
-                                        .tint(.white)
-                                } else if subscriptionRecordURI != nil {
-                                    Label("list.detail.unsubscribe", systemImage: "bell.slash.fill")
-                                } else {
-                                    Text("list.detail.subscribe")
-                                        .fontWeight(.semibold)
-                                }
-                                Spacer()
-                            }
-                        }
-                        .disabled(isSubscribing)
-                        .buttonStyle(.borderedProminent)
-                        .tint(subscriptionRecordURI != nil ? .red : .blue)
-                        .accessibilityHint("list.detail.subscribe.hint")
-                    }
-                    .padding(.vertical, 4)
-                }
+                ListDetailSubscribeSection(
+                    currentList: currentList,
+                    subscriptionRecordURI: $subscriptionRecordURI,
+                    subscribeError: $subscribeError,
+                    isSubscribing: $isSubscribing,
+                    account: account,
+                    appPassword: appPassword
+                )
 
                 Section {
                     Button(role: .destructive) {
@@ -531,6 +400,7 @@ struct ListDetailView: View {
                     viewModel: viewModel,
                     batchState: batchState,
                     searchQuery: $searchQuery,
+                    isSearching: isSearching,
                     currentList: currentList,
                     account: account,
                     appPassword: appPassword,
@@ -565,6 +435,8 @@ struct ListDetailView: View {
             await loadOwner()
         }
         .task(id: searchQuery) {
+            isSearching = true
+            defer { isSearching = false }
             do {
                 try await Task.sleep(for: .milliseconds(300))
             } catch {
@@ -643,14 +515,50 @@ struct ListDetailView: View {
         exportProgressMessage = "Processing..."
 
         let sanitizedName = currentList.name.lowercased().replacingOccurrences(of: " ", with: "-")
-        let data: Data
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(sanitizedName)-full-export.\(format.rawValue)")
 
         switch format {
         case .csv:
-            let csv = generateCSV(from: members, stats: stats)
-            data = Data(csv.utf8)
+            let header = "handle,did,display_name,followers,following,posts,description"
+            FileManager.default.createFile(atPath: url.path, contents: Data((header + "\n").utf8))
+            guard let handle = try? FileHandle(forWritingTo: url) else {
+                isExporting = false
+                exportProgressMessage = nil
+                return
+            }
+            defer { try? handle.close() }
+            for member in members {
+                let s = stats[member.actor.did]
+                let row = [
+                    member.actor.handle.csvField,
+                    member.actor.did.csvField,
+                    (member.actor.displayName ?? "").csvField,
+                    "\(s?.followers ?? 0)",
+                    "\(s?.following ?? 0)",
+                    "\(s?.posts ?? 0)",
+                    (s?.description ?? "").csvField,
+                ].joined(separator: ",") + "\n"
+                try? handle.write(contentsOf: Data(row.utf8))
+            }
         case .json:
-            data = generateJSON(from: members, stats: stats)
+            if let data = try? JSONSerialization.data(
+                withJSONObject: members.map { member in
+                    let s = stats[member.actor.did]
+                    return [
+                        "handle": member.actor.handle,
+                        "did": member.actor.did,
+                        "display_name": member.actor.displayName ?? "",
+                        "description": s?.description ?? "",
+                        "followers": s?.followers ?? 0,
+                        "following": s?.following ?? 0,
+                        "posts": s?.posts ?? 0,
+                    ] as [String: Any]
+                },
+                options: [.prettyPrinted, .sortedKeys]
+            ) {
+                try? data.write(to: url, options: .atomic)
+            }
         case .xlsx, .ods:
             let headers = ["handle", "did", "display_name", "followers", "following", "posts", "description"]
             let rows = members.map { member in
@@ -671,23 +579,21 @@ struct ListDetailView: View {
                     exportProgressMessage = nil
                     return
                 }
-                data = xlsx
+                try? xlsx.write(to: url, options: .atomic)
             } else {
                 guard let ods = SpreadsheetExport.generateODS(headers: headers, rows: rows) else {
                     isExporting = false
                     exportProgressMessage = nil
                     return
                 }
-                data = ods
+                try? ods.write(to: url, options: .atomic)
             }
         }
 
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("\(sanitizedName)-full-export.\(format.rawValue)")
-        try? data.write(to: url, options: .atomic)
         isExporting = false
         exportProgressMessage = nil
         shareFileURL = url
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
     private func generateCSV(from members: [BlueskyListMember], stats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]) -> String {
@@ -721,16 +627,6 @@ struct ListDetailView: View {
             ] as [String: Any]
         }
         return (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys])) ?? Data()
-    }
-
-    private var avatarPlaceholder: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Color.skyPrimary.opacity(0.12))
-            .overlay {
-                Image(systemName: currentList.kind.symbolName)
-                    .font(.title3)
-                    .foregroundStyle(Color.skyPrimary)
-            }
     }
 
     private func loadOwner() async {
