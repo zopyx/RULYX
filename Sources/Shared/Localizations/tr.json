@@ -1033,5 +1033,7 @@
   "debug.http.clear": "Günlüğü Temizle",
   "debug.http.state.running": "Koşma",
   "debug.http.state.succeeded": "Başarı",
-  "debug.http.state.failed": "Arızalı"
+  "debug.http.state.failed": "Arızalı",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }

@@ -1033,5 +1033,7 @@
   "debug.http.clear": "ล้างบันทึก",
   "debug.http.state.running": "วิ่ง",
   "debug.http.state.succeeded": "ความสำเร็จ",
-  "debug.http.state.failed": "ล้มเหลว"
+  "debug.http.state.failed": "ล้มเหลว",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }

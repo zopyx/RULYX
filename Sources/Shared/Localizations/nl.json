@@ -1033,5 +1033,7 @@
   "debug.http.clear": "Logboek wissen",
   "debug.http.state.running": "Rennen",
   "debug.http.state.succeeded": "Succes",
-  "debug.http.state.failed": "Mislukt"
+  "debug.http.state.failed": "Mislukt",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }
