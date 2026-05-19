@@ -18,7 +18,7 @@
       "th",
       "vi"
     ],
-    "total_keys": 1033,
+    "total_keys": 1035,
     "total_languages": 16,
     "untranslated_total": 0
   },
@@ -8780,6 +8780,69 @@
         "untranslated": false
       }
     },
+    "clearsky.unavailable": {
+      "en": "ClearSky API temporarily unavailable — some data may not load",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "common.progress.hint": {
       "en": "{title}: {completedCount} of {totalCount} complete",
       "de": {
@@ -11675,6 +11738,69 @@
       },
       "vi": {
         "text": "Xóa nhật ký",
+        "untranslated": false
+      }
+    },
+    "debug.http.close": {
+      "en": "Close",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },

@@ -1033,5 +1033,7 @@
   "debug.http.clear": "清除日志",
   "debug.http.state.running": "跑步",
   "debug.http.state.succeeded": "成功",
-  "debug.http.state.failed": "失败的"
+  "debug.http.state.failed": "失败的",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }

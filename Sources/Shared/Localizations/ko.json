@@ -1033,5 +1033,7 @@
   "debug.http.clear": "로그 지우기",
   "debug.http.state.running": "달리기",
   "debug.http.state.succeeded": "성공",
-  "debug.http.state.failed": "실패한"
+  "debug.http.state.failed": "실패한",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }

@@ -1033,5 +1033,7 @@
   "debug.http.clear": "Очистить журнал",
   "debug.http.state.running": "Бег",
   "debug.http.state.succeeded": "Успех",
-  "debug.http.state.failed": "Неуспешный"
+  "debug.http.state.failed": "Неуспешный",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }

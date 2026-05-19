@@ -1033,5 +1033,7 @@
   "debug.http.clear": "مسح السجل",
   "debug.http.state.running": "جري",
   "debug.http.state.succeeded": "نجاح",
-  "debug.http.state.failed": "فشل"
+  "debug.http.state.failed": "فشل",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }

@@ -1033,5 +1033,7 @@
   "debug.http.clear": "Cancella registro",
   "debug.http.state.running": "Corsa",
   "debug.http.state.succeeded": "Successo",
-  "debug.http.state.failed": "Fallito"
+  "debug.http.state.failed": "Fallito",
+  "debug.http.close": "Close",
+  "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load"
 }
