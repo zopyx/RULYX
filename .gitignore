@@ -3,3 +3,8 @@ DerivedData/
 *.xcuserstate
 xcuserdata/
 .env
+
+# Unwanted files
+.claude/
+crashlog.crash
+feedback.json
