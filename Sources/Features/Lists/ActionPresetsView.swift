@@ -37,6 +37,7 @@ struct ActionPresetsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { isCreating = true } label: { Image(systemName: "plus") }
+                    .accessibilityLabel("presets.new_title")
                     .accessibilityHint("action_preset.create.hint")
             }
         }

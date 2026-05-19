@@ -30,7 +30,7 @@ struct ModerationRulesView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("rules.title")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { Button { isCreating = true } label: { Image(systemName: "plus") }.accessibilityHint("moderation_rule.create.hint") }
+            ToolbarItem(placement: .topBarTrailing) { Button { isCreating = true } label: { Image(systemName: "plus") }.accessibilityLabel("rules.new_title").accessibilityHint("moderation_rule.create.hint") }
         }
         .sheet(isPresented: $isCreating) { EditRuleView(store: store) }
     }
