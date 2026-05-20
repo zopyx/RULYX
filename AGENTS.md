@@ -1,5 +1,7 @@
 # Rulyx — Project Guide for AI Agents
 
+> Report issues: https://github.com/anomalyco/opencode/issues
+
 ## Project Overview
 iOS-only SwiftUI app for Bluesky moderation (lists, bulk operations, profile inspection, followers/following management, timeline). Targets iOS 17+, runs on iPhone only (no iPad, no macOS). Uses xcodegen for project generation.
 
@@ -12,6 +14,39 @@ swiftformat --lint .
 swiftlint
 swiftformat Sources Tests
 ```
+
+## Navigation Design Guide
+
+### Toolbar Button Rules
+
+| Role | Visual | Placement | Component |
+|------|--------|-----------|-----------|
+| Dismiss / Close | `xmark.circle.fill` | `.topBarTrailing` | `ToolbarCloseButton()` |
+| Confirm / Save | Localized text | `.confirmationAction` | `Button(loc("actions.save"))` |
+| Cancel | Localized text | `.cancellationAction` | `Button(loc("actions.cancel"))` |
+| Create / Add | `plus` | `.topBarTrailing` | Inline button |
+| Search | `magnifyingglass` | `.topBarLeading` | Inline button |
+
+**Key rules:**
+- Dismiss buttons use `xmark.circle.fill` (via `ToolbarCloseButton`) — never `checkmark.circle.fill`
+- Dismiss buttons go in `.topBarTrailing` — never `.confirmationAction` (reserved for form submit)
+- All icon-only buttons MUST have `.accessibilityLabel(loc("..."))`
+- All toolbar titles use `.toolbarTitleDisplayMode(.inline)` (not the deprecated `.navigationBarTitleDisplayMode`)
+
+### Reusable Components
+
+- **`ToolbarCloseButton`** (`Sources/Shared/Components/StatePanels.swift`): Dismiss/close button with `xmark.circle.fill`. Use for all sheet dismissals. Supports optional `action:` for custom close logic (e.g., `ToolbarCloseButton(action: { showSheet = false })`).
+- **`HelpInfoButton`** (`Sources/Shared/Components/StatePanels.swift`): Info button with `info.circle.fill`, opens a `.sheet` with explanation text. Always placed right of a section header label.
+
+### Pull-to-Refresh vs Refresh Button
+
+- Views with `.refreshable` (pull-to-refresh) **must not** have a dedicated `arrow.clockwise` reload button
+- Only keep `arrow.clockwise` in views that lack `.refreshable`
+
+### Navigation Titles
+
+- Always use `.toolbarTitleDisplayMode(.inline)` (iOS 18+ API)
+- Suppress title (`.navigationTitle("")`) only when the view provides its own visual title via a section header or `.principal` toolbar item
 
 ## Platform Constraints
 - **iPhone only** — TARGETED_DEVICE_FAMILY = "1" (runs in iPhone compatibility mode on iPad)
