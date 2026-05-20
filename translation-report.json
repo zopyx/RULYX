@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1036,
+    "total_keys": 1050,
     "total_languages": 16,
-    "untranslated_total": 31
+    "untranslated_total": 1
   },
   "keys": {
     "account.active": {
@@ -3107,6 +3107,321 @@
       },
       "vi": {
         "text": "Choose an account with little or no blockings for unrestricted searches. (VI)",
+        "untranslated": false
+      }
+    },
+    "account.preferred_search.info.hint": {
+      "en": "Learn more about the search account feature",
+      "de": {
+        "text": "Mehr über die Suchkonto-Funktion erfahren",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "En savoir plus sur la fonctionnalité de compte de recherche",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Scopri di più sulla funzione account di ricerca",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "検索アカウント機能の詳細",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "了解更多关于搜索账户功能的信息",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Obtén más información sobre la función de cuenta de búsqueda",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Saiba mais sobre o recurso de conta de pesquisa",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "검색 계정 기능에 대해 자세히 알아보기",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Узнайте больше о функции учетной записи поиска",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تعرف على المزيد حول ميزة حساب البحث",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Meer informatie over de zoekaccount-functie",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Dowiedz się więcej o funkcji konta wyszukiwania",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Arama hesabı özelliği hakkında daha fazla bilgi",
+        "untranslated": false
+      },
+      "th": {
+        "text": "เรียนรู้เพิ่มเติมเกี่ยวกับฟีเจอร์บัญชีค้นหา",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Tìm hiểu thêm về tính năng tài khoản tìm kiếm",
+        "untranslated": false
+      }
+    },
+    "account.preferred_search.info.p1": {
+      "en": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective.",
+      "de": {
+        "text": "Das Suchkonto bestimmt, welches Bluesky-Konto für Suchanfragen in der App verwendet wird. Alle Moderationsaktionen, Profilabfragen und Timeline-Suchen werden aus der Perspektive dieses Kontos ausgeführt.",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Le compte de recherche détermine quel compte Bluesky est utilisé lors des recherches dans l'application. Toutes les actions de modération, les consultations de profil et les recherches dans le fil d'actualité seront exécutées depuis la perspective de ce compte.",
+        "untranslated": false
+      },
+      "it": {
+        "text": "L'account di ricerca determina quale account Bluesky viene utilizzato per eseguire ricerche nell'app. Tutte le azioni di moderazione, le ricerche di profili e le ricerche nella timeline verranno eseguite dalla prospettiva di questo account.",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "検索アカウントは、アプリ全体で検索を実行する際に使用するBlueskyアカウントを決定します。すべてのモデレーションアクション、プロフィール検索、タイムライン検索は、このアカウントの視点から実行されます。",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "搜索账户决定了在应用内执行搜索时使用哪个 Bluesky 账户。所有审核操作、个人资料查询和时间线搜索都将从该账户的视角执行。",
+        "untranslated": false
+      },
+      "es": {
+        "text": "La cuenta de búsqueda determina qué cuenta de Bluesky se utiliza al realizar búsquedas en la aplicación. Todas las acciones de moderación, consultas de perfiles y búsquedas en la cronología se ejecutarán desde la perspectiva de esta cuenta.",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "A conta de pesquisa determina qual conta do Bluesky é usada ao realizar pesquisas no aplicativo. Todas as ações de moderação, consultas de perfil e pesquisas de linha do tempo serão executadas a partir da perspectiva desta conta.",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "검색 계정은 앱 전체에서 검색을 수행할 때 사용할 Bluesky 계정을 결정합니다. 모든 중재 작업, 프로필 조회 및 타임라인 검색이 이 계정 관점에서 실행됩니다.",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Учетная запись поиска определяет, какая учетная запись Bluesky используется при выполнении поиска в приложении. Все действия модерации, поиск профилей и поиск по ленте будут выполняться с точки зрения этой учетной записи.",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "يحدد حساب البحث حساب Bluesky المستخدم عند إجراء عمليات البحث في التطبيق. سيتم تنفيذ جميع إجراءات الإشراف والبحث عن الملفات الشخصية وعمليات بحث الجدول الزمني من منظور هذا الحساب.",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Het zoekaccount bepaalt welk Bluesky-account wordt gebruikt bij het uitvoeren van zoekopdrachten in de app. Alle moderatieacties, profielzoekopdrachten en tijdlijnzoekopdrachten worden vanuit dit accountperspectief uitgevoerd.",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Konto wyszukiwania określa, które konto Bluesky jest używane podczas wyszukiwania w aplikacji. Wszystkie działania moderacyjne, wyszukiwanie profili i wyszukiwanie w osi czasu będą wykonywane z perspektywy tego konta.",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Arama hesabı, uygulama genelinde arama yaparken hangi Bluesky hesabının kullanılacağını belirler. Tüm moderasyon işlemleri, profil aramaları ve zaman tüneli aramaları bu hesap perspektifinden yürütülecektir.",
+        "untranslated": false
+      },
+      "th": {
+        "text": "บัญชีค้นหาจะกำหนดว่าบัญชี Bluesky ใดจะถูกใช้เมื่อทำการค้นหาทั่วทั้งแอป การดำเนินการกลั่นกรองทั้งหมด การค้นหาโปรไฟล์ และการค้นหาไทม์ไลน์จะดำเนินการจากมุมมองของบัญชีนี้",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Tài khoản tìm kiếm xác định tài khoản Bluesky nào được sử dụng khi thực hiện tìm kiếm trên toàn bộ ứng dụng. Tất cả các hành động kiểm duyệt, tra cứu hồ sơ và tìm kiếm dòng thời gian sẽ được thực hiện từ góc nhìn của tài khoản này.",
+        "untranslated": false
+      }
+    },
+    "account.preferred_search.info.p2": {
+      "en": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list.",
+      "de": {
+        "text": "Wählen Sie ein Konto mit möglichst wenigen Blockierungen und Stummschaltungen, um die breitesten Suchergebnisse zu erhalten. Konten mit vielen Blockierungen können aufgrund ihrer Blockierliste möglicherweise bestimmte Profile oder Inhalte nicht finden.",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Choisissez un compte avec un minimum de blocages et de silences pour obtenir les résultats de recherche les plus larges. Les comptes avec de nombreux blocages peuvent ne pas découvrir certains profils ou contenus en raison de leur liste de blocage.",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Scegli un account con il minor numero di blocchi e silenziamenti per ottenere i risultati di ricerca più ampi. Gli account con molti blocchi potrebbero non scoprire determinati profili o contenuti a causa della loro lista di blocchi.",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "最も広い検索結果を得るには、ブロックとミュートが最小限のアカウントを選択してください。ブロックが多いアカウントは、ブロックリストのために特定のプロフィールやコンテンツを発見できない場合があります。",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "选择具有最少屏蔽和静音的账户以获得最广泛的搜索结果。具有大量屏蔽的账户可能由于其屏蔽列表而无法发现某些个人资料或内容。",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Elige una cuenta con la menor cantidad de bloqueos y silencios para obtener los resultados de búsqueda más amplios. Las cuentas con muchos bloqueos pueden no descubrir ciertos perfiles o contenido debido a su lista de bloqueo.",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Escolha uma conta com o mínimo de bloqueios e silêncios para obter os resultados de pesquisa mais amplos. Contas com muitos bloqueios podem não descobrir certos perfis ou conteúdo devido à sua lista de bloqueio.",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "가장 넓은 검색 결과를 얻으려면 차단 및 음소거가 최소인 계정을 선택하세요. 차단이 많은 계정은 차단 목록으로 인해 특정 프로필이나 콘텐츠를 발견하지 못할 수 있습니다.",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Выберите учетную запись с минимальным количеством блокировок и отключений звука, чтобы получить наиболее широкие результаты поиска. Учетные записи с большим количеством блокировок могут не обнаруживать некоторые профили или контент из-за своего списка блокировок.",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "اختر حسابًا يحتوي على أقل عدد من الحظر والكتم للحصول على أوسع نتائج البحث. قد لا تكتشف الحسابات التي لديها الكثير من عمليات الحظر بعض الملفات الشخصية أو المحتوى بسبب قائمة الحظر الخاصة بها.",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Kies een account met minimale blokkades en dempingen om de breedste zoekresultaten te krijgen. Accounts met veel blokkades kunnen bepaalde profielen of inhoud mogelijk niet ontdekken vanwege hun blokkadelijst.",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Wybierz konto z minimalną liczbą blokad i wyciszeń, aby uzyskać najszersze wyniki wyszukiwania. Konta z wieloma blokadami mogą nie odkrywać niektórych profili lub treści z powodu listy blokad.",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "En geniş arama sonuçlarını elde etmek için minimum blokaj ve sessize almaya sahip bir hesap seçin. Çok sayıda blokajı olan hesaplar, blokaj listeleri nedeniyle belirli profilleri veya içerikleri keşfedemeyebilir.",
+        "untranslated": false
+      },
+      "th": {
+        "text": "เลือกบัญชีที่มีการบล็อกและปิดเสียงน้อยที่สุดเพื่อให้ได้ผลการค้นหาที่กว้างที่สุด บัญชีที่มีการบล็อกจำนวนมากอาจไม่สามารถค้นพบโปรไฟล์หรือเนื้อหาบางอย่างได้เนื่องจากรายการบล็อกของตน",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Chọn tài khoản có ít chặn và tắt tiếng nhất để có kết quả tìm kiếm rộng nhất. Các tài khoản có nhiều chặn có thể không khám phá được một số hồ sơ hoặc nội dung nhất định do danh sách chặn của họ.",
+        "untranslated": false
+      }
+    },
+    "account.preferred_search.info.p3": {
+      "en": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management.",
+      "de": {
+        "text": "Diese Auswahl hat keinen Einfluss auf Ihr aktives Konto — Sie können mit einem Konto angemeldet sein und ein anderes für Suchanfragen verwenden. Ihr aktives Konto wird für alle Moderationsaktionen wie Blockieren, Stummschalten und Listenverwaltung verwendet.",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Cette sélection n'affecte pas votre compte actif — vous pouvez être connecté à un compte pour naviguer et utiliser un compte différent pour les recherches. Votre compte actif est utilisé pour toutes les actions de modération comme le blocage, la mise en sourdine et la gestion des listes.",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Questa selezione non influisce sul tuo account attivo — puoi essere connesso a un account per navigare e utilizzare un account diverso per le ricerche. Il tuo account attivo viene utilizzato per tutte le azioni di moderazione come bloccare, silenziare e gestire le liste.",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "この選択はアクティブアカウントに影響しません — 閲覧用に1つのアカウントにサインインし、検索用に別のアカウントを使用できます。アクティブアカウントは、ブロック、ミュート、リスト管理などのすべてのモデレーションアクションに使用されます。",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "此选择不会影响您的活动账户 — 您可以登录一个账户进行浏览，并使用另一个账户进行搜索。您的活动账户用于所有审核操作，如屏蔽、静音和列表管理。",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Esta selección no afecta tu cuenta activa — puedes estar conectado en una cuenta para navegar y usar una cuenta diferente para las búsquedas. Tu cuenta activa se usa para todas las acciones de moderación como bloquear, silenciar y gestionar listas.",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Esta seleção não afeta sua conta ativa — você pode estar conectado em uma conta para navegar e usar uma conta diferente para pesquisas. Sua conta ativa é usada para todas as ações de moderação, como bloquear, silenciar e gerenciar listas.",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "이 선택은 활성 계정에 영향을 미치지 않습니다 — 브라우징용으로 하나의 계정에 로그인하고 검색용으로 다른 계정을 사용할 수 있습니다. 활성 계정은 차단, 음소거 및 목록 관리와 같은 모든 중재 작업에 사용됩니다.",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Этот выбор не влияет на вашу активную учетную запись — вы можете войти в одну учетную запись для просмотра и использовать другую учетную запись для поиска. Ваша активная учетная запись используется для всех действий модерации, таких как блокировка, отключение звука и управление списками.",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "لا يؤثر هذا التحديد على حسابك النشط — يمكنك تسجيل الدخول إلى حساب واحد للتصفح واستخدام حساب آخر لعمليات البحث. يتم استخدام حسابك النشط لجميع إجراءات الإشراف مثل الحظر والكتم وإدارة القوائم.",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Deze selectie heeft geen invloed op je actieve account — je kunt ingelogd zijn op één account voor browsen en een ander account gebruiken voor zoekopdrachten. Je actieve account wordt gebruikt voor alle moderatieacties zoals blokkeren, dempen en lijstbeheer.",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Ten wybór nie wpływa na Twoje aktywne konto — możesz być zalogowany na jedno konto do przeglądania i używać innego konta do wyszukiwania. Twoje aktywne konto jest używane do wszystkich działań moderacyjnych, takich jak blokowanie, wyciszanie i zarządzanie listami.",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Bu seçim aktif hesabınızı etkilemez — gezinme için bir hesaba giriş yapabilir ve aramalar için farklı bir hesap kullanabilirsiniz. Aktif hesabınız, bloklama, sessize alma ve liste yönetimi gibi tüm moderasyon işlemleri için kullanılır.",
+        "untranslated": false
+      },
+      "th": {
+        "text": "การเลือกนี้ไม่มีผลต่อบัญชีที่ใช้งานอยู่ของคุณ — คุณสามารถเข้าสู่ระบบบัญชีหนึ่งเพื่อเรียกดูและใช้บัญชีอื่นสำหรับการค้นหา บัญชีที่ใช้งานอยู่ของคุณใช้สำหรับการดำเนินการกลั่นกรองทั้งหมด เช่น การบล็อก การปิดเสียง และการจัดการรายการ",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Lựa chọn này không ảnh hưởng đến tài khoản đang hoạt động của bạn — bạn có thể đăng nhập vào một tài khoản để duyệt và sử dụng tài khoản khác để tìm kiếm. Tài khoản đang hoạt động của bạn được sử dụng cho tất cả các hành động kiểm duyệt như chặn, tắt tiếng và quản lý danh sách.",
+        "untranslated": false
+      }
+    },
+    "account.preferred_search.info.title": {
+      "en": "Search Account Info",
+      "de": {
+        "text": "Info zum Suchkonto",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Infos sur le compte de recherche",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Info account di ricerca",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "検索アカウント情報",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "搜索账户信息",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Información de cuenta de búsqueda",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Informações da conta de pesquisa",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "검색 계정 정보",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Информация об учетной записи поиска",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "معلومات حساب البحث",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Info zoekaccount",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Informacje o koncie wyszukiwania",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Arama hesabı bilgisi",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ข้อมูลบัญชีค้นหา",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Thông tin tài khoản tìm kiếm",
         "untranslated": false
       }
     },
@@ -8783,64 +9098,64 @@
     "clearsky.unavailable": {
       "en": "ClearSky API temporarily unavailable — some data may not load",
       "de": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky-API vorübergehend nicht verfügbar — einige Daten können nicht geladen werden",
+        "untranslated": false
       },
       "fr": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API ClearSky temporairement indisponible — certaines données peuvent ne pas se charger",
+        "untranslated": false
       },
       "it": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API ClearSky temporaneamente non disponibile — alcuni dati potrebbero non caricarsi",
+        "untranslated": false
       },
       "ja": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky APIが一時的に利用できません — 一部のデータが読み込めない場合があります",
+        "untranslated": false
       },
       "zh": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky API暂时不可用 — 某些数据可能无法加载",
+        "untranslated": false
       },
       "es": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API de ClearSky temporalmente no disponible — algunos datos pueden no cargarse",
+        "untranslated": false
       },
       "pt": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API do ClearSky temporariamente indisponível — alguns dados podem não carregar",
+        "untranslated": false
       },
       "ko": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky API를 일시적으로 사용할 수 없습니다 — 일부 데이터를 불러오지 못할 수 있습니다",
+        "untranslated": false
       },
       "ru": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API ClearSky временно недоступна — некоторые данные могут не загружаться",
+        "untranslated": false
       },
       "ar": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "واجهة برمجة تطبيقات ClearSky غير متوفرة مؤقتًا — قد لا يتم تحميل بعض البيانات",
+        "untranslated": false
       },
       "nl": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky API tijdelijk niet beschikbaar — sommige gegevens worden mogelijk niet geladen",
+        "untranslated": false
       },
       "pl": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API ClearSky tymczasowo niedostępna — niektóre dane mogą się nie ładować",
+        "untranslated": false
       },
       "tr": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky API geçici olarak kullanılamıyor — bazı veriler yüklenemeyebilir",
+        "untranslated": false
       },
       "th": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "ClearSky API ไม่พร้อมใช้งานชั่วคราว — ข้อมูลบางอย่างอาจไม่โหลด",
+        "untranslated": false
       },
       "vi": {
-        "text": "ClearSky API temporarily unavailable — some data may not load",
-        "untranslated": true
+        "text": "API ClearSky tạm thời không khả dụng — một số dữ liệu có thể không tải được",
+        "untranslated": false
       }
     },
     "common.progress.hint": {
@@ -10166,6 +10481,69 @@
         "untranslated": false
       }
     },
+    "customsearch.clear_recent": {
+      "en": "Clear All",
+      "de": {
+        "text": "Alle löschen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Tout effacer",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Cancella tutto",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "すべてクリア",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "清除全部",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Borrar todo",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Limpar tudo",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "모두 지우기",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Очистить все",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "مسح الكل",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Alles wissen",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Wyczyść wszystko",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Tümünü temizle",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ล้างทั้งหมด",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Xóa tất cả",
+        "untranslated": false
+      }
+    },
     "customsearch.empty": {
       "en": "No posts found",
       "de": {
@@ -10736,7 +11114,7 @@
     "customsearch.tab": {
       "en": "Tab",
       "de": {
-        "text": "Tab",
+        "text": "Registerkarte",
         "untranslated": false
       },
       "fr": {
@@ -10744,7 +11122,7 @@
         "untranslated": false
       },
       "it": {
-        "text": "Tab",
+        "text": "Scheda",
         "untranslated": false
       },
       "ja": {
@@ -10776,7 +11154,7 @@
         "untranslated": false
       },
       "nl": {
-        "text": "Tab",
+        "text": "Tabblad",
         "untranslated": false
       },
       "pl": {
@@ -11807,64 +12185,64 @@
     "debug.http.close": {
       "en": "Close",
       "de": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Schließen",
+        "untranslated": false
       },
       "fr": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Fermer",
+        "untranslated": false
       },
       "it": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Chiudi",
+        "untranslated": false
       },
       "ja": {
-        "text": "Close",
-        "untranslated": true
+        "text": "閉じる",
+        "untranslated": false
       },
       "zh": {
-        "text": "Close",
-        "untranslated": true
+        "text": "关闭",
+        "untranslated": false
       },
       "es": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Cerrar",
+        "untranslated": false
       },
       "pt": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Fechar",
+        "untranslated": false
       },
       "ko": {
-        "text": "Close",
-        "untranslated": true
+        "text": "닫기",
+        "untranslated": false
       },
       "ru": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Закрыть",
+        "untranslated": false
       },
       "ar": {
-        "text": "Close",
-        "untranslated": true
+        "text": "إغلاق",
+        "untranslated": false
       },
       "nl": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Sluiten",
+        "untranslated": false
       },
       "pl": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Zamknij",
+        "untranslated": false
       },
       "tr": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Kapat",
+        "untranslated": false
       },
       "th": {
-        "text": "Close",
-        "untranslated": true
+        "text": "ปิด",
+        "untranslated": false
       },
       "vi": {
-        "text": "Close",
-        "untranslated": true
+        "text": "Đóng",
+        "untranslated": false
       }
     },
     "debug.http.empty": {
@@ -24401,6 +24779,69 @@
       },
       "vi": {
         "text": "编辑列表 (VI)",
+        "untranslated": false
+      }
+    },
+    "list.export.complete": {
+      "en": "Export Complete",
+      "de": {
+        "text": "Export abgeschlossen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Export terminé",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Esportazione completata",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "エクスポート完了",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "导出完成",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Exportación completa",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Exportação concluída",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "내보내기 완료",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Экспорт завершен",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "اكتمل التصدير",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Export voltooid",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Eksport zakończony",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Dışa aktarma tamamlandı",
+        "untranslated": false
+      },
+      "th": {
+        "text": "การส่งออกเสร็จสมบูรณ์",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Xuất hoàn tất",
         "untranslated": false
       }
     },
@@ -42044,6 +42485,132 @@
         "untranslated": false
       }
     },
+    "post.block_likers.already_blocked": {
+      "en": "Already blocked: {count}",
+      "de": {
+        "text": "Bereits blockiert: {count}",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Déjà bloqué: {count}",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Già bloccato: {count}",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "既にブロック済み: {count}",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "已屏蔽: {count}",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Ya bloqueado: {count}",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Já bloqueado: {count}",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "이미 차단됨: {count}",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Уже заблокировано: {count}",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تم حظره مسبقًا: {count}",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Al geblokkeerd: {count}",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Już zablokowano: {count}",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Zaten engellenmiş: {count}",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ถูกบล็อกแล้ว: {count}",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đã bị chặn: {count}",
+        "untranslated": false
+      }
+    },
+    "post.block_likers.blocked_now": {
+      "en": "Blocked: {count}",
+      "de": {
+        "text": "Blockiert: {count}",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Bloqué: {count}",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Bloccato: {count}",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "ブロック済み: {count}",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "已屏蔽: {count}",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Bloqueado: {count}",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Bloqueado: {count}",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "차단됨: {count}",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Заблокировано: {count}",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تم الحظر: {count}",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Geblokkeerd: {count}",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Zablokowano: {count}",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Engellendi: {count}",
+        "untranslated": false
+      },
+      "th": {
+        "text": "บล็อกแล้ว: {count}",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đã chặn: {count}",
+        "untranslated": false
+      }
+    },
     "post.block_likers.blocking_title": {
       "en": "Blocking accounts...",
       "de": {
@@ -42104,6 +42671,69 @@
       },
       "vi": {
         "text": "Chặn tài khoản...",
+        "untranslated": false
+      }
+    },
+    "post.block_likers.checking_title": {
+      "en": "Checking accounts…",
+      "de": {
+        "text": "Konten werden überprüft…",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Vérification des comptes…",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Verifica degli account…",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "アカウントを確認中…",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "正在检查账户…",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Verificando cuentas…",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Verificando contas…",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "계정 확인 중…",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Проверка аккаунтов…",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "جارٍ التحقق من الحسابات…",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Accounts controleren…",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Sprawdzanie kont…",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Hesaplar kontrol ediliyor…",
+        "untranslated": false
+      },
+      "th": {
+        "text": "กำลังตรวจสอบบัญชี…",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đang kiểm tra tài khoản…",
         "untranslated": false
       }
     },
@@ -51060,7 +51690,7 @@
         "untranslated": false
       },
       "fr": {
-        "text": "Doxxing",
+        "text": "Doxing",
         "untranslated": false
       },
       "it": {
@@ -51076,11 +51706,11 @@
         "untranslated": false
       },
       "es": {
-        "text": "Doxxing",
+        "text": "Doxing",
         "untranslated": false
       },
       "pt": {
-        "text": "Doxxing",
+        "text": "Doxing",
         "untranslated": false
       },
       "ko": {
@@ -51100,7 +51730,7 @@
         "untranslated": false
       },
       "pl": {
-        "text": "Doxxing",
+        "text": "Doxing",
         "untranslated": false
       },
       "tr": {
@@ -55856,7 +56486,7 @@
         "untranslated": false
       },
       "ja": {
-        "text": "- {title}: {summary} ({date})",
+        "text": "- {title}: {summary}（{date}）",
         "untranslated": false
       },
       "zh": {
@@ -60503,6 +61133,258 @@
         "untranslated": false
       }
     },
+    "settings.icloud.privacy.cancel": {
+      "en": "Cancel",
+      "de": {
+        "text": "Abbrechen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Annuler",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Annulla",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "キャンセル",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "取消",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Cancelar",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Cancelar",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "취소",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Отмена",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "إلغاء",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Annuleren",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Anuluj",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "İptal",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ยกเลิก",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Hủy",
+        "untranslated": false
+      }
+    },
+    "settings.icloud.privacy.confirm": {
+      "en": "Enable",
+      "de": {
+        "text": "Aktivieren",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Activer",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Attiva",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "有効にする",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "启用",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Activar",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Ativar",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "활성화",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Включить",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تفعيل",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Inschakelen",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Włącz",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Etkinleştir",
+        "untranslated": false
+      },
+      "th": {
+        "text": "เปิดใช้งาน",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Bật",
+        "untranslated": false
+      }
+    },
+    "settings.icloud.privacy.message": {
+      "en": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device.",
+      "de": {
+        "text": "Account-Handles, Anzeigenamen und PDS-URLs werden im Klartext über iCloud auf Ihren Geräten synchronisiert. App-Passwörter bleiben auf dem Gerät.",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Les identifiants, noms d'affichage et URL PDS seront synchronisés en texte clair via iCloud sur vos appareils. Les mots de passe d'application restent sur l'appareil.",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Handle, nomi visualizzati e URL PDS verranno sincronizzati in chiaro tramite iCloud tra i tuoi dispositivi. Le password delle app rimangono sul dispositivo.",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "ハンドル、表示名、PDS URLはiCloud経由でデバイス間で平文のまま同期されます。アプリパスワードはデバイス上に残ります。",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "帐户句柄、显示名称和PDS URL将通过iCloud以明文形式在您的设备间同步。应用密码保留在设备上。",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Los handles, nombres para mostrar y URL de PDS se sincronizarán en texto plano a través de iCloud entre sus dispositivos. Las contraseñas de aplicación permanecen en el dispositivo.",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Handles, nomes de exibição e URLs de PDS serão sincronizados em texto simples via iCloud entre seus dispositivos. As senhas de aplicativo permanecem no dispositivo.",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "핸들, 표시 이름 및 PDS URL이 iCloud를 통해 기기 간에 일반 텍스트로 동기화됩니다. 앱 비밀번호는 기기에 남아 있습니다.",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Идентификаторы, отображаемые имена и URL-адреса PDS будут синхронизированы в открытом виде через iCloud между вашими устройствами. Пароли приложений остаются на устройстве.",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "سيتم مزامنة أسماء المستخدمين والأسماء المعروضة وعناوين URL الخاصة بـ PDS كنص واضح عبر iCloud عبر أجهزتك. تبقى كلمات مرور التطبيق على الجهاز.",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Handles, weergavenamen en PDS-URL's worden als platte tekst gesynchroniseerd via iCloud tussen uw apparaten. App-wachtwoorden blijven op het apparaat.",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Identyfikatory, nazwy wyświetlane i adresy URL PDS będą synchronizowane w postaci zwykłego tekstu przez iCloud między urządzeniami. Hasła aplikacji pozostają na urządzeniu.",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Kullanıcı adları, görünen adlar ve PDS URL'leri iCloud üzerinden cihazlarınız arasında düz metin olarak senkronize edilir. Uygulama şifreleri cihazda kalır.",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ชื่อผู้ใช้ ชื่อที่แสดง และ URL PDS จะถูกซิงค์เป็นข้อความธรรมดาผ่าน iCloud ระหว่างอุปกรณ์ของคุณ รหัสผ่านแอปจะยังคงอยู่ในอุปกรณ์",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Tên người dùng, tên hiển thị và URL PDS sẽ được đồng bộ dưới dạng văn bản thuần qua iCloud giữa các thiết bị của bạn. Mật khẩu ứng dụng vẫn ở trên thiết bị.",
+        "untranslated": false
+      }
+    },
+    "settings.icloud.privacy.title": {
+      "en": "iCloud Sync Privacy",
+      "de": {
+        "text": "iCloud-Synchronisation-Datenschutz",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Confidentialité de la synchronisation iCloud",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Privacy sincronizzazione iCloud",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "iCloud同期のプライバシー",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "iCloud同步隐私",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Privacidad de la sincronización de iCloud",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Privacidade da sincronização do iCloud",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "iCloud 동기화 개인정보",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Конфиденциальность синхронизации iCloud",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "خصوصية مزامنة iCloud",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Privacy iCloud-synchronisatie",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Prywatność synchronizacji iCloud",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "iCloud Senkronizasyon Gizliliği",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ความเป็นส่วนตัวของการซิงค์ iCloud",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Quyền riêng tư đồng bộ iCloud",
+        "untranslated": false
+      }
+    },
     "settings.icloud.sync": {
       "en": "iCloud Sync",
       "de": {
@@ -63971,7 +64853,7 @@
     "timeline.feed_uri_placeholder": {
       "en": "Feed AT URI (at://...)",
       "de": {
-        "text": "Feed AT URI (at://...)",
+        "text": "Feed-AT-URI (at://…)",
         "untranslated": false
       },
       "fr": {
@@ -63979,7 +64861,7 @@
         "untranslated": false
       },
       "it": {
-        "text": "Feed AT URI (at://...)",
+        "text": "Feed AT URI (at://…)",
         "untranslated": false
       },
       "ja": {
