@@ -148,15 +148,10 @@ struct MediaBrowserView: View {
                 }
             }
             .navigationTitle(loc("profile.media.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(loc("actions.close"))
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
                 }
             }
             .sheet(isPresented: $isShowingFolderPicker) {
@@ -192,7 +187,7 @@ struct MediaBrowserView: View {
                         }
                     }
                     .navigationTitle(loc("profile.media.download_complete"))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("actions.done") {

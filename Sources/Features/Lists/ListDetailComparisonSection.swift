@@ -147,10 +147,10 @@ extension ListDetailView {
                     }
                     .listStyle(.insetGrouped)
                     .navigationTitle(Text(loc("list.compare.help_title")))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            InfoSheetDismissButton()
+                            ToolbarCloseButton()
                         }
                     }
                 }

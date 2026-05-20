@@ -66,15 +66,10 @@ struct UserPostsView: View {
                 }
             }
             .navigationTitle(loc("profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(loc("actions.close"))
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if !viewModel.posts.isEmpty {

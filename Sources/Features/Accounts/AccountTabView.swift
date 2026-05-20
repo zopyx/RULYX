@@ -150,18 +150,10 @@ struct AccountTabView: View {
                     }
                     .listStyle(.insetGrouped)
                     .navigationTitle(Text(loc: "account.preferred_search.info.title"))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                showPreferredSearchInfo = false
-                            } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.secondary)
-                                    .font(.title3)
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(loc("actions.close"))
+                            ToolbarCloseButton(action: { showPreferredSearchInfo = false })
                         }
                     }
                 }
@@ -193,7 +185,7 @@ struct AccountTabView: View {
                         }
                     }
                     .navigationTitle(loc("account.edit_label.title"))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("account.edit_label.save") {

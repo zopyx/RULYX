@@ -24,7 +24,7 @@ struct ImportHandlesSheet: View {
                 }
             }
             .navigationTitle(loc("list.import.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("actions.cancel") {
@@ -55,10 +55,10 @@ struct ImportHandlesSheet: View {
                     }
                     .listStyle(.insetGrouped)
                     .navigationTitle(Text(loc("list.import.help_title")))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            InfoSheetDismissButton()
+                            ToolbarCloseButton()
                         }
                     }
                 }
@@ -110,20 +110,11 @@ struct ImportPreviewSheet: View {
                 previewSection(loc("list.import_preview.unresolved"), items: preview.unresolvedItems)
             }
             .navigationTitle(loc("list.import_preview.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismissAction()
-                        dismiss()
-                    } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .disabled(isImporting)
-                    .accessibilityLabel(loc("actions.close"))
-                    .accessibilityHint(loc("list.import.close_preview.hint"))
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton(action: { dismissAction(); dismiss() })
+                        .disabled(isImporting)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -147,10 +138,10 @@ struct ImportPreviewSheet: View {
                     }
                     .listStyle(.insetGrouped)
                     .navigationTitle(Text(loc("list.import_preview.help_title")))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            InfoSheetDismissButton()
+                            ToolbarCloseButton()
                         }
                     }
                 }
@@ -250,7 +241,7 @@ struct ListMetadataSheet: View {
                     Text(loc: "list.edit.desc_label")
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(navigationTitle)

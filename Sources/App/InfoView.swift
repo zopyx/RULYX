@@ -46,7 +46,7 @@ struct InfoView: View {
                     }
                 }
                 .navigationTitle("")
-                .navigationBarTitleDisplayMode(.inline)
+                .toolbarTitleDisplayMode(.inline)
                 .toolbarBackground(.hidden, for: .navigationBar)
             }
         }
@@ -498,15 +498,10 @@ private struct DebugInfoView: View {
                 }
             }
             .navigationTitle(localizationManager.localized("debug.diagnostics"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(localizationManager.localized("actions.done"))
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
