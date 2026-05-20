@@ -546,14 +546,22 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     meta: nil
                 )
             )
-            return try await requestExecutor.send(
-                path: "com.atproto.moderation.createReport",
-                method: "POST",
-                queryItems: [],
-                body: body,
-                accessToken: authSession.accessJWT,
-                hostURL: authSession.pdsURL
-            )
+            let url = authSession.pdsURL.appendingPathComponent("xrpc/com.atproto.moderation.createReport")
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
+            request.setValue("\(Self.bskyLabelerDID)#atproto_labeler", forHTTPHeaderField: "atproto-proxy")
+            request.httpBody = try JSONEncoder().encode(body)
+            let (data, httpResponse) = try await httpClient.data(for: request, source: "Moderation Report")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
+                    throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Report failed.")
+                }
+                throw BlueskyAPIError.invalidResponse
+            }
+            return try JSONDecoder().decode(CreateModerationReportResponse.self, from: data)
         }
     }
 
@@ -605,6 +613,45 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     func fetchBlockedByCount(for account: AppAccount) async throws -> Int {
         try await fetchClearskyActors(account: account, endpoint: "single-blocklist").totalCount
+    }
+
+    func fetchUnblockedBlockersCount(for account: AppAccount) async throws -> Int {
+        try guardClearskyAvailable()
+        let actorDID = try await resolveAccountDID(account)
+
+        async let blockedDIDs = fetchClearskyDIDs(actorDID: actorDID, endpoint: "blocklist")
+        async let blockedByDIDs = fetchClearskyDIDs(actorDID: actorDID, endpoint: "single-blocklist")
+        let (blocked, blockedBy) = try await (blockedDIDs, blockedByDIDs)
+
+        return blockedBy.subtracting(blocked).count
+    }
+
+    private func fetchClearskyDIDs(actorDID: String, endpoint: String) async throws -> Set<String> {
+        var allDIDs = Set<String>()
+        var page = 1
+        repeat {
+            let urlString = page == 1
+                ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
+                : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
+            guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+            var request = URLRequest(url: url)
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.timeoutInterval = 30
+            let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                return Set()
+            }
+            guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
+                return Set()
+            }
+            let entries = decoded.data.blocklist
+            for entry in entries {
+                allDIDs.insert(entry.did)
+            }
+            if entries.count < 100 { break }
+            page += 1
+        } while true
+        return allDIDs
     }
 
     private func resolveAccountDID(_ account: AppAccount) async throws -> String {

@@ -32,16 +32,7 @@ struct BlueskyProfileView: View {
     @State private var showClearskyLists = false
     @State private var showOwnedLists = false
     @State private var reportReasonText = ""
-
-    private var unblockedBlockers: Int? {
-        guard let b = blockedByCount, let k = blockingCount else { return nil }
-        return max(0, b - k)
-    }
-
-    private var hasUnblockedBlockers: Bool {
-        guard let count = unblockedBlockers else { return false }
-        return count > 0
-    }
+    @State private var unblockedBlockersCount: Int?
 
     enum BlockedAccessType: String, Identifiable {
         case posts
@@ -640,18 +631,16 @@ struct BlueskyProfileView: View {
                                     Text("profile.block_back.progress")
                                         .foregroundStyle(.secondary)
                                 }
-                            } else if hasUnblockedBlockers {
+                            } else if let count = unblockedBlockersCount, count > 0 {
                                 Button {
                                     showBlockBackConfirm1 = true
                                 } label: {
                                     HStack {
                                         Label("profile.block_back.action", systemImage: "hand.raised.slash.fill")
                                         Spacer()
-                                        if let count = unblockedBlockers {
-                                            Text("\(count)")
-                                                .foregroundStyle(.secondary)
-                                                .font(.caption.weight(.semibold))
-                                        }
+                                        Text("\(count)")
+                                            .foregroundStyle(.secondary)
+                                            .font(.caption.weight(.semibold))
                                         Image(systemName: "chevron.right")
                                             .appFont(.subheading)
                                             .foregroundStyle(.tertiary)
@@ -745,7 +734,7 @@ struct BlueskyProfileView: View {
                 showBlockBackConfirm2 = true
             }
         } message: {
-            if let count = unblockedBlockers {
+            if let count = unblockedBlockersCount {
                 Text(String(localized: "profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -757,7 +746,7 @@ struct BlueskyProfileView: View {
                 }
             }
         } message: {
-            if let count = unblockedBlockers {
+            if let count = unblockedBlockersCount {
                 Text(String(localized: "profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -844,7 +833,8 @@ struct BlueskyProfileView: View {
         do {
             async let b = blueskyClient.fetchBlockedByCount(for: account)
             async let k = blueskyClient.fetchBlockingCount(for: account)
-            (blockedByCount, blockingCount) = try await (b, k)
+            async let u = blueskyClient.fetchUnblockedBlockersCount(for: account)
+            (blockedByCount, blockingCount, unblockedBlockersCount) = try await (b, k, u)
         } catch {
             AppLogger.moderation.error("Failed to fetch block counts: \(error.localizedDescription, privacy: .public)")
         }
