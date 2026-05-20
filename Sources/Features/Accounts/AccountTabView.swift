@@ -92,16 +92,10 @@ struct AccountTabView: View {
                     } header: {
                         HStack(spacing: 4) {
                             Text(loc: "account.preferred_search.section")
-                            Button {
-                                showPreferredSearchInfo = true
-                            } label: {
-                                Image(systemName: "info.circle.fill")
-                                    .font(.subheadline)
-                                    .foregroundStyle(Color.skyPrimary)
-                                    .symbolRenderingMode(.hierarchical)
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(loc("account.preferred_search.info.hint"))
+                            HelpInfoButton(
+                                action: { showPreferredSearchInfo = true },
+                                accessibilityLabel: loc("account.preferred_search.info.hint")
+                            )
                         }
                     }
                 }

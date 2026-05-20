@@ -3,6 +3,7 @@ import SwiftUI
 struct ImportHandlesSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var rawInput = ""
+    @State private var showImportHelp = false
     let importAction: (String) -> Void
     @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -13,22 +14,13 @@ struct ImportHandlesSheet: View {
                     TextEditor(text: $rawInput)
                         .frame(minHeight: 180)
                 } header: {
-                    Text(loc: "list.import.paste_section")
-                }
-
-                Section {
-                    HelpSection(
-                        title: loc("list.import.help_title"),
-                        bulletPoints: [
-                            loc("list.import.help_1"),
-                            loc("list.import.help_2"),
-                            loc("list.import.help_3"),
-                            loc("list.import.help_4"),
-                            loc("list.import.help_5"),
-                        ]
-                    )
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
+                    HStack(spacing: 4) {
+                        Text(loc: "list.import.paste_section")
+                        HelpInfoButton(
+                            action: { showImportHelp = true },
+                            accessibilityLabel: loc("list.import.help_title")
+                        )
+                    }
                 }
             }
             .navigationTitle(loc("list.import.title"))
@@ -50,12 +42,34 @@ struct ImportHandlesSheet: View {
                     .accessibilityHint(loc("list.import.review.hint"))
                 }
             }
+            .sheet(isPresented: $showImportHelp) {
+                NavigationStack {
+                    List {
+                        Section {
+                            Text(loc("list.import.help_1"))
+                            Text(loc("list.import.help_2"))
+                            Text(loc("list.import.help_3"))
+                            Text(loc("list.import.help_4"))
+                            Text(loc("list.import.help_5"))
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .navigationTitle(Text(loc("list.import.help_title")))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            InfoSheetDismissButton()
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 struct ImportPreviewSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var showImportPreviewHelp = false
     let preview: ImportPreview
     let isImporting: Bool
     let dismissAction: () -> Void
@@ -81,30 +95,19 @@ struct ImportPreviewSheet: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } header: {
-                    Text(loc: "list.import_preview.summary")
+                    HStack(spacing: 4) {
+                        Text(loc: "list.import_preview.summary")
+                        HelpInfoButton(
+                            action: { showImportPreviewHelp = true },
+                            accessibilityLabel: loc("list.import_preview.help_title")
+                        )
+                    }
                 }
 
                 previewSection(loc("list.import_preview.ready"), items: preview.readyItems)
                 previewSection(loc("list.import_preview.already"), items: preview.alreadyPresentItems)
                 previewSection(loc("list.import_preview.duplicate"), items: preview.duplicateItems)
                 previewSection(loc("list.import_preview.unresolved"), items: preview.unresolvedItems)
-
-                if !isImporting {
-                    Section {
-                        HelpSection(
-                            title: loc("list.import_preview.help_title"),
-                            bulletPoints: [
-                                loc("list.import_preview.help_ready"),
-                                loc("list.import_preview.help_already"),
-                                loc("list.import_preview.help_duplicate"),
-                                loc("list.import_preview.help_unresolved"),
-                                loc("list.import_preview.help_write"),
-                            ]
-                        )
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                    }
-                }
             }
             .navigationTitle(loc("list.import_preview.title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -124,6 +127,27 @@ struct ImportPreviewSheet: View {
                     }
                     .disabled(isImporting || preview.readyItems.isEmpty)
                     .accessibilityHint(loc("list.import.import_items.hint"))
+                }
+            }
+            .sheet(isPresented: $showImportPreviewHelp) {
+                NavigationStack {
+                    List {
+                        Section {
+                            Text(loc("list.import_preview.help_ready"))
+                            Text(loc("list.import_preview.help_already"))
+                            Text(loc("list.import_preview.help_duplicate"))
+                            Text(loc("list.import_preview.help_unresolved"))
+                            Text(loc("list.import_preview.help_write"))
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .navigationTitle(Text(loc("list.import_preview.help_title")))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            InfoSheetDismissButton()
+                        }
+                    }
                 }
             }
         }

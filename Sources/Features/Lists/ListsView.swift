@@ -15,6 +15,9 @@ struct ListsView: View {
     @State var exportProgressMessage: String?
     @State var exportProgressFraction: Double?
     @State var showShareSheet = false
+    @State private var showModerationListsHelp = false
+    @State private var showListsHelp = false
+    @State private var showAdvancedHelp = false
 
     var body: some View {
         NavigationStack {
@@ -122,10 +125,10 @@ struct ListsView: View {
                         } header: {
                             HStack {
                                 Text(loc: "lists.moderation_lists")
-                                    .functionHelp(
-                                        title: loc("lists.moderation_lists"),
-                                        text: loc("lists.moderation_lists.help")
-                                    )
+                                HelpInfoButton(
+                                    action: { showModerationListsHelp = true },
+                                    accessibilityLabel: loc("lists.moderation_lists")
+                                )
                                 Spacer()
                                 Button {
                                     presentationState.createListKind = .moderation
@@ -170,10 +173,10 @@ struct ListsView: View {
                         } header: {
                             HStack {
                                 Text(loc: "lists.lists")
-                                    .functionHelp(
-                                        title: loc("lists.lists"),
-                                        text: loc("lists.lists.help")
-                                    )
+                                HelpInfoButton(
+                                    action: { showListsHelp = true },
+                                    accessibilityLabel: loc("lists.lists")
+                                )
                                 Spacer()
                                 Button {
                                     presentationState.createListKind = .regular
@@ -215,11 +218,13 @@ struct ListsView: View {
                                 .padding(.vertical, 4)
                             }
                         } header: {
-                            Text(loc: "lists.advanced")
-                                .functionHelp(
-                                    title: loc("lists.advanced"),
-                                    text: loc("lists.advanced.help")
+                            HStack(spacing: 4) {
+                                Text(loc: "lists.advanced")
+                                HelpInfoButton(
+                                    action: { showAdvancedHelp = true },
+                                    accessibilityLabel: loc("lists.advanced")
                                 )
+                            }
                         }
 
                         if let errorMessage = viewModel.errorMessage {
@@ -317,6 +322,24 @@ struct ListsView: View {
                         .environmentObject(blueskyClient)
                 }
             }
+            .sheet(isPresented: $showModerationListsHelp) {
+                helpSheet(
+                    title: loc("lists.moderation_lists"),
+                    text: loc("lists.moderation_lists.help")
+                )
+            }
+            .sheet(isPresented: $showListsHelp) {
+                helpSheet(
+                    title: loc("lists.lists"),
+                    text: loc("lists.lists.help")
+                )
+            }
+            .sheet(isPresented: $showAdvancedHelp) {
+                helpSheet(
+                    title: loc("lists.advanced"),
+                    text: loc("lists.advanced.help")
+                )
+            }
             .task(id: accountStore.activeAccountID) {
                 await loadInitial()
             }
@@ -386,6 +409,25 @@ struct ListsView: View {
         }
     }
 
+    private func helpSheet(title: String, text: String) -> some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text(text)
+                        .font(.body)
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    InfoSheetDismissButton()
+                }
+            }
+        }
+    }
+
     private func loadInitial() async {
         let password = accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
         await viewModel.load(
@@ -450,7 +492,6 @@ struct ListsView: View {
     private func openAccountManagement() {
         presentationState.isShowingAccountManagement = true
     }
-
 }
 
 #Preview {

@@ -12,6 +12,7 @@ extension ListDetailView {
         let comparisonList: BlueskyList?
         let syncSnapshot: () -> Void
 
+        @State private var showComparisonHelp = false
         @EnvironmentObject var accountStore: AccountStore
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
@@ -128,11 +129,31 @@ extension ListDetailView {
                     }
                 }
             } label: {
-                Text(loc: "list.compare.title")
-                    .functionHelpInteractive(
-                        title: loc("list.compare.help_title"),
-                        text: loc("list.compare.help_tooltip")
+                HStack(spacing: 4) {
+                    Text(loc: "list.compare.title")
+                    HelpInfoButton(
+                        action: { showComparisonHelp = true },
+                        accessibilityLabel: loc("list.compare.help_title")
                     )
+                }
+            }
+            .sheet(isPresented: $showComparisonHelp) {
+                NavigationStack {
+                    List {
+                        Section {
+                            Text(loc("list.compare.help_tooltip"))
+                                .font(.body)
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .navigationTitle(Text(loc("list.compare.help_title")))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            InfoSheetDismissButton()
+                        }
+                    }
+                }
             }
         }
 
