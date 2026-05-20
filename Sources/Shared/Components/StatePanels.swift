@@ -184,33 +184,6 @@ struct StatusChip: View {
     }
 }
 
-struct HelpSection: View {
-    let title: String
-    let bulletPoints: [String]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .appFont(.subheading)
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(bulletPoints, id: \.self) { point in
-                    HStack(alignment: .top, spacing: 8) {
-                        Image(systemName: "info.circle.fill")
-                            .appFont(.caption)
-                            .foregroundStyle(Color.skyPrimary)
-                            .frame(width: 16, height: 16)
-                        Text(point)
-                            .appFont(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-        .padding()
-        .appCardStyle(cornerRadius: 12, style: .subtle)
-    }
-}
-
 struct OnboardingRow: View {
     let icon: String
     let color: Color
@@ -232,6 +205,38 @@ struct OnboardingRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityHint(loc("common.status.hint"))
         .padding(.vertical, 8)
+    }
+}
+
+struct HelpInfoButton: View {
+    let action: () -> Void
+    let accessibilityLabel: String
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "info.circle.fill")
+                .font(.subheadline)
+                .foregroundStyle(Color.skyPrimary)
+                .symbolRenderingMode(.hierarchical)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
+struct InfoSheetDismissButton: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "xmark.circle.fill")
+                .foregroundStyle(.secondary)
+                .font(.title3)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(loc("actions.dismiss"))
     }
 }
 
