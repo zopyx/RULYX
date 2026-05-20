@@ -18,6 +18,12 @@ struct SplashScreenView: View {
     @State private var footerOpacity: CGFloat = 0
     @State private var showParticles = false
 
+    private var versionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return "v\(version) (\(build))"
+    }
+
     private var buildDate: String {
         if let url = Bundle.main.executableURL,
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
@@ -82,6 +88,11 @@ struct SplashScreenView: View {
                     .opacity(subtaglineOpacity)
 
                 Spacer()
+
+                Text(verbatim: versionString)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .opacity(footerOpacity)
 
                 Text(verbatim: "Build: \(buildDate)")
                     .font(.caption2)
