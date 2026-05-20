@@ -126,7 +126,12 @@ struct FeedTimelineView: View {
                     )
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("actions.close") { profileToShow = nil }
+                            Button { profileToShow = nil } label: {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .accessibilityLabel(loc("actions.close"))
                         }
                     }
                     .environmentObject(accountStore)

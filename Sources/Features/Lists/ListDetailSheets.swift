@@ -113,11 +113,16 @@ struct ImportPreviewSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("actions.close") {
+                    Button {
                         dismissAction()
                         dismiss()
+                    } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
                     }
                     .disabled(isImporting)
+                    .accessibilityLabel(loc("actions.close"))
                     .accessibilityHint(loc("list.import.close_preview.hint"))
                 }
 

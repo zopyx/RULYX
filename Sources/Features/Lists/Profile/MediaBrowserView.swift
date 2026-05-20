@@ -151,7 +151,12 @@ struct MediaBrowserView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("actions.close") { dismiss() }
+                    Button { dismiss() } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityLabel(loc("actions.close"))
                 }
             }
             .sheet(isPresented: $isShowingFolderPicker) {
