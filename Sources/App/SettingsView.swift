@@ -121,6 +121,18 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+
+                    if debugMode {
+                        Button {
+                            isShowingHTTPRequestDebugView = true
+                        } label: {
+                            Label {
+                                Text(localizationManager.localized("debug.http.title"))
+                            } icon: {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                            }
+                        }
+                    }
                 } header: {
                     HStack {
                         Text(localizationManager.localized("settings.internal"))
