@@ -454,6 +454,10 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         0
     }
 
+    override func fetchUnblockedBlockersCount(for _: AppAccount) async throws -> Int {
+        0
+    }
+
     override func blockActor(
         did _: String,
         account _: AppAccount,
