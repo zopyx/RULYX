@@ -72,7 +72,7 @@ struct AccountSwitcherSheet: View {
                 }
             }
             .navigationTitle(loc: "account.manage.title")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .task {
                 await accountStore.refreshAccountProfiles(using: blueskyClient)
             }
@@ -137,7 +137,7 @@ struct AccountSwitcherSheet: View {
                         }
                     }
                     .navigationTitle(loc: "account.edit_label.title")
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("account.edit_label.save") {

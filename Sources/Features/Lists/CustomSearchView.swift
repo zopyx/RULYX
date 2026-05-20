@@ -23,7 +23,7 @@ struct CustomSearchView: View {
         listContent
             .listStyle(.insetGrouped)
             .navigationTitle(loc("customsearch.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .modifier(SearchSheetsModifier(
                 selectedPostURI: $selectedPostURI,
                 imagePreview: $imagePreview,

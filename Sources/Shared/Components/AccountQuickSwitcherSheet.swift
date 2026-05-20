@@ -54,7 +54,7 @@ struct AccountQuickSwitcherSheet: View {
                 }
             }
             .navigationTitle(loc: "account.switcher.title")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
         }
         .presentationDetents([.height(360), .medium])
         .presentationDragIndicator(.visible)

@@ -73,7 +73,7 @@ extension ListsView {
                 }
             }
             .navigationTitle(loc("lists.export.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("actions.cancel") { isShowingListPicker = false }

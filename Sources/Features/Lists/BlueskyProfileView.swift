@@ -68,7 +68,7 @@ struct BlueskyProfileView: View {
             }
         }
         .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         .overlay {
             if isShowingAvatarPreview, let avatarURL = viewModel.profile?.avatarURL {
                 Color.black.opacity(0.9)

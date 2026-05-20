@@ -152,7 +152,7 @@ struct RootView: View {
                         }
                         .padding()
                     }
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button(localizationManager.localized("onboarding.close")) {

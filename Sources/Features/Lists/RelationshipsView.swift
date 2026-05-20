@@ -178,7 +178,7 @@ struct RelationshipsView: View {
             }
         }
         .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 16) {
@@ -541,7 +541,7 @@ struct ListPickerSheet: View {
                 }
             }
             .navigationTitle("\(String(localized: "rel.add_to_list")) \(actor.handle)")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("actions.cancel") { dismiss() }

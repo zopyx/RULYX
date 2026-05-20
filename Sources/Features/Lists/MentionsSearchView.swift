@@ -1,14 +1,5 @@
 import SwiftUI
 
-private struct PendingLikerTarget: Identifiable {
-    let did: String
-    let handle: String?
-
-    var id: String {
-        did
-    }
-}
-
 struct MentionsSearchView: View {
     let did: String
     let handle: String
@@ -30,19 +21,8 @@ struct MentionsSearchView: View {
     @State private var isFetchingLikers = false
     @State private var pendingLikerTargets: [PendingLikerTarget] = []
     @State private var showBlockLikersConfirmation = false
-    @State private var isCheckingLikers = false
-    @State private var isBlockingLikers = false
-    @State private var isAddingLikersToList = false
-    @State private var blockedCount = 0
-    @State private var alreadyBlockedCount = 0
-    @State private var totalToBlock = 0
-    @State private var currentBlockingHandle: String?
-    @State private var addedCount = 0
-    @State private var totalToAdd = 0
-    @State private var currentAddingHandle: String?
     @State private var blockError: String?
-    @State private var blockSuccessCount: Int?
-    @State private var addSuccessMessage: String?
+    @State private var batchOperationConfig: BatchOperationConfig?
 
     init(did: String, handle: String, displayName: String) {
         self.did = did
@@ -55,18 +35,6 @@ struct MentionsSearchView: View {
     var body: some View {
         List {
             searchAccountSection
-
-            if isCheckingLikers {
-                checkingProgressSection
-            }
-
-            if isBlockingLikers {
-                blockingProgressSection
-            }
-
-            if isAddingLikersToList {
-                addingProgressSection
-            }
 
             if isFetchingLikers {
                 HStack {
@@ -171,7 +139,7 @@ struct MentionsSearchView: View {
             await refresh()
         }
         .navigationTitle(Text(loc: "mentions.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         .sheet(item: $selectedPostURI) { uri in
             ThreadView(postURI: uri)
                 .environmentObject(accountStore)
@@ -192,6 +160,11 @@ struct MentionsSearchView: View {
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
         }
+        .sheet(item: $batchOperationConfig) { config in
+            BatchOperationProgressView(config: config)
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+        }
         .navigationDestination(item: $showProfileFor) { actor in
             BlueskyProfileView(
                 member: BlueskyListMember(recordURI: "mention:\(actor.did)", actor: actor),
@@ -204,7 +177,7 @@ struct MentionsSearchView: View {
             Button(loc("post.block_likers.confirm_block"), role: .destructive) {
                 let targets = pendingLikerTargets
                 showBlockLikersConfirmation = false
-                Task { await blockLikers(targets) }
+                blockLikers(targets)
             }
             Button(loc("actions.cancel"), role: .cancel) {
                 resetPendingLikerTargets()
@@ -219,20 +192,6 @@ struct MentionsSearchView: View {
             let remainder = pendingLikerTargets.count > 5 ? "\n…and \(pendingLikerTargets.count - 5) more" : ""
             Text(verbatim: loc("post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
         }
-        .alert("post.block_likers.done_title", isPresented: .init(get: { blockSuccessCount != nil }, set: { if !$0 { blockSuccessCount = nil } })) {
-            Button("actions.ok") { blockSuccessCount = nil }
-        } message: {
-            if let count = blockSuccessCount {
-                Text(verbatim: loc("post.block_likers.done").replacingOccurrences(of: "{count}", with: "\(count)"))
-            }
-        }
-        .alert("post.add_likers.done_title", isPresented: .init(get: { addSuccessMessage != nil }, set: { if !$0 { addSuccessMessage = nil } })) {
-            Button("actions.ok") { addSuccessMessage = nil }
-        } message: {
-            if let addSuccessMessage {
-                Text(verbatim: addSuccessMessage)
-            }
-        }
         .alert("list.detail.alert_title", isPresented: .init(get: { blockError != nil }, set: { if !$0 { blockError = nil } })) {
             Button("actions.ok") { blockError = nil }
         } message: {
@@ -244,8 +203,7 @@ struct MentionsSearchView: View {
             if !hasAppeared {
                 hasAppeared = true
                 if let prefID = accountStore.preferredSearchAccountID,
-                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
-                {
+                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
                     searchAccount = prefAccount
                 } else {
                     searchAccount = accountStore.activeAccount
@@ -322,105 +280,6 @@ struct MentionsSearchView: View {
             }
     }
 
-    private var checkingProgressSection: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text(loc: "post.block_likers.checking_title")
-                    .font(.subheadline.weight(.semibold))
-                Spacer()
-                ProgressView()
-                    .scaleEffect(0.8)
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.skyPrimary.opacity(0.06))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
-        )
-        .listRowSeparator(.hidden)
-    }
-
-    private var blockingProgressSection: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text(loc: "post.block_likers.blocking_title")
-                    .font(.subheadline.weight(.semibold))
-                Spacer()
-                Text("\(blockedCount)/\(totalToBlock)")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
-            ProgressView(value: Double(blockedCount), total: Double(max(totalToBlock, 1)))
-                .progressViewStyle(.linear)
-            HStack(spacing: 16) {
-                Label(
-                    loc("post.block_likers.blocked_now").replacingOccurrences(of: "{count}", with: "\(blockedCount)"),
-                    systemImage: "hand.raised.fill"
-                )
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                Label(
-                    loc("post.block_likers.already_blocked").replacingOccurrences(of: "{count}", with: "\(alreadyBlockedCount)"),
-                    systemImage: "checkmark.circle.fill"
-                )
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                Spacer()
-            }
-            if let handle = currentBlockingHandle {
-                Text(verbatim: handle)
-                    .font(.caption.monospaced())
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.skyPrimary.opacity(0.06))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
-        )
-        .listRowSeparator(.hidden)
-    }
-
-    private var addingProgressSection: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text(loc: "post.add_likers.adding_title")
-                    .font(.subheadline.weight(.semibold))
-                Spacer()
-                Text("\(addedCount)/\(totalToAdd)")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
-            ProgressView(value: Double(addedCount), total: Double(max(totalToAdd, 1)))
-                .progressViewStyle(.linear)
-            if let handle = currentAddingHandle {
-                Text(verbatim: handle)
-                    .font(.caption.monospaced())
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.skyPrimary.opacity(0.06))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
-        )
-        .listRowSeparator(.hidden)
-    }
-
     private func handleBlockAllLikers(postURI: String) {
         Task {
             guard let targets = await fetchLikerTargets(for: postURI) else { return }
@@ -434,7 +293,7 @@ struct MentionsSearchView: View {
             guard let targets = await fetchLikerTargets(for: postURI) else { return }
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
-            await addLikers(targets, to: list, account: account, appPassword: appPassword)
+            addLikers(targets, to: list, account: account, appPassword: appPassword)
         }
     }
 
@@ -465,102 +324,23 @@ struct MentionsSearchView: View {
         }
     }
 
-    private func blockLikers(_ targets: [PendingLikerTarget]) async {
+    private func blockLikers(_ targets: [PendingLikerTarget]) {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard !targets.isEmpty else { return }
-
-        isCheckingLikers = true
-        let blockedDIDs: Set<String>
-        do {
-            let blockedResult = try await blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
-            blockedDIDs = Set(blockedResult.actors.map(\.did))
-        } catch {
-            blockedDIDs = []
-            AppLogger.moderation.error("Failed to fetch blocked actors: \(error.localizedDescription, privacy: .public)")
-        }
-        isCheckingLikers = false
-        let filteredTargets = targets.filter { !blockedDIDs.contains($0.did) }
-        guard !filteredTargets.isEmpty else {
-            blockSuccessCount = 0
-            return
-        }
-
-        isBlockingLikers = true
-        blockedCount = 0
-        alreadyBlockedCount = targets.count - filteredTargets.count
-        totalToBlock = filteredTargets.count
-        currentBlockingHandle = nil
-        var lastError: String?
-        for target in filteredTargets {
-            currentBlockingHandle = displayHandle(for: target)
-            do {
-                try await blueskyClient.blockActor(did: target.did, account: account, appPassword: appPassword)
-                blockedCount += 1
-                await Task.yield()
-            } catch {
-                lastError = AppError.userMessage(from: error)
-                AppLogger.moderation.error("Failed to block \(target.did): \(error.localizedDescription, privacy: .public)")
-            }
-        }
-        currentBlockingHandle = nil
-        isBlockingLikers = false
         resetPendingLikerTargets()
-        if blockedCount > 0 {
-            blockSuccessCount = blockedCount
-        }
-        if let lastError {
-            blockError = lastError
-        }
+        batchOperationConfig = BatchOperationConfig(
+            targets: targets,
+            mode: .block(account: account, appPassword: appPassword)
+        )
     }
 
-    private func addLikers(_ targets: [PendingLikerTarget], to list: BlueskyList, account: AppAccount, appPassword: String) async {
+    private func addLikers(_ targets: [PendingLikerTarget], to list: BlueskyList, account: AppAccount, appPassword: String) {
         guard !targets.isEmpty else { return }
-
-        isCheckingLikers = true
-        let memberDIDs: Set<String>
-        do {
-            let members = try await blueskyClient.fetchListMembers(list: list, account: account, appPassword: appPassword)
-            memberDIDs = Set(members.map(\.actor.did))
-        } catch {
-            memberDIDs = []
-            AppLogger.moderation.error("Failed to fetch list members: \(error.localizedDescription, privacy: .public)")
-        }
-        isCheckingLikers = false
-        let filteredTargets = targets.filter { !memberDIDs.contains($0.did) }
-        guard !filteredTargets.isEmpty else {
-            addSuccessMessage = loc("post.add_likers.done")
-                .replacingOccurrences(of: "{count}", with: "0")
-                .replacingOccurrences(of: "{list}", with: list.name)
-            return
-        }
-
-        isAddingLikersToList = true
-        addedCount = 0
-        totalToAdd = filteredTargets.count
-        currentAddingHandle = nil
-        var lastError: String?
-        for target in filteredTargets {
-            currentAddingHandle = displayHandle(for: target)
-            do {
-                _ = try await blueskyClient.addActor(did: target.did, to: list, account: account, appPassword: appPassword)
-                addedCount += 1
-                await Task.yield()
-            } catch {
-                lastError = AppError.userMessage(from: error)
-                AppLogger.moderation.error("Failed to add \(target.did) to \(list.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            }
-        }
-        currentAddingHandle = nil
-        isAddingLikersToList = false
-        if addedCount > 0 {
-            addSuccessMessage = loc("post.add_likers.done")
-                .replacingOccurrences(of: "{count}", with: "\(addedCount)")
-                .replacingOccurrences(of: "{list}", with: list.name)
-        }
-        if let lastError {
-            blockError = lastError
-        }
+        batchOperationConfig = BatchOperationConfig(
+            targets: targets,
+            mode: .addToList(list: list, account: account, appPassword: appPassword)
+        )
     }
 
     private func collectPendingLikerTargets(from likes: [LikeItem]) -> [PendingLikerTarget] {
@@ -573,13 +353,6 @@ struct MentionsSearchView: View {
                 handle: like.actor.handle
             )
         }
-    }
-
-    private func displayHandle(for target: PendingLikerTarget) -> String {
-        if let handle = target.handle, !handle.isEmpty {
-            return "@\(handle)"
-        }
-        return target.did
     }
 
     private func resetPendingLikerTargets() {

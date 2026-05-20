@@ -114,6 +114,7 @@
 		6509B9F31479FBE5F089B659 /* BlueskyAPIDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCEF8AED13F2B79D85FD49B9 /* BlueskyAPIDTOs.swift */; };
 		6520ACA09FE4F0A2018F8418 /* NotificationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21101CBB5C669FA99A2EB0AF /* NotificationViewModelTests.swift */; };
 		65951C3773F1703732A7EE8B /* BlueskyAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5316102E1628DF01DEDFC7D /* BlueskyAPIError.swift */; };
+		662CF490E3F4D0904B192384 /* BatchOperationProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39841C5A6B9321BBA15AC75 /* BatchOperationProgressView.swift */; };
 		6654AD69966815BC0537ECBA /* ru.json in Resources */ = {isa = PBXBuildFile; fileRef = 044C3DCEEDFB53575670FFAF /* ru.json */; };
 		67CAE58679130123ECB4F1AB /* RelationshipCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123EC6941CBDC43FA504ECE3 /* RelationshipCacheTests.swift */; };
 		680E3BB4754FCFB8FAEB3436 /* AppErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */; };
@@ -187,7 +188,6 @@
 		BDC3DF6F1B30A99EDB60D233 /* CustomSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BC1B1C6F11B6ECB47B7C38 /* CustomSearchViewModel.swift */; };
 		C4F19EFE40D63950CE3C7C0E /* ListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 741E2169946E95FC95D9281A /* ListDetailView.swift */; };
 		C58EBE66DA3EB174DC1681F3 /* ListsView+Export.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4214910379FF69F2EC530EF /* ListsView+Export.swift */; };
-		C7FDB21508B3D003F05F7029 /* FunctionHelpModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */; };
 		CB294FA1201E62383542BE8E /* FeedTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BE169952D43B0D6F3941A5 /* FeedTimelineView.swift */; };
 		CB8463BEB64EF9484278166C /* ja.json in Resources */ = {isa = PBXBuildFile; fileRef = 83B3F04F6B6A8D971735B290 /* ja.json */; };
 		CB92F8BAC45E4EDD80C3DFE2 /* RULYXApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FAFCD1F150B6EDC814E753 /* RULYXApp.swift */; };
@@ -443,7 +443,6 @@
 		C8DB2630E3CFC2DFA4B6A431 /* FollowerDiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDiffView.swift; sourceTree = "<group>"; };
 		C97F1C64A2434A71ED6D5D5E /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		C9C15F3EC6473AAFBE5DF3E8 /* ListDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailViewModel.swift; sourceTree = "<group>"; };
-		CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionHelpModifier.swift; sourceTree = "<group>"; };
 		CC6C6354A3B0AAD68494A616 /* SkeletonRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonRow.swift; sourceTree = "<group>"; };
 		CC9175EDE69D7111DF25CC02 /* PreviewBlueskyClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewBlueskyClient.swift; sourceTree = "<group>"; };
 		CCEF8AED13F2B79D85FD49B9 /* BlueskyAPIDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPIDTOs.swift; sourceTree = "<group>"; };
@@ -452,8 +451,9 @@
 		D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileViewModel.swift; sourceTree = "<group>"; };
 		D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
 		D19F8289064A8E2ED734F301 /* AccountSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSummaryCard.swift; sourceTree = "<group>"; };
-		D258AE6157132481DC5BCF92 /* RULYX.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RULYX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D258AE6157132481DC5BCF92 /* RULYX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RULYX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2AA2C4EF26C742918C3B0D4 /* AnalyticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsStore.swift; sourceTree = "<group>"; };
+		D39841C5A6B9321BBA15AC75 /* BatchOperationProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchOperationProgressView.swift; sourceTree = "<group>"; };
 		D4214910379FF69F2EC530EF /* ListsView+Export.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsView+Export.swift"; sourceTree = "<group>"; };
 		D444B3DE1BA8C8E335576B00 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		D495EFD4FEF70FB5C0D7BA2B /* String+CSV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+CSV.swift"; sourceTree = "<group>"; };
@@ -485,7 +485,7 @@
 		F94186D084104DD1FB229672 /* BlueskySessionService401RetryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskySessionService401RetryTests.swift; sourceTree = "<group>"; };
 		FA2AD2BB8C1CC0559D0272C9 /* ListTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTemplatesView.swift; sourceTree = "<group>"; };
 		FA90BEDAA32D87A0E65875AC /* LiveBlueskyClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBlueskyClientTests.swift; sourceTree = "<group>"; };
-		FFDF59404421F648A8D1C3E6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FFDF59404421F648A8D1C3E6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -760,7 +760,6 @@
 				7E73015FFF0E908DAB113970 /* BlueskyActorRow.swift */,
 				58E92F175C3C35100F674497 /* ClearskyBanner.swift */,
 				4F9ACE422B7A3A392487CBA6 /* DirectionalSymbol.swift */,
-				CBE65E8404BD927B101C6921 /* FunctionHelpModifier.swift */,
 				7A5D7000E53B53FE6C003496 /* GIFPickerView.swift */,
 				0BA4021225B9BDA8F1BED731 /* ImageCarouselView.swift */,
 				02B51EB3F99EB2D9290D1B37 /* InlineAnimatedMediaView.swift */,
@@ -839,6 +838,7 @@
 			isa = PBXGroup;
 			children = (
 				F28D489A23353FE7D98E312B /* ActionPresetsView.swift */,
+				D39841C5A6B9321BBA15AC75 /* BatchOperationProgressView.swift */,
 				EB7FA070494DC5485DFB0CCC /* BlueskyProfileView.swift */,
 				D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */,
 				17BA3ED2DF94DACF5746B95F /* ClearskyListsView.swift */,
@@ -1008,9 +1008,6 @@
 						DevelopmentTeam = "";
 						TestTargetID = CEBD426283199691B9AB7DA5;
 					};
-					CEBD426283199691B9AB7DA5 = {
-						DevelopmentTeam = "";
-					};
 				};
 			};
 			buildConfigurationList = 7D40D386051E0F313261A0FA /* Build configuration list for PBXProject "RULYX" */;
@@ -1161,6 +1158,7 @@
 				CECD7D5F34215B77043259BF /* AppLockManager.swift in Sources */,
 				30C6532847608A3368F1EF6D /* AppLogger.swift in Sources */,
 				9217A5F7547405EA07F09316 /* AppStyling.swift in Sources */,
+				662CF490E3F4D0904B192384 /* BatchOperationProgressView.swift in Sources */,
 				6509B9F31479FBE5F089B659 /* BlueskyAPIDTOs.swift in Sources */,
 				65951C3773F1703732A7EE8B /* BlueskyAPIError.swift in Sources */,
 				9AE16400D0C01E972ABC495E /* BlueskyActor.swift in Sources */,
@@ -1208,7 +1206,6 @@
 				CB294FA1201E62383542BE8E /* FeedTimelineView.swift in Sources */,
 				747F69785535C00DE735B82B /* FeedTimelineViewModel.swift in Sources */,
 				26EA41B91FE55BBC34A30219 /* FollowerDiffView.swift in Sources */,
-				C7FDB21508B3D003F05F7029 /* FunctionHelpModifier.swift in Sources */,
 				47CB701956751D8A606925EE /* GIFPickerView.swift in Sources */,
 				3DB486679FEFC46E16A11AE7 /* GIFService.swift in Sources */,
 				2951ED986F755DF6DEB781C6 /* GlassSupport.swift in Sources */,
@@ -1440,7 +1437,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 55;
+				DEVELOPMENT_TEAM = 4PC9Z56E47;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1458,7 +1456,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 55;
+				DEVELOPMENT_TEAM = 4PC9Z56E47;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
