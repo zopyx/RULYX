@@ -31,23 +31,6 @@ struct NotificationTab: View {
             }
             .navigationTitle(loc("notifications.title"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if !viewModel.entries.isEmpty {
-                        Button {
-                            guard let account = accountStore.activeAccount,
-                                  let appPassword = accountStore.appPassword(for: account)
-                            else { return }
-                            Task { await viewModel.markAllRead(account: account, appPassword: appPassword, using: blueskyClient) }
-                        } label: {
-                            Text(loc: "notifications.mark_read")
-                                .font(.subheadline)
-                        }
-                        .disabled(viewModel.unreadCount == 0)
-                        .accessibilityHint(loc("notifications.mark_read.hint"))
-                    }
-                }
-            }
             .sheet(item: $selectedActor) { actor in
                 NavigationStack {
                     BlueskyProfileView(
@@ -142,6 +125,7 @@ struct NotificationTab: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
         else { return }
+        await viewModel.markAllRead(account: account, appPassword: appPassword, using: blueskyClient)
         await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
         await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: blueskyClient)
     }
