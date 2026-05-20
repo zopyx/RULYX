@@ -33,6 +33,17 @@ struct BlueskyProfileView: View {
     @State private var showOwnedLists = false
     @State private var reportReasonText = ""
     @State private var unblockedBlockersCount: Int?
+    @State private var searchAccount: AppAccount?
+
+    private var preferredSearchAccount: AppAccount? {
+        if let prefID = accountStore.preferredSearchAccountID,
+           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+        {
+            prefAccount
+        } else {
+            accountStore.activeAccount
+        }
+    }
 
     enum BlockedAccessType: String, Identifiable {
         case posts
@@ -206,7 +217,19 @@ struct BlueskyProfileView: View {
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     private func content(account: AppAccount, appPassword: String) -> some View {
-        List {
+        let dataAccount: AppAccount
+        let dataPassword: String
+        if let prefID = accountStore.preferredSearchAccountID,
+           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }),
+           let pwd = accountStore.appPassword(for: prefAccount)
+        {
+            dataAccount = prefAccount
+            dataPassword = pwd
+        } else {
+            dataAccount = account
+            dataPassword = appPassword
+        }
+        return List {
             if let profile = viewModel.profile {
                 Section {
                     VStack(alignment: .leading, spacing: 16) {
@@ -425,7 +448,7 @@ struct BlueskyProfileView: View {
                                 .foregroundStyle(.secondary)
                         }
                     } header: {
-                                Text(loc: "profile.moderation_section")
+                        Text(loc: "profile.moderation_section")
                     }
                 }
 
@@ -689,8 +712,8 @@ struct BlueskyProfileView: View {
                     startLoadTask {
                         await viewModel.load(
                             did: member.actor.did,
-                            account: account,
-                            appPassword: appPassword,
+                            account: dataAccount,
+                            appPassword: dataPassword,
                             using: blueskyClient
                         )
                     }
@@ -702,8 +725,8 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.load(
                     did: member.actor.did,
-                    account: account,
-                    appPassword: appPassword,
+                    account: dataAccount,
+                    appPassword: dataPassword,
                     using: blueskyClient
                 )
             }
@@ -712,8 +735,8 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.loadIfNeeded(
                     did: member.actor.did,
-                    account: account,
-                    appPassword: appPassword,
+                    account: dataAccount,
+                    appPassword: dataPassword,
                     using: blueskyClient
                 )
             }
@@ -724,11 +747,17 @@ struct BlueskyProfileView: View {
             exportTask?.cancel()
         }
         .task(id: viewModel.profile?.did) {
+            searchAccount = preferredSearchAccount
             async let blocks = fetchBlockCounts()
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
                 async let lists = viewModel.fetchClearskyLists(handle: handle, using: blueskyClient)
-                async let owned = viewModel.fetchOwnedLists(did: did, account: account, appPassword: appPassword, using: blueskyClient)
-                _ = await (blocks, lists, owned)
+                if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
+                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: blueskyClient)
+
+                    _ = await (blocks, lists, owned)
+                } else {
+                    _ = await (blocks, lists)
+                }
             } else {
                 await blocks
             }

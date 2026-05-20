@@ -13,6 +13,7 @@ struct MediaBrowserView: View {
     @State private var selectedDownloadFolder: URL?
     @State private var previewItem: MediaItem?
     @State private var initialLoadTask: Task<Void, Never>?
+    @State private var searchAccount: AppAccount?
     @State private var loadMoreTask: Task<Void, Never>?
     @State private var downloadTask: Task<Void, Never>?
 
@@ -206,6 +207,7 @@ struct MediaBrowserView: View {
                 }
             }
             .task {
+                resolveSearchAccount()
                 await loadInitial()
             }
             .onDisappear {
@@ -327,10 +329,20 @@ struct MediaBrowserView: View {
         item.ageText
     }
 
+    private func resolveSearchAccount() {
+        if let prefID = accountStore.preferredSearchAccountID,
+           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+        {
+            searchAccount = prefAccount
+        } else {
+            searchAccount = accountStore.activeAccount
+        }
+    }
+
     private func loadInitial() async {
         initialLoadTask?.cancel()
         loadMoreTask?.cancel()
-        guard let account = accountStore.activeAccount,
+        guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         let task = Task {
             await viewModel.load(account: account, appPassword: appPassword, using: blueskyClient)
@@ -340,7 +352,7 @@ struct MediaBrowserView: View {
     }
 
     private func loadMore() async {
-        guard let account = accountStore.activeAccount,
+        guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
@@ -352,7 +364,7 @@ struct MediaBrowserView: View {
     }
 
     private func refresh() async {
-        guard accountStore.activeAccount != nil else { return }
+        guard searchAccount != nil || accountStore.activeAccount != nil else { return }
         await loadInitial()
     }
 

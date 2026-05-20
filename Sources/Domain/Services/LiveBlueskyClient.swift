@@ -708,24 +708,33 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
         try guardClearskyAvailable()
-        let urlString = "https://api.clearsky.app/csky/api/v1/get-list/\(handle)?identifier="
-        AppLogger.performance.debug("Fetching Clearsky lists from: \(urlString, privacy: .public)")
-        guard var components = URLComponents(string: urlString) else { throw BlueskyAPIError.invalidURL }
-        if components.queryItems == nil { components.queryItems = [] }
-        components.queryItems?.append(URLQueryItem(name: "identifier", value: ""))
-        guard let url = components.url else { throw BlueskyAPIError.invalidURL }
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.timeoutInterval = 30
-        let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists")
-        guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            if let body = String(data: data, encoding: .utf8) {
-                AppLogger.performance.error("Clearsky lists API returned \(httpResponse.statusCode): \(body, privacy: .public)")
+        var allLists: [ClearskyListEntry] = []
+        var page = 1
+        repeat {
+            let urlString = page == 1
+                ? "https://api.clearsky.app/csky/api/v1/get-list/\(handle)"
+                : "https://api.clearsky.app/csky/api/v1/get-list/\(handle)/\(page)"
+            AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(urlString, privacy: .public)")
+            guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+            var request = URLRequest(url: url)
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.timeoutInterval = 30
+            let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                if page == 1 {
+                    if let body = String(data: data, encoding: .utf8) {
+                        AppLogger.performance.error("Clearsky lists API returned \(httpResponse.statusCode): \(body, privacy: .public)")
+                    }
+                    throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
+                }
+                break
             }
-            throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
-        }
-        let decoded = try JSONDecoder().decode(ClearskyListsResponse.self, from: data)
-        return decoded.data.lists
+            let decoded = try JSONDecoder().decode(ClearskyListsResponse.self, from: data)
+            allLists += decoded.data.lists
+            if decoded.data.lists.count < 100 { break }
+            page += 1
+        } while true
+        return allLists
     }
 
     // MARK: - DID Resolution & PLC Audit
