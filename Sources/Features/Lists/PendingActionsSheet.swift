@@ -76,7 +76,7 @@ struct PendingActionsSheet: View {
                 }
             }
             .navigationTitle(Text(loc: "pending.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("pending.done_button") { isPresented = false }

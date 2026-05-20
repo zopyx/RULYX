@@ -18,7 +18,7 @@
       "th",
       "vi"
     ],
-    "total_keys": 1050,
+    "total_keys": 1052,
     "total_languages": 16,
     "untranslated_total": 1
   },
@@ -42044,6 +42044,69 @@
         "untranslated": false
       }
     },
+    "post.add_likers.check_progress": {
+      "en": "Checked {done} of {total}",
+      "de": {
+        "text": "{done} von {total} geprüft",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "{done} sur {total} vérifiés",
+        "untranslated": false
+      },
+      "it": {
+        "text": "{done} di {total} verificati",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "{total}件中{done}件確認済み",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "已检查 {done}，共 {total}",
+        "untranslated": false
+      },
+      "es": {
+        "text": "{done} de {total} verificados",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "{done} de {total} verificados",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "{total}개 중 {done}개 확인됨",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Проверено {done} из {total}",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تم التحقق من {done} من أصل {total}",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "{done} van {total} gecontroleerd",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Sprawdzono {done} z {total}",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "{done}/{total} kontrol edildi",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ตรวจสอบแล้ว {done} จาก {total}",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đã kiểm tra {done} trên {total}",
+        "untranslated": false
+      }
+    },
     "post.add_likers.choose_list_title": {
       "en": "Add {count} accounts to a list",
       "de": {
@@ -42671,6 +42734,69 @@
       },
       "vi": {
         "text": "Chặn tài khoản...",
+        "untranslated": false
+      }
+    },
+    "post.block_likers.check_progress": {
+      "en": "Checked {done} of {total}",
+      "de": {
+        "text": "{done} von {total} geprüft",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "{done} sur {total} vérifiés",
+        "untranslated": false
+      },
+      "it": {
+        "text": "{done} di {total} verificati",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "{total}件中{done}件確認済み",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "已检查 {done}，共 {total}",
+        "untranslated": false
+      },
+      "es": {
+        "text": "{done} de {total} verificados",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "{done} de {total} verificados",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "{total}개 중 {done}개 확인됨",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Проверено {done} из {total}",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تم التحقق من {done} من أصل {total}",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "{done} van {total} gecontroleerd",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Sprawdzono {done} z {total}",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "{done}/{total} kontrol edildi",
+        "untranslated": false
+      },
+      "th": {
+        "text": "ตรวจสอบแล้ว {done} จาก {total}",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đã kiểm tra {done} trên {total}",
         "untranslated": false
       }
     },

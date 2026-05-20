@@ -176,7 +176,7 @@ struct ComposePostView: View {
                 }
             }
             .navigationTitle(replyTo != nil ? loc("compose.reply_title") : (quote != nil ? loc("compose.quote_title") : loc("compose.title")))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("actions.cancel") { dismiss() }

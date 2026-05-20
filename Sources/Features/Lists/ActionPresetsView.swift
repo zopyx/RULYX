@@ -94,7 +94,7 @@ struct EditActionPresetView: View {
                 }
             }
             .navigationTitle(loc("presets.new_title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("actions.cancel") { dismiss() }.accessibilityHint(loc("action_preset.discard.hint")) }
                 ToolbarItem(placement: .confirmationAction) {

@@ -78,7 +78,7 @@ struct AddAccountView: View {
                 }
             }
             .navigationTitle(Text(loc: "account.add.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("account.add.cancel") {

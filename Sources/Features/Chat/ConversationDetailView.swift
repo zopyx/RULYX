@@ -58,7 +58,7 @@ struct ConversationDetailView: View {
 
             sendBar
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         .task {
             chatStore.setVisibleConversation(conversation.id)
             await chatStore.loadMessages(convoId: conversation.id)

@@ -53,7 +53,7 @@ struct ListDetailView: View {
     var body: some View {
         rootContent
             .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar(content: toolbarContent)
             .sheet(isPresented: $importState.isShowingEditSheet) {
                 if let account = accountStore.activeAccount,

@@ -49,7 +49,7 @@ struct NewConversationSheet: View {
                 }
             }
             .navigationTitle(loc("chat.new.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("actions.cancel") {
