@@ -90,15 +90,10 @@ struct FeedPickerView: View {
                 }
             }
             .navigationTitle(loc("timeline.picker_title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(loc("actions.close"))
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
                 }
             }
         }

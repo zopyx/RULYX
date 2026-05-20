@@ -215,7 +215,7 @@ struct HelpInfoButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "info.circle.fill")
-                .font(.subheadline)
+                .font(.body)
                 .foregroundStyle(Color.skyPrimary)
                 .symbolRenderingMode(.hierarchical)
         }
@@ -224,12 +224,17 @@ struct HelpInfoButton: View {
     }
 }
 
-struct InfoSheetDismissButton: View {
+struct ToolbarCloseButton: View {
     @Environment(\.dismiss) private var dismiss
+    let action: (() -> Void)?
+
+    init(action: (() -> Void)? = nil) {
+        self.action = action
+    }
 
     var body: some View {
         Button {
-            dismiss()
+            action?() ?? dismiss()
         } label: {
             Image(systemName: "xmark.circle.fill")
                 .foregroundStyle(.secondary)
@@ -346,7 +351,7 @@ struct SimplifiedReportSheet: View {
                 }
             }
             .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(loc("actions.cancel"), action: onCancel)

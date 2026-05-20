@@ -53,15 +53,10 @@ struct UserSearchSheet: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle(loc("usersearch.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(loc("actions.close"))
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
                 }
             }
         }

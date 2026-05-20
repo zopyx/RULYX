@@ -41,18 +41,12 @@ struct FeedTimelineView: View {
                 }
             }
             .navigationTitle(loc("timeline.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { showNewPostComposer = true } label: {
                         Image(systemName: "square.and.pencil")
                     }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { Task { await refresh() } } label: {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .keyboardShortcut("r", modifiers: .command)
                 }
             }
             .sheet(item: $selectedPostURI) { uri in
@@ -125,13 +119,8 @@ struct FeedTimelineView: View {
                         list: nil
                     )
                     .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button { profileToShow = nil } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title3)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .accessibilityLabel(loc("actions.close"))
+                        ToolbarItem(placement: .topBarTrailing) {
+                            ToolbarCloseButton(action: { profileToShow = nil })
                         }
                     }
                     .environmentObject(accountStore)

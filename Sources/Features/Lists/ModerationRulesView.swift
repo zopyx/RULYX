@@ -8,29 +8,29 @@ struct ModerationRulesView: View {
     var body: some View {
         List {
             if store.rules.isEmpty {
-                ContentUnavailableView("rules.no_rules", systemImage: "wand.and.rays", description: Text("rules.no_rules_desc"))
+                ContentUnavailableView(loc("rules.no_rules"), systemImage: "wand.and.rays", description: Text(loc("rules.no_rules_desc")))
             }
             ForEach(store.rules) { rule in
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(rule.name).font(.headline)
-                        Text(String(localized: "rules.rule_format").replacingOccurrences(of: "{trigger}", with: triggerLocalized(rule.trigger)).replacingOccurrences(of: "{action}", with: actionLocalized(rule.action))).font(.caption).foregroundStyle(.secondary)
+                        Text(loc("rules.rule_format").replacingOccurrences(of: "{trigger}", with: triggerLocalized(rule.trigger)).replacingOccurrences(of: "{action}", with: actionLocalized(rule.action))).font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle("", isOn: Binding(get: { rule.isEnabled }, set: { _ in store.toggle(rule) }))
                         .labelsHidden()
-                        .accessibilityHint(rule.isEnabled ? String(localized: "moderation_rule.disable.hint") : String(localized: "moderation_rule.enable.hint"))
+                        .accessibilityHint(rule.isEnabled ? loc("moderation_rule.disable.hint") : loc("moderation_rule.enable.hint"))
                 }
                 .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) { store.delete(rule) } label: { Label("actions.delete", systemImage: "trash") }
-                        .accessibilityHint("moderation_rule.delete.hint")
+                    Button(role: .destructive) { store.delete(rule) } label: { Label(loc("actions.delete"), systemImage: "trash") }
+                        .accessibilityHint(loc("moderation_rule.delete.hint"))
                 }
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("rules.title")
+        .navigationTitle(loc("rules.title"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { Button { isCreating = true } label: { Image(systemName: "plus") }.accessibilityLabel("rules.new_title").accessibilityHint("moderation_rule.create.hint") }
+            ToolbarItem(placement: .topBarTrailing) { Button { isCreating = true } label: { Image(systemName: "plus") }.accessibilityLabel(loc("rules.new_title")).accessibilityHint(loc("moderation_rule.create.hint")) }
         }
         .sheet(isPresented: $isCreating) { EditRuleView(store: store) }
     }
@@ -39,21 +39,21 @@ struct ModerationRulesView: View {
 @MainActor
 private func triggerLocalized(_ trigger: ModerationRule.Trigger) -> String {
     switch trigger {
-    case .accountYoungerThan: String(localized: "rules.trigger.account_younger_than")
-    case .followerCountBelow: String(localized: "rules.trigger.follower_count_below")
-    case .followerCountAbove: String(localized: "rules.trigger.follower_count_above")
-    case .handleContains: String(localized: "rules.trigger.handle_contains")
-    case .hasLabel: String(localized: "rules.trigger.has_label")
+    case .accountYoungerThan: loc("rules.trigger.account_younger_than")
+    case .followerCountBelow: loc("rules.trigger.follower_count_below")
+    case .followerCountAbove: loc("rules.trigger.follower_count_above")
+    case .handleContains: loc("rules.trigger.handle_contains")
+    case .hasLabel: loc("rules.trigger.has_label")
     }
 }
 
 @MainActor
 private func actionLocalized(_ action: ModerationRule.Action) -> String {
     switch action {
-    case .addToModList: String(localized: "rules.action.add_to_mod_list")
-    case .block: String(localized: "rules.action.block")
-    case .mute: String(localized: "rules.action.mute")
-    case .report: String(localized: "rules.action.report")
+    case .addToModList: loc("rules.action.add_to_mod_list")
+    case .block: loc("rules.action.block")
+    case .mute: loc("rules.action.mute")
+    case .report: loc("rules.action.report")
     }
 }
 
@@ -81,17 +81,16 @@ private struct EditRuleView: View {
                 }
                 .accessibilityHint("moderation_rule.action.hint")
             }
-            .navigationTitle("rules.new_title")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(loc("rules.new_title"))
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("actions.cancel") { dismiss() }.accessibilityHint("moderation_rule.discard.hint") }
+                ToolbarItem(placement: .cancellationAction) { Button(loc("actions.cancel")) { dismiss() }.accessibilityHint(loc("moderation_rule.discard.hint")) }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("actions.save") {
+                    Button(loc("actions.save")) {
                         store.save(ModerationRule(name: name, trigger: trigger, triggerValue: triggerValue, action: action))
                         dismiss()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityHint("moderation_rule.save.hint")
+                    .accessibilityHint(loc("moderation_rule.save.hint"))
                 }
             }
         }

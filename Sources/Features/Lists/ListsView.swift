@@ -255,19 +255,6 @@ struct ListsView: View {
                     .disabled(accountStore.activeAccount == nil)
                 }
 
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await reload() }
-                    } label: {
-                        if viewModel.isRefreshing {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                    }
-                    .accessibilityLabel(loc("lists.refresh.label"))
-                    .disabled(accountStore.activeAccount == nil || viewModel.isRefreshing)
-                }
             }
             .sheet(isPresented: $presentationState.isShowingAccountPicker) {
                 AccountSwitcherSheet(isPresented: $presentationState.isShowingAccountPicker)
@@ -419,10 +406,10 @@ struct ListsView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    InfoSheetDismissButton()
+                    ToolbarCloseButton()
                 }
             }
         }

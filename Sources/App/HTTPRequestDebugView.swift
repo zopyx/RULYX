@@ -72,15 +72,8 @@ struct HTTPRequestDebugView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
-                .accessibilityLabel(loc("actions.close"))
+            ToolbarItem(placement: .topBarTrailing) {
+                ToolbarCloseButton()
             }
         }
     }
@@ -143,17 +136,10 @@ private struct HTTPRequestDebugErrorResponseView: View {
                 .textSelection(.enabled)
         }
         .navigationTitle(entry.url)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
-                .accessibilityLabel(loc("actions.close"))
+                ToolbarCloseButton()
             }
         }
     }

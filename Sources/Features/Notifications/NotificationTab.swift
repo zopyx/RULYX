@@ -30,7 +30,7 @@ struct NotificationTab: View {
                 }
             }
             .navigationTitle(loc("notifications.title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .sheet(item: $selectedActor) { actor in
                 NavigationStack {
                     BlueskyProfileView(
@@ -41,13 +41,8 @@ struct NotificationTab: View {
                         list: nil
                     )
                     .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button { selectedActor = nil } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title3)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .accessibilityLabel(loc("actions.close"))
+                        ToolbarItem(placement: .topBarTrailing) {
+                            ToolbarCloseButton(action: { selectedActor = nil })
                         }
                     }
                 }
