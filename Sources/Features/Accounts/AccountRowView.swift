@@ -63,7 +63,7 @@ struct AccountRowView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.caption)
-                    Text("account.active")
+                    Text(loc: "account.active")
                         .font(.caption.weight(.semibold))
                 }
                 .padding(.horizontal, 10)

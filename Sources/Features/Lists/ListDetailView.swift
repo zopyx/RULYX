@@ -21,6 +21,7 @@ struct ListDetailView: View {
     @State private var isExporting = false
     @State private var exportProgressMessage: String?
     @State private var exportProgressFraction: Double?
+    @State private var showExportCompleteToast = false
     @State private var ownerActor: BlueskyActor?
     @State private var isSubscribing = false
     @State private var subscriptionRecordURI: String?
@@ -85,7 +86,7 @@ struct ListDetailView: View {
                    let appPassword = accountStore.appPassword(for: account)
                 {
                     SimplifiedReportSheet(
-                        title: String(localized: "actions.report"),
+                        title: loc("actions.report"),
                         selectedReason: $selectedReportReason,
                         evidenceText: $reportEvidenceText,
                         isSubmitting: isReportingList,
@@ -118,23 +119,23 @@ struct ListDetailView: View {
                     ShareSheet(activityItems: [url])
                 }
             }
-            .alert("list.detail.alert_title", isPresented: .constant(viewModel.errorMessage != nil), actions: {
+            .alert(Text(loc: "list.detail.alert_title"), isPresented: .constant(viewModel.errorMessage != nil), actions: {
                 Button("actions.ok") {
                     viewModel.errorMessage = nil
                 }
-                .accessibilityHint("list.detail.dismiss_error.hint")
-                .accessibilityInputLabels(["actions.ok"])
+                .accessibilityHint(loc("list.detail.dismiss_error.hint"))
+                .accessibilityInputLabels([loc("actions.ok")])
             }, message: {
                 Text(viewModel.errorMessage ?? "")
             })
             .alert(
-                viewModel.bulkActionResult?.operation.title ?? String(localized: "list.detail.bulk_update"),
+                viewModel.bulkActionResult?.operation.title ?? loc("list.detail.bulk_update"),
                 isPresented: bulkResultPresentedBinding
             ) {
                 Button("actions.ok") {
                     viewModel.bulkActionResult = nil
                 }
-                .accessibilityHint("list.detail.dismiss_bulk.hint")
+                .accessibilityHint(loc("list.detail.dismiss_bulk.hint"))
 
                 if let account = accountStore.activeAccount,
                    let appPassword = accountStore.appPassword(for: account),
@@ -154,7 +155,7 @@ struct ListDetailView: View {
                             syncSnapshot()
                         }
                     }
-                    .accessibilityHint("list.detail.retry_failed.hint")
+                    .accessibilityHint(loc("list.detail.retry_failed.hint"))
                 }
             } message: {
                 if let result = viewModel.bulkActionResult {
@@ -162,11 +163,11 @@ struct ListDetailView: View {
                 }
             }
             .confirmationDialog(
-                String(localized: "list.detail.delete_confirm"),
+                Text(loc: "list.detail.delete_confirm"),
                 isPresented: $isShowingDeleteConfirmation,
                 titleVisibility: .visible
             ) {
-                Button(String(localized: "actions.delete"), role: .destructive) {
+                Button(loc("actions.delete"), role: .destructive) {
                     if let account = accountStore.activeAccount,
                        let appPassword = accountStore.appPassword(for: account)
                     {
@@ -185,13 +186,13 @@ struct ListDetailView: View {
                         }
                     }
                 }
-                .accessibilityHint("list.detail.delete_list.hint")
-                .accessibilityInputLabels(["actions.delete"])
-                Button(String(localized: "actions.cancel"), role: .cancel) {}
-                    .accessibilityHint("list.detail.cancel_delete.hint")
-                    .accessibilityInputLabels(["actions.cancel"])
+                .accessibilityHint(loc("list.detail.delete_list.hint"))
+                .accessibilityInputLabels([loc("actions.delete")])
+                Button(loc("actions.cancel"), role: .cancel) {}
+                    .accessibilityHint(loc("list.detail.cancel_delete.hint"))
+                    .accessibilityInputLabels([loc("actions.cancel")])
             } message: {
-                Text("list.detail.delete_message")
+                Text(loc: "list.detail.delete_message")
             }
             .onChange(of: viewModel.bulkActionResult) { _, newResult in
                 guard let newResult else { return }
@@ -213,9 +214,9 @@ struct ListDetailView: View {
                 content(account: account, appPassword: appPassword)
             } else {
                 ContentUnavailableView(
-                    String(localized: "list.detail.missing_creds"),
+                    loc("list.detail.missing_creds"),
                     systemImage: "key.slash",
-                    description: Text("list.detail.missing_creds.desc")
+                    description: Text(loc: "list.detail.missing_creds.desc")
                 )
             }
         }
@@ -228,6 +229,26 @@ struct ListDetailView: View {
         .onChange(of: viewModel.comparisonReport) { _, _ in
             exportState.cachedDiffExportFileURL = nil
         }
+        .overlay(alignment: .bottom) {
+            if showExportCompleteToast {
+                Text(loc: "list.export.complete")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(Capsule().fill(Color.green))
+                    .padding(.bottom, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .onAppear {
+                        Task {
+                            try? await Task.sleep(for: .seconds(2))
+                            withAnimation(.easeOut(duration: 0.3)) {
+                                showExportCompleteToast = false
+                            }
+                        }
+                    }
+            }
+        }
     }
 
     @ToolbarContentBuilder
@@ -237,18 +258,18 @@ struct ListDetailView: View {
                 Button(role: .destructive) {
                     isShowingDeleteConfirmation = true
                 } label: {
-                    Label { Text("list.detail.delete") } icon: { Image(systemName: "trash") }
+                    Label { Text(loc: "list.detail.delete") } icon: { Image(systemName: "trash") }
                 }
-                .accessibilityHint("list.detail.delete_list.hint")
+                .accessibilityHint(loc("list.detail.delete_list.hint"))
             }
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     importState.isShowingEditSheet = true
                 } label: {
-                    Label { Text("list.detail.edit") } icon: { Image(systemName: "pencil") }
+                    Label { Text(loc: "list.detail.edit") } icon: { Image(systemName: "pencil") }
                 }
-                .accessibilityHint("list.detail.edit_list.hint")
+                .accessibilityHint(loc("list.detail.edit_list.hint"))
             }
         }
 
@@ -259,28 +280,28 @@ struct ListDetailView: View {
                         isExporting = true
                         Task { await exportList(format: .csv) }
                     } label: {
-                        Label { Text("list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text(loc: "list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
                     }
 
                     Button {
                         isExporting = true
                         Task { await exportList(format: .json) }
                     } label: {
-                        Label { Text("list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text(loc: "list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
                     }
 
                     Button {
                         isExporting = true
                         Task { await exportList(format: .xlsx) }
                     } label: {
-                        Label { Text("list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text(loc: "list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
                     }
 
                     Button {
                         isExporting = true
                         Task { await exportList(format: .ods) }
                     } label: {
-                        Label { Text("list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
+                        Label { Text(loc: "list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
                     }
                 } label: {
                     if isExporting {
@@ -327,7 +348,7 @@ struct ListDetailView: View {
                 Task {
                     await viewModel.prepareImportPreview(
                         from: rawInput,
-                        sourceDescription: String(localized: "list.import.pasted_input"),
+                        sourceDescription: loc("list.import.pasted_input"),
                         account: account,
                         appPassword: appPassword,
                         using: blueskyClient
@@ -424,7 +445,7 @@ struct ListDetailView: View {
             Section {
                 LabeledContent("list.detail.members", value: "\(currentList.memberCount ?? viewModel.members.count)")
             } header: {
-                Text("list.detail.stats_section")
+                Text(loc: "list.detail.stats_section")
             }
         }
         .listStyle(.insetGrouped)
@@ -518,6 +539,10 @@ struct ListDetailView: View {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(sanitizedName)-full-export.\(format.rawValue)")
 
+        // Export strategy: CSV writes row-by-row via FileHandle (streaming).
+        // JSON and spreadsheet formats build the entire payload in memory; for
+        // typical list sizes (<10K members) this is negligible, so no streaming
+        // complexity is warranted.
         switch format {
         case .csv:
             let header = "handle,did,display_name,followers,following,posts,description"
@@ -593,6 +618,7 @@ struct ListDetailView: View {
         isExporting = false
         exportProgressMessage = nil
         shareFileURL = url
+        showExportCompleteToast = true
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
@@ -682,6 +708,31 @@ extension ListDetailView {
     }
 }
 
+// MARK: - State structs (consolidated from ListDetailView+State.swift)
+
+extension ListDetailView {
+    /// Groups export-related state into a single struct.
+    struct ExportState {
+        var cachedExportFileURL: URL?
+        var cachedDiffExportFileURL: URL?
+    }
+
+    /// Groups list-comparison and snapshot-related state into a single struct.
+    struct ComparisonState {
+        var selectedComparisonListID = ""
+        var snapshotSummary: ListMembershipSnapshotSummary?
+        var selectedNewerSnapshotID: UUID?
+        var selectedOlderSnapshotID: UUID?
+    }
+
+    /// Groups sheet-presentation state for import/edit operations into a single struct.
+    struct ImportState {
+        var isShowingEditSheet = false
+        var isShowingImportSheet = false
+        var isShowingImportFilePicker = false
+    }
+}
+
 extension ListDetailView {
     struct BatchProgressSection: View {
         @ObservedObject var batchState: ListBatchProgressState
@@ -698,7 +749,7 @@ extension ListDetailView {
                         onCancel: { batchState.cancelBatch() }
                     )
                 } header: {
-                    Text("list.detail.bulk_operation")
+                    Text(loc: "list.detail.bulk_operation")
                 }
             }
         }

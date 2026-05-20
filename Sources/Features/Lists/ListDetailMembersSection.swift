@@ -27,7 +27,7 @@ extension ListDetailView {
                 TextField("list.members.filter_placeholder", text: $memberSearchQuery)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .accessibilityLabel("list.members.filter.label")
+                    .accessibilityLabel(loc("list.members.filter.label"))
                     .focused($memberFilterFocused)
 
                 if !viewModel.members.isEmpty {
@@ -37,19 +37,19 @@ extension ListDetailView {
                 }
 
                 if !memberSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text(verbatim: String(localized: "list.members.matching").replacingOccurrences(of: "{count}", with: "\(viewModel.filteredMembers.count)"))
+                    Text(verbatim: loc("list.members.matching").replacingOccurrences(of: "{count}", with: "\(viewModel.filteredMembers.count)"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             } header: {
-                Text("list.members.find")
+                Text(loc: "list.members.find")
             }
         }
 
         private var membersSection: some View {
             Section {
                 if viewModel.isLoadingMembers, viewModel.members.isEmpty {
-                    LoadingPanel(message: String(localized: "list.members.loading"))
+                    LoadingPanel(message: loc("list.members.loading"))
                 } else if let errorMsg = viewModel.membersErrorMessage, viewModel.members.isEmpty {
                     ErrorRetryBanner(message: errorMsg) {
                         Task {
@@ -63,13 +63,13 @@ extension ListDetailView {
                     }
                 } else if viewModel.members.isEmpty {
                     EmptyStatePanel(
-                        title: String(localized: "list.members.no_members"),
-                        message: String(localized: "list.members.no_members_desc")
+                        title: loc("list.members.no_members"),
+                        message: loc("list.members.no_members_desc")
                     )
                 } else if viewModel.filteredMembers.isEmpty {
                     EmptyStatePanel(
-                        title: String(localized: "list.members.no_matches"),
-                        message: String(localized: "list.members.no_matches_desc")
+                        title: loc("list.members.no_matches"),
+                        message: loc("list.members.no_matches_desc")
                     )
                 } else {
                     ForEach(viewModel.filteredMembers) { member in
@@ -90,17 +90,17 @@ extension ListDetailView {
                                     syncSnapshot()
                                 }
                             } label: {
-                                Label { Text("actions.remove") } icon: { Image(systemName: "person.crop.circle.badge.minus") }
+                                Label { Text(loc: "actions.remove") } icon: { Image(systemName: "person.crop.circle.badge.minus") }
                             }
                             .disabled(viewModel.isRemoving(member) || batchState.isPerformingBulkAction)
-                            .accessibilityHint("list.members.remove.hint")
+                            .accessibilityHint(loc("list.members.remove.hint"))
                         }
                     }
 
                     if viewModel.isLoadingMoreMembers {
                         HStack {
                             ProgressView()
-                            Text("list.members.loading_more")
+                            Text(loc: "list.members.loading_more")
                                 .foregroundStyle(.secondary)
                         }
                     } else if viewModel.hasMoreMembers {
@@ -115,12 +115,12 @@ extension ListDetailView {
                                 )
                             }
                         }
-                        .accessibilityLabel("list.members.load_more.label")
-                        .accessibilityHint("list.members.load_more.hint")
+                        .accessibilityLabel(loc("list.members.load_more.label"))
+                        .accessibilityHint(loc("list.members.load_more.hint"))
                     }
                 }
             } header: {
-                Text("list.members.title")
+                Text(loc: "list.members.title")
             }
         }
     }

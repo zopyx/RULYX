@@ -39,32 +39,32 @@ struct UserPostsView: View {
         NavigationStack {
             Group {
                 if viewModel.isLoading, viewModel.posts.isEmpty {
-                    LoadingPanel(message: String(localized: "profile.posts.loading"))
+                    LoadingPanel(message: loc("profile.posts.loading"))
                 } else if let error = viewModel.errorMessage, viewModel.posts.isEmpty {
                     if error.localizedCaseInsensitiveContains("blocked") {
                         ContentUnavailableView(
-                            String(localized: "profile.blocked.title"),
+                            loc("profile.blocked.title"),
                             systemImage: "hand.raised.slash.fill",
-                            description: Text("profile.blocked.posts_desc")
+                            description: Text(loc: "profile.blocked.posts_desc")
                         )
                     } else {
                         ContentUnavailableView(
-                            String(localized: "list.detail.alert_title"),
+                            loc("list.detail.alert_title"),
                             systemImage: "exclamationmark.bubble",
                             description: Text(error)
                         )
                     }
                 } else if viewModel.posts.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "profile.posts.empty"),
+                        loc("profile.posts.empty"),
                         systemImage: "bubble.left",
-                        description: Text("profile.posts.empty_desc")
+                        description: Text(loc: "profile.posts.empty_desc")
                     )
                 } else {
                     listContent
                 }
             }
-            .navigationTitle(String(localized: "profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
+            .navigationTitle(loc("profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -148,14 +148,14 @@ struct UserPostsView: View {
                 .listRowSeparator(.hidden)
             }
             if !viewModel.hasMore, !viewModel.posts.isEmpty {
-                Text("profile.posts.end")
+                Text(loc: "profile.posts.end")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }
             if !viewModel.searchText.isEmpty, viewModel.sortedFilteredPosts.isEmpty {
-                Text("profile.posts.no_matches")
+                Text(loc: "profile.posts.no_matches")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -217,7 +217,7 @@ struct UserPostsView: View {
     private var dateFilterPickers: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("profile.posts.from_date")
+                Text(loc: "profile.posts.from_date")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                 DatePicker(
@@ -233,7 +233,7 @@ struct UserPostsView: View {
                 .datePickerStyle(.compact)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text("profile.posts.to_date")
+                Text(loc: "profile.posts.to_date")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                 DatePicker(
@@ -260,7 +260,7 @@ struct UserPostsView: View {
                 try? csv.write(to: url, atomically: true, encoding: .utf8)
                 shareFileURL = url
             } label: {
-                Label { Text("profile.export.csv") } icon: { Image(systemName: "arrow.down.doc") }
+                Label { Text(loc: "profile.export.csv") } icon: { Image(systemName: "arrow.down.doc") }
             }
             Button {
                 let json = viewModel.exportJSON()
@@ -268,7 +268,7 @@ struct UserPostsView: View {
                 try? json.write(to: url, options: .atomic)
                 shareFileURL = url
             } label: {
-                Label { Text("profile.export.json") } icon: { Image(systemName: "arrow.down.doc") }
+                Label { Text(loc: "profile.export.json") } icon: { Image(systemName: "arrow.down.doc") }
             }
         } label: {
             Image(systemName: "arrow.down.doc")

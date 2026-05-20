@@ -20,8 +20,8 @@ struct ProfileInspectorView: View {
                     TextField("profile.search.placeholder", text: $viewModel.query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                        .accessibilityLabel("profile.search.label")
-                        .accessibilityHint("profile.search.hint")
+                        .accessibilityLabel(loc("profile.search.label"))
+                        .accessibilityHint(loc("profile.search.hint"))
 
                     if viewModel.isSearching {
                         LoadingPanel(message: localizationManager.localized("profile.searching"))
@@ -85,8 +85,8 @@ struct ProfileInspectorView: View {
                         }
                     }
                     .disabled(viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityLabel(String(localized: "profile.save_search.label"))
-                    .accessibilityHint("profile.save_search.hint")
+                    .accessibilityLabel(loc("profile.save_search.label"))
+                    .accessibilityHint(loc("profile.save_search.hint"))
 
                     if let activeAccount = accountStore.activeAccount {
                         Text(verbatim: localizationManager.localized("profile.using_account").replacingOccurrences(of: "{handle}", with: activeAccount.handle))
@@ -188,7 +188,7 @@ struct ProfileInspectorView: View {
                                 RelationshipsView(mode: .followers, initialCount: inspection.profile.followersCount)
                             } label: {
                                 HStack {
-                                    Text("profile.stats.followers")
+                                    Text(loc: "profile.stats.followers")
                                     Spacer()
                                     Text(countText(inspection.profile.followersCount))
                                         .foregroundStyle(.secondary)
@@ -198,7 +198,7 @@ struct ProfileInspectorView: View {
                                 RelationshipsView(mode: .following, initialCount: inspection.profile.followsCount)
                             } label: {
                                 HStack {
-                                    Text("profile.stats.following")
+                                    Text(loc: "profile.stats.following")
                                     Spacer()
                                     Text(countText(inspection.profile.followsCount))
                                         .foregroundStyle(.secondary)
@@ -212,7 +212,7 @@ struct ProfileInspectorView: View {
                         LabeledContent("profile.stats.lists", value: countText(inspection.profile.listsCount))
                         LabeledContent("profile.stats.starter_packs", value: countText(inspection.profile.starterPacksCount))
                     } header: {
-                        Text("profile.stats")
+                        Text(loc: "profile.stats")
                     }
 
                     Section {
@@ -222,7 +222,7 @@ struct ProfileInspectorView: View {
                             isShowingReportSheet = true
                         } label: {
                             Label {
-                                Text("profile.report")
+                                Text(loc: "profile.report")
                             } icon: {
                                 Image(systemName: "exclamationmark.shield")
                             }
@@ -244,15 +244,15 @@ struct ProfileInspectorView: View {
                             )
                         } label: {
                             Label {
-                                Text("profile.open_controls")
+                                Text(loc: "profile.open_controls")
                             } icon: {
                                 Image(systemName: "slider.horizontal.3")
                             }
                         }
-                        .accessibilityLabel("profile.open_controls.label")
-                        .accessibilityHint("profile.open_controls.hint")
+                        .accessibilityLabel(loc("profile.open_controls.label"))
+                        .accessibilityHint(loc("profile.open_controls.hint"))
                     } header: {
-                        Text("profile.moderation_actions")
+                        Text(loc: "profile.moderation_actions")
                     }
 
                     if !inspection.profile.labels.isEmpty {
@@ -261,13 +261,13 @@ struct ProfileInspectorView: View {
                                 Text(label)
                             }
                         } header: {
-                            Text("profile.labels_section")
+                            Text(loc: "profile.labels_section")
                         }
                     }
 
                     Section {
                         if inspection.listMemberships.isEmpty {
-                            Text("profile.no_lists")
+                            Text(loc: "profile.no_lists")
                                 .foregroundStyle(.secondary)
                         } else {
                             ForEach(inspection.listMemberships) { item in
@@ -279,19 +279,19 @@ struct ProfileInspectorView: View {
                                             .foregroundStyle(.secondary)
                                     }
                                     Spacer()
-                                    Text(item.isMember ? String(localized: "profile.member_status") : String(localized: "profile.not_in_list_status"))
+                                    Text(item.isMember ? loc("profile.member_status") : loc("profile.not_in_list_status"))
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(item.isMember ? .green : .secondary)
                                 }
                             }
                         }
                     } header: {
-                        Text("profile.your_lists_section")
+                        Text(loc: "profile.your_lists_section")
                     }
 
                     Section {
                         if inspection.starterPackMemberships.isEmpty {
-                            Text("profile.no_starter_packs")
+                            Text(loc: "profile.no_starter_packs")
                                 .foregroundStyle(.secondary)
                         } else {
                             ForEach(inspection.starterPackMemberships) { item in
@@ -299,40 +299,40 @@ struct ProfileInspectorView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(item.name)
                                         if let joined = item.joinedAllTimeCount {
-                                            Text(verbatim: String(localized: "profile.joined_all_time").replacingOccurrences(of: "{count}", with: "\(joined)"))
+                                            Text(verbatim: loc("profile.joined_all_time").replacingOccurrences(of: "{count}", with: "\(joined)"))
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
                                         }
                                     }
                                     Spacer()
-                                    Text(item.isMember ? String(localized: "profile.included_status") : String(localized: "profile.not_included_status"))
+                                    Text(item.isMember ? loc("profile.included_status") : loc("profile.not_included_status"))
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(item.isMember ? .green : .secondary)
                                 }
                             }
                         }
                     } header: {
-                        Text("profile.your_starter_packs_section")
+                        Text(loc: "profile.your_starter_packs_section")
                     }
 
                     if let profileURL = inspection.profile.profileURL {
                         Section {
                             Link(destination: profileURL) {
                                 Label {
-                                    Text("profile.open_bluesky")
+                                    Text(loc: "profile.open_bluesky")
                                 } icon: {
                                     Image(systemName: "arrow.up.right.square")
                                 }
                             }
-                            .accessibilityLabel("profile.open_bluesky.label")
-                            .accessibilityHint("profile.open_bluesky.hint")
+                            .accessibilityLabel(loc("profile.open_bluesky.label"))
+                            .accessibilityHint(loc("profile.open_bluesky.hint"))
                         } header: {
-                            Text("profile.open_section")
+                            Text(loc: "profile.open_section")
                         }
                     }
                 }
             }
-            .navigationTitle("profile.title")
+            .navigationTitle(loc("profile.title"))
             .toolbar {
                 accountSwitcherToolbar(isPresented: $isShowingQuickAccountSwitcher, accountStore: accountStore, localizationManager: localizationManager)
             }
@@ -355,7 +355,7 @@ struct ProfileInspectorView: View {
                    let appPassword = activePassword
                 {
                     SimplifiedReportSheet(
-                        title: String(localized: "profile.report"),
+                        title: loc("profile.report"),
                         selectedReason: $selectedReportReason,
                         evidenceText: $reportEvidenceText,
                         isSubmitting: isSubmittingReport,

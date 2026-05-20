@@ -64,11 +64,120 @@ final class LiveAuthenticationTests: XCTestCase {
         )
     }
 
+    func testSessionSurvivesAfterAuthenticatedRequest() async throws {
+        let credentials = try liveCredentials()
+        let keychain = TestKeychainService()
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+
+        let requestExecutor = BlueskyRequestExecutor()
+        let sessionService = BlueskySessionService(
+            requestExecutor: requestExecutor,
+            keychain: keychain
+        )
+        let client = LiveBlueskyClient(
+            requestExecutor: requestExecutor,
+            sessionService: sessionService
+        )
+        let store = AccountStore(defaults: defaults, keychain: keychain)
+
+        let added = await store.addAccount(
+            handle: credentials.handle,
+            appPassword: credentials.appPassword,
+            client: client
+        )
+
+        XCTAssertTrue(added, store.errorMessage ?? "Expected live login to succeed.")
+        guard let account = store.activeAccount else {
+            return XCTFail("Expected an active account after login.")
+        }
+
+        // Verify the session survives making an authenticated API call
+        let lists = try? await client.fetchLists(for: account, appPassword: credentials.appPassword)
+        XCTAssertNotNil(lists, "Expected authenticated request to succeed after login.")
+
+        do {
+            let profile = try await client.fetchProfile(
+                did: account.did ?? account.handle,
+                account: account,
+                appPassword: credentials.appPassword
+            )
+            XCTAssertEqual(profile.handle.lowercased(), credentials.handle.lowercased())
+        } catch {
+            XCTFail("Expected profile fetch to succeed: \(error.localizedDescription)")
+        }
+
+        store.removeAccount(account, client: client)
+        XCTAssertTrue(store.accounts.isEmpty)
+    }
+
+    func testMultiAccountLoginLogoutCycle() async throws {
+        let credentials = try liveCredentials()
+        let keychain = TestKeychainService()
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+
+        let requestExecutor = BlueskyRequestExecutor()
+        let sessionService = BlueskySessionService(
+            requestExecutor: requestExecutor,
+            keychain: keychain
+        )
+        let client = LiveBlueskyClient(
+            requestExecutor: requestExecutor,
+            sessionService: sessionService
+        )
+        let store = AccountStore(defaults: defaults, keychain: keychain)
+
+        // First login
+        let added1 = await store.addAccount(
+            handle: credentials.handle,
+            appPassword: credentials.appPassword,
+            client: client
+        )
+        XCTAssertTrue(added1, "First login should succeed.")
+        XCTAssertEqual(store.accounts.count, 1)
+
+        guard let account1 = store.activeAccount else {
+            return XCTFail("Expected an active account after first login.")
+        }
+
+        // Logout
+        store.removeAccount(account1, client: client)
+        XCTAssertTrue(store.accounts.isEmpty)
+        XCTAssertNil(store.activeAccount)
+
+        // Second login (same credentials, full cycle)
+        let added2 = await store.addAccount(
+            handle: credentials.handle,
+            appPassword: credentials.appPassword,
+            client: client
+        )
+        XCTAssertTrue(added2, "Second login after logout should succeed.")
+        XCTAssertEqual(store.accounts.count, 1)
+
+        guard let account2 = store.activeAccount else {
+            return XCTFail("Expected an active account after second login.")
+        }
+
+        XCTAssertEqual(account2.handle, credentials.handle)
+
+        // Verify session works after the cycle
+        let profile = try? await client.fetchProfile(
+            did: account2.did ?? account2.handle,
+            account: account2,
+            appPassword: credentials.appPassword
+        )
+        XCTAssertNotNil(profile, "Profile fetch should succeed after login cycle.")
+        XCTAssertEqual(profile?.handle.lowercased(), credentials.handle.lowercased())
+
+        // Cleanup
+        store.removeAccount(account2, client: client)
+        XCTAssertTrue(store.accounts.isEmpty)
+    }
+
     private func liveCredentials() throws -> (handle: String, appPassword: String) {
         let env = ProcessInfo.processInfo.environment
-        if let handle = env["BLUESKY_TEST_USER"], let password = env["BLUESKY_TEST_PASSWORD"],
-           !handle.isEmpty, !password.isEmpty
-        {
+        if let handle = env["BLUESKY_TEST_USER"], let password = env["BLUESKY_TEST_PASSWORD"], !handle.isEmpty, !password.isEmpty {
             return (handle, password)
         }
 
@@ -122,7 +231,7 @@ private enum LiveAuthenticationTestError: Error {
     case missingKey(String)
 }
 
-private final class TestKeychainService: KeychainServicing {
+private final class TestKeychainService: KeychainServicing, @unchecked Sendable {
     private var values: [String: String] = [:]
 
     func save(_ value: String, service: String, account: String) throws {

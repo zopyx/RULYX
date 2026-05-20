@@ -37,7 +37,7 @@ struct AccountQuickSwitcherSheet: View {
                         .accessibilityHint("Switches to \(account.label ?? account.handle)")
                     }
                 } header: {
-                    Text("account.switcher.accounts_section")
+                    Text(loc: "account.switcher.accounts_section")
                 }
 
                 Section {
@@ -53,7 +53,7 @@ struct AccountQuickSwitcherSheet: View {
                     .accessibilityHint("Opens the full account management screen")
                 }
             }
-            .navigationTitle("account.switcher.title")
+            .navigationTitle(loc: "account.switcher.title")
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.height(360), .medium])

@@ -9,7 +9,7 @@ struct PendingActionsSheet: View {
         NavigationStack {
             List {
                 if workspaceStore.queuedActions.isEmpty {
-                    ContentUnavailableView("pending.empty.title", systemImage: "tray", description: Text("pending.empty.desc"))
+                    ContentUnavailableView("pending.empty.title", systemImage: "tray", description: Text(loc: "pending.empty.desc"))
                 } else {
                     ForEach(workspaceStore.queuedActions) { action in
                         VStack(alignment: .leading, spacing: 8) {
@@ -22,7 +22,7 @@ struct PendingActionsSheet: View {
 
                             switch action.status {
                             case .pending:
-                                Text("pending.waiting")
+                                Text(loc: "pending.waiting")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             case let .running(done, total, handle):
@@ -52,18 +52,18 @@ struct PendingActionsSheet: View {
                             }
 
                             if case .pending = action.status {
-                                Button(String(localized: "pending.cancel_button"), role: .destructive) {
+                                Button(loc("pending.cancel_button"), role: .destructive) {
                                     workspaceStore.actionQueue.cancel(action.id)
                                 }
                                 .font(.caption)
-                                .accessibilityHint("action_queue.cancel.hint")
+                                .accessibilityHint(loc("action_queue.cancel.hint"))
                             }
                             if case .completed = action.status {
                                 Button("pending.retry_button") {
                                     workspaceStore.actionQueue.retry(action.id)
                                 }
                                 .font(.caption)
-                                .accessibilityHint("action_queue.retry.hint")
+                                .accessibilityHint(loc("action_queue.retry.hint"))
                             }
                         }
                         .padding(.vertical, 4)
@@ -75,12 +75,12 @@ struct PendingActionsSheet: View {
                     }
                 }
             }
-            .navigationTitle("pending.title")
+            .navigationTitle(Text(loc: "pending.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("pending.done_button") { isPresented = false }
-                        .accessibilityHint("action_queue.close.hint")
+                        .accessibilityHint(loc("action_queue.close.hint"))
                 }
             }
         }
@@ -91,7 +91,7 @@ struct PendingActionsSheet: View {
     private func statusBadge(_ status: QueuedActionStatus) -> some View {
         switch status {
         case .pending:
-            Text("pending.status.pending")
+            Text(loc: "pending.status.pending")
                 .font(.caption2.weight(.semibold))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
@@ -104,7 +104,7 @@ struct PendingActionsSheet: View {
                 }
                 .foregroundStyle(.secondary)
         case .running:
-            Text("pending.badge_running")
+            Text(loc: "pending.badge_running")
                 .font(.caption2.weight(.semibold))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
@@ -131,7 +131,7 @@ struct PendingActionsSheet: View {
                     }
                     .foregroundStyle(.orange)
             } else {
-                Text("pending.status.done")
+                Text(loc: "pending.status.done")
                     .font(.caption2.weight(.semibold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)

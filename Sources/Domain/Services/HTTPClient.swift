@@ -1,12 +1,37 @@
 import Foundation
 
-struct HTTPClient {
+private actor InflightManager {
+    private var tasks: [String: Task<(Data, HTTPURLResponse), Error>] = [:]
+
+    func dedup(key: String, operation: @escaping @Sendable () async throws -> (Data, HTTPURLResponse)) async throws -> (Data, HTTPURLResponse) {
+        if let existing = tasks[key] {
+            return try await existing.value
+        }
+        let task = Task { try await operation() }
+        tasks[key] = task
+        defer { tasks.removeValue(forKey: key) }
+        return try await task.value
+    }
+}
+
+struct HTTPClient: Sendable {
     private let session: URLSession
     private let debugStore: HTTPRequestDebugStore?
+    private static let inflightManager = InflightManager()
 
     init(session: URLSession = .shared, debugStore: HTTPRequestDebugStore? = HTTPRequestDebugStore.shared) {
         self.session = session
         self.debugStore = debugStore
+    }
+
+    /// Deduplicates in-flight network requests by method + URL.
+    /// If a request to the same URL with the same HTTP method is already in flight,
+    /// the second caller awaits the same task instead of starting a duplicate network call.
+    func dedupedData(for request: URLRequest, source: String) async throws -> (Data, HTTPURLResponse) {
+        let cacheKey = "\(request.httpMethod ?? "GET"):\(request.url?.absoluteString ?? "")"
+        return try await Self.inflightManager.dedup(key: cacheKey) {
+            try await self.data(for: request, source: source)
+        }
     }
 
     func data(

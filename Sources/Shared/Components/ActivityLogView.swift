@@ -33,7 +33,7 @@ struct ActivityLogView: View {
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            FilterChip(title: String(localized: "activity.all"), isSelected: selectedType == nil) { selectedType = nil }
+                            FilterChip(title: loc("activity.all"), isSelected: selectedType == nil) { selectedType = nil }
                                 .accessibilityHint("Shows all activity types")
                             ForEach(types, id: \.self) { type in
                                 FilterChip(title: type, isSelected: selectedType == type) { selectedType = type }
@@ -45,12 +45,12 @@ struct ActivityLogView: View {
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                 } header: {
-                    Text("activity.filter_by_type")
+                    Text(loc: "activity.filter_by_type")
                 }
             }
 
             if filtered.isEmpty {
-                ContentUnavailableView("activity.no_matches", systemImage: "magnifyingglass", description: Text("activity.no_matches_desc"))
+                ContentUnavailableView("activity.no_matches", systemImage: "magnifyingglass", description: Text(loc: "activity.no_matches_desc"))
             } else {
                 ForEach(filtered) { entry in
                     VStack(alignment: .leading, spacing: 6) {
@@ -61,7 +61,7 @@ struct ActivityLogView: View {
                         }
                         Text(entry.summary).font(.caption).foregroundStyle(.secondary)
                         if !entry.failedHandles.isEmpty {
-                            Text(verbatim: String(localized: "activity.failed_format").replacingOccurrences(of: "{handles}", with: entry.failedHandles.joined(separator: ", ")))
+                            Text(verbatim: loc("activity.failed_format").replacingOccurrences(of: "{handles}", with: entry.failedHandles.joined(separator: ", ")))
                                 .font(.caption2).foregroundStyle(.red)
                         }
                     }
@@ -70,7 +70,7 @@ struct ActivityLogView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("activity.title")
+        .navigationTitle(loc: "activity.title")
     }
 }
 

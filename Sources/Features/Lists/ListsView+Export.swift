@@ -21,9 +21,9 @@ extension ListsView {
             List {
                 if lists.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "lists.export.no_members"),
+                        loc("lists.export.no_members"),
                         systemImage: "arrow.down.doc",
-                        description: Text("lists.export.no_members_desc")
+                        description: Text(loc: "lists.export.no_members_desc")
                     )
                 }
                 ForEach(lists) { list in
@@ -37,10 +37,8 @@ extension ListsView {
                                     .foregroundStyle(.primary)
                                 if let count = list.memberCount {
                                     Text(
-                                        verbatim: String.localized(
-                                            count == 1 ? "members_count_one" : "members_count_other",
-                                            replacements: ["count": "\(count)"]
-                                        )
+                                        verbatim: locPlural("members_count", count: count)
+                                            .replacingOccurrences(of: "{count}", with: "\(count)")
                                     )
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -74,7 +72,7 @@ extension ListsView {
                     .padding(.vertical, 8)
                 }
             }
-            .navigationTitle("lists.export.title")
+            .navigationTitle(loc("lists.export.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

@@ -9,7 +9,7 @@ final class AppLockManagerTimeoutTests: XCTestCase {
     override func setUp() {
         super.setUp()
         currentTime = Date()
-        lockManager = AppLockManager()
+        lockManager = AppLockManager.shared
         lockManager.isEnabled = true
         lockManager.timeoutMinutes = 5
         lockManager.isLocked = false

@@ -10,15 +10,16 @@ struct AccountTabView: View {
     @State private var editLabelText = ""
     @State private var editMode: EditMode = .inactive
     @State private var switchingAccountID: AppAccount.ID?
+    @State private var showPreferredSearchInfo = false
 
     var body: some View {
         NavigationStack {
             List {
                 if accountStore.accounts.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "account.no_accounts.title"),
+                        loc("account.no_accounts.title"),
                         systemImage: "person.crop.circle.badge.plus",
-                        description: Text("account.no_accounts.desc")
+                        description: Text(loc: "account.no_accounts.desc")
                     )
                 } else {
                     Section("account.manage.saved") {
@@ -40,7 +41,7 @@ struct AccountTabView: View {
                             }
                             .buttonStyle(.plain)
                             .disabled(switchingAccountID != nil)
-                            .accessibilityHint("account.switch_tab.hint")
+                            .accessibilityHint(loc("account.switch_tab.hint"))
                         }
                         .onMove(perform: accountStore.moveAccount)
                         .onDelete { indexSet in
@@ -85,19 +86,31 @@ struct AccountTabView: View {
                             }
                         }
                         .buttonStyle(.plain)
-                        Text("account.preferred_search.hint")
+                        Text(loc: "account.preferred_search.hint")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     } header: {
-                        Text("account.preferred_search.section")
+                        HStack(spacing: 4) {
+                            Text(loc: "account.preferred_search.section")
+                            Button {
+                                showPreferredSearchInfo = true
+                            } label: {
+                                Image(systemName: "info.circle.fill")
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color.skyPrimary)
+                                    .symbolRenderingMode(.hierarchical)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(loc("account.preferred_search.info.hint"))
+                        }
                     }
                 }
             }
-            .navigationTitle("account.manage.title")
+            .navigationTitle(loc("account.manage.title"))
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(editMode.isEditing ? String(localized: "actions.done") : String(localized: "account.manage.edit")) {
+                    Button(editMode.isEditing ? loc("actions.done") : loc("account.manage.edit")) {
                         withAnimation {
                             editMode = editMode.isEditing ? .inactive : .active
                         }
@@ -110,7 +123,7 @@ struct AccountTabView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .accessibilityLabel("account.manage.add")
+                    .accessibilityLabel(loc("account.manage.add"))
                 }
             }
             .task {
@@ -122,20 +135,50 @@ struct AccountTabView: View {
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
             }
-            .alert("account.manage.title", isPresented: .constant(accountStore.errorMessage != nil), actions: {
+            .alert(Text(loc: "account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
                 Button("actions.ok") {
                     accountStore.errorMessage = nil
                 }
             }, message: {
                 Text(accountStore.errorMessage ?? "")
             })
+            .sheet(isPresented: $showPreferredSearchInfo) {
+                NavigationStack {
+                    List {
+                        Section {
+                            Text(loc: "account.preferred_search.info.p1")
+                                .font(.body)
+                            Text(loc: "account.preferred_search.info.p2")
+                                .font(.body)
+                            Text(loc: "account.preferred_search.info.p3")
+                                .font(.body)
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .navigationTitle(Text(loc: "account.preferred_search.info.title"))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                showPreferredSearchInfo = false
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.secondary)
+                                    .font(.title3)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(loc("actions.dismiss"))
+                        }
+                    }
+                }
+            }
             .sheet(item: $editingLabelAccount) { account in
                 NavigationStack {
                     List {
                         Section("account.edit_label.section") {
                             TextField("account.edit_label.placeholder", text: $editLabelText)
                                 .textInputAutocapitalization(.never)
-                            Button(String(localized: "account.edit_label.clear"), role: .destructive) {
+                            Button(loc("account.edit_label.clear"), role: .destructive) {
                                 accountStore.setLabel(for: account, label: nil)
                                 editingLabelAccount = nil
                             }
@@ -155,7 +198,7 @@ struct AccountTabView: View {
                             }
                         }
                     }
-                    .navigationTitle("account.edit_label.title")
+                    .navigationTitle(loc("account.edit_label.title"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {

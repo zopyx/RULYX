@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - Bulk selection, add/remove/mute/block/transfer, and batch operations
+
 extension ListDetailViewModel {
     func isSelectedForBulkAdd(_ actor: BlueskyActor) -> Bool {
         selectedSearchActorIDs.contains(actor.id)

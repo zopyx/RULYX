@@ -158,7 +158,7 @@ struct RootView: View {
                             Button(localizationManager.localized("onboarding.close")) {
                                 hasSeenOnboarding = true
                             }
-                            .accessibilityLabel("onboarding.close.label")
+                            .accessibilityLabel(loc: "onboarding.close.label")
                         }
                     }
                 }

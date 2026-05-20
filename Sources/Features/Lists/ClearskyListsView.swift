@@ -32,7 +32,7 @@ struct ClearskyListsView: View {
                     }
                 }
             }
-            .navigationTitle("lists.lists_on_profile")
+            .navigationTitle(loc("lists.lists_on_profile"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -41,7 +41,7 @@ struct ClearskyListsView: View {
                             .font(.title3)
                             .foregroundStyle(.tertiary)
                     }
-                    .accessibilityLabel("actions.close")
+                    .accessibilityLabel(loc("actions.close"))
                 }
             }
             .task {

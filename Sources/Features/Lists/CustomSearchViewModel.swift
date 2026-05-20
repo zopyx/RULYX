@@ -149,6 +149,11 @@ final class CustomSearchViewModel: ObservableObject {
         saveHistory()
     }
 
+    func clearHistory() {
+        searchHistory.removeAll()
+        saveHistory()
+    }
+
     private func saveQuery(_ q: String) {
         searchHistory.removeAll { $0 == q }
         searchHistory.insert(q, at: 0)

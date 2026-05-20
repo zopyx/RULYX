@@ -149,6 +149,7 @@ private extension BlueskyRequestExecutor {
 
 private final class PinningDelegate: NSObject, URLSessionDelegate {
     private static let pinnedSPKIHashes = [
+        // bsky.social leaf SPKI — verified 2026-05-20
         "Va6hs2tSCkc4CWC91P6Bga2S05J/R2R+Tp4WPAv7Hlc=",
     ]
 

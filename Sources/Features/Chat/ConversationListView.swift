@@ -25,13 +25,13 @@ struct ConversationListView: View {
         NavigationStack(path: $navPath) {
             Group {
                 if chatStore.isLoadingConvos, chatStore.conversations.isEmpty {
-                    LoadingPanel(message: String(localized: "chat.loading"))
+                    LoadingPanel(message: loc("chat.loading"))
                 } else if let chatError = chatStore.error, chatStore.conversations.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 48))
                             .foregroundStyle(.orange)
-                        Text("chat.error.title")
+                        Text(loc: "chat.error.title")
                             .font(.headline)
                         Text(chatError.localizedDescription)
                             .font(.subheadline)
@@ -48,9 +48,9 @@ struct ConversationListView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .font(.system(size: 48))
                             .foregroundStyle(.tertiary)
-                        Text("chat.empty.title")
+                        Text(loc: "chat.empty.title")
                             .font(.headline)
-                        Text("chat.empty.desc")
+                        Text(loc: "chat.empty.desc")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -102,7 +102,7 @@ struct ConversationListView: View {
                     .environmentObject(chatStore)
                     .environmentObject(accountStore)
             }
-            .navigationTitle("tab.chat")
+            .navigationTitle(Text(loc: "tab.chat"))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -114,7 +114,7 @@ struct ConversationListView: View {
                             Image(systemName: "arrow.clockwise")
                         }
                     }
-                    .accessibilityLabel("chat.reload")
+                    .accessibilityLabel(loc("chat.reload"))
                     .disabled(chatStore.isLoadingConvos)
                 }
 
@@ -134,12 +134,12 @@ struct ConversationListView: View {
                         } label: {
                             Image(systemName: "square.and.pencil")
                         }
-                        .accessibilityLabel("chat.new")
+                        .accessibilityLabel(loc("chat.new"))
                     }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(editMode.isEditing ? String(localized: "actions.done") : String(localized: "chat.edit")) {
+                    Button(editMode.isEditing ? loc("actions.done") : loc("chat.edit")) {
                         withAnimation {
                             if editMode.isEditing {
                                 selectedConvos = []
@@ -292,7 +292,7 @@ struct ConversationListView: View {
             guard let last = conversation.lastMessage else { return "" }
             switch last {
             case let .message(m): return m.text
-            case .deleted: return String(localized: "chat.message.deleted")
+            case .deleted: return loc("chat.message.deleted")
             case let .system(s): return systemMessageText(s)
             }
         }
@@ -368,21 +368,21 @@ struct ConversationListView: View {
 
         private func systemMessageText(_ msg: ChatSystemMessage) -> String {
             switch msg.data {
-            case .addMember: String(localized: "chat.system.added")
-            case .removeMember: String(localized: "chat.system.removed")
-            case .memberJoin: String(localized: "chat.system.joined")
-            case .memberLeave: String(localized: "chat.system.left")
-            case .lockConvo: String(localized: "chat.system.locked")
-            case .unlockConvo: String(localized: "chat.system.unlocked")
-            case .lockConvoPermanently: String(localized: "chat.system.locked_permanent")
-            case .editGroup: String(localized: "chat.system.group_updated")
+            case .addMember: loc("chat.system.added")
+            case .removeMember: loc("chat.system.removed")
+            case .memberJoin: loc("chat.system.joined")
+            case .memberLeave: loc("chat.system.left")
+            case .lockConvo: loc("chat.system.locked")
+            case .unlockConvo: loc("chat.system.unlocked")
+            case .lockConvoPermanently: loc("chat.system.locked_permanent")
+            case .editGroup: loc("chat.system.group_updated")
             case .unknown: ""
             }
         }
 
         private func formatRelativeTime(_ date: Date) -> String {
             let diff = Date().timeIntervalSince(date)
-            if diff < 60 { return String(localized: "time.just_now") }
+            if diff < 60 { return loc("time.just_now") }
             if diff < 3600 { return "\(Int(diff / 60))m" }
             if diff < 86400 { return "\(Int(diff / 3600))h" }
             if diff < 604_800 { return "\(Int(diff / 86400))d" }

@@ -19,9 +19,9 @@ struct AccountSwitcherSheet: View {
             List {
                 if accountStore.accounts.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "account.no_accounts.title"),
+                        loc("account.no_accounts.title"),
                         systemImage: "person.crop.circle.badge.plus",
-                        description: Text("account.no_accounts.desc")
+                        description: Text(loc: "account.no_accounts.desc")
                     )
                 } else {
                     Section("account.manage.saved") {
@@ -71,7 +71,7 @@ struct AccountSwitcherSheet: View {
                     }
                 }
             }
-            .navigationTitle("account.manage.title")
+            .navigationTitle(loc: "account.manage.title")
             .navigationBarTitleDisplayMode(.inline)
             .task {
                 await accountStore.refreshAccountProfiles(using: blueskyClient)
@@ -79,7 +79,7 @@ struct AccountSwitcherSheet: View {
             .environment(\.editMode, $editMode)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(editMode.isEditing ? String(localized: "actions.done") : String(localized: "account.manage.edit")) {
+                    Button(editMode.isEditing ? loc("actions.done") : loc("account.manage.edit")) {
                         withAnimation {
                             editMode = editMode.isEditing ? .inactive : .active
                         }
@@ -92,7 +92,7 @@ struct AccountSwitcherSheet: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .accessibilityLabel("account.manage.add")
+                    .accessibilityLabel(loc: "account.manage.add")
                     .accessibilityHint("Opens the form to add a new Bluesky account")
                 }
             }
@@ -114,7 +114,7 @@ struct AccountSwitcherSheet: View {
                         Section("account.edit_label.section") {
                             TextField("account.edit_label.placeholder", text: $editLabelText)
                                 .textInputAutocapitalization(.never)
-                            Button(String(localized: "account.edit_label.clear"), role: .destructive) {
+                            Button(loc("account.edit_label.clear"), role: .destructive) {
                                 accountStore.setLabel(for: account, label: nil)
                                 editingLabelAccount = nil
                             }
@@ -136,7 +136,7 @@ struct AccountSwitcherSheet: View {
                             }
                         }
                     }
-                    .navigationTitle("account.edit_label.title")
+                    .navigationTitle(loc: "account.edit_label.title")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {

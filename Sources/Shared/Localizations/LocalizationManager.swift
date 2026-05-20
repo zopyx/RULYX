@@ -78,3 +78,63 @@ final class LocalizationManager: ObservableObject {
 func loc(_ key: String) -> String {
     LocalizationManager.shared.localized(key)
 }
+
+// MARK: - CLDR Plural Rules
+
+enum PluralCategory: String, CaseIterable {
+    case zero, one, two, few, many, other
+}
+
+enum PluralRules {
+    static func category(for count: Int, language: String) -> PluralCategory {
+        switch language {
+        case "en", "de", "it", "nl", "pt", "es", "tr":
+            return count == 1 ? .one : .other
+        case "fr":
+            return (count == 0 || count == 1) ? .one : .other
+        case "ru":
+            if count % 10 == 1 && count % 100 != 11 { return .one }
+            if count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) { return .few }
+            return .many
+        case "ar":
+            if count == 0 { return .zero }
+            if count == 1 { return .one }
+            if count == 2 { return .two }
+            if count % 100 >= 3 && count % 100 <= 10 { return .few }
+            if count % 100 >= 11 { return .many }
+            return .other
+        case "pl":
+            if count == 1 { return .one }
+            if count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) { return .few }
+            return .many
+        case "ja", "zh", "ko", "th", "vi":
+            return .other
+        default:
+            return count == 1 ? .one : .other
+        }
+    }
+
+    static func lookupOrder(for category: PluralCategory) -> [PluralCategory] {
+        switch category {
+        case .zero: return [.zero, .other]
+        case .one: return [.one, .other]
+        case .two: return [.two, .other]
+        case .few: return [.few, .other]
+        case .many: return [.many, .other]
+        case .other: return [.other]
+        }
+    }
+}
+
+@MainActor
+func locPlural(_ keyPrefix: String, count: Int) -> String {
+    let language = LocalizationManager.shared.currentLanguage
+    let category = PluralRules.category(for: count, language: language)
+    let lookupOrder = PluralRules.lookupOrder(for: category)
+    for cat in lookupOrder {
+        let key = "\(keyPrefix)_\(cat.rawValue)"
+        let result = LocalizationManager.shared.localized(key)
+        if result != key { return result }
+    }
+    return keyPrefix
+}

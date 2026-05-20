@@ -49,17 +49,17 @@ struct LockScreenView: View {
 
     private var title: String {
         switch appLockManager.biometricType {
-        case .faceID: String(localized: "lock_screen.face_id_title")
-        case .touchID: String(localized: "lock_screen.touch_id_title")
-        default: String(localized: "lock_screen.app_locked")
+        case .faceID: loc("lock_screen.face_id_title")
+        case .touchID: loc("lock_screen.touch_id_title")
+        default: loc("lock_screen.app_locked")
         }
     }
 
     private var subtitle: String {
         if appLockManager.isBiometricsAvailable {
-            String(localized: "lock_screen.biometric_subtitle").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel)
+            loc("lock_screen.biometric_subtitle").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel)
         } else {
-            String(localized: "lock_screen.biometric_unavailable")
+            loc("lock_screen.biometric_unavailable")
         }
     }
 }

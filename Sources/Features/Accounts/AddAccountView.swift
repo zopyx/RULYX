@@ -36,17 +36,17 @@ struct AddAccountView: View {
                     Picker(selection: $selectedProvider) {
                         ForEach(ProviderOption.allCases) { option in
                             if option == .bluesky {
-                                Text("account.add.bluesky").tag(option)
+                                Text(loc: "account.add.bluesky").tag(option)
                             } else if option == .eurosky {
-                                Text("account.add.eurosky").tag(option)
+                                Text(loc: "account.add.eurosky").tag(option)
                             } else {
-                                Text("account.add.other").tag(option)
+                                Text(loc: "account.add.other").tag(option)
                             }
                         }
                     } label: {
-                        Text("account.add.provider")
+                        Text(loc: "account.add.provider")
                     }
-                    .accessibilityHint("account.select_pds.hint")
+                    .accessibilityHint(loc("account.select_pds.hint"))
 
                     if selectedProvider == .other {
                         TextField("account.add.placeholder.url", text: $customPDS)
@@ -55,7 +55,7 @@ struct AddAccountView: View {
                             .keyboardType(.URL)
                     }
                 } header: {
-                    Text("account.add.provider")
+                    Text(loc: "account.add.provider")
                 }
 
                 Section {
@@ -67,24 +67,24 @@ struct AddAccountView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 } header: {
-                    Text("account.add.credentials")
+                    Text(loc: "account.add.credentials")
                 }
 
                 Section {
-                    Text("account.add.password_hint")
+                    Text(loc: "account.add.password_hint")
                         .foregroundStyle(.secondary)
                 } header: {
-                    Text("account.add.why_password")
+                    Text(loc: "account.add.why_password")
                 }
             }
-            .navigationTitle(Text("account.add.title"))
+            .navigationTitle(Text(loc: "account.add.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("account.add.cancel") {
                         dismiss()
                     }
-                    .accessibilityHint("account.discard_add.hint")
+                    .accessibilityHint(loc("account.discard_add.hint"))
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -112,7 +112,7 @@ struct AddAccountView: View {
                             appPassword.isEmpty ||
                             accountStore.isAddingAccount
                     )
-                    .accessibilityHint("account.validate.hint")
+                    .accessibilityHint(loc("account.validate.hint"))
                 }
             }
             .overlay {

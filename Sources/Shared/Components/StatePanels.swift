@@ -69,7 +69,7 @@ struct ErrorRetryBanner: View {
             }
             .buttonStyle(.bordered)
             .glassBorderedButton()
-            .accessibilityHint("common.retry.hint")
+            .accessibilityHint(loc("common.retry.hint"))
         }
         .padding()
         .appCardStyle(cornerRadius: 12, style: .subtle)
@@ -118,7 +118,7 @@ struct BatchProgressCard: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .accessibilityLabel("actions.cancel")
+                    .accessibilityLabel(loc("actions.cancel"))
                 }
             }
         }
@@ -126,7 +126,7 @@ struct BatchProgressCard: View {
         .appCardStyle(cornerRadius: 12, style: .subtle)
         .padding(.horizontal)
         .accessibilityElement(children: .combine)
-        .accessibilityHint("common.progress.hint")
+        .accessibilityHint(loc("common.progress.hint"))
     }
 }
 
@@ -230,7 +230,7 @@ struct OnboardingRow: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityHint("common.status.hint")
+        .accessibilityHint(loc("common.status.hint"))
         .padding(.vertical, 8)
     }
 }
@@ -261,13 +261,13 @@ struct SimplifiedReportSheet: View {
                     }
                     .pickerStyle(.navigationLink)
                 } header: {
-                    Text("profile.report.reason")
+                    Text(loc: "profile.report.reason")
                 }
 
                 Section {
                     ZStack(alignment: .topLeading) {
                         if evidenceText.isEmpty {
-                            Text("profile.report.evidence_placeholder")
+                            Text(loc: "profile.report.evidence_placeholder")
                                 .foregroundStyle(.tertiary)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 8)
@@ -277,7 +277,7 @@ struct SimplifiedReportSheet: View {
                             .foregroundStyle(.primary)
                     }
                 } header: {
-                    Text("profile.report.evidence")
+                    Text(loc: "profile.report.evidence")
                 }
 
                 Section {
@@ -288,7 +288,7 @@ struct SimplifiedReportSheet: View {
                                 ProgressView()
                                     .tint(.white)
                             } else {
-                                Text("profile.report.submit")
+                                Text(loc: "profile.report.submit")
                                     .fontWeight(.semibold)
                             }
                             Spacer()
@@ -313,7 +313,7 @@ struct SimplifiedReportSheet: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("report.support.attachment")
+                                Text(loc: "report.support.attachment")
                                     .appFont(.subheading)
                                 Button(role: .destructive) {
                                     selectedPhotoItem = nil
@@ -337,14 +337,14 @@ struct SimplifiedReportSheet: View {
                     }
                     .disabled(isSubmitting)
                 } header: {
-                    Text("report.support.section")
+                    Text(loc: "report.support.section")
                 }
             }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "actions.cancel"), action: onCancel)
+                    Button(loc("actions.cancel"), action: onCancel)
                         .disabled(isSubmitting)
                 }
             }
@@ -488,15 +488,15 @@ extension ModerationReportReasonType {
     var localizedTitle: String {
         switch self {
         case .harassmentTargeted:
-            String(localized: "profile.report.reason.harassment_targeted")
+            loc("profile.report.reason.harassment_targeted")
         case .harassmentHateSpeech:
-            String(localized: "profile.report.reason.harassment_hate_speech")
+            loc("profile.report.reason.harassment_hate_speech")
         case .harassmentDoxxing:
-            String(localized: "profile.report.reason.harassment_doxxing")
+            loc("profile.report.reason.harassment_doxxing")
         case .harassmentTroll:
-            String(localized: "profile.report.reason.harassment_troll")
+            loc("profile.report.reason.harassment_troll")
         case .harassmentOther:
-            String(localized: "profile.report.reason.harassment_other")
+            loc("profile.report.reason.harassment_other")
         }
     }
 }

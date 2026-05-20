@@ -26,8 +26,10 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
 
     @MainActor @Published private(set) var entries: [HTTPRequestDebugEntry] = []
     @MainActor private var nextSequenceNumber = 1
+    @MainActor private var lastPurgeDate: Date?
 
     private let maxEntries: Int
+    private let maxAge: TimeInterval = 3 * 60 * 60
 
     init(maxEntries: Int = 250) {
         self.maxEntries = maxEntries
@@ -38,6 +40,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
         let startedAt = Date()
         let sanitizedURL = Self.sanitizeURL(request.url?.absoluteString ?? "about:blank")
         await MainActor.run {
+            purgeOldEntries()
             let entry = HTTPRequestDebugEntry(
                 id: entryID,
                 sequenceNumber: nextSequenceNumber,
@@ -63,6 +66,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
 
     func succeed(id: UUID, statusCode: Int) async {
         await MainActor.run {
+            purgeOldEntries()
             update(id: id) { entry in
                 entry.state = .succeeded
                 entry.statusCode = statusCode
@@ -76,6 +80,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     func fail(id: UUID, statusCode: Int? = nil, errorMessage: String?, errorResponseJSON: String? = nil) async {
         let sanitizedJSON = Self.sanitizeErrorResponseJSON(errorResponseJSON)
         await MainActor.run {
+            purgeOldEntries()
             update(id: id) { entry in
                 entry.state = .failed
                 entry.statusCode = statusCode
@@ -91,6 +96,14 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
             entries.removeAll()
             nextSequenceNumber = 1
         }
+    }
+
+    @MainActor
+    private func purgeOldEntries() {
+        let cutoff = Date().addingTimeInterval(-maxAge)
+        if let lastPurge = lastPurgeDate, lastPurge > cutoff { return }
+        lastPurgeDate = Date()
+        entries.removeAll { $0.startedAt < cutoff }
     }
 
     @MainActor

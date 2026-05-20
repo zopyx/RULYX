@@ -22,9 +22,9 @@ struct SettingsView: View {
                             set: { appearanceMode = $0 }
                         )
                     ) {
-                        Text("settings.appearance.light").tag("light")
-                        Text("settings.appearance.system").tag("system")
-                        Text("settings.appearance.dark").tag("dark")
+                        Text(loc: "settings.appearance.light").tag("light")
+                        Text(loc: "settings.appearance.system").tag("system")
+                        Text(loc: "settings.appearance.dark").tag("dark")
                     } label: {
                         Label {
                             Text(localizationManager.localized("settings.appearance"))
@@ -54,7 +54,7 @@ struct SettingsView: View {
                             Image(systemName: "globe")
                         }
                     }
-                    .accessibilityHint("settings.language.hint")
+                    .accessibilityHint(loc: "settings.language.hint")
                 } header: {
                     Text(localizationManager.localized("settings.preferences"))
                 }
@@ -63,7 +63,7 @@ struct SettingsView: View {
                     Section {
                         Toggle(isOn: $appLockManager.isEnabled) {
                             Label {
-                                Text(String(localized: "settings.biometric_lock").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
+                                Text(loc("settings.biometric_lock").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
                             } icon: {
                                 Image(systemName: biometricIcon)
                             }
@@ -71,18 +71,18 @@ struct SettingsView: View {
 
                         if appLockManager.isEnabled {
                             Picker("settings.auto_lock", selection: $appLockManager.timeoutMinutes) {
-                                Text("settings.auto_lock.immediately").tag(0)
-                                Text("settings.auto_lock.1min").tag(1)
-                                Text("settings.auto_lock.5min").tag(5)
-                                Text("settings.auto_lock.15min").tag(15)
-                                Text("settings.auto_lock.30min").tag(30)
+                                Text(loc: "settings.auto_lock.immediately").tag(0)
+                                Text(loc: "settings.auto_lock.1min").tag(1)
+                                Text(loc: "settings.auto_lock.5min").tag(5)
+                                Text(loc: "settings.auto_lock.15min").tag(15)
+                                Text(loc: "settings.auto_lock.30min").tag(30)
                             }
                         }
                     } header: {
-                        Text("settings.security")
+                        Text(loc: "settings.security")
                     } footer: {
                         if appLockManager.isEnabled {
-                            Text(String(localized: "settings.biometric_footer").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
+                            Text(loc("settings.biometric_footer").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
                         }
                     }
                 }
@@ -103,7 +103,7 @@ struct SettingsView: View {
                             Image(systemName: "wrench.adjustable")
                         }
                     }
-                    .accessibilityHint("settings.debug_tools.hint")
+                    .accessibilityHint(loc: "settings.debug_tools.hint")
 
                     Button(role: .destructive) {
                         isShowingClearCacheConfirmation = true
@@ -114,7 +114,7 @@ struct SettingsView: View {
                             Image(systemName: "trash")
                         }
                     }
-                    .accessibilityHint("settings.clear_cache.hint")
+                    .accessibilityHint(loc: "settings.clear_cache.hint")
 
                     if let cacheStatusMessage {
                         Text(cacheStatusMessage)
@@ -147,7 +147,7 @@ struct SettingsView: View {
             ) {
                 Button(localizationManager.localized("settings.clear_cache"), role: .destructive) {
                     blueskyClient.clearCache()
-                    cacheStatusMessage = String(localized: "settings.cache_cleared")
+                    cacheStatusMessage = loc("settings.cache_cleared")
                 }
                 Button(localizationManager.localized("settings.cancel"), role: .cancel) {}
             } message: {

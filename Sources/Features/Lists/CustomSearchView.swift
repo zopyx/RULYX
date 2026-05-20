@@ -22,7 +22,7 @@ struct CustomSearchView: View {
     var body: some View {
         listContent
             .listStyle(.insetGrouped)
-            .navigationTitle("customsearch.title")
+            .navigationTitle(loc("customsearch.title"))
             .navigationBarTitleDisplayMode(.inline)
             .modifier(SearchSheetsModifier(
                 selectedPostURI: $selectedPostURI,
@@ -93,7 +93,7 @@ struct CustomSearchView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("customsearch.searching_as")
+                Text(loc: "customsearch.searching_as")
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.primary)
                 Text(account.displayName)
@@ -158,7 +158,7 @@ struct CustomSearchView: View {
     }
 
     private var recentSearchesSection: some View {
-        Section("customsearch.recent") {
+        Section {
             ForEach(viewModel.searchHistory, id: \.self) { query in
                 HStack {
                     Button {
@@ -185,6 +185,18 @@ struct CustomSearchView: View {
                             .font(.caption.weight(.medium))
                             .foregroundStyle(.tertiary)
                     }
+                    .buttonStyle(.plain)
+                }
+            }
+        } header: {
+            HStack {
+                Text(loc: "customsearch.recent")
+                Spacer()
+                if !viewModel.searchHistory.isEmpty {
+                    Button(loc("customsearch.clear_recent"), role: .destructive) {
+                        viewModel.clearHistory()
+                    }
+                    .font(.caption)
                     .buttonStyle(.plain)
                 }
             }
@@ -255,7 +267,7 @@ struct CustomSearchView: View {
         HStack {
             Spacer()
             ContentUnavailableView(
-                String(localized: "list.detail.alert_title"),
+                loc("list.detail.alert_title"),
                 systemImage: "exclamationmark.bubble",
                 description: Text(error)
             )
@@ -269,9 +281,9 @@ struct CustomSearchView: View {
         HStack {
             Spacer()
             ContentUnavailableView(
-                String(localized: "customsearch.empty"),
+                loc("customsearch.empty"),
                 systemImage: "magnifyingglass",
-                description: Text("customsearch.empty_desc")
+                description: Text(loc: "customsearch.empty_desc")
             )
             Spacer()
         }
@@ -294,7 +306,7 @@ struct CustomSearchView: View {
             .listRowSeparator(.hidden)
         }
         if !hasMore, !entries.isEmpty {
-            Text("customsearch.end")
+            Text(loc: "customsearch.end")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: .infinity)
@@ -329,9 +341,9 @@ struct CustomSearchView: View {
             HStack {
                 Spacer()
                 ContentUnavailableView(
-                    String(localized: "customsearch.empty_users"),
+                    loc("customsearch.empty_users"),
                     systemImage: "person.slash",
-                    description: Text("customsearch.empty_users_desc")
+                    description: Text(loc: "customsearch.empty_users_desc")
                 )
                 Spacer()
             }
@@ -353,9 +365,9 @@ struct CustomSearchView: View {
 
     private func tabLabel(_ tab: CustomSearchViewModel.Tab) -> String {
         switch tab {
-        case .top: String(localized: "customsearch.tab.top")
-        case .newest: String(localized: "customsearch.tab.newest")
-        case .users: String(localized: "customsearch.tab.users")
+        case .top: loc("customsearch.tab.top")
+        case .newest: loc("customsearch.tab.newest")
+        case .users: loc("customsearch.tab.users")
         }
     }
 

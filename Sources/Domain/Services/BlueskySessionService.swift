@@ -105,7 +105,7 @@ final class BlueskySessionService: BlueskySessionServicing {
                     appPassword: appPassword
                 )
                 let delay = pow(2.0, Double(attempt)) * Double.random(in: 0.8 ..< 1.2)
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                try? await Task.sleep(for: .seconds(delay))
             }
         }
 

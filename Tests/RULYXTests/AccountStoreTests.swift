@@ -355,7 +355,7 @@ final class AccountStoreTests: XCTestCase {
     }
 }
 
-private final class MockKeychainService: KeychainServicing {
+private final class MockKeychainService: KeychainServicing, @unchecked Sendable {
     var savedValues: [String: String] = [:]
 
     func save(_ value: String, service: String, account: String) throws {

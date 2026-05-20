@@ -48,7 +48,7 @@ func makeProfile(
     )
 }
 
-final class MockKeychain: KeychainServicing {
+final class MockKeychain: KeychainServicing, @unchecked Sendable {
     var savedValues: [String: String] = [:]
 
     func save(_ value: String, service: String, account: String) throws {
@@ -149,34 +149,6 @@ final class MockRequestExecutor: @unchecked Sendable, BlueskyRequestExecuting {
 }
 
 struct EmptyDecodable: Decodable {}
-
-final class MockURLProtocol: URLProtocol {
-    nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
-
-    override class func canInit(with _: URLRequest) -> Bool {
-        true
-    }
-
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        request
-    }
-
-    override func startLoading() {
-        guard let handler = MockURLProtocol.requestHandler else {
-            fatalError("No request handler set")
-        }
-        do {
-            let (response, data) = try handler(request)
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client?.urlProtocol(self, didLoad: data)
-            client?.urlProtocolDidFinishLoading(self)
-        } catch {
-            client?.urlProtocol(self, didFailWithError: error)
-        }
-    }
-
-    override func stopLoading() {}
-}
 
 extension XCTestCase {
     func makeSession(for handle: String = "test.bsky.social") -> BlueskySession {
