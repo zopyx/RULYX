@@ -69,7 +69,12 @@ struct UserPostsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("actions.close") { dismiss() }
+                    Button { dismiss() } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityLabel(loc("actions.close"))
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if !viewModel.posts.isEmpty {

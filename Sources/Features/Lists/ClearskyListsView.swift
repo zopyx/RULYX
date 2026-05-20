@@ -37,9 +37,9 @@ struct ClearskyListsView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button { dismiss() } label: {
-                        Image(systemName: "xmark.circle.fill")
+                        Image(systemName: "checkmark.circle.fill")
                             .font(.title3)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .accessibilityLabel(loc("actions.close"))
                 }
