@@ -59,7 +59,12 @@ struct NotificationTab: View {
                     )
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("actions.close") { selectedActor = nil }
+                            Button { selectedActor = nil } label: {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .accessibilityLabel(loc("actions.close"))
                         }
                     }
                 }

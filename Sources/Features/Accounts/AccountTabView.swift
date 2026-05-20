@@ -156,12 +156,12 @@ struct AccountTabView: View {
                             Button {
                                 showPreferredSearchInfo = false
                             } label: {
-                                Image(systemName: "xmark.circle.fill")
+                                Image(systemName: "checkmark.circle.fill")
                                     .foregroundStyle(.secondary)
                                     .font(.title3)
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(loc("actions.dismiss"))
+                            .accessibilityLabel(loc("actions.close"))
                         }
                     }
                 }

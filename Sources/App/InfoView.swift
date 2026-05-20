@@ -501,7 +501,12 @@ private struct DebugInfoView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(localizationManager.localized("actions.done")) { dismiss() }
+                    Button { dismiss() } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityLabel(localizationManager.localized("actions.done"))
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
