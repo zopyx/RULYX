@@ -80,7 +80,7 @@ struct InfoView: View {
                     .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(verbatim: "Build")
+                    Text(verbatim: versionString)
                         .appFont(.subheading)
                         .foregroundStyle(.primary)
                     Text(buildDate)
@@ -93,6 +93,12 @@ struct InfoView: View {
             .padding(16)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
+    }
+
+    private var versionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return "v\(version) (\(build))"
     }
 
     private var buildDate: String {
@@ -528,8 +534,6 @@ private struct DebugInfoView: View {
         add("Orientation", interfaceOrientation)
         add("Low Power Mode", process.isLowPowerModeEnabled ? "Yes" : "No")
         add("Thermal State", thermalState)
-        add("App Version", app.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "-")
-        add("App Build", app.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "-")
         add("App Language", localizationManager.currentLanguage)
         add("Device Language", Locale.current.language.languageCode?.identifier ?? "-")
         add("Region", Locale.current.region?.identifier ?? "-")
@@ -541,6 +545,11 @@ private struct DebugInfoView: View {
         add("Total Disk", byteCount(process.physicalMemory))
         add("Thermal State", process.thermalState == .nominal ? "Nominal" : process.thermalState == .fair ? "Fair" : process.thermalState == .serious ? "Serious" : "Critical")
         add("Build Date", buildDate)
+        let ver = app.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        let bld = app.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        add("Version", "v\(ver) (\(bld))")
+        add("App Version", ver)
+        add("App Build", bld)
 
         return result
     }
