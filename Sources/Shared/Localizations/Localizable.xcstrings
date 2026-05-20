@@ -104571,6 +104571,1049 @@
           }
         }
       }
+    },
+    "settings.icloud.privacy.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync Privacy"
+          }
+        }
+      }
+    },
+    "settings.icloud.privacy.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device."
+          }
+        }
+      }
+    },
+    "settings.icloud.privacy.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "settings.icloud.privacy.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        }
+      }
+    },
+    "list.export.complete": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Complete"
+          }
+        }
+      }
+    },
+    "account.preferred_search.info.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Account Info"
+          }
+        }
+      }
+    },
+    "account.preferred_search.info.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn more about the search account feature"
+          }
+        }
+      }
+    },
+    "account.preferred_search.info.p1": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective."
+          }
+        }
+      }
+    },
+    "account.preferred_search.info.p2": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list."
+          }
+        }
+      }
+    },
+    "account.preferred_search.info.p3": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management."
+          }
+        }
+      }
+    },
+    "clearsky.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "ClearSky is currently unavailable"
+          }
+        }
+      }
+    },
+    "debug.http.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "debug.diagnostics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Diagnostics"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

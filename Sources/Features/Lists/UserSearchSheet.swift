@@ -24,9 +24,9 @@ struct UserSearchSheet: View {
 
                 if results.isEmpty, !searchQuery.isEmpty, !isSearching {
                     ContentUnavailableView(
-                        String(localized: "usersearch.no_results"),
+                        loc("usersearch.no_results"),
                         systemImage: "magnifyingglass",
-                        description: Text("usersearch.no_results_desc")
+                        description: Text(loc: "usersearch.no_results_desc")
                     )
                 }
 
@@ -52,7 +52,7 @@ struct UserSearchSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("usersearch.title")
+            .navigationTitle(loc("usersearch.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

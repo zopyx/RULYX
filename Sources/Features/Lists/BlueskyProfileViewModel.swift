@@ -195,7 +195,7 @@ final class BlueskyProfileViewModel: ObservableObject {
                 account: account,
                 appPassword: appPassword
             )
-            statusMessage = String(localized: "actions.done")
+            statusMessage = loc("actions.done")
         } catch {
             errorMessage = AppError.userMessage(from: error)
         }

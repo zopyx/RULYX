@@ -16,18 +16,18 @@ struct LikesListView: View {
         NavigationStack {
             Group {
                 if isLoading {
-                    LoadingPanel(message: String(localized: "timeline.loading"))
+                    LoadingPanel(message: loc("timeline.loading"))
                 } else if let error = errorMessage {
                     ContentUnavailableView(
-                        String(localized: "list.detail.alert_title"),
+                        loc("list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(error)
                     )
                 } else if likes.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "likes.empty"),
+                        loc("likes.empty"),
                         systemImage: "heart",
-                        description: Text("likes.empty_desc")
+                        description: Text(loc: "likes.empty_desc")
                     )
                 } else {
                     List {
@@ -79,7 +79,7 @@ struct LikesListView: View {
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle("likes.title")
+            .navigationTitle(loc: "likes.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

@@ -1036,5 +1036,19 @@
   "debug.http.state.failed": "失败的",
   "debug.http.close": "Close",
   "clearsky.unavailable": "ClearSky API temporarily unavailable — some data may not load",
-  "debug.diagnostics": "诊断"
+  "debug.diagnostics": "诊断",
+  "settings.icloud.privacy.title": "iCloud Sync Privacy",
+  "settings.icloud.privacy.message": "Account handles, display names, and PDS URLs will be synced across your devices via iCloud in cleartext. App passwords remain on-device.",
+  "settings.icloud.privacy.cancel": "Cancel",
+  "settings.icloud.privacy.confirm": "Enable",
+  "list.export.complete": "Export Complete",
+  "account.preferred_search.info.title": "Search Account Info",
+  "account.preferred_search.info.hint": "Learn more about the search account feature",
+  "account.preferred_search.info.p1": "The search account determines which Bluesky account is used when performing searches across the app. All moderation actions, profile lookups, and timeline searches will be executed from this account perspective.",
+  "account.preferred_search.info.p2": "Choose an account with minimal blocks and mutes to get the broadest search results. Accounts with many blocks may not discover certain profiles or content due to their block list.",
+  "account.preferred_search.info.p3": "This selection does not affect your active account — you can be signed into one account for browsing and use a different account for searches. Your active account is used for all moderation actions like blocking, muting, and list management.",
+  "post.block_likers.checking_title": "Checking accounts…",
+  "customsearch.clear_recent": "Clear All",
+  "post.block_likers.blocked_now": "Blocked: {count}",
+  "post.block_likers.already_blocked": "Already blocked: {count}"
 }

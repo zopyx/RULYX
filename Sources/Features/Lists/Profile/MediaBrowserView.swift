@@ -63,7 +63,7 @@ struct MediaBrowserView: View {
                             if viewModel.isScanning {
                                 ProgressView()
                                     .scaleEffect(0.6)
-                                Text("profile.media.scanning")
+                                Text(loc: "profile.media.scanning")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
                             }
@@ -79,7 +79,7 @@ struct MediaBrowserView: View {
                             if viewModel.isScanning {
                                 ProgressView()
                                     .scaleEffect(0.6)
-                                Text("profile.media.scanning")
+                                Text(loc: "profile.media.scanning")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
                             }
@@ -91,7 +91,7 @@ struct MediaBrowserView: View {
                 }
 
                 if !viewModel.items.isEmpty {
-                    Text("media.instruction")
+                    Text(loc: "media.instruction")
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -103,27 +103,27 @@ struct MediaBrowserView: View {
                 Group {
                     if viewModel.isLoading, viewModel.items.isEmpty {
                         Spacer()
-                        LoadingPanel(message: String(localized: "profile.posts.loading"))
+                        LoadingPanel(message: loc("profile.posts.loading"))
                         Spacer()
                     } else if let error = viewModel.errorMessage, viewModel.items.isEmpty {
                         if error.localizedCaseInsensitiveContains("blocked") {
                             ContentUnavailableView(
-                                String(localized: "profile.blocked.title"),
+                                loc("profile.blocked.title"),
                                 systemImage: "hand.raised.slash.fill",
-                                description: Text("profile.blocked.media_desc")
+                                description: Text(loc: "profile.blocked.media_desc")
                             )
                         } else {
                             ContentUnavailableView(
-                                String(localized: "list.detail.alert_title"),
+                                loc("list.detail.alert_title"),
                                 systemImage: "exclamationmark.bubble",
                                 description: Text(error)
                             )
                         }
                     } else if viewModel.items.isEmpty {
                         ContentUnavailableView(
-                            String(localized: "profile.media.empty"),
+                            loc("profile.media.empty"),
                             systemImage: "photo.on.rectangle",
-                            description: Text("profile.media.empty_desc")
+                            description: Text(loc: "profile.media.empty_desc")
                         )
                     } else {
                         ScrollView {
@@ -146,7 +146,7 @@ struct MediaBrowserView: View {
                     }
                 }
             }
-            .navigationTitle("profile.media.title")
+            .navigationTitle(loc("profile.media.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -181,11 +181,11 @@ struct MediaBrowserView: View {
                                         .foregroundStyle(.red)
                                 }
                             } header: {
-                                Text("profile.media.download_errors")
+                                Text(loc: "profile.media.download_errors")
                             }
                         }
                     }
-                    .navigationTitle("profile.media.download_complete")
+                    .navigationTitle(loc("profile.media.download_complete"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
@@ -224,7 +224,7 @@ struct MediaBrowserView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: viewModel.selectAll ? "checkmark.circle.fill" : "circle")
-                        Text("profile.media.select_all")
+                        Text(loc: "profile.media.select_all")
                     }
                     .font(.body.weight(.medium))
                     .padding(.vertical, 6)

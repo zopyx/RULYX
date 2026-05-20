@@ -1,6 +1,7 @@
 @testable import RULYX
 import XCTest
 
+@MainActor
 final class ClearskyHeartbeatServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()

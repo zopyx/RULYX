@@ -67,7 +67,7 @@ struct SplashScreenView: View {
 
                 Spacer().frame(height: 8)
 
-                Text("splash.tagline")
+                Text(loc: "splash.tagline")
                     .font(.body.weight(.medium))
                     .foregroundStyle(.white.opacity(0.7))
                     .offset(y: taglineOffset)
@@ -75,7 +75,7 @@ struct SplashScreenView: View {
 
                 Spacer().frame(height: 24)
 
-                Text("splash.subtagline")
+                Text(loc: "splash.subtagline")
                     .font(.caption.weight(.regular))
                     .foregroundStyle(.white.opacity(0.5))
                     .offset(y: subtaglineOffset)

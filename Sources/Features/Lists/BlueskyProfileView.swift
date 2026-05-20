@@ -50,9 +50,9 @@ struct BlueskyProfileView: View {
                 content(account: account, appPassword: appPassword)
             } else {
                 ContentUnavailableView(
-                    String(localized: "list.detail.missing_creds"),
+                    loc("list.detail.missing_creds"),
                     systemImage: "key.slash",
-                    description: Text("list.detail.missing_creds.desc")
+                    description: Text(loc: "list.detail.missing_creds.desc")
                 )
             }
         }
@@ -113,7 +113,7 @@ struct BlueskyProfileView: View {
             NavigationStack {
                 if let ownedLists = viewModel.ownedLists {
                     if ownedLists.isEmpty {
-                        ContentUnavailableView("profile.stats.owned_lists.empty", systemImage: "list.bullet", description: Text("profile.stats.owned_lists.empty_desc"))
+                        ContentUnavailableView(loc("profile.stats.owned_lists.empty"), systemImage: "list.bullet", description: Text(loc: "profile.stats.owned_lists.empty_desc"))
                     } else {
                         List {
                             ForEach(ownedLists) { list in
@@ -130,7 +130,7 @@ struct BlueskyProfileView: View {
                                         Text(list.name).font(.subheadline.weight(.semibold))
                                         Text(list.kind.title).font(.caption).foregroundStyle(.secondary)
                                         if let count = list.memberCount {
-                                            Text(String(localized: "profile.stats.owned_lists.member_count").replacingOccurrences(of: "{count}", with: "\(count)")).font(.caption).foregroundStyle(.secondary)
+                                            Text(loc("profile.stats.owned_lists.member_count").replacingOccurrences(of: "{count}", with: "\(count)")).font(.caption).foregroundStyle(.secondary)
                                         }
                                     }
                                     .padding(.vertical, 2)
@@ -150,7 +150,7 @@ struct BlueskyProfileView: View {
                let appPassword = accountStore.appPassword(for: account)
             {
                 SimplifiedReportSheet(
-                    title: String(localized: "profile.report"),
+                    title: loc("profile.report"),
                     selectedReason: $viewModel.selectedReportReason,
                     evidenceText: $reportReasonText,
                     isSubmitting: viewModel.isReporting,
@@ -183,7 +183,7 @@ struct BlueskyProfileView: View {
                         .symbolRenderingMode(.hierarchical)
 
                     VStack(spacing: 8) {
-                        Text("profile.blocked.title")
+                        Text(loc: "profile.blocked.title")
                             .font(.title2.weight(.bold))
                         Text("profile.blocked.\(type.rawValue)_desc")
                             .font(.body)
@@ -239,7 +239,7 @@ struct BlueskyProfileView: View {
                         RelationshipsView(mode: .followers, initialCount: profile.followersCount, profileDID: profile.did, profileHandle: profile.handle)
                     } label: {
                         HStack {
-                            Text("profile.stats.followers")
+                            Text(loc: "profile.stats.followers")
                             Spacer()
                             Text(statText(profile.followersCount))
                                 .foregroundStyle(.secondary)
@@ -249,7 +249,7 @@ struct BlueskyProfileView: View {
                         RelationshipsView(mode: .following, initialCount: profile.followsCount, profileDID: profile.did, profileHandle: profile.handle)
                     } label: {
                         HStack {
-                            Text("profile.stats.following")
+                            Text(loc: "profile.stats.following")
                             Spacer()
                             Text(statText(profile.followsCount))
                                 .foregroundStyle(.secondary)
@@ -263,11 +263,12 @@ struct BlueskyProfileView: View {
                         }
                     } label: {
                         HStack {
-                            Text("profile.stats.posts")
+                            Text(loc: "profile.stats.posts")
                             Spacer()
                             Text(statText(profile.postsCount))
                                 .foregroundStyle(.secondary)
                             Image(systemName: "chevron.right")
+                                .flipsForRightToLeftLayoutDirection(true)
                                 .appFont(.subheading)
                                 .foregroundStyle(.tertiary)
                         }
@@ -281,7 +282,7 @@ struct BlueskyProfileView: View {
                         }
                     } label: {
                         HStack {
-                            Text("profile.stats.media")
+                            Text(loc: "profile.stats.media")
                             Spacer()
                             if viewModel.isScanningMedia {
                                 ProgressView()
@@ -293,10 +294,11 @@ struct BlueskyProfileView: View {
                                 ].compactMap(\.self).joined(separator: " · "))
                                     .foregroundStyle(.secondary)
                                 Image(systemName: "chevron.right")
+                                    .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
                                     .foregroundStyle(.tertiary)
                             } else if !viewModel.isScanningMedia {
-                                Text("profile.media.empty")
+                                Text(loc: "profile.media.empty")
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -306,7 +308,7 @@ struct BlueskyProfileView: View {
                         showClearskyLists = true
                     } label: {
                         HStack {
-                            Text("profile.stats.lists")
+                            Text(loc: "profile.stats.lists")
                             Spacer()
                             if viewModel.isFetchingLists {
                                 ProgressView()
@@ -315,6 +317,7 @@ struct BlueskyProfileView: View {
                                 Text("\(viewModel.clearskyLists.count)")
                                     .foregroundStyle(.secondary)
                                 Image(systemName: "chevron.right")
+                                    .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
                                     .foregroundStyle(.tertiary)
                             } else if viewModel.listError == nil, !viewModel.isLoading {
@@ -328,7 +331,7 @@ struct BlueskyProfileView: View {
                         showOwnedLists = true
                     } label: {
                         HStack {
-                            Text("profile.stats.owned_lists")
+                            Text(loc: "profile.stats.owned_lists")
                             Spacer()
                             if viewModel.isFetchingOwnedLists {
                                 ProgressView()
@@ -337,6 +340,7 @@ struct BlueskyProfileView: View {
                                 Text("\(owned.count)")
                                     .foregroundStyle(.secondary)
                                 Image(systemName: "chevron.right")
+                                    .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
                                     .foregroundStyle(.tertiary)
                             } else if !viewModel.isLoading {
@@ -357,7 +361,7 @@ struct BlueskyProfileView: View {
                         }
                     }
                 } header: {
-                    Text("profile.stats")
+                    Text(loc: "profile.stats")
                         .onTapGesture(count: 2) { showPostBrowser = true }
                 }
 
@@ -376,7 +380,7 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text("profile.following") } icon: { Image(systemName: "person.badge.plus") }
+                                Label { Text(loc: "profile.following") } icon: { Image(systemName: "person.badge.plus") }
                             }
                             .disabled(viewModel.isUpdatingModeration)
 
@@ -392,10 +396,10 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text("profile.block") } icon: { Image(systemName: "hand.raised") }
+                                Label { Text(loc: "profile.block") } icon: { Image(systemName: "hand.raised") }
                             }
                             .disabled(viewModel.isUpdatingModeration)
-                            .accessibilityHint(viewerState.isBlocking ? String(localized: "profile.unblock.hint") : String(localized: "profile.block.hint"))
+                            .accessibilityHint(viewerState.isBlocking ? loc("profile.unblock.hint") : loc("profile.block.hint"))
 
                             Toggle(isOn: Binding(
                                 get: { viewModel.pendingMuteState ?? viewerState.muted },
@@ -409,10 +413,10 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text("profile.mute") } icon: { Image(systemName: "speaker.slash") }
+                                Label { Text(loc: "profile.mute") } icon: { Image(systemName: "speaker.slash") }
                             }
                             .disabled(viewModel.isUpdatingModeration)
-                            .accessibilityHint(viewerState.muted ? String(localized: "profile.unmute.hint") : String(localized: "profile.mute.hint"))
+                            .accessibilityHint(viewerState.muted ? loc("profile.unmute.hint") : loc("profile.mute.hint"))
                         }
 
                         if let statusMessage = viewModel.statusMessage {
@@ -421,7 +425,7 @@ struct BlueskyProfileView: View {
                                 .foregroundStyle(.secondary)
                         }
                     } header: {
-                        Text("profile.moderation_section")
+                                Text(loc: "profile.moderation_section")
                     }
                 }
 
@@ -450,7 +454,7 @@ struct BlueskyProfileView: View {
                                 .disabled(viewModel.isUpdatingModeration)
                             }
                         } header: {
-                            Text("profile.on_my_moderation_lists")
+                            Text(loc: "profile.on_my_moderation_lists")
                         }
                     }
 
@@ -475,7 +479,7 @@ struct BlueskyProfileView: View {
                                 .disabled(viewModel.isUpdatingModeration)
                             }
                         } header: {
-                            Text("profile.on_my_lists")
+                            Text(loc: "profile.on_my_lists")
                         }
                     }
                 }
@@ -483,9 +487,9 @@ struct BlueskyProfileView: View {
                 if let profileURL = profile.profileURL {
                     Section {
                         Link(destination: profileURL) {
-                            Label { Text("profile.open_bluesky") } icon: { Image(systemName: "arrow.up.right.square") }
+                            Label { Text(loc: "profile.open_bluesky") } icon: { Image(systemName: "arrow.up.right.square") }
                         }
-                        .accessibilityHint("profile.open_bluesky.hint")
+                        .accessibilityHint(loc("profile.open_bluesky.hint"))
                     }
                 }
 
@@ -505,7 +509,7 @@ struct BlueskyProfileView: View {
                             .foregroundStyle(.tertiary)
                         }
                     } label: {
-                        Text("profile.stats.handle")
+                        Text(loc: "profile.stats.handle")
                     }
                     LabeledContent {
                         HStack(spacing: 4) {
@@ -523,7 +527,7 @@ struct BlueskyProfileView: View {
                             .foregroundStyle(.tertiary)
                         }
                     } label: {
-                        Text("profile.stats.did")
+                        Text(loc: "profile.stats.did")
                     }
                     if let createdAt = profile.createdAt {
                         LabeledContent("profile.stats.joined", value: createdAt.formatted(date: .abbreviated, time: .omitted))
@@ -532,7 +536,7 @@ struct BlueskyProfileView: View {
                         LabeledContent("profile.stats.labels", value: profile.labels.joined(separator: ", "))
                     }
                 } header: {
-                    Text("profile.account_info")
+                    Text(loc: "profile.account_info")
                 }
 
                 if !viewModel.handleHistory.isEmpty {
@@ -542,7 +546,7 @@ struct BlueskyProfileView: View {
                                 Text(entry.handle)
                                     .font(.caption.monospaced())
                                 if entry.isCurrent {
-                                    Text("profile.current_badge")
+                                    Text(loc: "profile.current_badge")
                                         .font(.caption2.weight(.semibold))
                                         .foregroundStyle(.white)
                                         .padding(.horizontal, 8)
@@ -556,7 +560,7 @@ struct BlueskyProfileView: View {
                             }
                         }
                     } header: {
-                        Text("profile.handle_history")
+                        Text(loc: "profile.handle_history")
                     }
                 }
 
@@ -567,13 +571,13 @@ struct BlueskyProfileView: View {
                             reportReasonText = ""
                             viewModel.showReportSheet = true
                         } label: {
-                            Label { Text("profile.report") } icon: { Image(systemName: "exclamationmark.shield") }
+                            Label { Text(loc: "profile.report") } icon: { Image(systemName: "exclamationmark.shield") }
                         }
                         .disabled(viewModel.isReporting)
-                        .accessibilityHint("profile.report.hint")
+                        .accessibilityHint(loc("profile.report.hint"))
 
                         if let list {
-                            Label { Text(verbatim: String(localized: "profile.member_of").replacingOccurrences(of: "{list}", with: list.name)) } icon: { Image(systemName: "person.2.badge.gearshape") }
+                            Label { Text(verbatim: loc("profile.member_of").replacingOccurrences(of: "{list}", with: list.name)) } icon: { Image(systemName: "person.2.badge.gearshape") }
                                 .foregroundStyle(.secondary)
                         }
 
@@ -590,8 +594,8 @@ struct BlueskyProfileView: View {
                             } label: {
                                 HStack(spacing: 8) {
                                     Image(systemName: "bubble.left.and.bubble.right")
-                                    Text("profile.direct_message")
-                                    Text("profile.beta")
+                                    Text(loc: "profile.direct_message")
+                                    Text(loc: "profile.beta")
                                         .font(.caption2.weight(.bold))
                                         .foregroundStyle(.white)
                                         .padding(.horizontal, 5)
@@ -602,7 +606,7 @@ struct BlueskyProfileView: View {
                         }
 
                     } header: {
-                        Text("profile.actions_section")
+                        Text(loc: "profile.actions_section")
                     }
                 }
 
@@ -612,7 +616,7 @@ struct BlueskyProfileView: View {
                             HStack {
                                 ProgressView()
                                     .scaleEffect(0.7)
-                                Text("profile.block_back.loading")
+                                Text(loc: "profile.block_back.loading")
                                     .foregroundStyle(.secondary)
                             }
                         } else {
@@ -628,7 +632,7 @@ struct BlueskyProfileView: View {
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }
-                                    Text("profile.block_back.progress")
+                                    Text(loc: "profile.block_back.progress")
                                         .foregroundStyle(.secondary)
                                 }
                             } else if let count = unblockedBlockersCount, count > 0 {
@@ -642,6 +646,7 @@ struct BlueskyProfileView: View {
                                             .foregroundStyle(.secondary)
                                             .font(.caption.weight(.semibold))
                                         Image(systemName: "chevron.right")
+                                            .flipsForRightToLeftLayoutDirection(true)
                                             .appFont(.subheading)
                                             .foregroundStyle(.tertiary)
                                     }
@@ -664,8 +669,8 @@ struct BlueskyProfileView: View {
                         }
                     } header: {
                         HStack(spacing: 6) {
-                            Text("profile.block_back.section")
-                            Text("profile.beta")
+                            Text(loc: "profile.block_back.section")
+                            Text(loc: "profile.beta")
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 5)
@@ -675,7 +680,7 @@ struct BlueskyProfileView: View {
                     }
                 }
             } else if viewModel.isLoading {
-                LoadingPanel(message: String(localized: "profile.loading"))
+                LoadingPanel(message: loc("profile.loading"))
             }
 
             if let errorMessage = viewModel.errorMessage {
@@ -728,26 +733,26 @@ struct BlueskyProfileView: View {
                 await blocks
             }
         }
-        .alert("profile.block_back.confirm.first.title", isPresented: $showBlockBackConfirm1) {
-            Button(String(localized: "actions.cancel"), role: .cancel) {}
+        .alert(Text(loc: "profile.block_back.confirm.first.title"), isPresented: $showBlockBackConfirm1) {
+            Button(loc("actions.cancel"), role: .cancel) {}
             Button("profile.block_back.action") {
                 showBlockBackConfirm2 = true
             }
         } message: {
             if let count = unblockedBlockersCount {
-                Text(String(localized: "profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
+                Text(loc("profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
-        .alert("profile.block_back.confirm.second.title", isPresented: $showBlockBackConfirm2) {
-            Button(String(localized: "actions.cancel"), role: .cancel) {}
-            Button(String(localized: "profile.block_back.action"), role: .destructive) {
+        .alert(Text(loc: "profile.block_back.confirm.second.title"), isPresented: $showBlockBackConfirm2) {
+            Button(loc("actions.cancel"), role: .cancel) {}
+            Button(loc("profile.block_back.action"), role: .destructive) {
                 Task {
                     await blockBack(account: account, appPassword: appPassword)
                 }
             }
         } message: {
             if let count = unblockedBlockersCount {
-                Text(String(localized: "profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
+                Text(loc("profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
     }
@@ -894,10 +899,10 @@ struct BlueskyProfileView: View {
     @ViewBuilder
     private func relationshipBadges(state: BlueskyViewerState) -> some View {
         let badges: [(label: String, icon: String, color: Color, active: Bool)] = [
-            (String(localized: "profile.badge.follows_me"), "person.crop.circle.badge.checkmark", .green, state.followsYou),
-            (String(localized: "profile.badge.blocks_me"), "hand.raised.slash.fill", .red, state.blockedBy),
-            (String(localized: "profile.badge.following"), "heart.fill", .blue, state.isFollowing),
-            (String(localized: "profile.badge.blocking"), "hand.raised.fill", .orange, state.isBlocking),
+            (loc("profile.badge.follows_me"), "person.crop.circle.badge.checkmark", .green, state.followsYou),
+            (loc("profile.badge.blocks_me"), "hand.raised.slash.fill", .red, state.blockedBy),
+            (loc("profile.badge.following"), "heart.fill", .blue, state.isFollowing),
+            (loc("profile.badge.blocking"), "hand.raised.fill", .orange, state.isBlocking),
         ]
         let active = badges.filter(\.active)
         if !active.isEmpty {

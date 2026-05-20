@@ -27,10 +27,10 @@ struct ThreadView: View {
         NavigationStack {
             Group {
                 if viewModel.isLoading {
-                    LoadingPanel(message: String(localized: "profile.posts.loading"))
+                    LoadingPanel(message: loc("profile.posts.loading"))
                 } else if let error = viewModel.errorMessage {
                     ContentUnavailableView(
-                        String(localized: "list.detail.alert_title"),
+                        loc("list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(error)
                     )
@@ -47,7 +47,7 @@ struct ThreadView: View {
                                     ancestorRow(ancestor, isFirst: index == 0, isLast: index == ancestors.count - 1)
                                 }
                             } header: {
-                                Text("profile.posts.replying_to")
+                                Text(loc: "profile.posts.replying_to")
                             }
                         }
 
@@ -57,14 +57,14 @@ struct ThreadView: View {
                                     replyThreadRow(reply, depth: 0, isLast: index == replies.count - 1)
                                 }
                             } header: {
-                                Text("profile.posts.replies")
+                                Text(loc: "profile.posts.replies")
                             }
                         }
                     }
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle("profile.posts.thread")
+            .navigationTitle(loc("profile.posts.thread"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -734,7 +734,7 @@ final class ThreadViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     func handleMissingCredentials() {
-        errorMessage = String(localized: "list.detail.missing_creds")
+        errorMessage = loc("list.detail.missing_creds")
         isLoading = false
     }
 

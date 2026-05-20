@@ -49,7 +49,7 @@ struct ListsView: View {
                                 presentationState.showFollowers = true
                             } label: {
                                 relationshipRow(
-                                    label: String(localized: "lists.followers"),
+                                    label: loc("lists.followers"),
                                     count: viewModel.activeProfile?.followersCount
                                 )
                             }
@@ -59,7 +59,7 @@ struct ListsView: View {
                                 presentationState.showFollowing = true
                             } label: {
                                 relationshipRow(
-                                    label: String(localized: "lists.following"),
+                                    label: loc("lists.following"),
                                     count: viewModel.activeProfile?.followsCount
                                 )
                             }
@@ -69,7 +69,7 @@ struct ListsView: View {
                                 presentationState.showBlocking = true
                             } label: {
                                 relationshipRow(
-                                    label: String(localized: "lists.blocking"),
+                                    label: loc("lists.blocking"),
                                     count: viewModel.blockingCount
                                 )
                             }
@@ -79,7 +79,7 @@ struct ListsView: View {
                                 presentationState.showBlockedBy = true
                             } label: {
                                 relationshipRow(
-                                    label: String(localized: "lists.blocked_by"),
+                                    label: loc("lists.blocked_by"),
                                     count: viewModel.blockedByCount
                                 )
                             }
@@ -111,7 +111,7 @@ struct ListsView: View {
                                         Image(systemName: "plus.circle.fill")
                                             .font(.title3)
                                             .foregroundStyle(.secondary)
-                                        Text("lists.create_first_mod")
+                                        Text(loc: "lists.create_first_mod")
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                         Spacer()
@@ -121,10 +121,10 @@ struct ListsView: View {
                             }
                         } header: {
                             HStack {
-                                Text("lists.moderation_lists")
+                                Text(loc: "lists.moderation_lists")
                                     .functionHelp(
-                                        title: String(localized: "lists.moderation_lists"),
-                                        text: String(localized: "lists.moderation_lists.help")
+                                        title: loc("lists.moderation_lists"),
+                                        text: loc("lists.moderation_lists.help")
                                     )
                                 Spacer()
                                 Button {
@@ -159,7 +159,7 @@ struct ListsView: View {
                                         Image(systemName: "plus.circle.fill")
                                             .font(.title3)
                                             .foregroundStyle(.secondary)
-                                        Text("lists.create_first")
+                                        Text(loc: "lists.create_first")
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                         Spacer()
@@ -169,10 +169,10 @@ struct ListsView: View {
                             }
                         } header: {
                             HStack {
-                                Text("lists.lists")
+                                Text(loc: "lists.lists")
                                     .functionHelp(
-                                        title: String(localized: "lists.lists"),
-                                        text: String(localized: "lists.lists.help")
+                                        title: loc("lists.lists"),
+                                        text: loc("lists.lists.help")
                                     )
                                 Spacer()
                                 Button {
@@ -191,9 +191,10 @@ struct ListsView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "at")
-                                    Text("lists.advanced.mentions_button")
+                                    Text(loc: "lists.advanced.mentions_button")
                                     Spacer()
                                     Image(systemName: "chevron.right")
+                                        .flipsForRightToLeftLayoutDirection(true)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
@@ -204,19 +205,20 @@ struct ListsView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "magnifyingglass")
-                                    Text("lists.advanced.customsearch_button")
+                                    Text(loc: "lists.advanced.customsearch_button")
                                     Spacer()
                                     Image(systemName: "chevron.right")
+                                        .flipsForRightToLeftLayoutDirection(true)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                                 .padding(.vertical, 4)
                             }
                         } header: {
-                            Text("lists.advanced")
+                            Text(loc: "lists.advanced")
                                 .functionHelp(
-                                    title: String(localized: "lists.advanced"),
-                                    text: String(localized: "lists.advanced.help")
+                                    title: loc("lists.advanced"),
+                                    text: loc("lists.advanced.help")
                                 )
                         }
 
@@ -258,7 +260,7 @@ struct ListsView: View {
                             Image(systemName: "arrow.clockwise")
                         }
                     }
-                    .accessibilityLabel("lists.refresh.label")
+                    .accessibilityLabel(loc("lists.refresh.label"))
                     .disabled(accountStore.activeAccount == nil || viewModel.isRefreshing)
                 }
             }
@@ -416,6 +418,7 @@ struct ListsView: View {
             }
             Spacer()
             Image(systemName: "chevron.right")
+                .flipsForRightToLeftLayoutDirection(true)
                 .appFont(.subheading)
                 .foregroundStyle(Color.skyPrimary.opacity(0.8))
         }
@@ -429,7 +432,7 @@ struct ListsView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
         }
-        .appButtonAccessibility(label: label, hint: String(localized: "rel.view.hint"))
+        .appButtonAccessibility(label: label, hint: loc("rel.view.hint"))
     }
 
     private func activeAccountMember(_ account: AppAccount) -> BlueskyListMember {

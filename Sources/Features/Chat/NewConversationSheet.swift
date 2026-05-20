@@ -48,7 +48,7 @@ struct NewConversationSheet: View {
                     }
                 }
             }
-            .navigationTitle("chat.new.title")
+            .navigationTitle(loc("chat.new.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

@@ -20,9 +20,9 @@ extension ListDetailView {
                             .font(.title3)
                             .foregroundStyle(subscriptionRecordURI != nil ? .red : .blue)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(verbatim: subscriptionRecordURI != nil ? String(localized: "list.detail.subscribed") : String(localized: "list.detail.subscribe"))
+                            Text(verbatim: subscriptionRecordURI != nil ? loc("list.detail.subscribed") : loc("list.detail.subscribe"))
                                 .font(.subheadline.weight(.semibold))
-                            Text("list.detail.subscribe.desc")
+                            Text(loc: "list.detail.subscribe.desc")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -73,7 +73,7 @@ extension ListDetailView {
                             } else if subscriptionRecordURI != nil {
                                 Label("list.detail.unsubscribe", systemImage: "bell.slash.fill")
                             } else {
-                                Text("list.detail.subscribe")
+                                Text(loc: "list.detail.subscribe")
                                     .fontWeight(.semibold)
                             }
                             Spacer()
@@ -82,7 +82,7 @@ extension ListDetailView {
                     .disabled(isSubscribing)
                     .buttonStyle(.borderedProminent)
                     .tint(subscriptionRecordURI != nil ? .red : .blue)
-                    .accessibilityHint("list.detail.subscribe.hint")
+                    .accessibilityHint(loc("list.detail.subscribe.hint"))
                 }
                 .padding(.vertical, 4)
             }

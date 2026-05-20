@@ -21,6 +21,7 @@ struct RULYXApp: App {
                     .environmentObject(deps.workspaceStore)
                     .environmentObject(deps.blueskyClient)
                     .environmentObject(deps.localizationManager)
+                    .environment(\.locale, deps.localizationManager.locale)
                     .environmentObject(deps.mutedWordsStore)
                     .environmentObject(deps.analyticsStore)
                     .environmentObject(deps.chatStore)
@@ -28,6 +29,16 @@ struct RULYXApp: App {
                     .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
+                    .alert(Text(loc: "settings.icloud.privacy.title"), isPresented: Binding(get: { iCloudAccountSync.shared.showPrivacyAlert }, set: { if !$0 { iCloudAccountSync.shared.showPrivacyAlert = false } })) {
+                        Button(loc("settings.icloud.privacy.cancel"), role: .cancel) {
+                            iCloudAccountSync.shared.cancelEnable()
+                        }
+                        Button(loc("settings.icloud.privacy.confirm")) {
+                            iCloudAccountSync.shared.confirmEnable()
+                        }
+                    } message: {
+                        Text(loc: "settings.icloud.privacy.message")
+                    }
                     .onAppear {
                         DispatchQueue.main.async {
                             configureCache()

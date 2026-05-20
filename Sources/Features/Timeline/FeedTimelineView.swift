@@ -30,7 +30,7 @@ struct FeedTimelineView: View {
                     skeletonContent
                 case let .failed(msg):
                     ContentUnavailableView(
-                        String(localized: "list.detail.alert_title"),
+                        loc("list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(msg)
                     )
@@ -40,7 +40,7 @@ struct FeedTimelineView: View {
                     listContent
                 }
             }
-            .navigationTitle("timeline.title")
+            .navigationTitle(loc("timeline.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -137,17 +137,17 @@ struct FeedTimelineView: View {
                 }
             }
             .confirmationDialog(
-                String(localized: "post.delete.confirm"),
+                loc("post.delete.confirm"),
                 isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
                 titleVisibility: .visible,
                 presenting: postToDelete
             ) { post in
-                Button(String(localized: "post.delete"), role: .destructive) {
+                Button(loc("post.delete"), role: .destructive) {
                     Task { await deletePost(post) }
                 }
-                Button(String(localized: "actions.cancel"), role: .cancel) {}
+                Button(loc("actions.cancel"), role: .cancel) {}
             } message: { _ in
-                Text("post.delete.message")
+                Text(loc: "post.delete.message")
             }
             .task {
                 await loadInitial()
@@ -214,7 +214,7 @@ struct FeedTimelineView: View {
                             viewModel.mutedWords.add(word)
                         } label: {
                             Label {
-                                Text(verbatim: String(localized: "timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
+                                Text(verbatim: loc("timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
                             } icon: {
                                 Image(systemName: "eye.slash")
                             }
@@ -240,7 +240,7 @@ struct FeedTimelineView: View {
                 .listRowSeparator(.hidden)
             }
             if viewModel.state == .exhausted {
-                Text("timeline.end")
+                Text(loc: "timeline.end")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity)
@@ -290,9 +290,9 @@ struct FeedTimelineView: View {
     private var emptyStateContent: some View {
         let isCustomFeed = viewModel.feedStore.isUsingCustomFeed
         return ContentUnavailableView {
-            Label(isCustomFeed ? String(localized: "timeline.empty_custom") : String(localized: "timeline.empty"), systemImage: "bubble.left.and.bubble.right")
+            Label(isCustomFeed ? loc("timeline.empty_custom") : loc("timeline.empty"), systemImage: "bubble.left.and.bubble.right")
         } description: {
-            Text(verbatim: isCustomFeed ? String(localized: "timeline.empty_custom_desc") : String(localized: "timeline.empty_desc"))
+            Text(verbatim: isCustomFeed ? loc("timeline.empty_custom_desc") : loc("timeline.empty_desc"))
         }
     }
 
@@ -419,7 +419,7 @@ struct FeedTimelineView: View {
     }
 
     private var newPostsBanner: some View {
-        Text(String(localized: "timeline.new_posts").replacingOccurrences(of: "{n}", with: "\(viewModel.newPostCount)"))
+        Text(loc("timeline.new_posts").replacingOccurrences(of: "{n}", with: "\(viewModel.newPostCount)"))
             .font(.subheadline.weight(.medium))
             .foregroundStyle(.white)
             .padding(.horizontal, 16)

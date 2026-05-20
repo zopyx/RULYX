@@ -155,6 +155,7 @@ private struct HTTPRequestDebugRow: View {
 
                     if isErrorPayloadAvailable {
                         Image(systemName: "chevron.right")
+                            .flipsForRightToLeftLayoutDirection(true)
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }

@@ -44,7 +44,7 @@ struct NetworkGraphView: View {
                     Label(a.handle, systemImage: "person.fill")
                 }
             } header: {
-                Text("network.account_a")
+                Text(loc: "network.account_a")
             }
 
             Section {
@@ -56,7 +56,7 @@ struct NetworkGraphView: View {
                     Label(b.handle, systemImage: "person.fill")
                 }
             } header: {
-                Text("network.account_b")
+                Text(loc: "network.account_b")
             }
 
             if let a = accountA, let b = accountB {
@@ -65,14 +65,14 @@ struct NetworkGraphView: View {
                     LabeledContent("network.mutual_following", value: "\(mutualFollowing.count)")
                     LabeledContent(
                         String.localized("network.follows_relationship", replacements: ["handle1": a.handle, "handle2": b.handle]),
-                        value: aFollowsB ? String(localized: "network.yes") : String(localized: "network.no")
+                        value: aFollowsB ? loc("network.yes") : loc("network.no")
                     )
                     LabeledContent(
                         String.localized("network.follows_relationship", replacements: ["handle1": b.handle, "handle2": a.handle]),
-                        value: bFollowsA ? String(localized: "network.yes") : String(localized: "network.no")
+                        value: bFollowsA ? loc("network.yes") : loc("network.no")
                     )
                 } header: {
-                    Text("network.overlap")
+                    Text(loc: "network.overlap")
                 }
 
                 if !mutualFollowers.isEmpty {
@@ -81,10 +81,10 @@ struct NetworkGraphView: View {
                             Text(did).font(.caption.monospaced())
                         }
                         if mutualFollowers.count > 20 {
-                            Text(verbatim: String(localized: "network.more_count").replacingOccurrences(of: "{count}", with: "\(mutualFollowers.count - 20)")).font(.caption).foregroundStyle(.secondary)
+                            Text(verbatim: loc("network.more_count").replacingOccurrences(of: "{count}", with: "\(mutualFollowers.count - 20)")).font(.caption).foregroundStyle(.secondary)
                         }
                     } header: {
-                        Text("network.following_both")
+                        Text(loc: "network.following_both")
                     }
                 }
             }
@@ -93,7 +93,7 @@ struct NetworkGraphView: View {
                 Button("network.analyze") { Task { await analyze() } }
                     .disabled(accountA == nil || accountB == nil || isLoading)
                     .foregroundStyle(Color.skyPrimary)
-                    .accessibilityHint("network.analyze.hint")
+                    .accessibilityHint(loc("network.analyze.hint"))
             }
 
             if isLoading {
@@ -109,7 +109,7 @@ struct NetworkGraphView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("network.title")
+        .navigationTitle(loc("network.title"))
     }
 
     private func analyze() async {
@@ -166,7 +166,7 @@ private struct SearchField: View {
                 } label: {
                     Label(actor.handle, systemImage: "person").foregroundStyle(.primary)
                 }
-                .accessibilityHint("network.select.hint")
+                .accessibilityHint(loc("network.select.hint"))
             }
         }
     }

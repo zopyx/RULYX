@@ -114,7 +114,7 @@ struct PostRowView: View {
                 }
                 .padding(8)
                 .background(Color.skyPrimary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
-                Text(verbatim: "\(String(localized: "profile.posts.replying_to")) \(parentAuthor.displayName ?? parentAuthor.handle ?? "")")
+                Text(verbatim: "\(loc("profile.posts.replying_to")) \(parentAuthor.displayName ?? parentAuthor.handle ?? "")")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                     .lineLimit(1)

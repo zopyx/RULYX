@@ -29,7 +29,7 @@ struct ConversationDetailView: View {
         if let member = otherMember {
             return member.displayName ?? member.handle
         }
-        return conversation.members.first?.handle ?? String(localized: "chat.unknown")
+        return conversation.members.first?.handle ?? loc("chat.unknown")
     }
 
     var body: some View {
@@ -321,7 +321,7 @@ struct ConversationDetailView: View {
     private func deletedMessageView(_: ChatDeletedMessage) -> some View {
         HStack {
             Spacer()
-            Text("chat.message.deleted")
+            Text(loc: "chat.message.deleted")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .padding(.vertical, 8)
@@ -345,14 +345,14 @@ struct ConversationDetailView: View {
 
     private func systemText(_ data: ChatSystemMessageData) -> String {
         switch data {
-        case .addMember: String(localized: "chat.system.added")
-        case .removeMember: String(localized: "chat.system.removed")
-        case .memberJoin: String(localized: "chat.system.joined")
-        case .memberLeave: String(localized: "chat.system.left")
-        case .lockConvo: String(localized: "chat.system.locked")
-        case .unlockConvo: String(localized: "chat.system.unlocked")
-        case .lockConvoPermanently: String(localized: "chat.system.locked_permanent")
-        case .editGroup: String(localized: "chat.system.group_updated")
+        case .addMember: loc("chat.system.added")
+        case .removeMember: loc("chat.system.removed")
+        case .memberJoin: loc("chat.system.joined")
+        case .memberLeave: loc("chat.system.left")
+        case .lockConvo: loc("chat.system.locked")
+        case .unlockConvo: loc("chat.system.unlocked")
+        case .lockConvoPermanently: loc("chat.system.locked_permanent")
+        case .editGroup: loc("chat.system.group_updated")
         case .unknown: ""
         }
     }

@@ -1,5 +1,29 @@
 import Foundation
 
+// MARK: - Protocol Seams
+
+@MainActor
+protocol AccountServicing: AnyObject {
+    var accountStore: AccountStore { get }
+    var localizationManager: LocalizationManager { get }
+}
+
+@MainActor
+protocol ModerationServicing: AnyObject {
+    var blueskyClient: LiveBlueskyClient { get }
+    var workspaceStore: ModerationWorkspaceStore { get }
+    var mutedWordsStore: MutedWordsStore { get }
+    var analyticsStore: AnalyticsStore { get }
+}
+
+@MainActor
+protocol ChatServicesProtocol: AnyObject {
+    var chatStore: ChatStore { get }
+    var pushNotificationCoordinator: PushNotificationCoordinator { get }
+}
+
+// MARK: - Wiring
+
 @MainActor
 final class AppDependencies: ObservableObject {
     let accountStore: AccountStore
@@ -43,3 +67,9 @@ final class AppDependencies: ObservableObject {
         )
     }
 }
+
+// MARK: - Conformance
+
+extension AppDependencies: AccountServicing {}
+extension AppDependencies: ModerationServicing {}
+extension AppDependencies: ChatServicesProtocol {}

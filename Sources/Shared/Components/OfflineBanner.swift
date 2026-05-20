@@ -6,7 +6,7 @@ struct OfflineBanner: View {
         HStack(spacing: 8) {
             Image(systemName: "wifi.slash")
                 .font(.subheadline)
-            Text("offline.title")
+            Text(loc: "offline.title")
                 .font(.subheadline.weight(.semibold))
         }
         .frame(maxWidth: .infinity)

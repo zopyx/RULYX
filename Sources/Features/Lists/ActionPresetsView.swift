@@ -8,7 +8,7 @@ struct ActionPresetsView: View {
     var body: some View {
         List {
             if store.presets.isEmpty {
-                ContentUnavailableView("presets.no_presets", systemImage: "square.2.layers.3d", description: Text("presets.no_presets_desc"))
+                ContentUnavailableView(loc("presets.no_presets"), systemImage: "square.2.layers.3d", description: Text(loc: "presets.no_presets_desc"))
             }
 
             ForEach(store.presets) { preset in
@@ -24,21 +24,21 @@ struct ActionPresetsView: View {
                 .padding(.vertical, 4)
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) { store.delete(preset) } label: { Label("actions.delete", systemImage: "trash") }
-                        .accessibilityHint("action_preset.delete.hint")
+                        .accessibilityHint(loc("action_preset.delete.hint"))
                 }
                 .swipeActions(edge: .leading) {
                     Button { store.duplicate(preset) } label: { Label("presets.duplicate", systemImage: "doc.on.doc") }
-                        .accessibilityHint("action_preset.duplicate.hint")
+                        .accessibilityHint(loc("action_preset.duplicate.hint"))
                 }
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("presets.title")
+        .navigationTitle(loc("presets.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { isCreating = true } label: { Image(systemName: "plus") }
-                    .accessibilityLabel("presets.new_title")
-                    .accessibilityHint("action_preset.create.hint")
+                    .accessibilityLabel(loc("presets.new_title"))
+                    .accessibilityHint(loc("action_preset.create.hint"))
             }
         }
         .sheet(isPresented: $isCreating) {
@@ -83,27 +83,27 @@ struct EditActionPresetView: View {
                 TextField("presets.name_placeholder", text: $name)
                 Section("presets.actions_section") {
                     Toggle("presets.block", isOn: $shouldBlock)
-                        .accessibilityHint("action_preset.block.hint")
+                        .accessibilityHint(loc("action_preset.block.hint"))
                     Toggle("presets.mute", isOn: $shouldMute)
-                        .accessibilityHint("action_preset.mute.hint")
+                        .accessibilityHint(loc("action_preset.mute.hint"))
                     Toggle("presets.report", isOn: $shouldReport)
-                        .accessibilityHint("action_preset.report.hint")
+                        .accessibilityHint(loc("action_preset.report.hint"))
                 }
                 Section("presets.add_to_list") {
                     TextField("presets.list_placeholder", text: $targetListName)
                 }
             }
-            .navigationTitle("presets.new_title")
+            .navigationTitle(loc("presets.new_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("actions.cancel") { dismiss() }.accessibilityHint("action_preset.discard.hint") }
+                ToolbarItem(placement: .cancellationAction) { Button("actions.cancel") { dismiss() }.accessibilityHint(loc("action_preset.discard.hint")) }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("actions.save") {
                         store.save(ActionPreset(name: name, shouldBlock: shouldBlock, shouldMute: shouldMute, shouldReport: shouldReport, targetListName: targetListName.isEmpty ? nil : targetListName))
                         dismiss()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityHint("action_preset.save.hint")
+                    .accessibilityHint(loc("action_preset.save.hint"))
                 }
             }
         }

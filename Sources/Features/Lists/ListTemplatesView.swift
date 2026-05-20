@@ -42,10 +42,10 @@ struct ListTemplatesView: View {
             }
             .disabled(isCreating)
             .buttonStyle(.plain)
-            .accessibilityHint("list_templates.create.hint")
+            .accessibilityHint(loc("list_templates.create.hint"))
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("list_templates.title")
+        .navigationTitle(Text(loc: "list_templates.title"))
         .overlay {
             if isCreating { ProgressView("list_templates.creating") }
         }

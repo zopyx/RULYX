@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - Search, add/remove single actor, and membership filtering
+
 extension ListDetailViewModel {
     var searchResultSummary: String {
         if hasMoreSearchResults {

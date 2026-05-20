@@ -30,9 +30,11 @@ struct MentionsSearchView: View {
     @State private var isFetchingLikers = false
     @State private var pendingLikerTargets: [PendingLikerTarget] = []
     @State private var showBlockLikersConfirmation = false
+    @State private var isCheckingLikers = false
     @State private var isBlockingLikers = false
     @State private var isAddingLikersToList = false
     @State private var blockedCount = 0
+    @State private var alreadyBlockedCount = 0
     @State private var totalToBlock = 0
     @State private var currentBlockingHandle: String?
     @State private var addedCount = 0
@@ -53,6 +55,10 @@ struct MentionsSearchView: View {
     var body: some View {
         List {
             searchAccountSection
+
+            if isCheckingLikers {
+                checkingProgressSection
+            }
 
             if isBlockingLikers {
                 blockingProgressSection
@@ -75,7 +81,7 @@ struct MentionsSearchView: View {
             if viewModel.isLoading, viewModel.entries.isEmpty {
                 HStack {
                     Spacer()
-                    LoadingPanel(message: String(localized: "mentions.loading"))
+                    LoadingPanel(message: loc("mentions.loading"))
                     Spacer()
                 }
                 .listRowSeparator(.hidden)
@@ -84,7 +90,7 @@ struct MentionsSearchView: View {
                 HStack {
                     Spacer()
                     ContentUnavailableView(
-                        String(localized: "list.detail.alert_title"),
+                        loc("list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(error)
                     )
@@ -96,9 +102,9 @@ struct MentionsSearchView: View {
                 HStack {
                     Spacer()
                     ContentUnavailableView(
-                        String(localized: "mentions.empty"),
+                        loc("mentions.empty"),
                         systemImage: "at",
-                        description: Text("mentions.empty_desc")
+                        description: Text(loc: "mentions.empty_desc")
                     )
                     Spacer()
                 }
@@ -152,7 +158,7 @@ struct MentionsSearchView: View {
                     .listRowSeparator(.hidden)
                 }
                 if !viewModel.hasMore, !viewModel.entries.isEmpty {
-                    Text("mentions.end")
+                    Text(loc: "mentions.end")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity)
@@ -164,7 +170,7 @@ struct MentionsSearchView: View {
         .refreshable {
             await refresh()
         }
-        .navigationTitle("mentions.title")
+        .navigationTitle(Text(loc: "mentions.title"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedPostURI) { uri in
             ThreadView(postURI: uri)
@@ -195,12 +201,12 @@ struct MentionsSearchView: View {
             .environmentObject(blueskyClient)
         }
         .alert(String.localized("post.block_likers.confirm_title", replacements: ["count": "\(pendingLikerTargets.count)"]), isPresented: $showBlockLikersConfirmation) {
-            Button(String(localized: "post.block_likers.confirm_block"), role: .destructive) {
+            Button(loc("post.block_likers.confirm_block"), role: .destructive) {
                 let targets = pendingLikerTargets
                 showBlockLikersConfirmation = false
                 Task { await blockLikers(targets) }
             }
-            Button(String(localized: "actions.cancel"), role: .cancel) {
+            Button(loc("actions.cancel"), role: .cancel) {
                 resetPendingLikerTargets()
             }
         } message: {
@@ -211,13 +217,13 @@ struct MentionsSearchView: View {
                 return target.did
             }.joined(separator: "\n")
             let remainder = pendingLikerTargets.count > 5 ? "\n…and \(pendingLikerTargets.count - 5) more" : ""
-            Text(verbatim: String(localized: "post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
+            Text(verbatim: loc("post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
         }
         .alert("post.block_likers.done_title", isPresented: .init(get: { blockSuccessCount != nil }, set: { if !$0 { blockSuccessCount = nil } })) {
             Button("actions.ok") { blockSuccessCount = nil }
         } message: {
             if let count = blockSuccessCount {
-                Text(verbatim: String(localized: "post.block_likers.done").replacingOccurrences(of: "{count}", with: "\(count)"))
+                Text(verbatim: loc("post.block_likers.done").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
         .alert("post.add_likers.done_title", isPresented: .init(get: { addSuccessMessage != nil }, set: { if !$0 { addSuccessMessage = nil } })) {
@@ -283,7 +289,7 @@ struct MentionsSearchView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("mentions.searching_as")
+                Text(loc: "mentions.searching_as")
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.primary)
                 Text(account.displayName)
@@ -316,10 +322,32 @@ struct MentionsSearchView: View {
             }
     }
 
+    private var checkingProgressSection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text(loc: "post.block_likers.checking_title")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                ProgressView()
+                    .scaleEffect(0.8)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.skyPrimary.opacity(0.06))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
+        )
+        .listRowSeparator(.hidden)
+    }
+
     private var blockingProgressSection: some View {
         VStack(spacing: 12) {
             HStack {
-                Text("post.block_likers.blocking_title")
+                Text(loc: "post.block_likers.blocking_title")
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 Text("\(blockedCount)/\(totalToBlock)")
@@ -328,6 +356,21 @@ struct MentionsSearchView: View {
             }
             ProgressView(value: Double(blockedCount), total: Double(max(totalToBlock, 1)))
                 .progressViewStyle(.linear)
+            HStack(spacing: 16) {
+                Label(
+                    loc("post.block_likers.blocked_now").replacingOccurrences(of: "{count}", with: "\(blockedCount)"),
+                    systemImage: "hand.raised.fill"
+                )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                Label(
+                    loc("post.block_likers.already_blocked").replacingOccurrences(of: "{count}", with: "\(alreadyBlockedCount)"),
+                    systemImage: "checkmark.circle.fill"
+                )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                Spacer()
+            }
             if let handle = currentBlockingHandle {
                 Text(verbatim: handle)
                     .font(.caption.monospaced())
@@ -350,7 +393,7 @@ struct MentionsSearchView: View {
     private var addingProgressSection: some View {
         VStack(spacing: 12) {
             HStack {
-                Text("post.add_likers.adding_title")
+                Text(loc: "post.add_likers.adding_title")
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 Text("\(addedCount)/\(totalToAdd)")
@@ -411,7 +454,7 @@ struct MentionsSearchView: View {
             isFetchingLikers = false
             let targets = collectPendingLikerTargets(from: allLikes)
             if targets.isEmpty {
-                blockError = String(localized: "post.block_likers.no_likers")
+                blockError = loc("post.block_likers.no_likers")
                 return nil
             }
             return targets
@@ -427,6 +470,7 @@ struct MentionsSearchView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard !targets.isEmpty else { return }
 
+        isCheckingLikers = true
         let blockedDIDs: Set<String>
         do {
             let blockedResult = try await blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
@@ -435,6 +479,7 @@ struct MentionsSearchView: View {
             blockedDIDs = []
             AppLogger.moderation.error("Failed to fetch blocked actors: \(error.localizedDescription, privacy: .public)")
         }
+        isCheckingLikers = false
         let filteredTargets = targets.filter { !blockedDIDs.contains($0.did) }
         guard !filteredTargets.isEmpty else {
             blockSuccessCount = 0
@@ -443,6 +488,7 @@ struct MentionsSearchView: View {
 
         isBlockingLikers = true
         blockedCount = 0
+        alreadyBlockedCount = targets.count - filteredTargets.count
         totalToBlock = filteredTargets.count
         currentBlockingHandle = nil
         var lastError: String?
@@ -471,6 +517,7 @@ struct MentionsSearchView: View {
     private func addLikers(_ targets: [PendingLikerTarget], to list: BlueskyList, account: AppAccount, appPassword: String) async {
         guard !targets.isEmpty else { return }
 
+        isCheckingLikers = true
         let memberDIDs: Set<String>
         do {
             let members = try await blueskyClient.fetchListMembers(list: list, account: account, appPassword: appPassword)
@@ -479,9 +526,10 @@ struct MentionsSearchView: View {
             memberDIDs = []
             AppLogger.moderation.error("Failed to fetch list members: \(error.localizedDescription, privacy: .public)")
         }
+        isCheckingLikers = false
         let filteredTargets = targets.filter { !memberDIDs.contains($0.did) }
         guard !filteredTargets.isEmpty else {
-            addSuccessMessage = String(localized: "post.add_likers.done")
+            addSuccessMessage = loc("post.add_likers.done")
                 .replacingOccurrences(of: "{count}", with: "0")
                 .replacingOccurrences(of: "{list}", with: list.name)
             return
@@ -506,7 +554,7 @@ struct MentionsSearchView: View {
         currentAddingHandle = nil
         isAddingLikersToList = false
         if addedCount > 0 {
-            addSuccessMessage = String(localized: "post.add_likers.done")
+            addSuccessMessage = loc("post.add_likers.done")
                 .replacingOccurrences(of: "{count}", with: "\(addedCount)")
                 .replacingOccurrences(of: "{list}", with: list.name)
         }

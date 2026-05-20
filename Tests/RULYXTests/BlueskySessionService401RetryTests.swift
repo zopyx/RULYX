@@ -35,16 +35,16 @@ final class BlueskySessionService401RetryTests: XCTestCase {
             refreshJWT: "refreshed-refresh-jwt",
             pdsURL: session.pdsURL
         )
-        var callCount = 0
+        let callCount = LockedCounter()
 
         requestExecutor.onSend = { path, method, _, body, accessToken, _ in
-            callCount += 1
+            callCount.increment()
             if path == "com.atproto.server.refreshSession" {
                 return try JSONDecoder().decode(CreateSessionResponse.self, from: """
                 {"did": "\(session.did)", "handle": "\(session.handle)", "accessJwt": "refreshed-access-jwt", "refreshJwt": "refreshed-refresh-jwt"}
                 """.data(using: .utf8)!)
             }
-            if callCount == 1 {
+            if callCount.value == 1 {
                 throw BlueskyAPIError.unauthorized
             }
             return EmptyTestResponse()
@@ -56,7 +56,7 @@ final class BlueskySessionService401RetryTests: XCTestCase {
             operation: { _ in EmptyTestResponse() }
         )
 
-        XCTAssertEqual(callCount, 2)
+        XCTAssertEqual(callCount.value, 2)
         XCTAssert(result is EmptyTestResponse)
     }
 
@@ -108,4 +108,10 @@ private struct EmptyTestResponse: Decodable {}
 
 private extension Data {
     var utf8String: String { String(data: self, encoding: .utf8)! }
+}
+
+final class LockedCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private(set) var value = 0
+    func increment() { lock.lock(); value += 1; lock.unlock() }
 }

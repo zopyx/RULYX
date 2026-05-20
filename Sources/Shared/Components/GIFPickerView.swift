@@ -26,9 +26,9 @@ struct GIFPickerView: View {
             VStack(spacing: 0) {
                 if !hasAPIKey {
                     ContentUnavailableView(
-                        String(localized: "gif.missing_key_title"),
+                        loc("gif.missing_key_title"),
                         systemImage: "key.slash",
-                        description: Text("gif.missing_key_desc")
+                        description: Text(loc: "gif.missing_key_desc")
                     )
                 } else {
                     HStack(spacing: 8) {
@@ -45,7 +45,7 @@ struct GIFPickerView: View {
 
                     if let errorMessage {
                         ContentUnavailableView(
-                            String(localized: "list.detail.alert_title"),
+                            loc("list.detail.alert_title"),
                             systemImage: "exclamationmark.bubble",
                             description: Text(errorMessage)
                         )
@@ -55,9 +55,9 @@ struct GIFPickerView: View {
                         Spacer()
                     } else if results.isEmpty, !isLoading {
                         ContentUnavailableView(
-                            String(localized: "gif.empty_title"),
+                            loc("gif.empty_title"),
                             systemImage: "magnifyingglass",
-                            description: Text(verbatim: isSearching ? String(localized: "gif.no_results_desc") : String(localized: "gif.search_hint"))
+                            description: Text(verbatim: isSearching ? loc("gif.no_results_desc") : loc("gif.search_hint"))
                         )
                     } else {
                         ScrollView {
@@ -87,7 +87,7 @@ struct GIFPickerView: View {
                     }
                 }
             }
-            .navigationTitle("gif.title")
+            .navigationTitle(loc: "gif.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

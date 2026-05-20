@@ -22,6 +22,7 @@ struct AccountSummaryCard: View {
             Spacer()
 
             Image(systemName: "chevron.right")
+                .flipsForRightToLeftLayoutDirection(true)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.skyPrimary)
         }

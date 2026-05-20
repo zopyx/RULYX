@@ -19,13 +19,13 @@ struct FeedPickerView: View {
                             Image(systemName: "checkmark")
                                 .opacity(!feedStore.isUsingCustomFeed ? 1 : 0)
                             VStack(alignment: .leading) {
-                                Text("timeline.following")
+                                Text(loc: "timeline.following")
                                     .foregroundStyle(.primary)
                             }
                         }
                     }
                 } header: {
-                    Text("timeline.picker_default")
+                    Text(loc: "timeline.picker_default")
                 }
 
                 Section {
@@ -36,15 +36,15 @@ struct FeedPickerView: View {
                     TextField("timeline.feed_name_placeholder", text: $feedNameInput)
                     Button {
                         guard !feedURIInput.isEmpty else { return }
-                        let name = feedNameInput.isEmpty ? String(localized: "timeline.custom_feed") : feedNameInput
+                        let name = feedNameInput.isEmpty ? loc("timeline.custom_feed") : feedNameInput
                         feedStore.setFeed(uri: feedURIInput, name: name)
                         dismiss()
                     } label: {
-                        Text("timeline.picker_apply")
+                        Text(loc: "timeline.picker_apply")
                     }
                     .disabled(feedURIInput.isEmpty)
                 } header: {
-                    Text("timeline.picker_custom")
+                    Text(loc: "timeline.picker_custom")
                 }
 
                 if !feedStore.recentFeeds.isEmpty {
@@ -71,14 +71,14 @@ struct FeedPickerView: View {
                             }
                         }
                     } header: {
-                        Text("timeline.picker_recent")
+                        Text(loc: "timeline.picker_recent")
                     }
                 }
 
                 if feedStore.isUsingCustomFeed {
                     Section {
                         HStack {
-                            Text("timeline.current_feed")
+                            Text(loc: "timeline.current_feed")
                             Spacer()
                             Text(feedStore.customFeedName)
                                 .foregroundStyle(.secondary)
@@ -89,7 +89,7 @@ struct FeedPickerView: View {
                     }
                 }
             }
-            .navigationTitle("timeline.picker_title")
+            .navigationTitle(loc("timeline.picker_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

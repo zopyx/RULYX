@@ -11,6 +11,8 @@ final class iCloudAccountSync: ObservableObject {
         }
     }
 
+    @Published var showPrivacyAlert = false
+
     private let store = NSUbiquitousKeyValueStore.default
     private let accountKey = "syncedAccounts"
 
@@ -27,6 +29,20 @@ final class iCloudAccountSync: ObservableObject {
             }
         )
         store.synchronize()
+    }
+
+    func requestEnable() {
+        showPrivacyAlert = true
+    }
+
+    func confirmEnable() {
+        isEnabled = true
+        showPrivacyAlert = false
+    }
+
+    func cancelEnable() {
+        isEnabled = false
+        showPrivacyAlert = false
     }
 
     func pushAccounts(_ accounts: [AppAccount]) {

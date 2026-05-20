@@ -15,13 +15,13 @@ struct NotificationTab: View {
                     skeletonContent
                 case .empty:
                     ContentUnavailableView(
-                        String(localized: "notifications.empty"),
+                        loc("notifications.empty"),
                         systemImage: "bell.slash",
-                        description: Text("tab.notifications")
+                        description: Text(loc: "tab.notifications")
                     )
                 case let .failed(msg):
                     ContentUnavailableView(
-                        String(localized: "list.detail.alert_title"),
+                        loc("list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
                         description: Text(msg)
                     )
@@ -29,7 +29,7 @@ struct NotificationTab: View {
                     listContent
                 }
             }
-            .navigationTitle("notifications.title")
+            .navigationTitle(loc("notifications.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -40,11 +40,11 @@ struct NotificationTab: View {
                             else { return }
                             Task { await viewModel.markAllRead(account: account, appPassword: appPassword, using: blueskyClient) }
                         } label: {
-                            Text("notifications.mark_read")
+                            Text(loc: "notifications.mark_read")
                                 .font(.subheadline)
                         }
                         .disabled(viewModel.unreadCount == 0)
-                        .accessibilityHint("notifications.mark_read.hint")
+                        .accessibilityHint(loc("notifications.mark_read.hint"))
                     }
                 }
             }

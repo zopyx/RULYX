@@ -12,27 +12,40 @@ enum RelationshipCache {
 
     static func load(forKey key: String) -> [BlueskyActor] {
         let url = fileURL(forKey: key)
-        guard let data = try? Data(contentsOf: url),
-              let actors = try? JSONDecoder().decode([BlueskyActor].self, from: data)
-        else {
+        do {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode([BlueskyActor].self, from: data)
+        } catch {
+            AppLogger.persistence.error("RelationshipCache load failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
             return []
         }
-        return actors
     }
 
     static func save(_ actors: [BlueskyActor], forKey key: String) {
         let url = fileURL(forKey: key)
-        try? FileManager.default.createDirectory(at: cachesDirectory, withIntermediateDirectories: true)
-        guard let data = try? JSONEncoder().encode(actors) else { return }
-        try? data.write(to: url)
+        do {
+            try FileManager.default.createDirectory(at: cachesDirectory, withIntermediateDirectories: true)
+            let data = try JSONEncoder().encode(actors)
+            try data.write(to: url)
+        } catch {
+            AppLogger.persistence.error("RelationshipCache save failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     static func clear(forKey key: String) {
         let url = fileURL(forKey: key)
-        try? FileManager.default.removeItem(at: url)
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            AppLogger.persistence.error("RelationshipCache clear failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     static func clearAll() {
-        try? FileManager.default.removeItem(at: cachesDirectory)
+        do {
+            try FileManager.default.removeItem(at: cachesDirectory)
+        } catch {
+            AppLogger.persistence.error("RelationshipCache clearAll failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 }

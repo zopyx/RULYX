@@ -18,8 +18,8 @@ enum MediaFilter: String, CaseIterable {
     @MainActor
     var label: String {
         switch self {
-        case .images: String(localized: "media.filter.images")
-        case .videos: String(localized: "media.filter.videos")
+        case .images: loc("media.filter.images")
+        case .videos: loc("media.filter.videos")
         }
     }
 }

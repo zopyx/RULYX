@@ -15,9 +15,9 @@ struct BulkProfileLookupView: View {
                     .lineLimit(5 ... 15)
                     .font(.body.monospaced())
             } header: {
-                Text("bulk.input")
+                Text(loc: "bulk.input")
             } footer: {
-                Text("bulk.input_footer")
+                Text(loc: "bulk.input_footer")
             }
 
             if !viewModel.results.isEmpty {
@@ -47,7 +47,7 @@ struct BulkProfileLookupView: View {
                     }
                 } header: {
                     HStack {
-                        Text("bulk.results")
+                        Text(loc: "bulk.results")
                         Spacer()
                         let resolved = viewModel.results.filter(\.isResolved).count
                         Text(verbatim: String.localized("bulk.resolved", replacements: ["resolved": "\(resolved)", "total": "\(viewModel.results.count)"]))
@@ -64,7 +64,7 @@ struct BulkProfileLookupView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("bulk.title")
+        .navigationTitle(Text(loc: "bulk.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.isLoading {
@@ -73,7 +73,7 @@ struct BulkProfileLookupView: View {
                     Button {
                         Task { await runLookup() }
                     } label: {
-                        Text("bulk.lookup")
+                        Text(loc: "bulk.lookup")
                     }
                     .disabled(viewModel.rawInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .accessibilityHint("Looks up the entered handles or DIDs")

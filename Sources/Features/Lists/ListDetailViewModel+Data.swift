@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - Member loading, search, comparison, import, export, and metadata
+
 extension ListDetailViewModel {
     var loadedMemberSummary: String {
         if hasMoreMembers {

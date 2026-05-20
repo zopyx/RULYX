@@ -40,13 +40,13 @@ struct ComposePostView: View {
                             HStack {
                                 ProgressView()
                                     .scaleEffect(0.8)
-                                Text("timeline.loading")
+                                Text(loc: "timeline.loading")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
                             }
                         }
                     } header: {
-                        Text(verbatim: replyTo != nil ? String(localized: "profile.posts.replying_to") : String(localized: "compose.quoting"))
+                        Text(verbatim: replyTo != nil ? loc("profile.posts.replying_to") : loc("compose.quoting"))
                     }
                 }
 
@@ -67,7 +67,7 @@ struct ComposePostView: View {
                     }
                     .accessibilityLabel(loc("compose.char_count").replacingOccurrences(of: "{n}", with: "\(postText.count)/300"))
                 } header: {
-                    Text("compose.text_section")
+                    Text(loc: "compose.text_section")
                 }
 
                 if let previewURL = selectedGIFPreviewURL, !previewURL.isEmpty {
@@ -99,7 +99,7 @@ struct ComposePostView: View {
                             }
                         }
                     } header: {
-                        Text("compose.gif_selected")
+                        Text(loc: "compose.gif_selected")
                     }
                 }
 
@@ -146,13 +146,13 @@ struct ComposePostView: View {
                             .padding(.vertical, 4)
                         }
                     } header: {
-                        Text("compose.images_section")
+                        Text(loc: "compose.images_section")
                     }
                 }
 
                 Section {
                     PhotosPicker(selection: $selectedItems, maxSelectionCount: maxImages, matching: .images) {
-                        Label { Text("compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
+                        Label { Text(loc: "compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
                     }
                     .disabled(selectedImages.count >= maxImages || videoAttachment != nil)
                     .onChange(of: selectedItems) { _, items in
@@ -163,7 +163,7 @@ struct ComposePostView: View {
                         showGIFPicker = true
                     } label: {
                         HStack {
-                            Label { Text("compose.add_gif") } icon: { Image(systemName: "play.rectangle") }
+                            Label { Text(loc: "compose.add_gif") } icon: { Image(systemName: "play.rectangle") }
                             Spacer()
                             if isDownloadingGIF {
                                 ProgressView()
@@ -175,7 +175,7 @@ struct ComposePostView: View {
                     .foregroundStyle(videoAttachment != nil ? Color.skyPrimary : .primary)
                 }
             }
-            .navigationTitle(replyTo != nil ? String(localized: "compose.reply_title") : (quote != nil ? String(localized: "compose.quote_title") : String(localized: "compose.title")))
+            .navigationTitle(replyTo != nil ? loc("compose.reply_title") : (quote != nil ? loc("compose.quote_title") : loc("compose.title")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -188,7 +188,7 @@ struct ComposePostView: View {
                     .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                 }
             }
-            .alert("compose.error", isPresented: .constant(errorMessage != nil)) {
+            .alert(Text(loc: "compose.error"), isPresented: .constant(errorMessage != nil)) {
                 Button("actions.ok") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
