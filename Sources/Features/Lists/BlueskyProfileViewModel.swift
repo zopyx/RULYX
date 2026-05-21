@@ -24,6 +24,9 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published var selectedReportReason = ModerationReportReasonType.simplifiedDefault
     @Published private(set) var ownedLists: [BlueskyList]?
     @Published private(set) var isFetchingOwnedLists = false
+    @Published private(set) var isFetchingMemberships = false
+    @Published private(set) var isUpdatingListMembership = false
+    @Published private(set) var isCreatingList = false
 
     func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         isFetchingOwnedLists = true
@@ -93,6 +96,10 @@ final class BlueskyProfileViewModel: ObservableObject {
             return
         }
 
+        if inspection?.listMemberships.isEmpty ?? true {
+            isFetchingMemberships = true
+        }
+
         isLoading = false
         guard let profile else { return }
 
@@ -103,11 +110,12 @@ final class BlueskyProfileViewModel: ObservableObject {
             handleHistory = parseHandleChanges(from: log, currentHandle: profile.handle)
         }
 
-        if inspection?.listMemberships.isEmpty ?? true {
+        if isFetchingMemberships {
             let memberships = await client.fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
             if !memberships.isEmpty {
                 inspection = ProfileInspection(profile: profile, listMemberships: memberships, starterPackMemberships: inspection?.starterPackMemberships ?? [])
             }
+            isFetchingMemberships = false
         }
     }
 
@@ -411,10 +419,10 @@ final class BlueskyProfileViewModel: ObservableObject {
         guard let profile else { return }
         let isCurrentlyMember = pendingListMemberStates[membership.listURI] ?? membership.isMember
 
-        isUpdatingModeration = true
+        isUpdatingListMembership = true
         pendingListMemberStates[membership.listURI] = !isCurrentlyMember
         defer {
-            isUpdatingModeration = false
+            isUpdatingListMembership = false
             pendingListMemberStates[membership.listURI] = nil
         }
 
@@ -443,6 +451,48 @@ final class BlueskyProfileViewModel: ObservableObject {
                 )
                 statusMessage = "Added to \(membership.name)."
             }
+
+            await load(
+                did: profile.did,
+                account: account,
+                appPassword: appPassword,
+                using: client
+            )
+        } catch {
+            errorMessage = AppError.userMessage(from: error)
+        }
+    }
+
+    func createListAndAddActor(
+        name: String,
+        description: String,
+        kind: BlueskyList.Kind,
+        account: AppAccount,
+        appPassword: String,
+        using client: LiveBlueskyClient
+    ) async {
+        guard let profile else { return }
+
+        isCreatingList = true
+        defer { isCreatingList = false }
+
+        do {
+            let newList = try await client.createList(
+                name: name,
+                description: description,
+                kind: kind,
+                account: account,
+                appPassword: appPassword
+            )
+
+            _ = try await client.addActor(
+                did: profile.did,
+                to: newList,
+                account: account,
+                appPassword: appPassword
+            )
+
+            statusMessage = "Created \"\(name)\" and added \(profile.handle)."
 
             await load(
                 did: profile.did,
