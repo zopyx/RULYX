@@ -90,21 +90,7 @@ struct AccountTabView: View {
                                 }
                             }
                         } label: {
-                            if let prefID = accountStore.preferredSearchAccountID,
-                               let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
-                            {
-                                AccountRowView(
-                                    account: prefAccount,
-                                    isActive: prefAccount.id == accountStore.activeAccountID,
-                                    isDeactivated: accountStore.isDeactivated(prefAccount)
-                                )
-                            } else if let first = accountStore.accounts.first {
-                                AccountRowView(
-                                    account: first,
-                                    isActive: first.id == accountStore.activeAccountID,
-                                    isDeactivated: accountStore.isDeactivated(first)
-                                )
-                            }
+                            preferredSearchRow
                         }
                         .buttonStyle(.plain)
                         Text(loc: "account.preferred_search.hint")
@@ -203,6 +189,25 @@ struct AccountTabView: View {
                 }
                 .presentationDetents([.medium])
             }
+        }
+    }
+
+    @ViewBuilder
+    private var preferredSearchRow: some View {
+        if let prefID = accountStore.preferredSearchAccountID,
+           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+        {
+            AccountRowView(
+                account: prefAccount,
+                isActive: prefAccount.id == accountStore.activeAccountID,
+                isDeactivated: accountStore.isDeactivated(prefAccount)
+            )
+        } else if let first = accountStore.accounts.first {
+            AccountRowView(
+                account: first,
+                isActive: first.id == accountStore.activeAccountID,
+                isDeactivated: accountStore.isDeactivated(first)
+            )
         }
     }
 

@@ -41,6 +41,7 @@ struct BlueskyProfileView: View {
     @State private var showCreateRegularList = false
     @State private var showModerationListsHelp = false
     @State private var showListsHelp = false
+    @State private var pendingCreateKind: BlueskyList.Kind?
 
     private var preferredSearchAccount: AppAccount? {
         if let prefID = accountStore.preferredSearchAccountID,
@@ -271,6 +272,26 @@ struct BlueskyProfileView: View {
                 title: loc("profile.on_my_lists"),
                 text: loc("profile.on_my_lists.help")
             )
+        }
+        .confirmationDialog(
+            loc("profile.create_list_confirm.title"),
+            isPresented: Binding(
+                get: { pendingCreateKind != nil },
+                set: { if !$0 { pendingCreateKind = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(loc("profile.create_list_confirm.create")) {
+                if pendingCreateKind == .moderation {
+                    showCreateModerationList = true
+                } else {
+                    showCreateRegularList = true
+                }
+                pendingCreateKind = nil
+            }
+            Button(loc("actions.cancel"), role: .cancel) {
+                pendingCreateKind = nil
+            }
         }
     }
 
@@ -536,7 +557,7 @@ struct BlueskyProfileView: View {
                             )
                             Spacer()
                             Button {
-                                showCreateModerationList = true
+                                pendingCreateKind = .moderation
                             } label: {
                                 Image(systemName: "plus")
                                     .font(.subheadline.weight(.semibold))
@@ -579,7 +600,7 @@ struct BlueskyProfileView: View {
                             )
                             Spacer()
                             Button {
-                                showCreateRegularList = true
+                                pendingCreateKind = .regular
                             } label: {
                                 Image(systemName: "plus")
                                     .font(.subheadline.weight(.semibold))
