@@ -26,7 +26,10 @@ struct BlueskyProfileView: View {
     @State private var isBlockingBack = false
     @State private var blockBackCompleted = 0
     @State private var blockBackTotal = 0
+    @State private var blockBackSuccessCount = 0
+    @State private var blockBackFailureCount = 0
     @State private var blockBackError: String?
+    @State private var showBlockBackResult = false
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
     @State private var showClearskyLists = false
@@ -34,6 +37,10 @@ struct BlueskyProfileView: View {
     @State private var reportReasonText = ""
     @State private var unblockedBlockersCount: Int?
     @State private var searchAccount: AppAccount?
+    @State private var showCreateModerationList = false
+    @State private var showCreateRegularList = false
+    @State private var showModerationListsHelp = false
+    @State private var showListsHelp = false
 
     private var preferredSearchAccount: AppAccount? {
         if let prefID = accountStore.preferredSearchAccountID,
@@ -213,23 +220,63 @@ struct BlueskyProfileView: View {
             }
             .presentationDetents([.height(320)])
         }
+        .sheet(isPresented: $showCreateModerationList) {
+            if let sheetAccount = accountStore.activeAccount,
+               let sheetAppPassword = accountStore.appPassword(for: sheetAccount)
+            {
+                ListMetadataSheet(mode: .create(kind: .moderation)) { name, description, _ in
+                    Task {
+                        await viewModel.createListAndAddActor(
+                            name: name,
+                            description: description,
+                            kind: .moderation,
+                            account: sheetAccount,
+                            appPassword: sheetAppPassword,
+                            using: blueskyClient
+                        )
+                    }
+                }
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            }
+        }
+        .sheet(isPresented: $showCreateRegularList) {
+            if let sheetAccount = accountStore.activeAccount,
+               let sheetAppPassword = accountStore.appPassword(for: sheetAccount)
+            {
+                ListMetadataSheet(mode: .create(kind: .regular)) { name, description, _ in
+                    Task {
+                        await viewModel.createListAndAddActor(
+                            name: name,
+                            description: description,
+                            kind: .regular,
+                            account: sheetAccount,
+                            appPassword: sheetAppPassword,
+                            using: blueskyClient
+                        )
+                    }
+                }
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            }
+        }
+        .sheet(isPresented: $showModerationListsHelp) {
+            helpSheet(
+                title: loc("profile.on_my_moderation_lists"),
+                text: loc("profile.on_my_moderation_lists.help")
+            )
+        }
+        .sheet(isPresented: $showListsHelp) {
+            helpSheet(
+                title: loc("profile.on_my_lists"),
+                text: loc("profile.on_my_lists.help")
+            )
+        }
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     private func content(account: AppAccount, appPassword: String) -> some View {
-        let dataAccount: AppAccount
-        let dataPassword: String
-        if let prefID = accountStore.preferredSearchAccountID,
-           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }),
-           let pwd = accountStore.appPassword(for: prefAccount)
-        {
-            dataAccount = prefAccount
-            dataPassword = pwd
-        } else {
-            dataAccount = account
-            dataPassword = appPassword
-        }
-        return List {
+        List {
             if let profile = viewModel.profile {
                 Section {
                     VStack(alignment: .leading, spacing: 16) {
@@ -457,9 +504,9 @@ struct BlueskyProfileView: View {
                     let regularMemberships = viewModel.listMemberships.filter { $0.kind == .regular }
 
                     Section {
-                        if moderationMemberships.isEmpty {
-                            Text(loc: "profile.no_lists")
-                                .foregroundStyle(.secondary)
+                        if viewModel.isFetchingMemberships {
+                            ProgressView()
+                                .scaleEffect(0.6)
                         } else {
                             ForEach(moderationMemberships) { membership in
                                 Toggle(isOn: Binding(
@@ -477,17 +524,32 @@ struct BlueskyProfileView: View {
                                 )) {
                                     Text(membership.name)
                                 }
-                                .disabled(viewModel.isUpdatingModeration)
+                                .disabled(viewModel.isUpdatingListMembership)
                             }
                         }
                     } header: {
-                        Text(loc: "profile.on_my_moderation_lists")
+                        HStack {
+                            Text(loc: "profile.on_my_moderation_lists")
+                            HelpInfoButton(
+                                action: { showModerationListsHelp = true },
+                                accessibilityLabel: loc("profile.on_my_moderation_lists")
+                            )
+                            Spacer()
+                            Button {
+                                showCreateModerationList = true
+                            } label: {
+                                Image(systemName: "plus")
+                                    .font(.subheadline.weight(.semibold))
+                                    .accessibilityLabel(loc("profile.create_moderation_list"))
+                            }
+                            .disabled(viewModel.isCreatingList)
+                        }
                     }
 
                     Section {
-                        if regularMemberships.isEmpty {
-                            Text(loc: "profile.no_lists")
-                                .foregroundStyle(.secondary)
+                        if viewModel.isFetchingMemberships {
+                            ProgressView()
+                                .scaleEffect(0.6)
                         } else {
                             ForEach(regularMemberships) { membership in
                                 Toggle(isOn: Binding(
@@ -505,11 +567,26 @@ struct BlueskyProfileView: View {
                                 )) {
                                     Text(membership.name)
                                 }
-                                .disabled(viewModel.isUpdatingModeration)
+                                .disabled(viewModel.isUpdatingListMembership)
                             }
                         }
                     } header: {
-                        Text(loc: "profile.on_my_lists")
+                        HStack {
+                            Text(loc: "profile.on_my_lists")
+                            HelpInfoButton(
+                                action: { showListsHelp = true },
+                                accessibilityLabel: loc("profile.on_my_lists")
+                            )
+                            Spacer()
+                            Button {
+                                showCreateRegularList = true
+                            } label: {
+                                Image(systemName: "plus")
+                                    .font(.subheadline.weight(.semibold))
+                                    .accessibilityLabel(loc("profile.create_regular_list"))
+                            }
+                            .disabled(viewModel.isCreatingList)
+                        }
                     }
                 }
 
@@ -652,18 +729,35 @@ struct BlueskyProfileView: View {
                             LabeledContent("profile.block_back.blocking", value: countText(blockingCount))
                             LabeledContent("profile.block_back.blocked_by", value: countText(blockedByCount))
 
-                            if isBlockingBack {
-                                HStack {
-                                    ProgressView()
-                                        .scaleEffect(0.7)
-                                    if blockBackTotal > 0 {
-                                        Text("\(blockBackCompleted)/\(blockBackTotal)")
+                            if isBlockingBack, blockBackTotal > 0 {
+                                VStack(spacing: 6) {
+                                    ProgressView(value: Double(blockBackCompleted), total: Double(blockBackTotal))
+                                        .progressViewStyle(.linear)
+                                        .tint(Color.skyPrimary)
+                                    HStack {
+                                        Text(loc("profile.block_back.progress")
+                                            .replacingOccurrences(of: "{completed}", with: "\(blockBackCompleted)")
+                                            .replacingOccurrences(of: "{total}", with: "\(blockBackTotal)"))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
+                                        Spacer()
                                     }
-                                    Text(loc: "profile.block_back.progress")
+                                }
+                                .padding(.vertical, 4)
+                            } else if showBlockBackResult {
+                                HStack(spacing: 8) {
+                                    if blockBackFailureCount == 0 {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
+                                    } else {
+                                        Image(systemName: "exclamationmark.triangle.fill")
+                                            .foregroundStyle(.orange)
+                                    }
+                                    Text(blockBackResultSummary)
+                                        .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
+                                .padding(.vertical, 4)
                             } else if let count = unblockedBlockersCount, count > 0 {
                                 Button {
                                     showBlockBackConfirm1 = true
@@ -718,8 +812,8 @@ struct BlueskyProfileView: View {
                     startLoadTask {
                         await viewModel.load(
                             did: member.actor.did,
-                            account: dataAccount,
-                            appPassword: dataPassword,
+                            account: account,
+                            appPassword: appPassword,
                             using: blueskyClient
                         )
                     }
@@ -731,8 +825,8 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.load(
                     did: member.actor.did,
-                    account: dataAccount,
-                    appPassword: dataPassword,
+                    account: account,
+                    appPassword: appPassword,
                     using: blueskyClient
                 )
             }
@@ -741,8 +835,8 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.loadIfNeeded(
                     did: member.actor.did,
-                    account: dataAccount,
-                    appPassword: dataPassword,
+                    account: account,
+                    appPassword: appPassword,
                     using: blueskyClient
                 )
             }
@@ -860,6 +954,16 @@ struct BlueskyProfileView: View {
         return activeAccount.handle.lowercased() == profile.handle.lowercased()
     }
 
+    private var blockBackResultSummary: String {
+        if blockBackFailureCount == 0 {
+            return loc("profile.block_back.result_success")
+                .replacingOccurrences(of: "{count}", with: "\(blockBackSuccessCount)")
+        }
+        return loc("profile.block_back.result")
+            .replacingOccurrences(of: "{success}", with: "\(blockBackSuccessCount)")
+            .replacingOccurrences(of: "{fail}", with: "\(blockBackFailureCount)")
+    }
+
     private func countText(_ value: Int?) -> String {
         if let value { return "\(value)" }
         return "-"
@@ -886,6 +990,9 @@ struct BlueskyProfileView: View {
         blockBackError = nil
         blockBackCompleted = 0
         blockBackTotal = 0
+        blockBackSuccessCount = 0
+        blockBackFailureCount = 0
+        showBlockBackResult = false
 
         do {
             async let blockedByResult = blueskyClient.fetchBlockedByActors(account: account, appPassword: appPassword)
@@ -907,14 +1014,25 @@ struct BlueskyProfileView: View {
                 let batchEnd = min(batchStart + batchSize, blockBackTotal)
                 let batch = toBlock[batchStart ..< batchEnd]
 
-                try await withThrowingTaskGroup(of: Void.self) { group in
+                await withTaskGroup(of: Bool.self) { group in
                     for actor in batch {
                         group.addTask {
-                            try await blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
+                            do {
+                                try await blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
+                                return true
+                            } catch {
+                                AppLogger.moderation.error("Block back failed for \(actor.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                                return false
+                            }
                         }
                     }
-                    for try await _ in group {
+                    for await success in group {
                         blockBackCompleted += 1
+                        if success {
+                            blockBackSuccessCount += 1
+                        } else {
+                            blockBackFailureCount += 1
+                        }
                     }
                 }
 
@@ -923,9 +1041,19 @@ struct BlueskyProfileView: View {
                 }
             }
 
+            showBlockBackResult = true
             await fetchBlockCounts()
+
+            try? await Task.sleep(for: .seconds(4))
+            showBlockBackResult = false
         } catch {
-            blockBackError = error.localizedDescription
+            if blockBackSuccessCount == 0, blockBackFailureCount == 0 {
+                blockBackError = error.localizedDescription
+            } else {
+                showBlockBackResult = true
+                try? await Task.sleep(for: .seconds(4))
+                showBlockBackResult = false
+            }
         }
 
         isBlockingBack = false
@@ -1008,6 +1136,25 @@ struct BlueskyProfileView: View {
         }
         loadTask = task
         return task
+    }
+
+    private func helpSheet(title: String, text: String) -> some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text(text)
+                        .font(.body)
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle(title)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
+                }
+            }
+        }
     }
 }
 
