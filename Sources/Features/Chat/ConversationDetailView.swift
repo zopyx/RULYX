@@ -139,10 +139,13 @@ struct ConversationDetailView: View {
                     .environmentObject(blueskyClient)
                     .environmentObject(workspaceStore)
                     .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("actions.done") {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
                                 showProfile = false
+                            } label: {
+                                Image(systemName: "chevron.down.circle.fill")
                             }
+                            .accessibilityLabel(loc("actions.done"))
                         }
                     }
                 }
@@ -167,10 +170,13 @@ struct ConversationDetailView: View {
                 .environmentObject(blueskyClient)
                 .environmentObject(workspaceStore)
                 .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("actions.done") {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
                             mentionProfileHandle = nil
+                        } label: {
+                            Image(systemName: "chevron.down.circle.fill")
                         }
+                        .accessibilityLabel(loc("actions.done"))
                     }
                 }
             }

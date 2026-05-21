@@ -87,6 +87,7 @@ struct ListsView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+
                         }
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
@@ -244,18 +245,6 @@ struct ListsView: View {
             }
             .navigationTitle("")
             .toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        isShowingUserSearch = true
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    .accessibilityLabel(loc("lists.search.label"))
-                    .disabled(accountStore.activeAccount == nil)
-                }
-
-            }
             .sheet(isPresented: $presentationState.isShowingAccountPicker) {
                 AccountSwitcherSheet(isPresented: $presentationState.isShowingAccountPicker)
                     .environmentObject(accountStore)
