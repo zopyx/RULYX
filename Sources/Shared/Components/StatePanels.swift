@@ -338,16 +338,6 @@ struct SimplifiedReportSheet: View {
                         }
                     }
 
-                    Button {
-                        guard MFMailComposeViewController.canSendMail() else {
-                            isShowingMailUnavailableAlert = true
-                            return
-                        }
-                        mailDraft = makeSupportDraft()
-                    } label: {
-                        Label("report.support.email", systemImage: "envelope")
-                    }
-                    .disabled(isSubmitting)
                 } header: {
                     HStack(spacing: 4) {
                         Text(loc: "report.option_contact.title")
@@ -356,6 +346,26 @@ struct SimplifiedReportSheet: View {
                             accessibilityLabel: loc("report.option_contact.title")
                         )
                     }
+                }
+
+                Section {
+                    Button {
+                        guard MFMailComposeViewController.canSendMail() else {
+                            isShowingMailUnavailableAlert = true
+                            return
+                        }
+                        mailDraft = makeSupportDraft()
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Label("report.support.email", systemImage: "envelope")
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                    }
+                    .disabled(isSubmitting)
+                    .listRowBackground(isSubmitting ? Color.gray : Color.red)
+                    .foregroundStyle(.white)
                 }
             }
             .navigationTitle(title)
