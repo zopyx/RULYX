@@ -254,8 +254,8 @@ struct SimplifiedReportSheet: View {
     let onCancel: () -> Void
     let onSubmit: () -> Void
 
-    @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var supportImage: UIImage?
+    @State private var selectedPhotoItems: [PhotosPickerItem] = []
+    @State private var supportImages: [UIImage] = []
     @State private var mailDraft: SupportEmailDraft?
     @State private var isShowingMailUnavailableAlert = false
     @State private var showSubmitHelp = false
@@ -312,30 +312,35 @@ struct SimplifiedReportSheet: View {
                 }
 
                 Section {
-                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                    PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 5, matching: .images) {
                         Label("report.support.attachment.add", systemImage: "paperclip")
                     }
 
-                    if let supportImage {
-                        HStack(spacing: 12) {
-                            Image(uiImage: supportImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 64, height: 64)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                    if !supportImages.isEmpty {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 8) {
+                            ForEach(supportImages.indices, id: \.self) { index in
+                                Image(uiImage: supportImages[index])
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 80, height: 80)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(loc: "report.support.attachment")
-                                    .appFont(.subheading)
-                                Button(role: .destructive) {
-                                    selectedPhotoItem = nil
-                                    self.supportImage = nil
-                                } label: {
-                                    Label("report.support.attachment.remove", systemImage: "trash")
-                                }
-                                .buttonStyle(.borderless)
+                                    .overlay(alignment: .topTrailing) {
+                                        Button {
+                                            supportImages.remove(at: index)
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(.red)
+                                                .background(Circle().fill(.white.opacity(0.9)))
+                                        }
+                                        .buttonStyle(.plain)
+                                        .padding(2)
+                                    }
                             }
                         }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                     }
 
                 } header: {
@@ -376,25 +381,26 @@ struct SimplifiedReportSheet: View {
                         .disabled(isSubmitting)
                 }
             }
-            .onChange(of: selectedPhotoItem) { _, newItem in
-                guard let newItem else {
-                    supportImage = nil
-                    return
-                }
+            .onChange(of: selectedPhotoItems) { _, newItems in
+                guard !newItems.isEmpty else { return }
 
                 Task {
-                    guard let data = try? await newItem.loadTransferable(type: Data.self),
-                          let image = UIImage(data: data)
-                    else { return }
+                    var images: [UIImage] = []
+                    for item in newItems {
+                        guard let data = try? await item.loadTransferable(type: Data.self),
+                              let image = UIImage(data: data)
+                        else { continue }
+                        images.append(image)
+                    }
                     await MainActor.run {
-                        supportImage = image
+                        supportImages += images
                     }
                 }
             }
             .sheet(item: $mailDraft) { draft in
                 SupportMailComposeView(
                     draft: draft,
-                    attachmentImage: supportImage
+                    attachmentImages: supportImages
                 )
             }
             .alert("report.support.mail_unavailable", isPresented: $isShowingMailUnavailableAlert) {
@@ -490,7 +496,7 @@ struct SupportEmailDraft: Identifiable {
 
 private struct SupportMailComposeView: UIViewControllerRepresentable {
     let draft: SupportEmailDraft
-    let attachmentImage: UIImage?
+    let attachmentImages: [UIImage]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -504,15 +510,17 @@ private struct SupportMailComposeView: UIViewControllerRepresentable {
         controller.setToRecipients(["support@bluesky.com"])
         controller.setSubject(draft.subject)
         controller.setMessageBody(draft.body, isHTML: true)
-        if let attachmentImage,
-           let data = attachmentImage.jpegData(compressionQuality: 0.9)
-        {
-            controller.addAttachmentData(
-                data,
-                mimeType: "image/jpeg",
-                fileName: "support-attachment.jpg"
-            )
+
+        for (index, image) in attachmentImages.enumerated() {
+            if let data = image.jpegData(compressionQuality: 0.9) {
+                controller.addAttachmentData(
+                    data,
+                    mimeType: "image/jpeg",
+                    fileName: "support-attachment-\(index + 1).jpg"
+                )
+            }
         }
+
         return controller
     }
 
