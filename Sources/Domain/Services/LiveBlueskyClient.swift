@@ -1062,7 +1062,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             throw BlueskyAPIError.server("Enter a Bluesky handle or DID.")
         }
 
-        let (profile, lists, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse, StarterPacksWithMembershipResponse) =
+        let (profile, lists, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
             try await sessionService.performAuthenticatedRequest(
                 account: account,
                 appPassword: appPassword
@@ -1072,12 +1072,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     queryItems: [URLQueryItem(name: "actor", value: actor)],
                     accessToken: authSession.accessJWT, hostURL: authSession.pdsURL
                 )
-                async let listMembershipResponse: ListsWithMembershipResponse = requestExecutor.send(
+                async let listMembershipResponse: ListsWithMembershipResponse? = try? requestExecutor.send(
                     path: "app.bsky.graph.getListsWithMembership", method: "GET",
                     queryItems: [URLQueryItem(name: "actor", value: actor), URLQueryItem(name: "limit", value: "100")],
                     accessToken: authSession.accessJWT, hostURL: authSession.pdsURL
                 )
-                async let starterPackMembershipResponse: StarterPacksWithMembershipResponse = requestExecutor.send(
+                async let starterPackMembershipResponse: StarterPacksWithMembershipResponse? = try? requestExecutor.send(
                     path: "app.bsky.graph.getStarterPacksWithMembership", method: "GET",
                     queryItems: [URLQueryItem(name: "actor", value: actor), URLQueryItem(name: "limit", value: "100")],
                     accessToken: authSession.accessJWT, hostURL: authSession.pdsURL
@@ -1099,12 +1099,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
         return ProfileInspection(
             profile: mappedProfile,
-            listMemberships: lists.listsWithMembership.map {
+            listMemberships: lists?.listsWithMembership.map {
                 ProfileListMembership(listURI: $0.list.uri, name: $0.list.name, kind: $0.list.purpose.kind, memberCount: $0.list.listItemCount, isMember: $0.listItem != nil, listItemRecordURI: $0.listItem?.uri)
-            },
-            starterPackMemberships: starterPacks.starterPacksWithMembership.map {
+            } ?? [],
+            starterPackMemberships: starterPacks?.starterPacksWithMembership.map {
                 ProfileStarterPackMembership(uri: $0.starterPack.uri, name: $0.starterPack.name ?? $0.starterPack.uri, memberCount: $0.starterPack.listItemCount, joinedAllTimeCount: $0.starterPack.joinedAllTimeCount, isMember: $0.listItem != nil)
-            }
+            } ?? []
         )
     }
 

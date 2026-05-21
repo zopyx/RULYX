@@ -180,7 +180,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             throw BlueskyAPIError.server("Enter a Bluesky handle or DID.")
         }
 
-        let (profile, lists, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse, StarterPacksWithMembershipResponse) =
+        let (profile, lists, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
             try await sessionService.performAuthenticatedRequest(
                 account: account,
                 appPassword: appPassword
@@ -192,7 +192,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     accessToken: authSession.accessJWT,
                     hostURL: authSession.pdsURL
                 )
-                async let listMembershipResponse: ListsWithMembershipResponse = requestExecutor.send(
+                async let listMembershipResponse: ListsWithMembershipResponse? = try? requestExecutor.send(
                     path: "app.bsky.graph.getListsWithMembership",
                     method: "GET",
                     queryItems: [
@@ -202,7 +202,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     accessToken: authSession.accessJWT,
                     hostURL: authSession.pdsURL
                 )
-                async let starterPackMembershipResponse: StarterPacksWithMembershipResponse = requestExecutor.send(
+                async let starterPackMembershipResponse: StarterPacksWithMembershipResponse? = try? requestExecutor.send(
                     path: "app.bsky.graph.getStarterPacksWithMembership",
                     method: "GET",
                     queryItems: [
@@ -237,7 +237,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
 
         return ProfileInspection(
             profile: mappedProfile,
-            listMemberships: lists.listsWithMembership.map {
+            listMemberships: lists?.listsWithMembership.map {
                 ProfileListMembership(
                     listURI: $0.list.uri,
                     name: $0.list.name,
@@ -246,8 +246,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     isMember: $0.listItem != nil,
                     listItemRecordURI: $0.listItem?.uri
                 )
-            },
-            starterPackMemberships: starterPacks.starterPacksWithMembership.map {
+            } ?? [],
+            starterPackMemberships: starterPacks?.starterPacksWithMembership.map {
                 ProfileStarterPackMembership(
                     uri: $0.starterPack.uri,
                     name: $0.starterPack.name ?? $0.starterPack.uri,
@@ -255,7 +255,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     joinedAllTimeCount: $0.starterPack.joinedAllTimeCount,
                     isMember: $0.listItem != nil
                 )
-            }
+            } ?? []
         )
     }
 
