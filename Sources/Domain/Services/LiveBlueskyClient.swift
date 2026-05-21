@@ -1097,14 +1097,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             viewerState: mapViewerState(profile.viewer)
         )
 
-        let listMemberships: [ProfileListMembership]
-        if let lists {
-            listMemberships = lists.listsWithMembership.map {
-                ProfileListMembership(listURI: $0.list.uri, name: $0.list.name, kind: $0.list.purpose.kind, memberCount: $0.list.listItemCount, isMember: $0.listItem != nil, listItemRecordURI: $0.listItem?.uri)
-            }
-        } else {
-            listMemberships = await fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
-        }
+        let listMemberships = await fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
 
         return ProfileInspection(
             profile: mappedProfile,
