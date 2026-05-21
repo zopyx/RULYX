@@ -258,6 +258,8 @@ struct SimplifiedReportSheet: View {
     @State private var supportImage: UIImage?
     @State private var mailDraft: SupportEmailDraft?
     @State private var isShowingMailUnavailableAlert = false
+    @State private var showSubmitHelp = false
+    @State private var showContactHelp = false
 
     var body: some View {
         NavigationStack {
@@ -270,11 +272,7 @@ struct SimplifiedReportSheet: View {
                         }
                     }
                     .pickerStyle(.navigationLink)
-                } header: {
-                    Text(loc: "profile.report.reason")
-                }
 
-                Section {
                     ZStack(alignment: .topLeading) {
                         if evidenceText.isEmpty {
                             Text(loc: "profile.report.evidence_placeholder")
@@ -286,11 +284,7 @@ struct SimplifiedReportSheet: View {
                             .frame(minHeight: 100)
                             .foregroundStyle(.primary)
                     }
-                } header: {
-                    Text(loc: "profile.report.evidence")
-                }
 
-                Section {
                     Button(action: onSubmit) {
                         HStack {
                             Spacer()
@@ -307,6 +301,14 @@ struct SimplifiedReportSheet: View {
                     .disabled(isSubmitting)
                     .listRowBackground(isSubmitting ? Color.gray : Color.red)
                     .foregroundStyle(.white)
+                } header: {
+                    HStack(spacing: 4) {
+                        Text(loc: "report.option_submit.title")
+                        HelpInfoButton(
+                            action: { showSubmitHelp = true },
+                            accessibilityLabel: loc("report.option_submit.title")
+                        )
+                    }
                 }
 
                 Section {
@@ -347,7 +349,13 @@ struct SimplifiedReportSheet: View {
                     }
                     .disabled(isSubmitting)
                 } header: {
-                    Text(loc: "report.support.section")
+                    HStack(spacing: 4) {
+                        Text(loc: "report.option_contact.title")
+                        HelpInfoButton(
+                            action: { showContactHelp = true },
+                            accessibilityLabel: loc("report.option_contact.title")
+                        )
+                    }
                 }
             }
             .navigationTitle(title)
@@ -381,6 +389,37 @@ struct SimplifiedReportSheet: View {
             }
             .alert("report.support.mail_unavailable", isPresented: $isShowingMailUnavailableAlert) {
                 Button("actions.ok") {}
+            }
+            .sheet(isPresented: $showSubmitHelp) {
+                helpSheet(
+                    title: loc("report.option_submit.title"),
+                    text: loc("report.option_submit.help")
+                )
+            }
+            .sheet(isPresented: $showContactHelp) {
+                helpSheet(
+                    title: loc("report.option_contact.title"),
+                    text: loc("report.option_contact.help")
+                )
+            }
+        }
+    }
+
+    private func helpSheet(title: String, text: String) -> some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text(text)
+                        .font(.body)
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle(title)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
+                }
             }
         }
     }
