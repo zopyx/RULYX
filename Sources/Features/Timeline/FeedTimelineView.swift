@@ -43,7 +43,7 @@ struct FeedTimelineView: View {
             .navigationTitle(loc("timeline.title"))
             .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button { showNewPostComposer = true } label: {
                         Image(systemName: "square.and.pencil")
                     }

@@ -104,21 +104,21 @@ struct ConversationListView: View {
             }
             .navigationTitle(Text(loc: "tab.chat"))
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        Task { await chatStore.loadConvos() }
-                    } label: {
-                        if chatStore.isLoadingConvos {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "arrow.clockwise")
+                        withAnimation {
+                            if editMode.isEditing {
+                                selectedConvos = []
+                            }
+                            editMode = editMode.isEditing ? .inactive : .active
                         }
+                    } label: {
+                        Image(systemName: editMode.isEditing ? "checkmark" : "pencil")
                     }
-                    .accessibilityLabel(loc("chat.reload"))
-                    .disabled(chatStore.isLoadingConvos)
+                    .accessibilityLabel(editMode.isEditing ? loc("actions.done") : loc("chat.edit"))
                 }
 
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if editMode.isEditing {
                         Button("chat.select_all") {
                             let allIDs = Set(filteredConvos.map(\.id))
@@ -139,14 +139,17 @@ struct ConversationListView: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(editMode.isEditing ? loc("actions.done") : loc("chat.edit")) {
-                        withAnimation {
-                            if editMode.isEditing {
-                                selectedConvos = []
-                            }
-                            editMode = editMode.isEditing ? .inactive : .active
+                    Button {
+                        Task { await chatStore.loadConvos() }
+                    } label: {
+                        if chatStore.isLoadingConvos {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "arrow.clockwise")
                         }
                     }
+                    .accessibilityLabel(loc("chat.reload"))
+                    .disabled(chatStore.isLoadingConvos)
                 }
             }
             .safeAreaInset(edge: .bottom) {

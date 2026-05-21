@@ -22,7 +22,7 @@ struct AccountTabView: View {
                         description: Text(loc: "account.no_accounts.desc")
                     )
                 } else {
-                    Section("account.manage.saved") {
+                    Section {
                         ForEach(accountStore.accounts) { account in
                             Button {
                                 switchToAccount(account)
@@ -30,7 +30,8 @@ struct AccountTabView: View {
                                 HStack {
                                     AccountRowView(
                                         account: account,
-                                        isActive: account.id == accountStore.activeAccountID
+                                        isActive: account.id == accountStore.activeAccountID,
+                                        isDeactivated: accountStore.isDeactivated(account)
                                     )
                                     if switchingAccountID == account.id {
                                         Spacer()
@@ -50,6 +51,23 @@ struct AccountTabView: View {
                                 accountStore.removeAccount(account, client: blueskyClient)
                             }
                         }
+                    } header: {
+                        HStack {
+                            Text(loc("account.manage.saved"))
+                            Spacer()
+                            Button(editMode.isEditing ? loc("actions.done") : loc("account.manage.edit")) {
+                                withAnimation {
+                                    editMode = editMode.isEditing ? .inactive : .active
+                                }
+                            }
+                            .tint(.skyPrimary)
+                            Button {
+                                isPresentingAddAccount = true
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .accessibilityLabel(loc("account.manage.add"))
+                        }
                     }
 
                     Section {
@@ -61,7 +79,8 @@ struct AccountTabView: View {
                                     HStack {
                                         AccountRowView(
                                             account: account,
-                                            isActive: account.id == accountStore.activeAccountID
+                                            isActive: account.id == accountStore.activeAccountID,
+                                            isDeactivated: accountStore.isDeactivated(account)
                                         )
                                         if account.id == accountStore.preferredSearchAccountID {
                                             Spacer()
@@ -76,12 +95,14 @@ struct AccountTabView: View {
                             {
                                 AccountRowView(
                                     account: prefAccount,
-                                    isActive: prefAccount.id == accountStore.activeAccountID
+                                    isActive: prefAccount.id == accountStore.activeAccountID,
+                                    isDeactivated: accountStore.isDeactivated(prefAccount)
                                 )
                             } else if let first = accountStore.accounts.first {
                                 AccountRowView(
                                     account: first,
-                                    isActive: first.id == accountStore.activeAccountID
+                                    isActive: first.id == accountStore.activeAccountID,
+                                    isDeactivated: accountStore.isDeactivated(first)
                                 )
                             }
                         }
@@ -102,24 +123,6 @@ struct AccountTabView: View {
             }
             .navigationTitle(loc("account.manage.title"))
             .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(editMode.isEditing ? loc("actions.done") : loc("account.manage.edit")) {
-                        withAnimation {
-                            editMode = editMode.isEditing ? .inactive : .active
-                        }
-                    }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isPresentingAddAccount = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .accessibilityLabel(loc("account.manage.add"))
-                }
-            }
             .task {
                 await accountStore.refreshAccountProfiles(using: blueskyClient)
             }
