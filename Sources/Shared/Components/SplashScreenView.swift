@@ -13,6 +13,8 @@ struct SplashScreenView: View {
     @State private var logoBreathing: CGFloat = 1
     @State private var taglineOpacity: CGFloat = 0
     @State private var taglineOffset: CGFloat = 24
+    @State private var subTaglineOpacity: CGFloat = 0
+    @State private var subTaglineOffset: CGFloat = 16
     @State private var subtaglineOpacity: CGFloat = 0
     @State private var subtaglineOffset: CGFloat = 16
     @State private var footerOpacity: CGFloat = 0
@@ -79,6 +81,14 @@ struct SplashScreenView: View {
                     .offset(y: taglineOffset)
                     .opacity(taglineOpacity)
 
+                Spacer().frame(height: 4)
+
+                Text(loc: "splash.tagline_sub")
+                    .font(.caption.weight(.regular))
+                    .foregroundStyle(.white.opacity(0.55))
+                    .offset(y: subTaglineOffset)
+                    .opacity(subTaglineOpacity)
+
                 Spacer().frame(height: 24)
 
                 Text(loc: "splash.subtagline")
@@ -127,6 +137,13 @@ struct SplashScreenView: View {
         withAnimation(.easeOut(duration: 0.6)) {
             taglineOffset = 0
             taglineOpacity = 1
+        }
+
+        try? await Task.sleep(for: .seconds(0.2))
+
+        withAnimation(.easeOut(duration: 0.5)) {
+            subTaglineOffset = 0
+            subTaglineOpacity = 1
         }
 
         try? await Task.sleep(for: .seconds(0.2))
