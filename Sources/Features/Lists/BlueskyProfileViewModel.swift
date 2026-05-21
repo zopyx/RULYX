@@ -102,6 +102,13 @@ final class BlueskyProfileViewModel: ObservableObject {
         if let log = try? await auditLog {
             handleHistory = parseHandleChanges(from: log, currentHandle: profile.handle)
         }
+
+        if inspection?.listMemberships.isEmpty ?? true {
+            let memberships = await client.fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
+            if !memberships.isEmpty {
+                inspection = ProfileInspection(profile: profile, listMemberships: memberships, starterPackMemberships: inspection?.starterPackMemberships ?? [])
+            }
+        }
     }
 
     private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
