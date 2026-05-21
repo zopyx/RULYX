@@ -1097,15 +1097,68 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             viewerState: mapViewerState(profile.viewer)
         )
 
+        let listMemberships: [ProfileListMembership]
+        if let lists {
+            listMemberships = lists.listsWithMembership.map {
+                ProfileListMembership(listURI: $0.list.uri, name: $0.list.name, kind: $0.list.purpose.kind, memberCount: $0.list.listItemCount, isMember: $0.listItem != nil, listItemRecordURI: $0.listItem?.uri)
+            }
+        } else {
+            listMemberships = await fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
+        }
+
         return ProfileInspection(
             profile: mappedProfile,
-            listMemberships: lists?.listsWithMembership.map {
-                ProfileListMembership(listURI: $0.list.uri, name: $0.list.name, kind: $0.list.purpose.kind, memberCount: $0.list.listItemCount, isMember: $0.listItem != nil, listItemRecordURI: $0.listItem?.uri)
-            } ?? [],
+            listMemberships: listMemberships,
             starterPackMemberships: starterPacks?.starterPacksWithMembership.map {
                 ProfileStarterPackMembership(uri: $0.starterPack.uri, name: $0.starterPack.name ?? $0.starterPack.uri, memberCount: $0.starterPack.listItemCount, joinedAllTimeCount: $0.starterPack.joinedAllTimeCount, isMember: $0.listItem != nil)
             } ?? []
         )
+    }
+
+    func fetchListMemberships(
+        for targetDID: String,
+        account: AppAccount,
+        appPassword: String?
+    ) async -> [ProfileListMembership] {
+        guard let lists = try? await fetchLists(for: account, appPassword: appPassword) else {
+            return []
+        }
+
+        return await withTaskGroup(of: ProfileListMembership?.self) { group in
+            for list in lists {
+                group.addTask {
+                    var cursor: String?
+                    var foundItem: BlueskyListMember?
+                    var pagesChecked = 0
+
+                    while foundItem == nil, pagesChecked < 5 {
+                        guard let page = try? await self.fetchListMembersPage(
+                            list: list, cursor: cursor,
+                            account: account, appPassword: appPassword
+                        ) else { break }
+                        foundItem = page.members.first { $0.actor.did == targetDID }
+                        cursor = page.cursor
+                        pagesChecked += 1
+                        if cursor == nil { break }
+                    }
+
+                    return ProfileListMembership(
+                        listURI: list.id,
+                        name: list.name,
+                        kind: list.kind,
+                        memberCount: list.memberCount,
+                        isMember: foundItem != nil,
+                        listItemRecordURI: foundItem?.recordURI
+                    )
+                }
+            }
+
+            var results: [ProfileListMembership] = []
+            for await result in group {
+                if let result { results.append(result) }
+            }
+            return results
+        }
     }
 
     func uploadBlob(data: Data, mimeType: String, account: AppAccount, appPassword: String?) async throws -> UploadBlobResponse {

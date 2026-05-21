@@ -388,6 +388,32 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         )
     }
 
+    override func fetchListMemberships(
+        for targetDID: String,
+        account: AppAccount,
+        appPassword: String?
+    ) async -> [ProfileListMembership] {
+        try? await Task.sleep(for: .milliseconds(80))
+        return [
+            ProfileListMembership(
+                listURI: "at://did:plc:preview/app.bsky.graph.list/1",
+                name: "Reply Filters",
+                kind: .moderation,
+                memberCount: 42,
+                isMember: targetDID == "did:plc:preview-inspect",
+                listItemRecordURI: targetDID == "did:plc:preview-inspect" ? "at://did:plc:preview/app.bsky.graph.listitem/42" : nil
+            ),
+            ProfileListMembership(
+                listURI: "at://did:plc:preview/app.bsky.graph.list/2",
+                name: "Trusted Sources",
+                kind: .regular,
+                memberCount: 67,
+                isMember: false,
+                listItemRecordURI: nil
+            ),
+        ]
+    }
+
     override func fetchActorLists(actor: String, account _: AppAccount, appPassword _: String?) async throws -> [BlueskyList] {
         try await Task.sleep(for: .milliseconds(80))
         return [
