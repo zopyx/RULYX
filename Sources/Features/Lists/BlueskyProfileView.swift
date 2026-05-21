@@ -456,8 +456,11 @@ struct BlueskyProfileView: View {
                     let moderationMemberships = viewModel.listMemberships.filter { $0.kind == .moderation }
                     let regularMemberships = viewModel.listMemberships.filter { $0.kind == .regular }
 
-                    if !moderationMemberships.isEmpty {
-                        Section {
+                    Section {
+                        if moderationMemberships.isEmpty {
+                            Text(loc: "profile.no_lists")
+                                .foregroundStyle(.secondary)
+                        } else {
                             ForEach(moderationMemberships) { membership in
                                 Toggle(isOn: Binding(
                                     get: { viewModel.pendingListMemberStates[membership.listURI] ?? membership.isMember },
@@ -476,13 +479,16 @@ struct BlueskyProfileView: View {
                                 }
                                 .disabled(viewModel.isUpdatingModeration)
                             }
-                        } header: {
-                            Text(loc: "profile.on_my_moderation_lists")
                         }
+                    } header: {
+                        Text(loc: "profile.on_my_moderation_lists")
                     }
 
-                    if !regularMemberships.isEmpty {
-                        Section {
+                    Section {
+                        if regularMemberships.isEmpty {
+                            Text(loc: "profile.no_lists")
+                                .foregroundStyle(.secondary)
+                        } else {
                             ForEach(regularMemberships) { membership in
                                 Toggle(isOn: Binding(
                                     get: { viewModel.pendingListMemberStates[membership.listURI] ?? membership.isMember },
@@ -501,9 +507,9 @@ struct BlueskyProfileView: View {
                                 }
                                 .disabled(viewModel.isUpdatingModeration)
                             }
-                        } header: {
-                            Text(loc: "profile.on_my_lists")
                         }
+                    } header: {
+                        Text(loc: "profile.on_my_lists")
                     }
                 }
 
