@@ -88,8 +88,6 @@ final class BlueskyProfileViewModel: ObservableObject {
             )
         } catch {
             hasLoadedOnce = false
-            inspection = nil
-            handleHistory = []
             errorMessage = AppError.userMessage(from: error)
             isLoading = false
             return
