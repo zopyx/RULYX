@@ -63,16 +63,16 @@ struct ClearskyListsView: View {
                     Text(entry.name)
                         .lineLimit(1)
                 }
-                if let handle = ownerHandles[entry.url] {
-                    Text(handle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
                 if let desc = entry.description, !desc.isEmpty {
                     Text(desc)
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                         .lineLimit(2)
+                }
+                if let handle = ownerHandles[entry.url] {
+                    Text(handle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
             Spacer()
