@@ -616,18 +616,16 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     func fetchUnblockedBlockersCount(for account: AppAccount) async throws -> Int {
-        try guardClearskyAvailable()
-        let actorDID = try await resolveAccountDID(account)
-
-        async let blockedDIDs = fetchClearskyDIDs(actorDID: actorDID, endpoint: "blocklist")
-        async let blockedByDIDs = fetchClearskyDIDs(actorDID: actorDID, endpoint: "single-blocklist")
-        let (blocked, blockedBy) = try await (blockedDIDs, blockedByDIDs)
-
-        return blockedBy.subtracting(blocked).count
+        try await fetchUnblockedBlockerActors(account: account, appPassword: nil).count
     }
 
     private func fetchClearskyDIDs(actorDID: String, endpoint: String) async throws -> Set<String> {
-        var allDIDs = Set<String>()
+        let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint)
+        return Set(entries.map(\.did))
+    }
+
+    private func fetchClearskyEntries(actorDID: String, endpoint: String) async throws -> [ClearskyBlocklistEntry] {
+        var allEntries: [ClearskyBlocklistEntry] = []
         var page = 1
         repeat {
             let urlString = page == 1
@@ -639,19 +637,68 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             request.timeoutInterval = 30
             let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
-                return Set()
+                return []
             }
             guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
-                return Set()
+                return []
             }
             let entries = decoded.data.blocklist
-            for entry in entries {
-                allDIDs.insert(entry.did)
-            }
+            allEntries.append(contentsOf: entries)
             if entries.count < 100 { break }
             page += 1
         } while true
-        return allDIDs
+        return allEntries
+    }
+
+    func fetchUnblockedBlockerActors(account: AppAccount, appPassword _: String?) async throws -> [BlueskyActor] {
+        try guardClearskyAvailable()
+        let actorDID = try await resolveAccountDID(account)
+
+        async let blockedDIDsTask = fetchClearskyDIDs(actorDID: actorDID, endpoint: "blocklist")
+        async let blockedByEntriesTask = fetchClearskyEntries(actorDID: actorDID, endpoint: "single-blocklist")
+        let (blockedDIDs, blockedByEntries) = try await (blockedDIDsTask, blockedByEntriesTask)
+
+        let candidateEntries = blockedByEntries.filter { !blockedDIDs.contains($0.did) }
+        guard !candidateEntries.isEmpty else { return [] }
+
+        var blockedDates = [String: String]()
+        for entry in candidateEntries {
+            blockedDates[entry.did] = entry.blockedDate
+        }
+
+        var result = await resolveProfilesBestEffort(dids: candidateEntries.map(\.did))
+        for index in result.indices {
+            if let dateString = blockedDates[result[index].did] {
+                result[index].blockedDate = parseDate(dateString)
+            }
+        }
+
+        return result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
+    }
+
+    private func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
+        let uniqueDIDs = Array(Set(dids)).sorted()
+        return await withTaskGroup(of: [BlueskyActor].self) { group in
+            var offset = 0
+            while offset < uniqueDIDs.count {
+                let chunk = Array(uniqueDIDs[offset ..< min(offset + 25, uniqueDIDs.count)])
+                offset += 25
+                group.addTask { [httpClient] in
+                    do {
+                        return try await Self.fetchProfileBatch(identifiers: chunk, httpClient: httpClient)
+                    } catch {
+                        AppLogger.performance.error("Profile batch lookup failed: \(error.localizedDescription, privacy: .public)")
+                        return []
+                    }
+                }
+            }
+
+            var actors: [BlueskyActor] = []
+            for await batch in group {
+                actors.append(contentsOf: batch)
+            }
+            return actors
+        }
     }
 
     private func resolveAccountDID(_ account: AppAccount) async throws -> String {
@@ -663,32 +710,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
+        let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint)
         var allDIDs = Set<String>()
         var blockedDates = [String: String]()
-        var page = 1
-        repeat {
-            let urlString = page == 1
-                ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
-                : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
-            guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
-            var request = URLRequest(url: url)
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
-            request.timeoutInterval = 30
-            let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
-            guard (200 ..< 300).contains(httpResponse.statusCode) else {
-                return ClearskyBlocklistResult(actors: [], totalCount: 0)
-            }
-            guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
-                return ClearskyBlocklistResult(actors: [], totalCount: 0)
-            }
-            let entries = decoded.data.blocklist
-            for entry in entries {
-                allDIDs.insert(entry.did)
-                blockedDates[entry.did] = entry.blockedDate
-            }
-            if entries.count < 100 { break }
-            page += 1
-        } while true
+        for entry in entries {
+            allDIDs.insert(entry.did)
+            blockedDates[entry.did] = entry.blockedDate
+        }
 
         guard !allDIDs.isEmpty else {
             return ClearskyBlocklistResult(actors: [], totalCount: 0)
