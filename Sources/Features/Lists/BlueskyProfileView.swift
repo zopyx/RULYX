@@ -112,9 +112,13 @@ struct BlueskyProfileView: View {
         }
         .sheet(isPresented: $showPostBrowser) {
             if let profile = viewModel.profile {
-                UserPostsView(did: profile.did, displayName: profile.displayName ?? profile.handle)
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                UserPostsView(
+                    did: profile.did,
+                    displayName: profile.displayName ?? profile.handle,
+                    searchAccount: preferredSearchAccount
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
             }
         }
         .sheet(item: $shareFileURL) { url in
@@ -351,11 +355,7 @@ struct BlueskyProfileView: View {
                         }
                     }
                     Button {
-                        if profile.viewerState?.blockedBy == true {
-                            blockedAccessType = .posts
-                        } else {
-                            showPostBrowser = true
-                        }
+                        showPostBrowser = true
                     } label: {
                         HStack {
                             Text(loc: "profile.stats.posts")
@@ -664,7 +664,7 @@ struct BlueskyProfileView: View {
                         LabeledContent("profile.stats.joined", value: createdAt.formatted(date: .abbreviated, time: .omitted))
                     }
                     if !profile.labels.isEmpty {
-                        LabeledContent("profile.stats.labels", value: profile.labels.joined(separator: ", "))
+                        LabeledContent("profile.stats.labels", value: profile.labels.map(localizedLabel).joined(separator: ", "))
                     }
                 } header: {
                     Text(loc: "profile.account_info")

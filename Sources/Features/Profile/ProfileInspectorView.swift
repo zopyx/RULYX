@@ -258,7 +258,7 @@ struct ProfileInspectorView: View {
                     if !inspection.profile.labels.isEmpty {
                         Section {
                             ForEach(inspection.profile.labels, id: \.self) { label in
-                                Text(label)
+                                Text(localizedLabel(label))
                             }
                         } header: {
                             Text(loc: "profile.labels_section")

@@ -6,6 +6,7 @@ enum BlueskyAPIError: LocalizedError {
     case unauthorized
     case missingCredentials
     case sslPinFailure
+    case deactivated(String)
     case server(String)
 
     var errorDescription: String? {
@@ -20,6 +21,8 @@ enum BlueskyAPIError: LocalizedError {
             "No saved app password was found for this account."
         case .sslPinFailure:
             "The server certificate does not match the pinned fingerprint."
+        case let .deactivated(message):
+            "This account has been deactivated: \(message)"
         case let .server(message):
             "Bluesky returned an error: \(message)"
         }

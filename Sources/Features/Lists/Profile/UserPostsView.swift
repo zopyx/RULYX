@@ -15,6 +15,7 @@ extension URL: @retroactive Identifiable {
 struct UserPostsView: View {
     let did: String
     let displayName: String
+    let searchAccount: AppAccount?
 
     @StateObject private var viewModel: UserPostsViewModel
     @EnvironmentObject var accountStore: AccountStore
@@ -25,13 +26,13 @@ struct UserPostsView: View {
     @State private var videoPreviewURL: URL?
     @State private var showLikesForURI: String?
     @State private var shareFileURL: URL?
-    @State private var searchAccount: AppAccount?
     @State private var initialLoadTask: Task<Void, Never>?
     @State private var loadMoreTask: Task<Void, Never>?
 
-    init(did: String, displayName: String) {
+    init(did: String, displayName: String, searchAccount: AppAccount? = nil) {
         self.did = did
         self.displayName = displayName
+        self.searchAccount = searchAccount
         _viewModel = StateObject(wrappedValue: UserPostsViewModel(did: did))
     }
 
@@ -101,7 +102,6 @@ struct UserPostsView: View {
                     .environmentObject(blueskyClient)
             }
             .task {
-                resolveSearchAccount()
                 await loadInitial()
             }
             .onDisappear {
@@ -274,16 +274,6 @@ struct UserPostsView: View {
             }
         } label: {
             Image(systemName: "arrow.down.doc")
-        }
-    }
-
-    private func resolveSearchAccount() {
-        if let prefID = accountStore.preferredSearchAccountID,
-           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
-        {
-            searchAccount = prefAccount
-        } else {
-            searchAccount = accountStore.activeAccount
         }
     }
 

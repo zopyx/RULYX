@@ -74,12 +74,23 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
         )
 
         if httpResponse.statusCode == 401 {
+            if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data),
+               let errorCode = errorPayload.error
+            {
+                if errorCode == "AccountTakedown" || errorCode == "Deactivated" {
+                    throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
+                }
+            }
             throw BlueskyAPIError.unauthorized
         }
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
-                throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Bluesky request failed.")
+                let errorCode = errorPayload.error ?? ""
+                if errorCode == "AccountTakedown" || errorCode == "Deactivated" {
+                    throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
+                }
+                throw BlueskyAPIError.server(errorPayload.message ?? errorCode)
             }
             throw BlueskyAPIError.invalidResponse
         }

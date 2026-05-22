@@ -227,24 +227,22 @@ final class iCloudAccountSyncTests: XCTestCase {
         UserDefaults.standard.removeObject(forKey: "iCloudSyncEnabled")
     }
 
-    func testInitEnabledByDefault() {
+    func testInitDisabledByDefault() {
         UserDefaults.standard.removeObject(forKey: "iCloudSyncEnabled")
-        let sync = iCloudAccountSync.shared
-        XCTAssertTrue(sync.isEnabled)
+        let sync = iCloudAccountSync()
+        XCTAssertFalse(sync.isEnabled)
     }
 
     func testSetEnabledPersists() {
-        let sync = iCloudAccountSync.shared
+        let sync = iCloudAccountSync()
         sync.isEnabled = false
         XCTAssertFalse(UserDefaults.standard.bool(forKey: "iCloudSyncEnabled"))
-        sync.isEnabled = true
     }
 
     func testPushAccountsWhenDisabledDoesNothing() {
-        let sync = iCloudAccountSync.shared
+        let sync = iCloudAccountSync()
         sync.isEnabled = false
         let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
         sync.pushAccounts([account])
-        sync.isEnabled = true
     }
 }

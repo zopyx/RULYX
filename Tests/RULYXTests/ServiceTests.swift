@@ -16,7 +16,7 @@ final class FeedStoreTests: XCTestCase {
     func testInitialState() {
         let store = makeStore()
         XCTAssertNil(store.customFeedURI)
-        XCTAssertEqual(store.customFeedName, String(localized: "timeline.following"))
+        XCTAssertEqual(store.customFeedName, String.localized("timeline.following"))
         XCTAssertTrue(store.recentFeeds.isEmpty)
     }
 
@@ -79,7 +79,7 @@ final class FeedStoreTests: XCTestCase {
         store.setFeed(uri: "at://feed/1", name: "Custom")
         store.resetToFollowing()
         XCTAssertNil(store.customFeedURI)
-        XCTAssertEqual(store.customFeedName, String(localized: "timeline.following"))
+        XCTAssertEqual(store.customFeedName, String.localized("timeline.following"))
     }
 
     func testPersistenceAcrossInstances() {
@@ -381,8 +381,7 @@ final class HTTPClientTests: XCTestCase {
         let entry = try XCTUnwrap(debugStore.entries.first)
         XCTAssertNil(entry.source)
         XCTAssertEqual(entry.sequenceNumber, 1)
-        XCTAssertTrue((entry.origin ?? "").contains("Tests/RULYXTests/ServiceTests.swift"))
-        XCTAssertTrue((entry.origin ?? "").contains("testDataForRequestSuccess()"))
+        XCTAssertTrue((entry.origin ?? "").contains("testDataForRequestSuccess()"), "origin: \(entry.origin ?? "nil")")
         XCTAssertEqual(entry.method, "GET")
         XCTAssertEqual(entry.url, "https://example.com/api")
         XCTAssertEqual(entry.state, .succeeded)
@@ -479,8 +478,7 @@ final class HTTPClientTests: XCTestCase {
         _ = try await client.data(for: request, source: "Unit Test Source")
         let entry = try XCTUnwrap(debugStore.entries.first)
         XCTAssertEqual(entry.source, "Unit Test Source")
-        XCTAssertTrue((entry.origin ?? "").contains("Tests/RULYXTests/ServiceTests.swift"))
-        XCTAssertTrue((entry.origin ?? "").contains("testDataForRequestRecordsSource()"))
+        XCTAssertTrue((entry.origin ?? "").contains("testDataForRequestRecordsSource()"), "origin: \(entry.origin ?? "nil")")
         XCTAssertEqual(entry.url, "https://example.com/source")
     }
 

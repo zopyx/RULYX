@@ -12,7 +12,7 @@ final class LocalizationManager: ObservableObject {
     }
 
     private var bundle: [String: String] = [:]
-    private var allBundles: [String: [String: String]] = [:]
+    var allBundles: [String: [String: String]] = [:]
 
     let supportedLanguages: [(code: String, displayName: String)] = [
         ("en", "English"),
@@ -77,6 +77,18 @@ final class LocalizationManager: ObservableObject {
 @MainActor
 func loc(_ key: String) -> String {
     LocalizationManager.shared.localized(key)
+}
+
+/// Returns a human-readable localized string for a known label value (e.g. "bot", "spam").
+/// Falls back to the raw value for unknown labels.
+@MainActor
+func localizedLabel(_ val: String) -> String {
+    let key = "label.\(val)"
+    let localized = LocalizationManager.shared.localized(key)
+    if localized != key {
+        return localized
+    }
+    return val
 }
 
 // MARK: - CLDR Plural Rules

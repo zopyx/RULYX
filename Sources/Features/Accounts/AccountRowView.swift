@@ -3,6 +3,14 @@ import SwiftUI
 struct AccountRowView: View {
     let account: AppAccount
     let isActive: Bool
+    let isDeactivated: Bool
+
+    init(account: AppAccount, isActive: Bool, isDeactivated: Bool = false) {
+        self.account = account
+        self.isActive = isActive
+        self.isDeactivated = isDeactivated
+    }
+
     @ScaledMetric(relativeTo: .body) private var avatarSize = 40.0
 
     private var entrywayLabel: String? {
@@ -59,7 +67,24 @@ struct AccountRowView: View {
 
             Spacer()
 
-            if isActive {
+            if isDeactivated {
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.octagon.fill")
+                        .font(.caption)
+                    Text(loc("account.deactivated"))
+                        .font(.caption.weight(.semibold))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background {
+                    if #available(iOS 26, *) {
+                        Color.clear.glassEffect(.regular.tint(.red), in: .rect(cornerRadius: .infinity))
+                    } else {
+                        Color.clear.background(Color.red.opacity(0.14), in: Capsule())
+                    }
+                }
+                .foregroundStyle(.red)
+            } else if isActive {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.caption)
@@ -79,6 +104,7 @@ struct AccountRowView: View {
             }
         }
         .padding(.vertical, 4)
+        .opacity(isDeactivated ? 0.6 : 1)
     }
 
     @ViewBuilder
@@ -118,7 +144,8 @@ struct AccountRowView: View {
     List {
         AccountRowView(
             account: AppAccount(handle: "team-alpha.bsky.social", displayName: "Team Alpha"),
-            isActive: true
+            isActive: true,
+            isDeactivated: false
         )
     }
 }

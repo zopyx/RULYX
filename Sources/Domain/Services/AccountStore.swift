@@ -12,6 +12,7 @@ final class AccountStore: ObservableObject {
 
     @Published var errorMessage: String?
     @Published private(set) var isAddingAccount = false
+    @Published var deactivatedAccountIDs: Set<UUID> = []
 
     var activeAccount: AppAccount? {
         accounts.first { $0.id == activeAccountID }
@@ -51,6 +52,30 @@ final class AccountStore: ObservableObject {
             guard let entries = notification.object as? [[String: String]] else { return }
             Task { @MainActor [weak self] in
                 self?.mergeCloudAccounts(entries)
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: .accountDeactivated,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let idString = notification.userInfo?["accountID"] as? String,
+                  let accountID = UUID(uuidString: idString)
+            else { return }
+            Task { @MainActor [weak self] in
+                self?.deactivatedAccountIDs.insert(accountID)
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: .accountReactivated,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let idString = notification.userInfo?["accountID"] as? String,
+                  let accountID = UUID(uuidString: idString)
+            else { return }
+            Task { @MainActor [weak self] in
+                self?.deactivatedAccountIDs.remove(accountID)
             }
         }
     }
@@ -149,6 +174,10 @@ final class AccountStore: ObservableObject {
             accounts[index].lastUsedAt = .now
         }
         persist()
+    }
+
+    func isDeactivated(_ account: AppAccount) -> Bool {
+        deactivatedAccountIDs.contains(account.id)
     }
 
     func setLabel(for account: AppAccount, label: String?) {

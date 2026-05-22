@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-final class iCloudAccountSync: ObservableObject {
+class iCloudAccountSync: ObservableObject {
     static let shared = iCloudAccountSync()
 
     @Published var isEnabled: Bool {
@@ -16,7 +16,7 @@ final class iCloudAccountSync: ObservableObject {
     private let store = NSUbiquitousKeyValueStore.default
     private let accountKey = "syncedAccounts"
 
-    private init() {
+    init() {
         isEnabled = UserDefaults.standard.object(forKey: "iCloudSyncEnabled") as? Bool ?? false
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
