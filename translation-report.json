@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1052,
+    "total_keys": 1083,
     "total_languages": 16,
-    "untranslated_total": 1
+    "untranslated_total": 407
   },
   "keys": {
     "account.active": {
@@ -1029,6 +1029,69 @@
       "vi": {
         "text": "为什么使用应用密码？ (VI)",
         "untranslated": false
+      }
+    },
+    "account.deactivated": {
+      "en": "Deactivated",
+      "de": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Deactivated",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Deactivated",
+        "untranslated": true
       }
     },
     "account.discard_add.hint": {
@@ -17598,6 +17661,636 @@
       "vi": {
         "text": "Visit website (VI)",
         "untranslated": false
+      }
+    },
+    "label.!hide": {
+      "en": "Hidden",
+      "de": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Hidden",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Hidden",
+        "untranslated": true
+      }
+    },
+    "label.!no-unauthenticated": {
+      "en": "No Unauthenticated Access",
+      "de": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No Unauthenticated Access",
+        "untranslated": true
+      }
+    },
+    "label.!warn": {
+      "en": "Warning",
+      "de": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Warning",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Warning",
+        "untranslated": true
+      }
+    },
+    "label.bot": {
+      "en": "Bot",
+      "de": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Bot",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Bot",
+        "untranslated": true
+      }
+    },
+    "label.graphic-media": {
+      "en": "Graphic Media",
+      "de": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Graphic Media",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Graphic Media",
+        "untranslated": true
+      }
+    },
+    "label.impersonation": {
+      "en": "Impersonation",
+      "de": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Impersonation",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Impersonation",
+        "untranslated": true
+      }
+    },
+    "label.nudity": {
+      "en": "Nudity",
+      "de": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Nudity",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Nudity",
+        "untranslated": true
+      }
+    },
+    "label.porn": {
+      "en": "Pornographic",
+      "de": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Pornographic",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Pornographic",
+        "untranslated": true
+      }
+    },
+    "label.sexual": {
+      "en": "Sexual",
+      "de": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Sexual",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Sexual",
+        "untranslated": true
+      }
+    },
+    "label.spam": {
+      "en": "Spam",
+      "de": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Spam",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Spam",
+        "untranslated": true
       }
     },
     "likes.empty": {
@@ -35555,6 +36248,69 @@
         "untranslated": false
       }
     },
+    "lists.not_blocked_back": {
+      "en": "Accounts not yet blocked",
+      "de": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Accounts not yet blocked",
+        "untranslated": true
+      }
+    },
     "lists.pending_actions": {
       "en": "Pending Actions",
       "de": {
@@ -46139,66 +46895,507 @@
         "untranslated": false
       }
     },
-    "profile.block_back.progress": {
-      "en": "Blocking back…",
+    "profile.block_back.preview.blocks_me": {
+      "en": "Blocks me",
       "de": {
-        "text": "Zurückblockieren…",
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocks me",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocks me",
+        "untranslated": true
+      }
+    },
+    "profile.block_back.preview.count": {
+      "en": "{count} account(s) that block you but are not blocked back",
+      "de": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "{count} account(s) that block you but are not blocked back",
+        "untranslated": true
+      }
+    },
+    "profile.block_back.preview.empty": {
+      "en": "No accounts to block back",
+      "de": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No accounts to block back",
+        "untranslated": true
+      }
+    },
+    "profile.block_back.preview.not_blocked": {
+      "en": "Not blocked back",
+      "de": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Not blocked back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Not blocked back",
+        "untranslated": true
+      }
+    },
+    "profile.block_back.preview.title": {
+      "en": "Accounts to Block Back",
+      "de": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Accounts to Block Back",
+        "untranslated": true
+      }
+    },
+    "profile.block_back.progress": {
+      "en": "Blocking back {completed}/{total}…",
+      "de": {
+        "text": "Zurückblockieren {completed}/{total}…",
         "untranslated": false
       },
       "fr": {
-        "text": "Bloquer…",
+        "text": "Bloquer {completed}/{total}…",
         "untranslated": false
       },
       "it": {
-        "text": "Blocco indietro...",
+        "text": "Blocco indietro {completed}/{total}...",
         "untranslated": false
       },
       "ja": {
-        "text": "ブロックバック…",
+        "text": "ブロックバック {completed}/{total}…",
         "untranslated": false
       },
       "zh": {
-        "text": "挡回去……",
+        "text": "挡回去 {completed}/{total}……",
         "untranslated": false
       },
       "es": {
-        "text": "Bloqueando de nuevo...",
+        "text": "Bloqueando de nuevo {completed}/{total}...",
         "untranslated": false
       },
       "pt": {
-        "text": "Bloqueando de volta…",
+        "text": "Bloqueando de volta {completed}/{total}…",
         "untranslated": false
       },
       "ko": {
-        "text": "다시 차단 중…",
+        "text": "다시 차단 중 {completed}/{total}…",
         "untranslated": false
       },
       "ru": {
-        "text": "Блокируем ответ…",
+        "text": "Блокируем ответ {completed}/{total}…",
         "untranslated": false
       },
       "ar": {
-        "text": "حجب العودة…",
+        "text": "حجب العودة {completed}/{total}…",
         "untranslated": false
       },
       "nl": {
-        "text": "Terug blokkeren...",
+        "text": "Terug blokkeren {completed}/{total}...",
         "untranslated": false
       },
       "pl": {
-        "text": "Blokuję ponownie…",
+        "text": "Blokuję ponownie {completed}/{total}…",
         "untranslated": false
       },
       "tr": {
-        "text": "Geri engelleme…",
+        "text": "Geri engelleme {completed}/{total}…",
         "untranslated": false
       },
       "th": {
-        "text": "กำลังบล็อกกลับ...",
+        "text": "กำลังบล็อกกลับ {completed}/{total}...",
         "untranslated": false
       },
       "vi": {
-        "text": "Chặn lại…",
+        "text": "Chặn lại {completed}/{total}…",
+        "untranslated": false
+      }
+    },
+    "profile.block_back.result": {
+      "en": "{success} blocked, {fail} failed",
+      "de": {
+        "text": "{success} blockiert, {fail} fehlgeschlagen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "{success} bloqués, {fail} échoués",
+        "untranslated": false
+      },
+      "it": {
+        "text": "{success} bloccati, {fail} falliti",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "{success} ブロック成功、{fail} 失敗",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "成功 {success}，失败 {fail}",
+        "untranslated": false
+      },
+      "es": {
+        "text": "{success} bloqueados, {fail} fallidos",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "{success} bloqueados, {fail} falharam",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "{success}개 차단 성공, {fail}개 실패",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "{success} заблокировано, {fail} ошибок",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "{success} تم الحظر, {fail} فشل",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "{success} geblokkeerd, {fail} mislukt",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "{success} zablokowanych, {fail} niepowodzeń",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "{success} engellendi, {fail} başarısız",
+        "untranslated": false
+      },
+      "th": {
+        "text": "บล็อกสำเร็จ {success} ล้มเหลว {fail}",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "{success} đã chặn, {fail} thất bại",
+        "untranslated": false
+      }
+    },
+    "profile.block_back.result_success": {
+      "en": "All {count} accounts blocked",
+      "de": {
+        "text": "Alle {count} Konten blockiert",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Les {count} comptes bloqués",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Tutti i {count} account bloccati",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "すべての {count} アカウントをブロックしました",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "已屏蔽全部 {count} 个账户",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Todos los {count} cuentas bloqueadas",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Todas as {count} contas bloqueadas",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "{count}개 계정 모두 차단됨",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Все {count} аккаунтов заблокировано",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تم حظر جميع الحسابات الـ {count}",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Alle {count} accounts geblokkeerd",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Wszystkie {count} kont zablokowane",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "{count} hesabın tamamı engellendi",
+        "untranslated": false
+      },
+      "th": {
+        "text": "บล็อกทั้งหมด {count} บัญชีแล้ว",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đã chặn tất cả {count} tài khoản",
         "untranslated": false
       }
     },
@@ -46262,6 +47459,69 @@
       },
       "vi": {
         "text": "Chặn lại",
+        "untranslated": false
+      }
+    },
+    "profile.block_back.unblocked": {
+      "en": "Accounts not yet blocked",
+      "de": {
+        "text": "Noch nicht blockierte Konten",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Comptes pas encore bloqués",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Account non ancora bloccati",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "まだブロックされていないアカウント",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "尚未封锁的账户",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Cuentas no bloqueadas aún",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Contas ainda não bloqueadas",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "아직 차단되지 않은 계정",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Ещё не заблокированные аккаунты",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "الحسابات غير المحظورة بعد",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Nog niet geblokkeerde accounts",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Konta jeszcze nie zablokowane",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Henüz engellenmemiş hesaplar",
+        "untranslated": false
+      },
+      "th": {
+        "text": "บัญชีที่ยังไม่ได้บล็อก",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Tài khoản chưa bị chặn",
         "untranslated": false
       }
     },
@@ -46452,6 +47712,258 @@
       "vi": {
         "text": "Chặn tài khoản của bạn",
         "untranslated": false
+      }
+    },
+    "profile.create_list_confirm.create": {
+      "en": "Create List",
+      "de": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Create List",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Create List",
+        "untranslated": true
+      }
+    },
+    "profile.create_list_confirm.title": {
+      "en": "Create a new list and add this account?",
+      "de": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Create a new list and add this account?",
+        "untranslated": true
+      }
+    },
+    "profile.create_moderation_list": {
+      "en": "Create moderation list",
+      "de": {
+        "text": "Moderationsliste erstellen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Créer une liste de modération",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Crea lista di moderazione",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "モデレーションリストを作成",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "创建审核列表",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Crear lista de moderación",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Criar lista de moderação",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Create moderation list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Create moderation list",
+        "untranslated": true
+      }
+    },
+    "profile.create_regular_list": {
+      "en": "Create list",
+      "de": {
+        "text": "Liste erstellen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Créer une liste",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Crea lista",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "リストを作成",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "创建列表",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Crear lista",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Criar lista",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Create list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Create list",
+        "untranslated": true
       }
     },
     "profile.current_badge": {
@@ -49730,6 +51242,69 @@
         "untranslated": false
       }
     },
+    "profile.on_my_lists.help": {
+      "en": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+      "de": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      }
+    },
     "profile.on_my_moderation_lists": {
       "en": "On my moderation lists",
       "de": {
@@ -49791,6 +51366,69 @@
       "vi": {
         "text": "Trong danh sách kiểm duyệt của tôi",
         "untranslated": false
+      }
+    },
+    "profile.on_my_moderation_lists.help": {
+      "en": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+      "de": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
+        "untranslated": true
       }
     },
     "profile.open": {
@@ -57542,6 +59180,258 @@
         "untranslated": false
       }
     },
+    "report.option_contact.help": {
+      "en": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+      "de": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
+        "untranslated": true
+      }
+    },
+    "report.option_contact.title": {
+      "en": "Contact Support",
+      "de": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Contact Support",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Contact Support",
+        "untranslated": true
+      }
+    },
+    "report.option_submit.help": {
+      "en": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+      "de": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+        "untranslated": true
+      }
+    },
+    "report.option_submit.title": {
+      "en": "Submit Report",
+      "de": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Submit Report",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Submit Report",
+        "untranslated": true
+      }
+    },
     "report.preview": {
       "en": "Preview",
       "de": {
@@ -62265,6 +64155,69 @@
       "vi": {
         "text": "Kiểm duyệt Bluesky trở nên dễ dàng",
         "untranslated": false
+      }
+    },
+    "splash.tagline_sub": {
+      "en": "Easy to use, sharp as a knife",
+      "de": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Easy to use, sharp as a knife",
+        "untranslated": true
       }
     },
     "state.batch_progress": {

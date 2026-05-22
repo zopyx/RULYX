@@ -22,8 +22,8 @@ final class ViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
         XCTAssertFalse(viewModel.isLoading)
         XCTAssertFalse(viewModel.isFromCache)
-        XCTAssertEqual(viewModel.blockingCount, 0)
-        XCTAssertEqual(viewModel.blockedByCount, 0)
+        XCTAssertNil(viewModel.blockingCount)
+        XCTAssertNil(viewModel.blockedByCount)
     }
 
     func testListsViewModelLoadWithNilAccountSetsNoError() async {
@@ -38,8 +38,8 @@ final class ViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.listsByKind.isEmpty)
         XCTAssertNil(viewModel.activeProfile)
         XCTAssertNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.blockingCount, 0)
-        XCTAssertEqual(viewModel.blockedByCount, 0)
+        XCTAssertNil(viewModel.blockingCount)
+        XCTAssertNil(viewModel.blockedByCount)
         XCTAssertFalse(viewModel.isLoading)
     }
 

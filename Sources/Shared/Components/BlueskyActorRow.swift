@@ -4,7 +4,7 @@ struct BlueskyActorRow<Extra: View>: View {
     let actor: BlueskyActor
     let extra: Extra
 
-    @ScaledMetric(relativeTo: .body) private var avatarSize: CGFloat = 40
+    @ScaledMetric(relativeTo: .body) private var avatarSize: CGFloat = 36
 
     init(actor: BlueskyActor, @ViewBuilder extra: () -> Extra) {
         self.actor = actor
@@ -13,11 +13,11 @@ struct BlueskyActorRow<Extra: View>: View {
 
     @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             avatarView
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
                     Text(actor.title)
                         .font(.headline)
                         .foregroundStyle(.primary)
@@ -36,7 +36,7 @@ struct BlueskyActorRow<Extra: View>: View {
 
             Spacer()
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 2)
         .accessibilityLabel(String.localized("actor_row.label", replacements: ["title": actor.title, "handle": actor.handle]))
     }
 

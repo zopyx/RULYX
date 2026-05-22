@@ -37,6 +37,8 @@ struct AppError: LocalizedError, Equatable {
                 return AppError(category: .authentication, message: apiError.localizedDescription)
             case .sslPinFailure:
                 return AppError(category: .network, message: apiError.localizedDescription)
+            case .deactivated:
+                return AppError(category: .authentication, message: apiError.localizedDescription)
             case .server:
                 return AppError(category: .server, message: apiError.localizedDescription)
             }

@@ -13,6 +13,7 @@ final class BlueskyListServiceTests: XCTestCase {
             let requestExecutor = MockRequestExecutor()
             let sessionService = MockSessionService()
             let service = BlueskyListService(requestExecutor: requestExecutor, sessionService: sessionService)
+            LocalizationManager.shared.currentLanguage = "en"
             return (requestExecutor, sessionService, service)
         }
         requestExecutor = setup.0

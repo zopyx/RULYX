@@ -46,7 +46,7 @@ final class AccountStoreTests: XCTestCase {
         let didAdd = await store.addAccount(handle: "", appPassword: "abcd-efgh-ijkl-mnop", client: client)
 
         XCTAssertFalse(didAdd)
-        XCTAssertEqual(store.errorMessage, String(localized: "account.error.handle_and_password_required"))
+        XCTAssertEqual(store.errorMessage, String.localized("account.error.handle_and_password_required"))
         XCTAssertTrue(store.accounts.isEmpty)
     }
 
@@ -57,7 +57,7 @@ final class AccountStoreTests: XCTestCase {
         let didAdd = await store.addAccount(handle: "moderator.bsky.social", appPassword: "", client: client)
 
         XCTAssertFalse(didAdd)
-        XCTAssertEqual(store.errorMessage, String(localized: "account.error.handle_and_password_required"))
+        XCTAssertEqual(store.errorMessage, String.localized("account.error.handle_and_password_required"))
         XCTAssertTrue(store.accounts.isEmpty)
     }
 
@@ -71,7 +71,7 @@ final class AccountStoreTests: XCTestCase {
         let second = await addTestAccount(store: store, client: client)
 
         XCTAssertFalse(second)
-        XCTAssertEqual(store.errorMessage, String(localized: "account.error.already_exists"))
+        XCTAssertEqual(store.errorMessage, String.localized("account.error.already_exists"))
         XCTAssertEqual(store.accounts.count, 1)
     }
 

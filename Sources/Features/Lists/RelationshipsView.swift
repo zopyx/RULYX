@@ -235,21 +235,11 @@ struct RelationshipsView: View {
                         .disabled(isExporting)
                     }
 
-                    if isLoading, actors.isEmpty {
-                        ProgressView()
-                    } else if isRefreshing {
-                        ProgressView()
-                    } else {
-                        Button {
-                            Task { await refresh() }
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        .accessibilityHint("rel.refresh.hint")
-                        .disabled(isExporting)
-                    }
                 }
             }
+        }
+        .refreshable {
+            await refresh()
         }
         .task {
             await load()

@@ -150,9 +150,8 @@ private final class MockNotificationClient: LiveBlueskyClient {
         fetchPostsCallCount += 1
         fetchedPostURIs = uris
         if shouldFailBatchFetch, uris.count > 1 || uris == ["at://did:plc:post/app.bsky.feed.post/2"] {
-            if uris.count > 1 {
-                throw URLError(.badServerResponse)
-            }
+            shouldFailBatchFetch = false
+            throw URLError(.badServerResponse)
         }
         return posts
     }

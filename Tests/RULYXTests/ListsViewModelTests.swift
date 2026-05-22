@@ -21,8 +21,8 @@ final class ListsViewModelTests: XCTestCase {
         await viewModel.load(for: nil, appPassword: nil, using: client)
         XCTAssertTrue(viewModel.listsByKind.isEmpty)
         XCTAssertNil(viewModel.activeProfile)
-        XCTAssertEqual(viewModel.blockingCount, 0)
-        XCTAssertEqual(viewModel.blockedByCount, 0)
+        XCTAssertNil(viewModel.blockingCount)
+        XCTAssertNil(viewModel.blockedByCount)
         XCTAssertNil(viewModel.errorMessage)
     }
 
@@ -79,7 +79,7 @@ final class ListsViewModelTests: XCTestCase {
         client.shouldFailBlocking = true
         let account = makeAccount()
         await viewModel.load(for: account, appPassword: "pass", using: client)
-        XCTAssertEqual(viewModel.blockingCount, 0)
+        XCTAssertNil(viewModel.blockingCount)
     }
 
     func testActiveProfilePopulatedOnLoad() async {

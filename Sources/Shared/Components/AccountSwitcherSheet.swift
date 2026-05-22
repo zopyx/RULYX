@@ -32,7 +32,8 @@ struct AccountSwitcherSheet: View {
                                 HStack {
                                     AccountRowView(
                                         account: account,
-                                        isActive: account.id == accountStore.activeAccountID
+                                        isActive: account.id == accountStore.activeAccountID,
+                                        isDeactivated: accountStore.isDeactivated(account)
                                     )
                                     if switchingAccountID == account.id {
                                         Spacer()

@@ -47,47 +47,51 @@ struct ListsView: View {
                             }
                         }
 
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading) {
-                            Button {
-                                presentationState.showFollowers = true
-                            } label: {
-                                relationshipRow(
-                                    label: loc("lists.followers"),
-                                    count: viewModel.activeProfile?.followersCount
-                                )
-                            }
-                            .buttonStyle(.plain)
+                        Section {
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading) {
+                                Button {
+                                    presentationState.showFollowers = true
+                                } label: {
+                                    relationshipRow(
+                                        label: loc("lists.followers"),
+                                        count: viewModel.activeProfile?.followersCount
+                                    )
+                                }
+                                .buttonStyle(.plain)
 
-                            Button {
-                                presentationState.showFollowing = true
-                            } label: {
-                                relationshipRow(
-                                    label: loc("lists.following"),
-                                    count: viewModel.activeProfile?.followsCount
-                                )
-                            }
-                            .buttonStyle(.plain)
+                                Button {
+                                    presentationState.showFollowing = true
+                                } label: {
+                                    relationshipRow(
+                                        label: loc("lists.following"),
+                                        count: viewModel.activeProfile?.followsCount
+                                    )
+                                }
+                                .buttonStyle(.plain)
 
-                            Button {
-                                presentationState.showBlocking = true
-                            } label: {
-                                relationshipRow(
-                                    label: loc("lists.blocking"),
-                                    count: viewModel.blockingCount
-                                )
-                            }
-                            .buttonStyle(.plain)
+                                Button {
+                                    presentationState.showBlocking = true
+                                } label: {
+                                    relationshipRow(
+                                        label: loc("lists.blocking"),
+                                        count: viewModel.blockingCount,
+                                        isLoading: viewModel.blockingCount == nil && (viewModel.isLoading || viewModel.isRefreshing)
+                                    )
+                                }
+                                .buttonStyle(.plain)
 
-                            Button {
-                                presentationState.showBlockedBy = true
-                            } label: {
-                                relationshipRow(
-                                    label: loc("lists.blocked_by"),
-                                    count: viewModel.blockedByCount
-                                )
-                            }
-                            .buttonStyle(.plain)
+                                Button {
+                                    presentationState.showBlockedBy = true
+                                } label: {
+                                    relationshipRow(
+                                        label: loc("lists.blocked_by"),
+                                        count: viewModel.blockedByCount,
+                                        isLoading: viewModel.blockedByCount == nil && (viewModel.isLoading || viewModel.isRefreshing)
+                                    )
+                                }
+                                .buttonStyle(.plain)
 
+                            }
                         }
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
@@ -238,6 +242,7 @@ struct ListsView: View {
                         }
                     }
                     .listStyle(.insetGrouped)
+                    .listSectionSpacing(.compact)
                     .refreshable {
                         await reload()
                     }
@@ -423,16 +428,21 @@ struct ListsView: View {
         )
     }
 
-    private func relationshipRow(label: String, count: Int?) -> some View {
+    private func relationshipRow(label: String, count: Int?, isLoading: Bool = false) -> some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(label)
                     .appFont(.heading)
                     .lineLimit(1)
                     .foregroundStyle(.primary)
-                Text(count.map { "\($0)" } ?? "-")
-                    .appFont(.statistic)
-                    .foregroundStyle(Color.skyPrimary)
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(0.7)
+                } else {
+                    Text(count.map { "\($0)" } ?? "-")
+                        .appFont(.statistic)
+                        .foregroundStyle(Color.skyPrimary)
+                }
             }
             Spacer()
             Image(systemName: "chevron.right")

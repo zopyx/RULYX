@@ -95,6 +95,9 @@ private struct HTTPRequestDebugRow: View {
                     Text(entry.method)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
+                    Text(entry.startedAt, style: .time)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                     if let code = entry.statusCode {
                         Text("\(code)")
                             .font(.caption2)

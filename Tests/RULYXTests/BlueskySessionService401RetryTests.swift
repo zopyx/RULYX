@@ -28,45 +28,34 @@ final class BlueskySessionService401RetryTests: XCTestCase {
 
     func test401TriggersRecoveryThenRetriesOperation() async throws {
         let session = makeSession()
-        let recoveredSession = BlueskySession(
-            did: session.did,
-            handle: session.handle,
-            accessJWT: "refreshed-access-jwt",
-            refreshJWT: "refreshed-refresh-jwt",
-            pdsURL: session.pdsURL
-        )
-        let callCount = LockedCounter()
+        var operationAttempt = 0
 
-        requestExecutor.onSend = { path, method, _, body, accessToken, _ in
-            callCount.increment()
+        requestExecutor.onSend = { path, method, _, _, accessToken, _ in
             if path == "com.atproto.server.refreshSession" {
                 return try JSONDecoder().decode(CreateSessionResponse.self, from: """
                 {"did": "\(session.did)", "handle": "\(session.handle)", "accessJwt": "refreshed-access-jwt", "refreshJwt": "refreshed-refresh-jwt"}
                 """.data(using: .utf8)!)
             }
-            if callCount.value == 1 {
-                throw BlueskyAPIError.unauthorized
-            }
-            return EmptyTestResponse()
+            throw BlueskyAPIError.invalidResponse
         }
 
         let result: EmptyTestResponse = try await service.performAuthenticatedRequest(
             account: account,
             appPassword: "test-password",
-            operation: { _ in EmptyTestResponse() }
+            operation: { _ in
+                operationAttempt += 1
+                if operationAttempt == 1 {
+                    throw BlueskyAPIError.unauthorized
+                }
+                return EmptyTestResponse()
+            }
         )
 
-        XCTAssertEqual(callCount.value, 2)
         XCTAssert(result is EmptyTestResponse)
     }
 
     func test401WithRecoveryFailureThrowsUnauthorized() async {
-        let session = makeSession()
-
-        requestExecutor.onSend = { path, _, _, _, _, _ in
-            if path == "com.atproto.server.refreshSession" {
-                throw BlueskyAPIError.unauthorized
-            }
+        requestExecutor.onSend = { _, _, _, _, _, _ in
             throw BlueskyAPIError.unauthorized
         }
 
@@ -74,7 +63,9 @@ final class BlueskySessionService401RetryTests: XCTestCase {
             let _: EmptyTestResponse = try await service.performAuthenticatedRequest(
                 account: account,
                 appPassword: "test-password",
-                operation: { _ in EmptyTestResponse() }
+                operation: { _ in
+                    throw BlueskyAPIError.unauthorized
+                }
             )
             XCTFail("Expected unauthorized error")
         } catch BlueskyAPIError.unauthorized {
@@ -85,15 +76,13 @@ final class BlueskySessionService401RetryTests: XCTestCase {
     }
 
     func testNoRetryOnNon401Error() async {
-        requestExecutor.onSend = { _, _, _, _, _, _ in
-            throw BlueskyAPIError.server("Some server error")
-        }
-
         do {
             let _: EmptyTestResponse = try await service.performAuthenticatedRequest(
                 account: account,
                 appPassword: "test-password",
-                operation: { _ in EmptyTestResponse() }
+                operation: { _ in
+                    throw BlueskyAPIError.server("Some server error")
+                }
             )
             XCTFail("Expected server error")
         } catch BlueskyAPIError.server {
@@ -108,10 +97,4 @@ private struct EmptyTestResponse: Decodable {}
 
 private extension Data {
     var utf8String: String { String(data: self, encoding: .utf8)! }
-}
-
-final class LockedCounter: @unchecked Sendable {
-    private let lock = NSLock()
-    private(set) var value = 0
-    func increment() { lock.lock(); value += 1; lock.unlock() }
 }

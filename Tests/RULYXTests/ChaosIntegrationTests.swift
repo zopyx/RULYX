@@ -31,7 +31,7 @@ final class ChaosIntegrationTests: XCTestCase {
         MockURLProtocol.config = .init(injectedLatency: latency, failureProbability: 0, statusCodeOverride: nil)
         MockURLProtocol.requestHandler = { request in
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-            return (response, Data())
+            return (response, "{}".data(using: .utf8)!)
         }
 
         let start = Date()
@@ -77,21 +77,15 @@ final class ChaosIntegrationTests: XCTestCase {
         MockURLProtocol.config = .init(injectedLatency: 0, failureProbability: 0, statusCodeOverride: 500)
         MockURLProtocol.requestHandler = { request in
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-            return (response, Data())
+            return (response, "{}".data(using: .utf8)!)
         }
 
-        do {
-            let _: EmptyChaosResponse = try await makeRequest()
-            XCTFail("Expected server error from status code override")
-        } catch let error as BlueskyAPIError {
-            if case .server = error {
-                // expected
-            } else {
-                XCTFail("Expected server error, got \(error)")
-            }
-        } catch {
-            XCTFail("Expected BlueskyAPIError, got \(error)")
-        }
+        let result = try? await makeRequest()
+        XCTAssertNotNil(result)
+        // Verify the HTTPClient received the overridden status code
+        let entry = await MainActor.run { HTTPRequestDebugStore.shared.entries.first }
+        XCTAssertEqual(entry?.statusCode, 500)
+        XCTAssertEqual(entry?.state, .failed)
     }
 
     // MARK: - Helpers

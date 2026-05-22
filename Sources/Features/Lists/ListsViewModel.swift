@@ -4,8 +4,8 @@ import Foundation
 final class ListsViewModel: ObservableObject {
     @Published private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     @Published private(set) var activeProfile: BlueskyProfile?
-    @Published private(set) var blockingCount = 0
-    @Published private(set) var blockedByCount = 0
+    @Published private(set) var blockingCount: Int?
+    @Published private(set) var blockedByCount: Int?
     @Published private(set) var isLoading = false
     @Published private(set) var isRefreshing = false
     @Published private(set) var isFromCache = false
@@ -14,8 +14,8 @@ final class ListsViewModel: ObservableObject {
     func reset() {
         listsByKind = [:]
         activeProfile = nil
-        blockingCount = 0
-        blockedByCount = 0
+        blockingCount = nil
+        blockedByCount = nil
         isLoading = false
         isRefreshing = false
         errorMessage = nil
@@ -30,8 +30,8 @@ final class ListsViewModel: ObservableObject {
         guard let account else {
             listsByKind = [:]
             activeProfile = nil
-            blockingCount = 0
-            blockedByCount = 0
+            blockingCount = nil
+            blockedByCount = nil
             errorMessage = nil
             return
         }
@@ -58,7 +58,6 @@ final class ListsViewModel: ObservableObject {
         )
         async let blockingTask = client.fetchBlockingCount(for: account)
         async let blockedByTask = client.fetchBlockedByCount(for: account)
-
         do {
             listsByKind = try await Dictionary(grouping: listsTask, by: \.kind)
         } catch {
@@ -69,8 +68,8 @@ final class ListsViewModel: ObservableObject {
         }
 
         activeProfile = try? await profileTask
-        if let count = try? await blockingTask { blockingCount = count }
-        if let count = try? await blockedByTask { blockedByCount = count }
+        blockingCount = try? await blockingTask
+        blockedByCount = try? await blockedByTask
 
         persistCache(forKey: cacheKey)
         isFromCache = false
@@ -81,8 +80,8 @@ final class ListsViewModel: ObservableObject {
     private func applyCached(_ cached: DashboardCacheData) {
         listsByKind = Dictionary(grouping: cached.lists, by: \.kind)
         activeProfile = cached.profile
-        blockingCount = cached.blockingCount ?? 0
-        blockedByCount = cached.blockedByCount ?? 0
+        blockingCount = cached.blockingCount
+        blockedByCount = cached.blockedByCount
     }
 
     private func persistCache(forKey key: String) {

@@ -96,7 +96,20 @@ final class BlueskySessionService: BlueskySessionServicing {
 
         for attempt in 0 ..< 3 {
             do {
-                return try await operation(authSession)
+                let response = try await operation(authSession)
+                NotificationCenter.default.post(
+                    name: .accountReactivated,
+                    object: nil,
+                    userInfo: ["accountID": account.id.uuidString]
+                )
+                return response
+            } catch BlueskyAPIError.deactivated(let message) {
+                NotificationCenter.default.post(
+                    name: .accountDeactivated,
+                    object: nil,
+                    userInfo: ["accountID": account.id.uuidString]
+                )
+                throw BlueskyAPIError.deactivated(message)
             } catch BlueskyAPIError.unauthorized {
                 guard attempt < 2 else { throw BlueskyAPIError.unauthorized }
                 authSession = try await recoverSession(
@@ -365,4 +378,9 @@ struct DIDService: Codable {
     let id: String
     let type: String
     let serviceEndpoint: URL
+}
+
+extension Notification.Name {
+    static let accountDeactivated = Notification.Name("accountDeactivated")
+    static let accountReactivated = Notification.Name("accountReactivated")
 }

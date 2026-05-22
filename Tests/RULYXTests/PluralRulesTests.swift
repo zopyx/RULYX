@@ -44,7 +44,7 @@ final class PluralRulesTests: XCTestCase {
     }
 
     func test_other_only_languages() {
-        for lang in ["ja", "ko", "zh", "th", "vi", "tr"] {
+        for lang in ["ja", "ko", "zh", "th", "vi"] {
             XCTAssertEqual(PluralRules.category(for: 1, language: lang), .other)
             XCTAssertEqual(PluralRules.category(for: 5, language: lang), .other)
             XCTAssertEqual(PluralRules.category(for: 0, language: lang), .other)

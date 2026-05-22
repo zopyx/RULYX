@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class ClearskyHeartbeatService: ObservableObject {
+class ClearskyHeartbeatService: ObservableObject {
     static let shared = ClearskyHeartbeatService()
 
     @Published private(set) var isClearskyAvailable: Bool = true
@@ -12,7 +12,7 @@ final class ClearskyHeartbeatService: ObservableObject {
     private let pingInterval: TimeInterval = 10
     private let timeout: TimeInterval = 5
 
-    private init() {}
+    init() {}
 
     func start() {
         guard timerTask == nil else { return }
