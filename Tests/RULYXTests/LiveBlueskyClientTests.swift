@@ -261,4 +261,108 @@ final class LiveBlueskyClientTests: XCTestCase {
         expectation.fulfill()
         await fulfillment(of: [expectation], timeout: 1.0)
     }
+
+    @MainActor func testFetchSubscribedModerationListsUsesListMutes() async throws {
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/xrpc/app.bsky.graph.getListMutes")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "atproto-proxy"), "did:web:api.bsky.app#bsky_appview")
+
+            let json = """
+            {
+              "lists": [
+                {
+                  "uri": "at://did:plc:owner/app.bsky.graph.list/mod-1",
+                  "cid": "cid-1",
+                  "name": "Spam Watch",
+                  "description": "Muted moderation list",
+                  "purpose": "app.bsky.graph.defs#modlist",
+                  "listItemCount": 42,
+                  "indexedAt": "2026-05-20T10:00:00Z",
+                  "creator": {
+                    "did": "did:plc:owner",
+                    "handle": "owner.bsky.social",
+                    "displayName": "Owner"
+                  }
+                }
+              ]
+            }
+            """.data(using: .utf8)!
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, json)
+        }
+
+        let lists = try await client.fetchSubscribedModerationLists(account: makeAccount(), appPassword: "pass")
+        XCTAssertEqual(lists.count, 1)
+        XCTAssertEqual(lists[0].listURI, "at://did:plc:owner/app.bsky.graph.list/mod-1")
+        XCTAssertEqual(lists[0].kind, .moderation)
+        XCTAssertEqual(lists[0].ownerHandle, "owner.bsky.social")
+        XCTAssertEqual(lists[0].memberCount, 42)
+        XCTAssertNotNil(lists[0].subscribedAt)
+    }
+
+    @MainActor func testIsSubscribedToModerationListReadsViewerMuteState() async throws {
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/xrpc/app.bsky.graph.getList")
+
+            let json = """
+            {
+              "list": {
+                "uri": "at://did:plc:owner/app.bsky.graph.list/mod-1",
+                "cid": "cid-1",
+                "name": "Spam Watch",
+                "purpose": "app.bsky.graph.defs#modlist",
+                "viewer": {
+                  "muted": true
+                }
+              },
+              "items": []
+            }
+            """.data(using: .utf8)!
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, json)
+        }
+
+        let isSubscribed = try await client.isSubscribedToModerationList(
+            "at://did:plc:owner/app.bsky.graph.list/mod-1",
+            account: makeAccount(),
+            appPassword: "pass"
+        )
+        XCTAssertTrue(isSubscribed)
+    }
+
+    @MainActor func testSubscribeToModerationListUsesMuteActorList() async throws {
+        let expectedURI = "at://did:plc:owner/app.bsky.graph.list/mod-1"
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/xrpc/app.bsky.graph.muteActorList")
+            XCTAssertEqual(request.httpMethod, "POST")
+
+            let body = try XCTUnwrap(request.httpBody)
+            let payload = try JSONDecoder().decode(ListReferenceRequest.self, from: body)
+            XCTAssertEqual(payload.list, expectedURI)
+
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, Data("{}".utf8))
+        }
+
+        try await client.subscribeToModerationList(expectedURI, account: makeAccount(), appPassword: "pass")
+    }
+
+    @MainActor func testUnsubscribeFromModerationListUsesUnmuteActorList() async throws {
+        let expectedURI = "at://did:plc:owner/app.bsky.graph.list/mod-1"
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/xrpc/app.bsky.graph.unmuteActorList")
+            XCTAssertEqual(request.httpMethod, "POST")
+
+            let body = try XCTUnwrap(request.httpBody)
+            let payload = try JSONDecoder().decode(ListReferenceRequest.self, from: body)
+            XCTAssertEqual(payload.list, expectedURI)
+
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, Data("{}".utf8))
+        }
+
+        try await client.unsubscribeFromModerationList(expectedURI, account: makeAccount(), appPassword: "pass")
+    }
 }

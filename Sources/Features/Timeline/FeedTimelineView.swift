@@ -19,6 +19,7 @@ struct FeedTimelineView: View {
     @State private var muteWordEntry: RichFeedEntry?
     @State private var showMuteConfirmation = false
     @State private var postToDelete: RichFeedEntry?
+    @State private var editPostEntry: RichFeedEntry?
     @State private var profileToShow: BlueskyActor?
     @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -104,6 +105,21 @@ struct FeedTimelineView: View {
                         blueskyClient: blueskyClient,
                         onComplete: { refreshAfterAction() },
                         quote: (context.uri, context.cid)
+                    )
+                    .environmentObject(accountStore)
+                    .environmentObject(blueskyClient)
+                }
+            }
+            .sheet(item: $editPostEntry) { entry in
+                if let account = accountStore.activeAccount,
+                   let appPassword = accountStore.appPassword(for: account)
+                {
+                    ComposePostView(
+                        account: account,
+                        appPassword: appPassword,
+                        blueskyClient: blueskyClient,
+                        onComplete: { refreshAfterAction() },
+                        editPost: entry
                     )
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
@@ -200,6 +216,7 @@ struct FeedTimelineView: View {
                     onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
                     onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
                     onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
+                    onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
                     onOpenProfile: { handle in openProfile(handle) }
                 )
                 .contextMenu {

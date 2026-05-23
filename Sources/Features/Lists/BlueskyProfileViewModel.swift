@@ -26,6 +26,8 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published private(set) var isFetchingOwnedLists = false
     @Published private(set) var isFetchingMemberships = false
     @Published private(set) var isUpdatingListMembership = false
+    @Published private(set) var subscribedLists: [SubscribedListInfo]?
+    @Published private(set) var isFetchingSubscribedLists = false
     @Published private(set) var isCreatingList = false
 
     func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
@@ -37,6 +39,17 @@ final class BlueskyProfileViewModel: ObservableObject {
             ownedLists = []
         }
         isFetchingOwnedLists = false
+    }
+
+    func fetchSubscribedLists(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        isFetchingSubscribedLists = true
+        do {
+            subscribedLists = try await client.fetchSubscribedModerationLists(account: account, appPassword: appPassword)
+        } catch {
+            AppLogger.moderation.error("Subscribed lists fetch failed: \(error.localizedDescription, privacy: .public)")
+            subscribedLists = []
+        }
+        isFetchingSubscribedLists = false
     }
 
     func fetchClearskyLists(handle: String, using client: LiveBlueskyClient) async {
