@@ -67,7 +67,7 @@ struct BlueskyProfileView: View {
 
     var body: some View {
         Group {
-            if let account = accountStore.activeAccount,
+            if let account = preferredSearchAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
                 content(account: account, appPassword: appPassword)
@@ -479,6 +479,7 @@ struct BlueskyProfileView: View {
                             }
                             .disabled(viewModel.isUpdatingModeration)
 
+                            let isBlockedByList = viewerState.blockingByListName != nil
                             Toggle(isOn: Binding(
                                 get: { viewModel.pendingBlockState ?? viewerState.isBlocking },
                                 set: { _ in
@@ -493,8 +494,14 @@ struct BlueskyProfileView: View {
                             )) {
                                 Label { Text(loc: "profile.block") } icon: { Image(systemName: "hand.raised") }
                             }
-                            .disabled(viewModel.isUpdatingModeration)
+                            .disabled(viewModel.isUpdatingModeration || isBlockedByList)
                             .accessibilityHint(viewerState.isBlocking ? loc("profile.unblock.hint") : loc("profile.block.hint"))
+                            if isBlockedByList, let listName = viewerState.blockingByListName {
+                                Text(loc("profile.block.by_list_notice").replacingOccurrences(of: "{list}", with: listName))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .listRowInsets(EdgeInsets(top: 0, leading: 48, bottom: 0, trailing: 0))
+                            }
 
                             Toggle(isOn: Binding(
                                 get: { viewModel.pendingMuteState ?? viewerState.muted },
@@ -1314,19 +1321,15 @@ struct BlueskyProfileView: View {
         isBlockingBack = false
     }
 
-    @ViewBuilder
     private func relationshipBadges(state: BlueskyViewerState) -> some View {
-        let badges: [(label: String, icon: String, color: Color, active: Bool)] = [
-            (loc("profile.badge.follows_me"), "person.crop.circle.badge.checkmark", .green, state.followsYou),
-            (loc("profile.badge.blocks_me"), "hand.raised.slash.fill", .red, state.blockedBy),
-            (loc("profile.badge.following"), "heart.fill", .blue, state.isFollowing),
-            (loc("profile.badge.blocking"), "hand.raised.fill", .orange, state.isBlocking),
-        ]
-        let active = badges.filter(\.active)
-        if !active.isEmpty {
+        let badges = Self.computeBadges(state: state)
+        if badges.isEmpty {
+            return AnyView(EmptyView())
+        }
+        return AnyView(
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    ForEach(active, id: \.label) { badge in
+                    ForEach(badges, id: \.label) { badge in
                         HStack(spacing: 4) {
                             Image(systemName: badge.icon)
                                 .font(.caption2)
@@ -1340,7 +1343,29 @@ struct BlueskyProfileView: View {
                     }
                 }
             }
+        )
+    }
+
+    private static func computeBadges(state: BlueskyViewerState) -> [(label: String, icon: String, color: Color)] {
+        var badges: [(label: String, icon: String, color: Color)] = []
+        if state.followsYou {
+            badges.append((loc("profile.badge.follows_me"), "person.crop.circle.badge.checkmark", .green))
         }
+        if state.blockedBy {
+            badges.append((loc("profile.badge.blocks_me"), "hand.raised.slash.fill", .red))
+        }
+        if state.isFollowing {
+            badges.append((loc("profile.badge.following"), "heart.fill", .blue))
+        }
+        if state.isBlocking {
+            if let listName = state.blockingByListName {
+                let label = loc("profile.badge.blocking_by_list").replacingOccurrences(of: "{list}", with: listName)
+                badges.append((label, "list.bullet", .orange))
+            } else {
+                badges.append((loc("profile.badge.blocking"), "hand.raised.fill", .orange))
+            }
+        }
+        return badges
     }
 
     private func statusChip(title: String, tint: Color, emphasized: Bool) -> some View {
