@@ -23,9 +23,9 @@ struct ListDetailView: View {
     @State private var exportProgressFraction: Double?
     @State private var showExportCompleteToast = false
     @State private var ownerActor: BlueskyActor?
-    @State private var isSubscribing = false
-    @State private var subscriptionRecordURI: String?
-    @State private var subscribeError: String?
+    @State var isSubscribing = false
+    @State var isSubscribedToModerationList = false
+    @State var subscribeError: String?
     @State private var reportEvidenceText = ""
     @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault
     @State private var isShowingReportSheet = false
@@ -39,7 +39,7 @@ struct ListDetailView: View {
         return parts[1].description
     }
 
-    private var isOwnedList: Bool {
+    var isOwnedList: Bool {
         guard let activeDID = accountStore.activeAccount?.did else { return false }
         return currentList.id.hasPrefix("at://\(activeDID)")
     }
@@ -392,16 +392,27 @@ struct ListDetailView: View {
                 imagePreview: $imagePreview
             )
 
-            if !isOwnedList {
+            if !isOwnedList, currentList.kind == .moderation {
                 ListDetailSubscribeSection(
                     currentList: currentList,
-                    subscriptionRecordURI: $subscriptionRecordURI,
+                    isSubscribed: $isSubscribedToModerationList,
                     subscribeError: $subscribeError,
                     isSubscribing: $isSubscribing,
                     account: account,
                     appPassword: appPassword
                 )
 
+                Section {
+                    Button(role: .destructive) {
+                        selectedReportReason = .simplifiedDefault
+                        reportEvidenceText = ""
+                        isShowingReportSheet = true
+                    } label: {
+                        Label("actions.report", systemImage: "exclamationmark.shield")
+                    }
+                    .disabled(isReportingList)
+                }
+            } else if !isOwnedList {
                 Section {
                     Button(role: .destructive) {
                         selectedReportReason = .simplifiedDefault

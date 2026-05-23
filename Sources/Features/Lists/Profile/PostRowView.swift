@@ -15,6 +15,7 @@ struct PostRowView: View {
     var onCopy: (() -> Void)?
     var onTranslate: (() -> Void)?
     var onDeletePost: (() -> Void)?
+    var onEditPost: (() -> Void)?
     var onOpenProfile: ((String) -> Void)?
     var onBlockAllLikers: (() -> Void)?
     var availableLikerTargetLists: [BlueskyList] = []
@@ -260,7 +261,7 @@ struct PostRowView: View {
                 )
             }
             Spacer()
-            if let likeCount = post.likeCount, likeCount > 0 {
+            if let likeCount = post.likeCount, likeCount > 0 || onDeletePost != nil || onEditPost != nil {
                 Menu {
                     if let onBlockAllLikers {
                         Button {
@@ -307,8 +308,15 @@ struct PostRowView: View {
                             Label("post.translate", systemImage: "globe")
                         }
                     }
-                    if let onDeletePost {
+                    if onEditPost != nil || onDeletePost != nil {
                         Divider()
+                    }
+                    if let onEditPost {
+                        Button(action: onEditPost) {
+                            Label("post.edit", systemImage: "pencil")
+                        }
+                    }
+                    if let onDeletePost {
                         Button(role: .destructive, action: onDeletePost) {
                             Label("post.delete", systemImage: "trash")
                         }

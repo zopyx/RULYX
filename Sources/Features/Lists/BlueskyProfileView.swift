@@ -456,7 +456,7 @@ struct BlueskyProfileView: View {
                         }
                     }
                 } header: {
-                    Text(loc: "profile.stats")
+                    Text(loc("profile.stats"))
                         .onTapGesture(count: 2) { showPostBrowser = true }
                 }
 
@@ -831,6 +831,71 @@ struct BlueskyProfileView: View {
                         }
                     }
                 }
+
+                if isOwnProfile {
+                    let moderationSubscriptions = (viewModel.subscribedLists ?? []).filter { $0.kind == .moderation }
+
+                    Section {
+                        if viewModel.isFetchingSubscribedLists {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                Text(loc("profile.subscribed_lists.loading"))
+                                    .foregroundStyle(.secondary)
+                            }
+                        } else if moderationSubscriptions.isEmpty {
+                            Text(loc("profile.subscribed_lists.empty"))
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach(moderationSubscriptions) { sub in
+                                NavigationLink {
+                                    ListDetailView(
+                                        list: BlueskyList(id: sub.listURI, name: sub.name, description: sub.description ?? "", memberCount: sub.memberCount, kind: sub.kind),
+                                        onListUpdated: { _ in }
+                                    )
+                                    .environmentObject(accountStore)
+                                    .environmentObject(blueskyClient)
+                                    .environmentObject(workspaceStore)
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        HStack {
+                                            Text(sub.name)
+                                                .lineLimit(1)
+                                            Spacer()
+                                            if let subscribedAt = sub.subscribedAt {
+                                                Text(formatDateRelative(dateString: subscribedAt))
+                                                    .font(.caption)
+                                                    .foregroundStyle(.tertiary)
+                                            }
+                                        }
+                                        if let desc = sub.description, !desc.isEmpty {
+                                            Text(desc)
+                                                .font(.caption)
+                                                .foregroundStyle(.tertiary)
+                                                .lineLimit(2)
+                                        }
+                                        HStack(spacing: 4) {
+                                            Text(sub.ownerHandle)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            if let count = sub.memberCount {
+                                                Text("·")
+                                                    .font(.caption)
+                                                    .foregroundStyle(.tertiary)
+                                                Text(loc("profile.subscribed_lists.member_count").replacingOccurrences(of: "{count}", with: "\(count)"))
+                                                    .font(.caption)
+                                                    .foregroundStyle(.tertiary)
+                                            }
+                                        }
+                                    }
+                                    .padding(.vertical, 2)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text(loc("profile.subscribed_lists"))
+                    }
+                }
             } else if viewModel.isLoading {
                 LoadingPanel(message: loc("profile.loading"))
             }
@@ -879,13 +944,14 @@ struct BlueskyProfileView: View {
             searchAccount = preferredSearchAccount
             async let blocks = fetchBlockCounts()
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
-                async let lists = viewModel.fetchClearskyLists(handle: handle, using: blueskyClient)
+                async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: blueskyClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
                     async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: blueskyClient)
+                    async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password)
 
-                    _ = await (blocks, lists, owned)
+                    _ = await (blocks, clearsky, owned, subscribed)
                 } else {
-                    _ = await (blocks, lists)
+                    _ = await (blocks, clearsky)
                 }
             } else {
                 await blocks
@@ -1135,6 +1201,11 @@ struct BlueskyProfileView: View {
         blockPreviewActors = []
     }
 
+    private func fetchSubscribedListsIfOwn(account: AppAccount, appPassword: String) async {
+        guard isOwnProfile else { return }
+        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: blueskyClient)
+    }
+
     private func fetchBlockCounts() async {
         guard let account = accountStore.activeAccount,
               accountStore.appPassword(for: account) != nil else { return }
@@ -1320,6 +1391,17 @@ struct BlueskyProfileView: View {
         }
         loadTask = task
         return task
+    }
+
+    private func formatDateRelative(dateString: Date) -> String {
+        let daysSince = Calendar.current.dateComponents([.day], from: dateString, to: Date()).day ?? 0
+        if daysSince < 28 {
+            let relativeFormatter = RelativeDateTimeFormatter()
+            relativeFormatter.unitsStyle = .short
+            relativeFormatter.locale = Locale(identifier: LocalizationManager.shared.currentLanguage)
+            return relativeFormatter.localizedString(for: dateString, relativeTo: Date())
+        }
+        return dateString.formatted(date: .abbreviated, time: .omitted)
     }
 
     private func helpSheet(title: String, text: String) -> some View {

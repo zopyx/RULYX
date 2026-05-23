@@ -10,6 +10,7 @@ struct ComposePostView: View {
     var replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
     var quote: (uri: String, cid: String)?
     var placeholder: String?
+    var editPost: RichFeedEntry?
 
     @Environment(\.dismiss) private var dismiss
     @State private var postText = ""
@@ -25,14 +26,27 @@ struct ComposePostView: View {
     @State private var referencedPost: ThreadPostNode?
     @State private var showGIFPicker = false
     @State private var isDownloadingGIF = false
+    @State private var isPreloadingEdit = false
+    @State private var editReplyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
+    @State private var replyRule: ThreadGateRule?
+    @State private var allowQuoting = true
+    @State private var showReplyPicker = false
+    @State private var showListPicker = false
+    @State private var userLists: [BlueskyList] = []
+    @State private var showImageResizeAlert = false
+    @State private var pendingImageResize: (() -> Void)?
+    @State private var isScaling = false
 
     private let maxImages = 4
+    private let maxImageDimension: CGFloat = 3600
+    private let maxImageFileSize = 1_887_437
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
         NavigationStack {
             List {
-                if replyTo != nil || quote != nil {
+                let activeReplyTo = editReplyTo ?? replyTo
+                if activeReplyTo != nil || quote != nil {
                     Section {
                         if let referencedPost {
                             postPreviewRow(referencedPost)
@@ -46,7 +60,7 @@ struct ComposePostView: View {
                             }
                         }
                     } header: {
-                        Text(verbatim: replyTo != nil ? loc("profile.posts.replying_to") : loc("compose.quoting"))
+                        Text(verbatim: activeReplyTo != nil ? loc("profile.posts.replying_to") : loc("compose.quoting"))
                     }
                 }
 
@@ -103,79 +117,12 @@ struct ComposePostView: View {
                     }
                 }
 
-                if !selectedImages.isEmpty {
-                    Section {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
-                                    let altBinding = Binding(
-                                        get: { index < imageAlts.count ? imageAlts[index] : "" },
-                                        set: { if index < imageAlts.count { imageAlts[index] = $0 } }
-                                    )
-                                    VStack(spacing: 4) {
-                                        ZStack(alignment: .topTrailing) {
-                                            if let uiImage = UIImage(data: image.data) {
-                                                Image(uiImage: uiImage)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 100, height: 100)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                            }
-                                            Button {
-                                                selectedImages.remove(at: index)
-                                                imageAlts.remove(at: index)
-                                            } label: {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .font(.title3)
-                                                    .foregroundStyle(.red)
-                                                    .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
-                                            }
-                                            .buttonStyle(.plain)
-                                            .accessibilityLabel(loc("compose.remove_image"))
-                                            .frame(minWidth: 44, minHeight: 44)
-                                            .contentShape(Rectangle())
-                                            .offset(x: 4, y: -4)
-                                        }
-                                        TextField("compose.alt_placeholder", text: altBinding)
-                                            .font(.caption)
-                                            .textFieldStyle(.plain)
-                                            .frame(width: 100)
-                                    }
-                                }
-                            }
-                            .padding(.vertical, 4)
-                        }
-                    } header: {
-                        Text(loc: "compose.images_section")
-                    }
-                }
+                imageAttachmentsSection
 
-                Section {
-                    PhotosPicker(selection: $selectedItems, maxSelectionCount: maxImages, matching: .images) {
-                        Label { Text(loc: "compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
-                    }
-                    .disabled(selectedImages.count >= maxImages || videoAttachment != nil)
-                    .onChange(of: selectedItems) { _, items in
-                        Task { await loadImages(from: items) }
-                    }
-
-                    Button {
-                        showGIFPicker = true
-                    } label: {
-                        HStack {
-                            Label { Text(loc: "compose.add_gif") } icon: { Image(systemName: "play.rectangle") }
-                            Spacer()
-                            if isDownloadingGIF {
-                                ProgressView()
-                                    .scaleEffect(0.7)
-                            }
-                        }
-                    }
-                    .disabled(videoAttachment != nil || !selectedImages.isEmpty)
-                    .foregroundStyle(videoAttachment != nil ? Color.skyPrimary : .primary)
-                }
+                replyControlsSection
+                addMediaSection
             }
-            .navigationTitle(replyTo != nil ? loc("compose.reply_title") : (quote != nil ? loc("compose.quote_title") : loc("compose.title")))
+            .navigationTitle(navigationTitleString)
             .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -198,9 +145,170 @@ struct ComposePostView: View {
                     Task { await handleGIFSelection(gif) }
                 }
             }
+            .confirmationDialog(loc("compose.reply_controls"), isPresented: $showReplyPicker) {
+                Button(loc("compose.reply_everyone")) { replyRule = nil }
+                Button(loc("compose.reply_nobody")) { replyRule = .noReply }
+                Button(loc("compose.reply_following")) { replyRule = .followingRule }
+                Button(loc("compose.reply_mention")) { replyRule = .mentionRule }
+                Button(loc("compose.reply_list")) {
+                    showListPicker = true
+                    Task { await loadUserLists() }
+                }
+                Button("actions.cancel", role: .cancel) {}
+            }
+            .sheet(isPresented: $showListPicker) {
+                NavigationStack {
+                    List(userLists) { list in
+                            Button {
+                                if let cid = list.cid {
+                                    replyRule = .listRule(list: list.id)
+                                }
+                                showListPicker = false
+                            } label: {
+                                listRowLabel(list)
+                            }
+                    }
+                    .navigationTitle(loc("compose.reply_list_pick"))
+                    .toolbarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("actions.cancel") { showListPicker = false }
+                        }
+                    }
+                }
+            }
+            .overlay {
+                if isScaling {
+                    ZStack {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                            Text(loc("compose.image_scaling"))
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                        }
+                        .padding(24)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    }
+                    .transition(.opacity.animation(.easeInOut(duration: 0.2)))
+                }
+            }
+            .alert(loc("compose.image_resize_title"), isPresented: $showImageResizeAlert, presenting: pendingImageResize) { _ in
+                Button(loc("compose.image_resize_scale")) {
+                    pendingImageResize?()
+                    showImageResizeAlert = false
+                }
+                Button("actions.cancel", role: .cancel) {
+                    showImageResizeAlert = false
+                }
+            } message: { _ in
+                Text(loc("compose.image_resize_message"))
+            }
             .task {
                 await loadReferencedPost()
+                await preloadEditData()
             }
+        }
+    }
+
+    @ViewBuilder private var imageAttachmentsSection: some View {
+        if !selectedImages.isEmpty {
+            Section {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
+                            let altBinding = Binding(
+                                get: { index < imageAlts.count ? imageAlts[index] : "" },
+                                set: { if index < imageAlts.count { imageAlts[index] = $0 } }
+                            )
+                            VStack(spacing: 4) {
+                                ZStack(alignment: .topTrailing) {
+                                    if let uiImage = UIImage(data: image.data) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 100, height: 100)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    }
+                                    Button {
+                                        selectedImages.remove(at: index)
+                                        imageAlts.remove(at: index)
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title3)
+                                            .foregroundStyle(.red)
+                                            .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
+                                    }
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel(loc("compose.remove_image"))
+                                    .frame(minWidth: 44, minHeight: 44)
+                                    .contentShape(Rectangle())
+                                    .offset(x: 4, y: -4)
+                                }
+                                TextField("compose.alt_placeholder", text: altBinding)
+                                    .font(.caption)
+                                    .textFieldStyle(.plain)
+                                    .frame(width: 100)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            } header: {
+                Text(loc: "compose.images_section")
+            }
+        }
+    }
+
+    private var replyControlsSection: some View {
+        Section {
+            Label {
+                HStack {
+                    Text(loc("compose.reply_controls"))
+                    Spacer()
+                    Text(replyRuleLabel)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            } icon: {
+                Image(systemName: "arrowshape.turn.up.right.circle")
+            }
+            .contentShape(Rectangle())
+            .onTapGesture { showReplyPicker = true }
+
+            Toggle(loc("compose.allow_quoting"), isOn: $allowQuoting)
+        }
+    }
+
+    private var addMediaSection: some View {
+        Section {
+            PhotosPicker(selection: $selectedItems, maxSelectionCount: maxImages, matching: .images) {
+                Label { Text(loc: "compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
+            }
+            .disabled(selectedImages.count >= maxImages || videoAttachment != nil)
+            .onChange(of: selectedItems) { _, items in
+                Task { await loadImages(from: items) }
+            }
+
+            Button {
+                showGIFPicker = true
+            } label: {
+                HStack {
+                    Label { Text(loc: "compose.add_gif") } icon: { Image(systemName: "play.rectangle") }
+                    Spacer()
+                    if isDownloadingGIF {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                    }
+                }
+            }
+            .disabled(videoAttachment != nil || !selectedImages.isEmpty)
+            .foregroundStyle(videoAttachment != nil ? Color.skyPrimary : .primary)
         }
     }
 
@@ -238,10 +346,54 @@ struct ComposePostView: View {
         }
     }
 
+    private var navigationTitleString: String {
+        if editPost != nil { return loc("post.edit") }
+        if (editReplyTo ?? replyTo) != nil { return loc("compose.reply_title") }
+        if quote != nil { return loc("compose.quote_title") }
+        return loc("compose.title")
+    }
+
+    private var replyRuleLabel: String {
+        guard let replyRule else { return loc("compose.reply_everyone") }
+        switch replyRule {
+        case .noReply: return loc("compose.reply_nobody")
+        case .mentionRule: return loc("compose.reply_mention")
+        case .followingRule: return loc("compose.reply_following")
+        case .listRule: return loc("compose.reply_list")
+        }
+    }
+
+    private var replyRuleListID: String? {
+        if case let .listRule(list) = replyRule { return list }
+        return nil
+    }
+
+    private func listRowLabel(_ list: BlueskyList) -> some View {
+        HStack {
+            Image(systemName: list.kind.symbolName)
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(list.name)
+                    .foregroundStyle(.primary)
+                if let count = list.memberCount {
+                    let members = loc("compose.reply_list_count").replacingOccurrences(of: "{n}", with: "\(count)")
+                    Text(verbatim: members)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            if case .listRule = replyRule, list.id == replyRuleListID {
+                Image(systemName: "checkmark")
+            }
+        }
+    }
+
     private func loadReferencedPost() async {
+        let activeReplyTo = editReplyTo ?? replyTo
         let uri: String
-        if let replyTo {
-            uri = replyTo.parentURI
+        if let activeReplyTo {
+            uri = activeReplyTo.parentURI
         } else if let quote {
             uri = quote.uri
         } else {
@@ -252,6 +404,48 @@ struct ComposePostView: View {
             referencedPost = response.thread.post
         } catch {
             AppLogger.moderation.error("Failed to load referenced post: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func preloadEditData() async {
+        guard let editPost, isPreloadingEdit == false else { return }
+        isPreloadingEdit = true
+        defer { isPreloadingEdit = false }
+
+        if let text = editPost.post.record?.text {
+            postText = text
+        }
+
+        if let images = editPost.post.embed?.images {
+            for img in images {
+                guard let fullsize = img.fullsize,
+                      let url = URL(string: fullsize),
+                      selectedImages.count < maxImages
+                else { continue }
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: url)
+                    let mimeType = fullsize.hasSuffix(".png") ? "image/png" : "image/jpeg"
+                    let stripped = data.strippingLocationMetadata()
+                    selectedImages.append((stripped, mimeType))
+                    imageAlts.append(img.alt ?? "")
+                } catch {
+                    AppLogger.moderation.error("Failed to download image for edit: \(error.localizedDescription, privacy: .public)")
+                }
+            }
+        }
+
+        if editReplyTo == nil, let reply = editPost.reply, let rootURI = reply.root?.uri, let rootCID = reply.root?.cid,
+           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid {
+            editReplyTo = (parentURI, parentCID, rootURI, rootCID)
+        }
+    }
+
+    private func loadUserLists() async {
+        guard userLists.isEmpty else { return }
+        do {
+            userLists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+        } catch {
+            AppLogger.moderation.error("Failed to load lists: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -267,6 +461,89 @@ struct ComposePostView: View {
         }
         selectedImages = Array(newImages.prefix(maxImages))
         imageAlts = Array(newAlts.prefix(maxImages))
+        await validateAndOfferResize()
+    }
+
+    private func validateAndOfferResize() async {
+        guard !selectedImages.isEmpty else { return }
+        let needsResize = selectedImages.contains { data, _ in
+            data.count > maxImageFileSize || imageExceedsMaxDimension(data)
+        }
+        if needsResize {
+            pendingImageResize = { Task { await scaleDownImages() } }
+            showImageResizeAlert = true
+        }
+    }
+
+    private func imageExceedsMaxDimension(_ data: Data) -> Bool {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any]
+        else { return false }
+        let w = props[kCGImagePropertyPixelWidth as String] as? CGFloat ?? 0
+        let h = props[kCGImagePropertyPixelHeight as String] as? CGFloat ?? 0
+        return max(w, h) > maxImageDimension
+    }
+
+    @MainActor
+    private func scaleDownImages() {
+        isScaling = true
+        var scaled: [(Data, String)] = []
+        var alts: [String] = []
+        for (index, image) in selectedImages.enumerated() {
+            let (data, _) = image
+            let scaledData = Self.scaleDownIfNeeded(data: data, maxDimension: maxImageDimension, maxFileSize: maxImageFileSize)
+            scaled.append((scaledData, "image/jpeg"))
+            alts.append(imageAlts[safe: index] ?? "")
+        }
+        selectedImages = scaled
+        imageAlts = alts
+        isScaling = false
+    }
+
+    private static func scaleDownIfNeeded(data: Data, maxDimension: CGFloat, maxFileSize: Int) -> Data {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return data }
+
+        let targetType = "public.jpeg" as CFString
+        var currentMax = Int(maxDimension)
+        var result = data
+
+        for _ in 0..<5 {
+            let opts: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceThumbnailMaxPixelSize: currentMax,
+            ]
+            guard let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, opts as CFDictionary)
+            else { return result }
+
+            let tw = thumbnail.width
+            let th = thumbnail.height
+            let fitsDimensions = max(tw, th) <= Int(maxDimension)
+
+            var quality: CGFloat = 0.9
+            var compressed = result
+
+            while quality > 0.1 {
+                let mutableData = NSMutableData()
+                guard let dest = CGImageDestinationCreateWithData(mutableData as CFMutableData, targetType, 1, nil)
+                else { break }
+                let props: NSDictionary = [kCGImageDestinationLossyCompressionQuality: quality]
+                CGImageDestinationAddImage(dest, thumbnail, props)
+                guard CGImageDestinationFinalize(dest) else { break }
+                compressed = mutableData as Data
+                if compressed.count <= maxFileSize, fitsDimensions { return compressed }
+                quality -= 0.1
+            }
+
+            result = compressed
+
+            let maxSide = max(tw, th)
+            if maxSide <= Int(maxDimension), compressed.count <= maxFileSize { return compressed }
+            if currentMax <= 500 { return result }
+            currentMax = Int(CGFloat(currentMax) * 0.85)
+        }
+
+        return result
     }
 
     private func handleGIFSelection(_ gif: GIFResult) async {
@@ -318,11 +595,22 @@ struct ComposePostView: View {
                 text: postText,
                 images: images,
                 video: videoAttachment,
-                replyTo: replyTo,
+                replyTo: editReplyTo ?? replyTo,
                 quote: quote,
+                threadGate: replyRule,
+                allowQuoting: allowQuoting,
                 account: account,
                 appPassword: appPassword
             )
+
+            if let editPost {
+                try? await blueskyClient.deleteRecord(
+                    recordURI: editPost.post.uri,
+                    account: account,
+                    appPassword: appPassword
+                )
+            }
+
             onComplete()
             dismiss()
         } catch {

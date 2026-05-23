@@ -77,8 +77,12 @@ extension ListDetailView {
             appPassword: appPassword,
             using: blueskyClient
         )
+        async let subscriptionTask: Void = loadSubscriptionStateIfNeeded(
+            account: account,
+            appPassword: appPassword
+        )
 
-        _ = await (membersTask, listsTask)
+        _ = await (membersTask, listsTask, subscriptionTask)
 
         if comparisonState.selectedComparisonListID.isEmpty {
             comparisonState.selectedComparisonListID = viewModel.availableLists.first?.id ?? ""
@@ -100,6 +104,25 @@ extension ListDetailView {
 
         if comparisonState.selectedOlderSnapshotID == nil {
             comparisonState.selectedOlderSnapshotID = history.dropFirst().first?.id ?? history.first?.id
+        }
+    }
+
+    func loadSubscriptionStateIfNeeded(account: AppAccount, appPassword: String) async {
+        guard !isOwnedList, currentList.kind == .moderation else {
+            isSubscribedToModerationList = false
+            subscribeError = nil
+            return
+        }
+
+        do {
+            isSubscribedToModerationList = try await blueskyClient.isSubscribedToModerationList(
+                currentList.id,
+                account: account,
+                appPassword: appPassword
+            )
+            subscribeError = nil
+        } catch {
+            subscribeError = AppError.userMessage(from: error)
         }
     }
 

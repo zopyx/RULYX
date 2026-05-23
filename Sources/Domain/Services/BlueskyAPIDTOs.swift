@@ -4,6 +4,11 @@ struct GetListsResponse: Decodable {
     let lists: [ListView]
 }
 
+struct PagedListsResponse: Decodable {
+    let cursor: String?
+    let lists: [ListView]
+}
+
 struct ListsWithMembershipResponse: Decodable {
     let listsWithMembership: [ListWithMembership]
 }
@@ -14,17 +19,21 @@ struct StarterPacksWithMembershipResponse: Decodable {
 
 struct GetListResponse: Decodable {
     let cursor: String?
+    let list: ListView?
     let items: [ListItemView]
 }
 
 struct ListView: Decodable {
     let uri: String
     let cid: String?
+    let creator: ActorView?
     let name: String
     let description: String?
     let purpose: ListPurpose
     let listItemCount: Int?
     let avatar: String?
+    let viewer: ListViewerState?
+    let indexedAt: String?
 }
 
 struct ListViewBasic: Decodable {
@@ -34,6 +43,13 @@ struct ListViewBasic: Decodable {
     let purpose: ListPurpose
     let listItemCount: Int?
     let avatar: String?
+    let viewer: ListViewerState?
+    let indexedAt: String?
+}
+
+struct ListViewerState: Decodable {
+    let muted: Bool?
+    let blocked: String?
 }
 
 struct ListWithMembership: Decodable {
@@ -158,6 +174,21 @@ struct CreateGenericRecordRequest<Record: Encodable>: Encodable {
     let repo: String
     let collection: String
     let record: Record
+    let rkey: String?
+
+    init(repo: String, collection: String, record: Record, rkey: String? = nil) {
+        self.repo = repo
+        self.collection = collection
+        self.record = record
+        self.rkey = rkey
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case repo
+        case collection
+        case record
+        case rkey
+    }
 }
 
 struct PutRecordRequest: Encodable {
@@ -217,9 +248,30 @@ struct ActorReferenceRequest: Encodable {
     let actor: String
 }
 
+struct ListReferenceRequest: Codable {
+    let list: String
+}
+
 struct CreateRecordResponse: Decodable {
     let uri: String
     let cid: String
+}
+
+struct ListRecordsResponse: Decodable {
+    let cursor: String?
+    let records: [ListRecordEntry]
+}
+
+struct ListRecordEntry: Decodable {
+    let uri: String
+    let cid: String
+    let value: ListItemRecordValue
+}
+
+struct ListItemRecordValue: Decodable {
+    let createdAt: String
+    let list: String
+    let subject: String
 }
 
 struct DeleteRecordRequest: Encodable {
@@ -448,9 +500,11 @@ struct RichFeedResponse: Decodable {
     let feed: [RichFeedEntry]
 }
 
-struct RichFeedEntry: Decodable {
+struct RichFeedEntry: Decodable, Identifiable {
     let post: RichPost
     let reply: RichFeedReply?
+
+    var id: String { post.uri }
 }
 
 struct RichFeedReply: Decodable {
@@ -958,4 +1012,76 @@ struct UpdateSeenRequest: Encodable {
 
 struct UnreadCountResponse: Decodable {
     let count: Int
+}
+
+// MARK: - Thread Gate & Post Gate
+
+struct ThreadGateRecord: Encodable {
+    let type = "app.bsky.feed.threadgate"
+    let post: String
+    let allow: [ThreadGateRule]
+    let createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case post
+        case allow
+        case createdAt
+    }
+}
+
+
+
+enum ThreadGateRule: Encodable, Equatable {
+    case noReply
+    case mentionRule
+    case followingRule
+    case listRule(list: String)
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .noReply:
+            break
+        case .mentionRule:
+            try container.encode("app.bsky.feed.threadgate#mentionRule", forKey: .type)
+        case .followingRule:
+            try container.encode("app.bsky.feed.threadgate#followingRule", forKey: .type)
+        case let .listRule(list):
+            try container.encode("app.bsky.feed.threadgate#listRule", forKey: .type)
+            try container.encode(list, forKey: .list)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case list
+    }
+}
+
+struct PostGateRecord: Encodable {
+    let type = "app.bsky.feed.postgate"
+    let post: String
+    let embeddingRules: [PostGateEmbeddingRule]
+    let createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case post
+        case embeddingRules
+        case createdAt
+    }
+}
+
+enum PostGateEmbeddingRule: Encodable {
+    case disableRule
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode("app.bsky.feed.postgate#disableRule", forKey: .type)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
 }

@@ -7,6 +7,7 @@ struct ClearskyBlocklistResult {
 
 @MainActor
 class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting {
+    private static let bskyAppViewServiceDID = "did:web:api.bsky.app#bsky_appview"
     private let baseURL: URL
     private let httpClient: HTTPClient
     private let session: URLSession
@@ -168,6 +169,139 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             },
             cursor: response.cursor
         )
+    }
+
+    func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor) {
+        let response: GetListResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            try await sendAppViewRequest(
+                path: "app.bsky.graph.getList",
+                method: "GET",
+                queryItems: [
+                    URLQueryItem(name: "list", value: uri),
+                    URLQueryItem(name: "limit", value: "1"),
+                ],
+                accessToken: authSession.accessJWT,
+                pdsURL: authSession.pdsURL
+            )
+        }
+
+        guard let list = response.list else {
+            throw BlueskyAPIError.server("List not found")
+        }
+
+        let blueskyList = BlueskyList(
+            id: list.uri,
+            name: list.name,
+            description: list.description ?? "",
+            memberCount: list.listItemCount,
+            kind: list.purpose.kind,
+            avatarURL: URL(string: list.avatar ?? ""),
+            cid: list.cid
+        )
+
+        let creator = BlueskyActor(
+            did: list.creator?.did ?? "",
+            handle: list.creator?.handle ?? "unknown",
+            displayName: list.creator?.displayName,
+            avatarURL: URL(string: list.creator?.avatar ?? "")
+        )
+
+        return (blueskyList, creator)
+    }
+
+    func fetchSubscribedModerationLists(account: AppAccount, appPassword: String?) async throws -> [SubscribedListInfo] {
+        var cursor: String?
+        var allLists: [SubscribedListInfo] = []
+
+        repeat {
+            let response: PagedListsResponse = try await sessionService.performAuthenticatedRequest(
+                account: account,
+                appPassword: appPassword
+            ) { authSession in
+                var queryItems = [URLQueryItem(name: "limit", value: "100")]
+                if let cursor {
+                    queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+                }
+                return try await sendAppViewRequest(
+                    path: "app.bsky.graph.getListMutes",
+                    method: "GET",
+                    queryItems: queryItems,
+                    accessToken: authSession.accessJWT,
+                    pdsURL: authSession.pdsURL
+                )
+            }
+
+            allLists.append(contentsOf: response.lists.map(mapSubscribedListInfo(from:)))
+            cursor = response.cursor
+        } while cursor != nil
+
+        return allLists.sorted { lhs, rhs in
+            switch (lhs.subscribedAt, rhs.subscribedAt) {
+            case let (left?, right?):
+                return left > right
+            case (.some, .none):
+                return true
+            case (.none, .some):
+                return false
+            case (.none, .none):
+                return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+            }
+        }
+    }
+
+    func isSubscribedToModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws -> Bool {
+        let response: GetListResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            try await sendAppViewRequest(
+                path: "app.bsky.graph.getList",
+                method: "GET",
+                queryItems: [
+                    URLQueryItem(name: "list", value: listURI),
+                    URLQueryItem(name: "limit", value: "1"),
+                ],
+                accessToken: authSession.accessJWT,
+                pdsURL: authSession.pdsURL
+            )
+        }
+
+        return response.list?.viewer?.muted ?? false
+    }
+
+    func subscribeToModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws {
+        let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            try await sendAppViewRequest(
+                path: "app.bsky.graph.muteActorList",
+                method: "POST",
+                queryItems: [],
+                body: ListReferenceRequest(list: listURI),
+                accessToken: authSession.accessJWT,
+                pdsURL: authSession.pdsURL
+            )
+        }
+    }
+
+    func unsubscribeFromModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws {
+        let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            try await sendAppViewRequest(
+                path: "app.bsky.graph.unmuteActorList",
+                method: "POST",
+                queryItems: [],
+                body: ListReferenceRequest(list: listURI),
+                accessToken: authSession.accessJWT,
+                pdsURL: authSession.pdsURL
+            )
+        }
     }
 
     func searchActors(query: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
@@ -452,6 +586,93 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 accessToken: authSession.accessJWT,
                 hostURL: authSession.pdsURL
             )
+        }
+    }
+
+    private func mapSubscribedListInfo(from item: ListView) -> SubscribedListInfo {
+        SubscribedListInfo(
+            id: item.uri,
+            listURI: item.uri,
+            name: item.name,
+            description: item.description,
+            ownerDID: item.creator?.did ?? "",
+            ownerHandle: item.creator?.handle ?? "",
+            ownerDisplayName: item.creator?.displayName,
+            memberCount: item.listItemCount,
+            kind: item.purpose.kind,
+            subscribedAt: item.indexedAt.flatMap(SharedDateFormatters.parseISO8601)
+        )
+    }
+
+    private func sendAppViewRequest<Response: Decodable>(
+        path: String,
+        method: String,
+        queryItems: [URLQueryItem],
+        accessToken: String,
+        pdsURL: URL
+    ) async throws -> Response {
+        try await sendAppViewRequest(
+            path: path,
+            method: method,
+            queryItems: queryItems,
+            body: Optional<String>.none,
+            accessToken: accessToken,
+            pdsURL: pdsURL
+        )
+    }
+
+    private func sendAppViewRequest<Response: Decodable, Body: Encodable>(
+        path: String,
+        method: String,
+        queryItems: [URLQueryItem],
+        body: Body?,
+        accessToken: String,
+        pdsURL: URL
+    ) async throws -> Response {
+        guard var components = URLComponents(url: pdsURL.appendingPathComponent("xrpc/\(path)"), resolvingAgainstBaseURL: false) else {
+            throw BlueskyAPIError.invalidURL
+        }
+        if !queryItems.isEmpty {
+            components.queryItems = queryItems
+        }
+        guard let url = components.url else {
+            throw BlueskyAPIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue(Self.bskyAppViewServiceDID, forHTTPHeaderField: "atproto-proxy")
+
+        if let body {
+            request.httpBody = try JSONEncoder().encode(body)
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
+
+        let (data, httpResponse) = try await httpClient.data(
+            for: request,
+            source: "Lists / Relationships",
+            origin: "LiveBlueskyClient \(method) xrpc/\(path)"
+        )
+
+        if httpResponse.statusCode == 401 {
+            throw BlueskyAPIError.unauthorized
+        }
+
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
+            if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
+                throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Request failed")
+            }
+            throw BlueskyAPIError.invalidResponse
+        }
+
+        do {
+            let decodedData = data.isEmpty ? Data("{}".utf8) : data
+            return try JSONDecoder().decode(Response.self, from: decodedData)
+        } catch {
+            AppLogger.performance.debug("Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            throw BlueskyAPIError.invalidResponse
         }
     }
 
@@ -1090,7 +1311,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             throw BlueskyAPIError.server("Enter a Bluesky handle or DID.")
         }
 
-        let (profile, lists, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
+        let (profile, _, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
             try await sessionService.performAuthenticatedRequest(
                 account: account,
                 appPassword: appPassword
@@ -1201,6 +1422,50 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         video: PostVideoAttachment? = nil,
         replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)? = nil,
         quote: (uri: String, cid: String)? = nil,
+        threadGate: ThreadGateRule? = nil,
+        allowQuoting: Bool = true,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> CreateRecordResponse {
+        let response = try await createPostRecord(
+            text: text,
+            images: images,
+            video: video,
+            replyTo: replyTo,
+            quote: quote,
+            account: account,
+            appPassword: appPassword
+        )
+        if let threadGate {
+            let rules: [ThreadGateRule]
+            if threadGate == .noReply {
+                rules = []
+            } else {
+                rules = [threadGate]
+            }
+            try await createThreadGate(
+                postURI: response.uri,
+                rules: rules,
+                account: account,
+                appPassword: appPassword
+            )
+        }
+        if !allowQuoting {
+            try await createPostGate(
+                postURI: response.uri,
+                account: account,
+                appPassword: appPassword
+            )
+        }
+        return response
+    }
+
+    private func createPostRecord(
+        text: String,
+        images: [PostImageAttachment]?,
+        video: PostVideoAttachment?,
+        replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
+        quote: (uri: String, cid: String)?,
         account: AppAccount,
         appPassword: String?
     ) async throws -> CreateRecordResponse {
@@ -1238,6 +1503,63 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     reply: reply,
                     embed: embed
                 )
+            )
+            return try await requestExecutor.send(
+                path: "com.atproto.repo.createRecord",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+    }
+
+    func createThreadGate(
+        postURI: String,
+        rules: [ThreadGateRule],
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> CreateRecordResponse {
+        try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
+            let components = try parseATURI(postURI)
+            let body = CreateGenericRecordRequest(
+                repo: authSession.did,
+                collection: "app.bsky.feed.threadgate",
+                record: ThreadGateRecord(
+                    post: postURI,
+                    allow: rules,
+                    createdAt: ISO8601DateFormatter().string(from: .now)
+                ),
+                rkey: components.rkey
+            )
+            return try await requestExecutor.send(
+                path: "com.atproto.repo.createRecord",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+    }
+
+    func createPostGate(
+        postURI: String,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> CreateRecordResponse {
+        try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
+            let components = try parseATURI(postURI)
+            let body = CreateGenericRecordRequest(
+                repo: authSession.did,
+                collection: "app.bsky.feed.postgate",
+                record: PostGateRecord(
+                    post: postURI,
+                    embeddingRules: [.disableRule],
+                    createdAt: ISO8601DateFormatter().string(from: .now)
+                ),
+                rkey: components.rkey
             )
             return try await requestExecutor.send(
                 path: "com.atproto.repo.createRecord",
