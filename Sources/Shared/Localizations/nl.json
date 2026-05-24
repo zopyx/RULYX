@@ -969,6 +969,7 @@
   "chat.edit": "Bewerking",
   "chat.select_all": "Selecteer Alles",
   "profile.direct_message": "Direct bericht",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "Kan gesprekken niet laden",
   "lists.lists_on_profile": "Profiel staat op lijsten...",
   "Search for posts mentioning your handle or run custom searches across Bluesky.": "Search for posts mentioning your handle or run custom searches across Bluesky.",

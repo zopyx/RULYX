@@ -973,6 +973,7 @@
   "chat.edit": "Bearbeiten",
   "chat.select_all": "Wählen Sie „Alle“ aus",
   "profile.direct_message": "Direktnachricht",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "Konversationen konnten nicht geladen werden",
   "lists.lists_on_profile": "Profil ist auf Listen aufgeführt...",
   "lists.advanced": "Erweitert",

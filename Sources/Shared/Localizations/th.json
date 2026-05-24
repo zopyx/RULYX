@@ -969,6 +969,7 @@
   "chat.edit": "แก้ไข",
   "chat.select_all": "เลือกทั้งหมด",
   "profile.direct_message": "ข้อความโดยตรง",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "โหลดการสนทนาไม่สำเร็จ",
   "lists.lists_on_profile": "โปรไฟล์นี้อยู่ในรายการ...",
   "Search for posts mentioning your handle or run custom searches across Bluesky.": "Search for posts mentioning your handle or run custom searches across Bluesky.",
