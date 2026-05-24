@@ -105,7 +105,10 @@ struct AccountTabView: View {
                                 .foregroundStyle(.quaternary)
 
                             Button {
-                                showImportPicker = true
+                                Task {
+                                    guard await AppLockManager.shared.authenticateSensitive() else { return }
+                                    showImportPicker = true
+                                }
                             } label: {
                                 Text(loc("account.import"))
                                     .font(.caption2)
@@ -260,6 +263,7 @@ struct AccountTabView: View {
     }
 
     private func exportAccounts() async {
+        guard await AppLockManager.shared.authenticateSensitive() else { return }
         var entries: [[String: String]] = []
         for account in accountStore.accounts {
             let password = accountStore.appPassword(for: account) ?? ""
