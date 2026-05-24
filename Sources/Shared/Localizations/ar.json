@@ -968,6 +968,7 @@
   "chat.edit": "يحرر",
   "chat.select_all": "حدد الكل",
   "profile.direct_message": "رسالة مباشرة",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "فشل تحميل المحادثات",
   "lists.lists_on_profile": "الملف الشخصي مُدرج في القوائم...",
   "Search for posts mentioning your handle or run custom searches across Bluesky.": "Search for posts mentioning your handle or run custom searches across Bluesky.",

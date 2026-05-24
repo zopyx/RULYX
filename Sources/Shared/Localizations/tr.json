@@ -969,6 +969,7 @@
   "chat.edit": "Düzenlemek",
   "chat.select_all": "Tümünü Seç",
   "profile.direct_message": "Doğrudan Mesaj",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "Konuşmalar Yüklenemedi",
   "lists.lists_on_profile": "Profilin yer aldığı listeler...",
   "Search for posts mentioning your handle or run custom searches across Bluesky.": "Search for posts mentioning your handle or run custom searches across Bluesky.",

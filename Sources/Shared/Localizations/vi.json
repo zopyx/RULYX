@@ -969,6 +969,7 @@
   "chat.edit": "Biên tập",
   "chat.select_all": "Chọn tất cả",
   "profile.direct_message": "Tin nhắn trực tiếp",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "Không thể tải cuộc trò chuyện",
   "lists.lists_on_profile": "Hồ sơ có trong các danh sách...",
   "Search for posts mentioning your handle or run custom searches across Bluesky.": "Search for posts mentioning your handle or run custom searches across Bluesky.",
