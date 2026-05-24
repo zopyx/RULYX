@@ -8,6 +8,7 @@ struct MentionsSearchView: View {
     @StateObject private var viewModel: MentionsSearchViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPostURI: String?
     @State private var imagePreview: ImagePreviewCollection?
@@ -17,6 +18,7 @@ struct MentionsSearchView: View {
     @State private var showProfileFor: BlueskyActor?
     @State private var searchAccount: AppAccount?
     @State private var hasAppeared = false
+    @StateObject private var likerActions = PostLikerActionsManager()
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var isFetchingLikers = false
     @State private var pendingLikerTargets: [PendingLikerTarget] = []
@@ -80,8 +82,7 @@ struct MentionsSearchView: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(viewModel.entries, id: \.post.uri) { entry in
-                    PostRowView(
-                        entry: entry,
+                    let entryCallbacks = PostRowCallbacks(
                         onTapImage: { index in
                             let allImages = entry.post.embed?.images ?? []
                             let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
@@ -93,7 +94,6 @@ struct MentionsSearchView: View {
                                 videoPreviewURL = url
                             }
                         },
-                        onShowLikes: { showLikesForURI = entry.post.uri },
                         onOpenProfile: { _ in
                             let author = entry.post.safeAuthor
                             showProfileFor = BlueskyActor(
@@ -103,18 +103,32 @@ struct MentionsSearchView: View {
                                 avatarURL: author.avatar.flatMap(URL.init)
                             )
                         },
+                        onShowLikes: { showLikesForURI = entry.post.uri },
+                        onReportPost: {
+                            guard let activeDID = accountStore.activeAccount?.did else { return }
+                            guard entry.post.author?.did != activeDID else { return }
+                            likerActions.postToReport = entry
+                        },
                         onBlockAllLikers: { handleBlockAllLikers(postURI: entry.post.uri) },
-                        availableLikerTargetLists: availableTargetLists,
                         onAddAllLikersToList: { list in
                             handleAddAllLikersToList(postURI: entry.post.uri, list: list)
-                        }
+                        },
+                        onClassify: { likerActions.postToClassify = entry },
+                        availableLikerTargetLists: availableTargetLists
+                    )
+                    PostRowView(
+                        entry: entry,
+                        style: .full,
+                        callbacks: entryCallbacks
                     )
                     .buttonStyle(.plain)
-                    .onAppear {
-                        if entry.post.uri == viewModel.entries.last?.post.uri {
-                            Task { await loadMore() }
-                        }
-                    }
+                    .postInfiniteScroll(
+                        entry: entry,
+                        entries: viewModel.entries,
+                        hasMore: viewModel.hasMore,
+                        isLoadingMore: viewModel.isLoadingMore,
+                        loadMore: { await loadMore() }
+                    )
                 }
                 if viewModel.isLoadingMore {
                     HStack {
@@ -220,6 +234,7 @@ struct MentionsSearchView: View {
         .onDisappear {
             loadMoreTask?.cancel()
         }
+        .postLikerActions(manager: likerActions)
     }
 
     private var searchAccountSection: some View {
@@ -289,11 +304,23 @@ struct MentionsSearchView: View {
     }
 
     private func handleAddAllLikersToList(postURI: String, list: BlueskyList) {
-        Task {
-            guard let targets = await fetchLikerTargets(for: postURI) else { return }
-            guard let account = accountStore.activeAccount,
-                  let appPassword = accountStore.appPassword(for: account) else { return }
-            addLikers(targets, to: list, account: account, appPassword: appPassword)
+        if list.kind == .internal {
+            Task {
+                guard let targets = await fetchLikerTargets(for: postURI) else { return }
+                for target in targets {
+                    let stripped = list.id.replacingOccurrences(of: "internal:", with: "")
+                    if let listID = UUID(uuidString: stripped) {
+                        internalListStore.addMember(did: target.did, handle: target.handle ?? target.did, to: listID)
+                    }
+                }
+            }
+        } else {
+            Task {
+                guard let targets = await fetchLikerTargets(for: postURI) else { return }
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                addLikers(targets, to: list, account: account, appPassword: appPassword)
+            }
         }
     }
 
@@ -367,17 +394,35 @@ struct MentionsSearchView: View {
             availableTargetLists = []
             return
         }
+        var lists: [BlueskyList] = []
         do {
-            availableTargetLists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
-                .sorted {
-                    if $0.kind != $1.kind {
-                        return $0.kind == .moderation
+            lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+                .sorted { lhs, rhs in
+                    if lhs.kind != rhs.kind {
+                        return lhs.kind.sortOrder < rhs.kind.sortOrder
                     }
-                    return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
                 }
         } catch {
             availableTargetLists = []
             AppLogger.moderation.error("Failed to load available target lists: \(error.localizedDescription, privacy: .public)")
+        }
+        let internalLists = internalListStore.lists.map { internalList in
+            BlueskyList(
+                id: "internal:\(internalList.id.uuidString)",
+                name: internalList.name,
+                description: "Internal",
+                memberCount: internalList.memberCount,
+                kind: .internal,
+                cid: nil
+            )
+        }
+        lists.append(contentsOf: internalLists)
+        availableTargetLists = lists.sorted { lhs, rhs in
+            if lhs.kind != rhs.kind {
+                return lhs.kind.sortOrder < rhs.kind.sortOrder
+            }
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
         }
     }
 

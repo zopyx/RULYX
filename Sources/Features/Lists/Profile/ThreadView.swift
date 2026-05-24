@@ -11,6 +11,7 @@ struct ThreadView: View {
     @State private var videoPreviewURL: URL?
     @State private var showLikesForURI: String?
     @State private var composeContext: ComposeContext?
+    @StateObject private var likerActions = PostLikerActionsManager()
 
     private var mentionURLHandler: OpenURLAction {
         OpenURLAction { url in
@@ -23,6 +24,7 @@ struct ThreadView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var internalListStore: InternalListStore
     var body: some View {
         NavigationStack {
             Group {
@@ -118,6 +120,12 @@ struct ThreadView: View {
                 }
                 await viewModel.loadThread(uri: postURI, account: account, appPassword: appPassword, using: blueskyClient)
             }
+            .task {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            }
+            .postLikerActions(manager: likerActions)
         }
     }
 
@@ -143,12 +151,59 @@ struct ThreadView: View {
         uri.dropFirst("at://".count).split(separator: "/").first.map(String.init) ?? uri
     }
 
+    // MARK: - Shared Helpers
+
+    private func threadAuthor(_ node: ThreadPostNode) -> RichAuthor {
+        node.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
+    }
+
+    private func threadRecord(_ node: ThreadPostNode) -> RichRecord {
+        node.record ?? RichRecord(text: "", createdAt: "")
+    }
+
+    private func threadCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
+        PostRowCallbacks(
+            onReply: { composeContext = makeReplyContext(uri: post.uri, cid: post.cid) },
+            onLike: { performLike(uri: post.uri, cid: post.cid) },
+            onShowLikes: { if let uri = post.uri { showLikesForURI = uri } },
+            onRepost: { performRepost(uri: post.uri, cid: post.cid) },
+            onQuote: { composeContext = makeQuoteContext(uri: post.uri, cid: post.cid) },
+            onCopy: { UIPasteboard.general.string = post.record?.text },
+            onTranslate: { translateText(post.record?.text ?? "") },
+            onReportPost: {
+                guard let activeDID = accountStore.activeAccount?.did else { return }
+                guard post.author?.did != activeDID else { return }
+                if let uri = post.uri {
+                    likerActions.postToReport = RichFeedEntry(threadPost: post)
+                }
+            },
+            onBlockAllLikers: {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account),
+                      let uri = post.uri else { return }
+                likerActions.handleBlockAllLikers(postURI: uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+            },
+            onAddAllLikersToList: { list in
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account),
+                      let uri = post.uri else { return }
+                likerActions.handleAddAllLikersToList(postURI: uri, list: list, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
+            },
+            onClassify: {
+                likerActions.postToClassify = RichFeedEntry(threadPost: post)
+            },
+            isLiked: post.isLikedByMe,
+            isReposted: post.isRepostedByMe,
+            availableLikerTargetLists: likerActions.availableTargetLists
+        )
+    }
+
     // MARK: - Ancestor Row
 
     @ViewBuilder
     private func ancestorRow(_ node: ThreadNode, isFirst: Bool = false, isLast: Bool = false) -> some View {
-        let author = node.post.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
-        let record = node.post.record ?? RichRecord(text: "", createdAt: "")
+        let author = threadAuthor(node.post)
+        let record = threadRecord(node.post)
 
         HStack(spacing: 8) {
             VStack(spacing: 0) {
@@ -207,24 +262,29 @@ struct ThreadView: View {
                     postMenu(for: record.text)
                 }
                 if let text = record.text, !text.isEmpty {
-                    Text(mentionAttributedString(from: text))
-                        .font(.subheadline)
-                        .lineLimit(3)
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(.secondary)
-                        .environment(\.openURL, mentionURLHandler)
+                    PostTextContent(
+                        text: text,
+                        onOpenProfile: { handle in openProfile(handle) },
+                        font: .subheadline,
+                        lineLimit: 3,
+                        foregroundStyle: .secondary
+                    )
                 }
                 if let embed = node.post.embed {
-                    postEmbed(embed, onPlayVideo: {
-                        if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
-                            videoPreviewURL = url
+                    PostEmbedView(
+                        embed: embed,
+                        onTapImage: { index in
+                            let allImages = embed.images ?? []
+                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                            guard index < urls.count else { return }
+                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                        },
+                        onPlayVideo: {
+                            if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
+                                videoPreviewURL = url
+                            }
                         }
-                    }, onTapImage: { index in
-                        let allImages = embed.images ?? []
-                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                        guard index < urls.count else { return }
-                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                    })
+                    )
                 }
             }
         }
@@ -235,8 +295,9 @@ struct ThreadView: View {
     // MARK: - Thread Post
 
     private func threadPostSection(_ post: ThreadPostNode) -> some View {
-        let author = post.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
-        let record = post.record ?? RichRecord(text: "", createdAt: "")
+        let author = threadAuthor(post)
+        let record = threadRecord(post)
+        let callbacks = threadCallbacks(for: post)
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -273,37 +334,36 @@ struct ThreadView: View {
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
-                postMenu(for: record.text)
             }
             if let text = record.text, !text.isEmpty {
-                Text(mentionAttributedString(from: text))
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .environment(\.openURL, mentionURLHandler)
+                PostTextContent(
+                    text: text,
+                    onOpenProfile: { handle in openProfile(handle) }
+                )
             }
             if let embed = post.embed {
-                postEmbed(embed, onPlayVideo: {
-                    if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
-                        videoPreviewURL = url
+                PostEmbedView(
+                    embed: embed,
+                    onTapImage: { index in
+                        let allImages = embed.images ?? []
+                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                        guard index < urls.count else { return }
+                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                    },
+                    onPlayVideo: {
+                        if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
+                            videoPreviewURL = url
+                        }
                     }
-                }, onTapImage: { index in
-                    let allImages = embed.images ?? []
-                    let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                    guard index < urls.count else { return }
-                    imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                })
+                )
             }
-            postActionBar(
+            PostActionBar(
                 replyCount: post.replyCount,
                 repostCount: post.repostCount,
                 likeCount: post.likeCount,
-                onReply: { composeContext = makeReplyContext(uri: post.uri, cid: post.cid) },
-                onRepost: { performRepost(uri: post.uri, cid: post.cid) },
-                onLike: { performLike(uri: post.uri, cid: post.cid) },
-                onQuote: { composeContext = makeQuoteContext(uri: post.uri, cid: post.cid) },
-                onShowLikes: { if let uri = post.uri { showLikesForURI = uri } },
-                isLiked: post.isLikedByMe, isReposted: post.isRepostedByMe
+                isLiked: post.isLikedByMe,
+                isReposted: post.isRepostedByMe,
+                callbacks: callbacks
             )
         }
         .padding(.vertical, 8)
@@ -317,8 +377,9 @@ struct ThreadView: View {
     }
 
     private func replyThreadRow(_ reply: ThreadNode, depth: Int, isLast: Bool) -> AnyView {
-        let author = reply.post.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
-        let record = reply.post.record ?? RichRecord(text: "", createdAt: "")
+        let author = threadAuthor(reply.post)
+        let record = threadRecord(reply.post)
+        let callbacks = threadCallbacks(for: reply.post)
 
         let content = HStack(spacing: 6) {
             VStack(spacing: 0) {
@@ -368,38 +429,38 @@ struct ThreadView: View {
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                     }
-                    postMenu(for: record.text)
                 }
                 if let text = record.text, !text.isEmpty {
-                    Text(mentionAttributedString(from: text))
-                        .font(.subheadline)
-                        .lineLimit(10)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .environment(\.openURL, mentionURLHandler)
+                    PostTextContent(
+                        text: text,
+                        onOpenProfile: { handle in openProfile(handle) },
+                        font: .subheadline,
+                        lineLimit: 10
+                    )
                 }
                 if let embed = reply.post.embed {
-                    postEmbed(embed, onPlayVideo: {
-                        if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
-                            videoPreviewURL = url
+                    PostEmbedView(
+                        embed: embed,
+                        onTapImage: { index in
+                            let allImages = embed.images ?? []
+                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                            guard index < urls.count else { return }
+                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                        },
+                        onPlayVideo: {
+                            if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
+                                videoPreviewURL = url
+                            }
                         }
-                    }, onTapImage: { index in
-                        let allImages = embed.images ?? []
-                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                        guard index < urls.count else { return }
-                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                    })
+                    )
                 }
-                postActionBar(
+                PostActionBar(
                     replyCount: reply.post.replyCount,
                     repostCount: reply.post.repostCount,
                     likeCount: reply.post.likeCount,
-                    onReply: { composeContext = makeReplyContext(uri: reply.post.uri, cid: reply.post.cid) },
-                    onRepost: { performRepost(uri: reply.post.uri, cid: reply.post.cid) },
-                    onLike: { performLike(uri: reply.post.uri, cid: reply.post.cid) },
-                    onQuote: { composeContext = makeQuoteContext(uri: reply.post.uri, cid: reply.post.cid) },
-                    onShowLikes: { if let uri = reply.post.uri { showLikesForURI = uri } },
-                    isLiked: reply.post.isLikedByMe, isReposted: reply.post.isRepostedByMe
+                    isLiked: reply.post.isLikedByMe,
+                    isReposted: reply.post.isRepostedByMe,
+                    callbacks: callbacks
                 )
                 if let replies = reply.replies, !replies.isEmpty {
                     ForEach(Array(replies.enumerated()), id: \.offset) { index, child in
@@ -515,63 +576,6 @@ struct ThreadView: View {
         return nil
     }
 
-    // MARK: - Embed
-
-    private func postActionBar(replyCount: Int?, repostCount: Int?, likeCount: Int?, onReply: @escaping () -> Void, onRepost: @escaping () -> Void, onLike: @escaping () -> Void, onQuote: @escaping () -> Void, onShowLikes: @escaping () -> Void = {}, isLiked: Bool = false, isReposted: Bool = false) -> some View {
-        HStack(spacing: 24) {
-            Button(action: onReply) {
-                HStack(spacing: 4) {
-                    Image(systemName: "bubble.left")
-                        .font(.body.weight(.medium))
-                    if let count = replyCount {
-                        Text("\(count)")
-                            .font(.callout)
-                    }
-                }
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tertiary)
-
-            Button(action: onRepost) {
-                HStack(spacing: 4) {
-                    Image(systemName: isReposted ? "repeat.circle.fill" : "repeat")
-                        .font(.body.weight(.medium))
-                    if let count = repostCount {
-                        Text("\(count)")
-                            .font(.callout)
-                    }
-                }
-                .foregroundStyle(isReposted ? Color.green : Color.gray.opacity(0.6))
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 4) {
-                Button(action: onLike) {
-                    Image(systemName: isLiked ? "heart.fill" : "heart")
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(isLiked ? Color.red : Color.gray.opacity(0.6))
-                }
-                if let count = likeCount {
-                    Button(action: onShowLikes) {
-                        Text("\(count)")
-                            .font(.callout)
-                    }
-                }
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tertiary)
-
-            Button(action: onQuote) {
-                HStack(spacing: 4) {
-                    Image(systemName: "quote.bubble")
-                        .font(.body.weight(.medium))
-                }
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tertiary)
-        }
-    }
-
     private func postMenu(for text: String?) -> some View {
         Menu {
             Button {
@@ -585,7 +589,7 @@ struct ThreadView: View {
                 Label("post.translate", systemImage: "globe")
             }
         } label: {
-            Image(systemName: "ellipsis")
+            Image(systemName: "gearshape")
                 .font(.body.weight(.medium))
                 .foregroundStyle(.tertiary)
                 .padding(.leading, 4)
@@ -602,129 +606,6 @@ struct ThreadView: View {
               let url = URL(string: "https://translate.google.com/?text=\(encoded)") else { return }
         UIApplication.shared.open(url)
     }
-
-    @ViewBuilder
-    private func postEmbed(_ embed: RichEmbed, onPlayVideo: @escaping () -> Void, onTapImage: @escaping (Int) -> Void) -> some View {
-        if let video = embed.video {
-            Button(action: onPlayVideo) {
-                ZStack {
-                    if let thumb = video.thumbnail, let url = URL(string: thumb) {
-                        ThumbnailImageView(url: url, maxPixelSize: 720) {
-                            Rectangle().fill(Color.skyPrimary.opacity(0.08))
-                        }
-                        .scaledToFill()
-                    } else {
-                        LinearGradient(
-                            colors: [Color.skyPrimary.opacity(0.22), Color.skyPrimary.opacity(0.08)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        .overlay {
-                            Image(systemName: "film.stack")
-                                .font(.system(size: 34, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.92))
-                        }
-                    }
-
-                    Image(systemName: "play.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.white)
-                        .shadow(radius: 4)
-                }
-                .frame(height: 200)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-            .buttonStyle(.plain)
-        }
-
-        if let images = embed.images, !images.isEmpty {
-            let cols = images.count == 1 ? 1 : 2
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: cols), spacing: 4) {
-                ForEach(Array(images.prefix(4).enumerated()), id: \.offset) { index, item in
-                    if let previewURL = item.fullsize.flatMap(URL.init) {
-                        Button {
-                            onTapImage(index)
-                        } label: {
-                            ThumbnailImageView(url: item.thumb.flatMap(URL.init) ?? previewURL, maxPixelSize: 512) {
-                                Rectangle().fill(Color.skyPrimary.opacity(0.08))
-                            }
-                            .scaledToFill()
-                            .frame(height: 120)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-
-        if let external = embed.external, let uri = external.uri, let url = URL(string: uri) {
-            if external.isTenorEmbed, let gifURL = external.preferredInlineMediaURL {
-                InlineAnimatedMediaView(url: gifURL, allowsInteraction: true)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
-                    }
-            } else {
-                Button {
-                    UIApplication.shared.open(url)
-                } label: {
-                    HStack(spacing: 12) {
-                        if let thumb = external.thumb, let thumbURL = URL(string: thumb) {
-                            ThumbnailImageView(url: thumbURL, maxPixelSize: 512) {
-                                RoundedRectangle(cornerRadius: 10).fill(Color.skyPrimary.opacity(0.08))
-                            }
-                            .scaledToFill()
-                            .frame(width: 96, height: 96)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            if let title = external.title, !title.isEmpty {
-                                Text(title)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.primary)
-                                    .lineLimit(2)
-                            }
-                            if let description = external.description, !description.isEmpty {
-                                Text(description)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(3)
-                            }
-                            if let host = URL(string: uri)?.host, !host.isEmpty {
-                                Label(host, systemImage: "link")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
-
-                        Spacer(minLength: 0)
-                    }
-                    .padding(10)
-                    .background(Color.skyPrimary.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
-                    }
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-}
-
-private struct ComposeContext: Identifiable {
-    let id = UUID()
-    let account: AppAccount
-    let appPassword: String
-    let isReply: Bool
-    var parentURI: String = ""
-    var parentCID: String = ""
-    var rootURI: String = ""
-    var rootCID: String = ""
-    var uri: String = ""
-    var cid: String = ""
 }
 
 @MainActor
