@@ -30,10 +30,16 @@ struct InternalListDetailView: View {
     var body: some View {
         List {
             Section {
-                if filteredMembers.isEmpty {
-                    Text(loc("internal.list.no_members"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if filteredMembers.isEmpty && !searchText.isEmpty {
+                    EmptyStatePanel(
+                        title: loc("list.members.no_matches"),
+                        message: loc("list.members.no_matches_desc")
+                    )
+                } else if filteredMembers.isEmpty {
+                    EmptyStatePanel(
+                        title: loc("list.members.no_members"),
+                        message: loc("list.members.no_members_desc")
+                    )
                 } else {
                     ForEach(filteredMembers) { member in
                         HStack(spacing: 10) {
