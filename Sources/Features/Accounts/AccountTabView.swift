@@ -116,7 +116,6 @@ struct AccountTabView: View {
                     }
 
                     Section {
-                        Color.clear.frame(height: 24).listRowBackground(Color.clear)
                         Menu {
                             ForEach(accountStore.accounts) { account in
                                 Button {
@@ -144,12 +143,13 @@ struct AccountTabView: View {
                             .foregroundStyle(.secondary)
                     } header: {
                         HStack(spacing: 4) {
-                            Text(loc: "account.preferred_search.section")
+                            Text(loc("account.preferred_search.section"))
                             HelpInfoButton(
                                 action: { showPreferredSearchInfo = true },
                                 accessibilityLabel: loc("account.preferred_search.info.hint")
                             )
                         }
+                        .padding(.top, 24)
                     }
                 }
             }
