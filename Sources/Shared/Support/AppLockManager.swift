@@ -119,4 +119,19 @@ final class AppLockManager: ObservableObject {
         guard isEnabled else { return }
         isLocked = true
     }
+
+    func authenticateSensitive() async -> Bool {
+        isAuthenticating = true
+        defer { isAuthenticating = false }
+        let context = LAContext()
+        context.localizedReason = String.localized("biometric.auth_reason")
+        do {
+            return try await context.evaluatePolicy(
+                .deviceOwnerAuthentication,
+                localizedReason: String.localized("biometric.auth_reason")
+            )
+        } catch {
+            return false
+        }
+    }
 }
