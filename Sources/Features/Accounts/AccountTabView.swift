@@ -76,29 +76,30 @@ struct AccountTabView: View {
                                     editMode = editMode.isEditing ? .inactive : .active
                                 }
                             }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
                             .tint(.skyPrimary)
                             Button {
                                 isPresentingAddAccount = true
                             } label: {
-                                Image(systemName: "plus")
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(Color.skyPrimary)
                             }
                             .accessibilityLabel(loc("account.manage.add"))
-                            Menu {
-                                Button {
-                                    Task { await exportAccounts() }
-                                } label: {
-                                    Label(loc("account.export"), systemImage: "square.and.arrow.up")
-                                }
-                                Button {
-                                    showImportPicker = true
-                                } label: {
-                                    Label(loc("account.import"), systemImage: "square.and.arrow.down")
-                                }
-                            } label: {
-                                Image(systemName: "ellipsis.circle")
-                                    .font(.body.weight(.medium))
-                            }
-                            .accessibilityLabel(loc("account.manage.more"))
+                        }
+                    }
+
+                    Section {
+                        Button {
+                            Task { await exportAccounts() }
+                        } label: {
+                            Label(loc("account.export"), systemImage: "square.and.arrow.up")
+                        }
+                        Button {
+                            showImportPicker = true
+                        } label: {
+                            Label(loc("account.import"), systemImage: "square.and.arrow.down")
                         }
                     }
 
