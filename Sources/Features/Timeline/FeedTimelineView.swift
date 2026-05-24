@@ -136,9 +136,24 @@ struct FeedTimelineView: View {
                     evidenceText: $reportEvidence,
                     isSubmitting: isSubmittingReport,
                     makeSupportDraft: {
-                        SupportEmailDraft(
-                            subject: "Post Report: \(entry.post.author?.handle ?? "unknown")",
-                            body: reportEvidence
+                        let author = entry.post.author
+                        let handle = author?.handle ?? "unknown"
+                        let text = entry.post.safeRecord.text ?? ""
+                        return SupportEmailDraft(
+                            subject: "Bluesky Post Report — @\(handle)",
+                            body: SupportEmailDraft.htmlBody(
+                                intro: "I am reporting the following Bluesky post for review.",
+                                fields: [
+                                    ("Author Handle", "@\(handle)"),
+                                    ("Author DID", author?.did ?? "—"),
+                                    ("Post URI", entry.post.uri),
+                                    ("Post CID", entry.post.cid ?? "—"),
+                                    ("Post Text", text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "—" : text),
+                                    ("Reason", reportReason.localizedTitle),
+                                    ("Additional Details", reportEvidence.isEmpty ? "—" : reportEvidence),
+                                ],
+                                footer: "Evidence screenshot attached below if provided."
+                            )
                         )
                     },
                     onCancel: {
