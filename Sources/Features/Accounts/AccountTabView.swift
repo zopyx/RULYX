@@ -90,18 +90,28 @@ struct AccountTabView: View {
                         }
                     }
 
-                    Section {
+                    HStack(spacing: 12) {
                         Button {
                             Task { await exportAccounts() }
                         } label: {
-                            Label(loc("account.export"), systemImage: "square.and.arrow.up")
+                            Text(loc("account.export"))
                         }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+
+                        Text("·")
+                            .foregroundStyle(.tertiary)
+
                         Button {
                             showImportPicker = true
                         } label: {
-                            Label(loc("account.import"), systemImage: "square.and.arrow.down")
+                            Text(loc("account.import"))
                         }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
                     }
+                    .font(.footnote)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 44, bottom: 4, trailing: 0))
 
                     Section {
                         Menu {
