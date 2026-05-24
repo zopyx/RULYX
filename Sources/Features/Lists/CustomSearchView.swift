@@ -18,6 +18,8 @@ struct CustomSearchView: View {
     @State private var hasAppeared = false
     @FocusState private var searchFocused: Bool
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var internalListStore: InternalListStore
+    @StateObject private var likerActions = PostLikerActionsManager()
 
     var body: some View {
         listContent
@@ -52,6 +54,12 @@ struct CustomSearchView: View {
             .onDisappear {
                 loadMoreTask?.cancel()
             }
+            .task {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            }
+            .postLikerActions(manager: likerActions)
     }
 
     private var listContent: some View {
@@ -323,7 +331,23 @@ struct CustomSearchView: View {
             videoPreviewURL: $videoPreviewURL,
             showLikesForURI: $showLikesForURI,
             showProfileFor: $showProfileFor,
-            availableTargetLists: availableTargetLists
+            availableTargetLists: availableTargetLists,
+            onBlockAllLikers: {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+            },
+            onAddAllLikersToList: { list in
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
+            },
+            onClassify: { likerActions.postToClassify = entry },
+            onReportPost: {
+                guard let activeDID = accountStore.activeAccount?.did else { return }
+                guard entry.post.author?.did != activeDID else { return }
+                likerActions.postToReport = entry
+            }
         )
     }
 
@@ -400,11 +424,11 @@ struct CustomSearchView: View {
         }
         do {
             availableTargetLists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
-                .sorted {
-                    if $0.kind != $1.kind {
-                        return $0.kind == .moderation
+                .sorted { lhs, rhs in
+                    if lhs.kind != rhs.kind {
+                        return lhs.kind.sortOrder < rhs.kind.sortOrder
                     }
-                    return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
                 }
         } catch {
             availableTargetLists = []

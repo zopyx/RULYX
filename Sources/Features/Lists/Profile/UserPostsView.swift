@@ -20,8 +20,10 @@ struct UserPostsView: View {
     @StateObject private var viewModel: UserPostsViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPostURI: String?
+    @StateObject private var likerActions = PostLikerActionsManager()
     @State private var imagePreview: ImagePreviewCollection?
     @State private var videoPreviewURL: URL?
     @State private var showLikesForURI: String?
@@ -108,6 +110,12 @@ struct UserPostsView: View {
                 initialLoadTask?.cancel()
                 loadMoreTask?.cancel()
             }
+            .task {
+                let account = searchAccount ?? accountStore.activeAccount
+                guard let account, let appPassword = accountStore.appPassword(for: account) else { return }
+                await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            }
+            .postLikerActions(manager: likerActions)
         }
     }
 
@@ -118,27 +126,51 @@ struct UserPostsView: View {
             ForEach(viewModel.sortedFilteredPosts, id: \.post.uri) { entry in
                 PostRowView(
                     entry: entry,
-                    onTapThread: {
-                        selectedPostURI = entry.post.uri
-                    },
-                    onTapImage: { index in
-                        let allImages = entry.post.embed?.images ?? []
-                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                        guard index < urls.count else { return }
-                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                    },
-                    onPlayVideo: {
-                        if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
-                            videoPreviewURL = url
-                        }
-                    },
-                    onShowLikes: { showLikesForURI = entry.post.uri }
+                    style: .compact,
+                    callbacks: PostRowCallbacks(
+                        onTapThread: { selectedPostURI = entry.post.uri },
+                        onTapImage: { index in
+                            let allImages = entry.post.embed?.images ?? []
+                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                            guard index < urls.count else { return }
+                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                        },
+                        onPlayVideo: {
+                            if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
+                                videoPreviewURL = url
+                            }
+                        },
+                        onShowLikes: { showLikesForURI = entry.post.uri },
+                        onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
+                        onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
+                        onReportPost: {
+                            guard let activeDID = accountStore.activeAccount?.did else { return }
+                            guard entry.post.author?.did != activeDID else { return }
+                            likerActions.postToReport = entry
+                        },
+                        onBlockAllLikers: {
+                            let fetchAccount = searchAccount ?? accountStore.activeAccount
+                            guard let fetchAccount, let fetchPassword = accountStore.appPassword(for: fetchAccount) else { return }
+                            likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword)
+                        },
+                        onAddAllLikersToList: { list in
+                            let fetchAccount = searchAccount ?? accountStore.activeAccount
+                            guard let fetchAccount, let fetchPassword = accountStore.appPassword(for: fetchAccount),
+                                  let activeAccount = accountStore.activeAccount,
+                                  let activePassword = accountStore.appPassword(for: activeAccount) else { return }
+                            likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+                        },
+                        onClassify: { likerActions.postToClassify = entry },
+                        availableLikerTargetLists: likerActions.availableTargetLists
+                    )
                 )
-                .onAppear {
-                    if entry.post.uri == viewModel.sortedFilteredPosts.last?.post.uri {
-                        Task { await loadMore() }
-                    }
-                }
+                .postInfiniteScroll(
+                    entry: entry,
+                    entries: viewModel.sortedFilteredPosts,
+                    hasMore: viewModel.hasMore,
+                    isLoadingMore: viewModel.isLoadingMore,
+                    loadMore: { await loadMore() }
+                )
             }
             if viewModel.isLoadingMore {
                 HStack {
@@ -304,6 +336,12 @@ struct UserPostsView: View {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
+    }
+
+    private func translateText(_ text: String) {
+        guard let encoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "https://translate.google.com/?text=\(encoded)") else { return }
+        UIApplication.shared.open(url)
     }
 }
 

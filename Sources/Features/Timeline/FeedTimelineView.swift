@@ -21,11 +21,9 @@ struct FeedTimelineView: View {
     @State private var postToDelete: RichFeedEntry?
     @State private var editPostEntry: RichFeedEntry?
     @State private var profileToShow: BlueskyActor?
-    @State private var postToReport: RichFeedEntry?
-    @State private var reportReason = ModerationReportReasonType.simplifiedDefault
-    @State private var reportEvidence = ""
-    @State private var isSubmittingReport = false
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var internalListStore: InternalListStore
+    @StateObject private var likerActions = PostLikerActionsManager()
 
     var body: some View {
         NavigationStack {
@@ -129,43 +127,6 @@ struct FeedTimelineView: View {
                     .environmentObject(blueskyClient)
                 }
             }
-            .sheet(item: $postToReport) { entry in
-                SimplifiedReportSheet(
-                    title: loc("post.report"),
-                    selectedReason: $reportReason,
-                    evidenceText: $reportEvidence,
-                    isSubmitting: isSubmittingReport,
-                    makeSupportDraft: {
-                        let author = entry.post.author
-                        let handle = author?.handle ?? "unknown"
-                        let text = entry.post.safeRecord.text ?? ""
-                        return SupportEmailDraft(
-                            subject: "Bluesky Post Report — @\(handle)",
-                            body: SupportEmailDraft.htmlBody(
-                                intro: "I am reporting the following Bluesky post for review.",
-                                fields: [
-                                    ("Author Handle", "@\(handle)"),
-                                    ("Author DID", author?.did ?? "—"),
-                                    ("Post URI", entry.post.uri),
-                                    ("Post CID", entry.post.cid ?? "—"),
-                                    ("Post Text", text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "—" : text),
-                                    ("Reason", reportReason.localizedTitle),
-                                    ("Additional Details", reportEvidence.isEmpty ? "—" : reportEvidence),
-                                ],
-                                footer: "Evidence screenshot attached below if provided."
-                            )
-                        )
-                    },
-                    onCancel: {
-                        postToReport = nil
-                        reportEvidence = ""
-                        reportReason = .simplifiedDefault
-                    },
-                    onSubmit: {
-                        Task { await submitPostReport(entry) }
-                    }
-                )
-            }
             .sheet(item: $profileToShow) { actor in
                 NavigationStack {
                     BlueskyProfileView(
@@ -206,6 +167,11 @@ struct FeedTimelineView: View {
                       let appPassword = accountStore.appPassword(for: account) else { return }
                 viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
             }
+            .task {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            }
             .onDisappear {
                 initialLoadTask?.cancel()
                 loadMoreTask?.cancel()
@@ -225,6 +191,7 @@ struct FeedTimelineView: View {
                     viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
                 }
             }
+            .postLikerActions(manager: likerActions)
         }
     }
 
@@ -233,33 +200,48 @@ struct FeedTimelineView: View {
             ForEach(viewModel.visibleEntries, id: \.post.uri) { entry in
                 PostRowView(
                     entry: entry,
-                    onTapThread: {
-                        selectedPostURI = entry.post.uri
-                    },
-                    onTapImage: { index in
-                        let allImages = entry.post.embed?.images ?? []
-                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                        guard index < urls.count else { return }
-                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                    },
-                    onPlayVideo: {
-                        if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
-                            videoPreviewURL = url
-                        }
-                    },
-                    onReply: { handleReply(entry) },
-                    onLike: { handleLike(entry) },
-                    onShowLikes: { showLikesForURI = entry.post.uri },
-                    isLiked: entry.post.isLikedByMe,
-                    isReposted: entry.post.isRepostedByMe,
-                    onRepost: { handleRepost(entry) },
-                    onQuote: { handleQuote(entry) },
-                    onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
-                    onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
-                    onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
-                    onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
-                    onReportPost: { postToReport = entry },
-                    onOpenProfile: { handle in openProfile(handle) }
+                    style: .full,
+                    callbacks: PostRowCallbacks(
+                        onTapThread: { selectedPostURI = entry.post.uri },
+                        onTapImage: { index in
+                            let allImages = entry.post.embed?.images ?? []
+                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                            guard index < urls.count else { return }
+                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                        },
+                        onPlayVideo: {
+                            if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
+                                videoPreviewURL = url
+                            }
+                        },
+                        onOpenProfile: { handle in openProfile(handle) },
+                        onReply: { handleReply(entry) },
+                        onLike: { handleLike(entry) },
+                        onShowLikes: { showLikesForURI = entry.post.uri },
+                        onRepost: { handleRepost(entry) },
+                        onQuote: { handleQuote(entry) },
+                        onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
+                        onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
+                        onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
+                        onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
+                        onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
+                        onBlockAllLikers: {
+                            guard let account = accountStore.activeAccount,
+                                  let appPassword = accountStore.appPassword(for: account) else { return }
+                            likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+                        },
+                        onAddAllLikersToList: { list in
+                            guard let fetchAccount = accountStore.activeAccount,
+                                  let fetchPassword = accountStore.appPassword(for: fetchAccount),
+                                  let activeAccount = accountStore.activeAccount,
+                                  let activePassword = accountStore.appPassword(for: activeAccount) else { return }
+                            likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+                        },
+                        onClassify: { likerActions.postToClassify = entry },
+                        isLiked: entry.post.isLikedByMe,
+                        isReposted: entry.post.isRepostedByMe,
+                        availableLikerTargetLists: likerActions.availableTargetLists
+                    )
                 )
                 .contextMenu {
                     if let word = muteWord(from: entry) {
@@ -517,42 +499,6 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
     }
-
-    private func submitPostReport(_ entry: RichFeedEntry) async {
-        guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account),
-              let cid = entry.post.cid else { return }
-        isSubmittingReport = true
-        do {
-            try await blueskyClient.reportRecord(
-                uri: entry.post.uri,
-                cid: cid,
-                reason: reportEvidence.isEmpty ? nil : reportEvidence,
-                selectedReason: reportReason,
-                account: account,
-                appPassword: appPassword
-            )
-            postToReport = nil
-            reportEvidence = ""
-            reportReason = .simplifiedDefault
-        } catch {
-            AppLogger.moderation.error("Post report failed: \(error.localizedDescription, privacy: .public)")
-        }
-        isSubmittingReport = false
-    }
-}
-
-private struct ComposeContext: Identifiable {
-    let id = UUID()
-    let account: AppAccount
-    let appPassword: String
-    let isReply: Bool
-    var parentURI: String = ""
-    var parentCID: String = ""
-    var rootURI: String = ""
-    var rootCID: String = ""
-    var uri: String = ""
-    var cid: String = ""
 }
 
 #Preview {

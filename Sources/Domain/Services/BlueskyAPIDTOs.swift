@@ -505,6 +505,27 @@ struct RichFeedEntry: Decodable, Identifiable {
     let reply: RichFeedReply?
 
     var id: String { post.uri }
+
+    init(post: RichPost, reply: RichFeedReply? = nil) {
+        self.post = post
+        self.reply = reply
+    }
+
+    init(threadPost: ThreadPostNode) {
+        self.post = RichPost(
+            uri: threadPost.uri ?? "",
+            cid: threadPost.cid,
+            author: threadPost.author,
+            record: threadPost.record,
+            embed: threadPost.embed,
+            viewer: threadPost.viewer,
+            replyCount: threadPost.replyCount,
+            repostCount: threadPost.repostCount,
+            likeCount: threadPost.likeCount,
+            indexedAt: threadPost.indexedAt
+        )
+        self.reply = nil
+    }
 }
 
 struct RichFeedReply: Decodable {

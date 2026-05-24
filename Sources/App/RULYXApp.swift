@@ -28,6 +28,7 @@ struct RULYXApp: App {
                     .environmentObject(deps.httpRequestDebugStore)
                     .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(deps.internalListStore)
+                    .environmentObject(deps.aiService)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
                     .alert(Text(loc: "settings.icloud.privacy.title"), isPresented: Binding(get: { iCloudAccountSync.shared.showPrivacyAlert }, set: { if !$0 { iCloudAccountSync.shared.showPrivacyAlert = false } })) {

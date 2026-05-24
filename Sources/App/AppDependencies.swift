@@ -17,6 +17,11 @@ protocol ModerationServicing: AnyObject {
 }
 
 @MainActor
+protocol AIServicing: AnyObject {
+    var aiService: LiveAIService { get }
+}
+
+@MainActor
 protocol ChatServicesProtocol: AnyObject {
     var chatStore: ChatStore { get }
     var pushNotificationCoordinator: PushNotificationCoordinator { get }
@@ -37,6 +42,7 @@ final class AppDependencies: ObservableObject {
     let httpRequestDebugStore: HTTPRequestDebugStore
     let clearskyHeartbeat: ClearskyHeartbeatService
     let internalListStore: InternalListStore
+    let aiService: LiveAIService
 
     init() {
         let isUITesting = CommandLine.arguments.contains("--uitesting")
@@ -61,6 +67,7 @@ final class AppDependencies: ObservableObject {
         analyticsStore = AnalyticsStore()
         chatStore = ChatStore(chatService: ChatService(requestExecutor: requestExecutor, sessionService: sessionService))
         internalListStore = InternalListStore()
+        aiService = LiveAIService()
         pushNotificationCoordinator = PushNotificationCoordinator(
             pushService: BlueskyPushNotificationService(requestExecutor: requestExecutor, sessionService: sessionService),
             accountStore: accountStore,
@@ -74,4 +81,5 @@ final class AppDependencies: ObservableObject {
 
 extension AppDependencies: AccountServicing {}
 extension AppDependencies: ModerationServicing {}
+extension AppDependencies: AIServicing {}
 extension AppDependencies: ChatServicesProtocol {}
