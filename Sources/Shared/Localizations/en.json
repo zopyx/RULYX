@@ -982,6 +982,7 @@
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "post.copy": "Copy post to clipboard",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Delete Post",
   "post.delete.confirm": "Delete this post?",
   "post.delete.message": "This will permanently remove the post from Bluesky. This cannot be undone.",

@@ -16,6 +16,7 @@ struct PostRowView: View {
     var onTranslate: (() -> Void)?
     var onDeletePost: (() -> Void)?
     var onEditPost: (() -> Void)?
+    var onReportPost: (() -> Void)?
     var onOpenProfile: ((String) -> Void)?
     var onBlockAllLikers: (() -> Void)?
     var availableLikerTargetLists: [BlueskyList] = []
@@ -306,6 +307,11 @@ struct PostRowView: View {
                     if let onTranslate {
                         Button(action: onTranslate) {
                             Label("post.translate", systemImage: "globe")
+                        }
+                    }
+                    if let onReportPost {
+                        Button(action: onReportPost) {
+                            Label("post.report", systemImage: "exclamationmark.shield")
                         }
                     }
                     if onEditPost != nil || onDeletePost != nil {

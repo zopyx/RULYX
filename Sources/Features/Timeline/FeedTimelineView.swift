@@ -21,6 +21,10 @@ struct FeedTimelineView: View {
     @State private var postToDelete: RichFeedEntry?
     @State private var editPostEntry: RichFeedEntry?
     @State private var profileToShow: BlueskyActor?
+    @State private var postToReport: RichFeedEntry?
+    @State private var reportReason = ModerationReportReasonType.simplifiedDefault
+    @State private var reportEvidence = ""
+    @State private var isSubmittingReport = false
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     var body: some View {
@@ -125,6 +129,28 @@ struct FeedTimelineView: View {
                     .environmentObject(blueskyClient)
                 }
             }
+            .sheet(item: $postToReport) { entry in
+                SimplifiedReportSheet(
+                    title: loc("post.report"),
+                    selectedReason: $reportReason,
+                    evidenceText: $reportEvidence,
+                    isSubmitting: isSubmittingReport,
+                    makeSupportDraft: {
+                        SupportEmailDraft(
+                            subject: "Post Report: \(entry.post.author?.handle ?? "unknown")",
+                            body: reportEvidence
+                        )
+                    },
+                    onCancel: {
+                        postToReport = nil
+                        reportEvidence = ""
+                        reportReason = .simplifiedDefault
+                    },
+                    onSubmit: {
+                        Task { await submitPostReport(entry) }
+                    }
+                )
+            }
             .sheet(item: $profileToShow) { actor in
                 NavigationStack {
                     BlueskyProfileView(
@@ -217,6 +243,7 @@ struct FeedTimelineView: View {
                     onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
                     onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
                     onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
+                    onReportPost: { postToReport = entry },
                     onOpenProfile: { handle in openProfile(handle) }
                 )
                 .contextMenu {
@@ -474,6 +501,29 @@ struct FeedTimelineView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
+    }
+
+    private func submitPostReport(_ entry: RichFeedEntry) async {
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account),
+              let cid = entry.post.cid else { return }
+        isSubmittingReport = true
+        do {
+            try await blueskyClient.reportRecord(
+                uri: entry.post.uri,
+                cid: cid,
+                reason: reportEvidence.isEmpty ? nil : reportEvidence,
+                selectedReason: reportReason,
+                account: account,
+                appPassword: appPassword
+            )
+            postToReport = nil
+            reportEvidence = ""
+            reportReason = .simplifiedDefault
+        } catch {
+            AppLogger.moderation.error("Post report failed: \(error.localizedDescription, privacy: .public)")
+        }
+        isSubmittingReport = false
     }
 }
 
