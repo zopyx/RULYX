@@ -748,6 +748,7 @@
   "chat.edit": "Edit",
   "chat.select_all": "Select All",
   "profile.direct_message": "Direct Message",
+  "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "onboarding.close.label": "Close onboarding",
   "info.github.label": "View on GitHub",
   "info.github.hint": "Opens the project repository on GitHub in your browser",

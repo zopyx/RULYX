@@ -728,6 +728,7 @@ struct BlueskyProfileView: View {
                         }
 
                         if showBetaFeatures {
+                            let isBlockedDM = profile.viewerState?.isBlocking == true || profile.viewerState?.blockingByListName != nil
                             Button {
                                 Task {
                                     chatStore.setAccount(account, appPassword: appPassword)
@@ -748,6 +749,12 @@ struct BlueskyProfileView: View {
                                         .padding(.vertical, 2)
                                         .background(Capsule().fill(.orange))
                                 }
+                            }
+                            .disabled(isBlockedDM)
+                            if isBlockedDM {
+                                Text(loc("profile.dm_blocked_notice"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
                         }
 
