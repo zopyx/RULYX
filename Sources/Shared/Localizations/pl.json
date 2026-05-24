@@ -449,6 +449,7 @@
   "report.option_contact.help": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
   "report.option_contact.title": "Contact Support",
   "report.option_submit.help": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
+  "report.tab_label": "Report Method",
   "report.option_submit.title": "Submit Report",
   "profile.block_all": "Block All Followers (PL)",
   "profile.member_of": "Member of {list} (PL)",
