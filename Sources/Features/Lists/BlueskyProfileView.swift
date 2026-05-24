@@ -47,6 +47,9 @@ struct BlueskyProfileView: View {
     @State private var blockPreviewActors: [BlueskyActor] = []
     @State private var isFetchingBlockPreview = false
     @State private var pendingCreateKind: BlueskyList.Kind?
+    @State private var showCreateInternalList = false
+    @State private var newInternalListName = ""
+    @State private var newInternalListColor = InternalListColor.blue
 
     private var preferredSearchAccount: AppAccount? {
         if let prefID = accountStore.preferredSearchAccountID,
@@ -269,6 +272,46 @@ struct BlueskyProfileView: View {
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             }
+        }
+        .sheet(isPresented: $showCreateInternalList) {
+            NavigationStack {
+                Form {
+                    Section {
+                        TextField(loc("internal.lists.name"), text: $newInternalListName)
+                        Picker(loc("internal.lists.color"), selection: $newInternalListColor) {
+                            ForEach(InternalListColor.allCases, id: \.self) { color in
+                                HStack {
+                                    Circle()
+                                        .fill(color.colorValue)
+                                        .frame(width: 16, height: 16)
+                                    Text(color.rawValue.capitalized)
+                                }
+                                .tag(color)
+                            }
+                        }
+                    }
+                }
+                .navigationTitle(loc("internal.lists.create"))
+                .toolbarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("actions.save") {
+                            internalListStore.addList(name: newInternalListName, color: newInternalListColor)
+                            newInternalListName = ""
+                            newInternalListColor = .blue
+                            showCreateInternalList = false
+                        }
+                        .disabled(newInternalListName.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("actions.cancel") {
+                            newInternalListName = ""
+                            showCreateInternalList = false
+                        }
+                    }
+                }
+            }
+            .presentationDetents([.medium])
         }
         .sheet(isPresented: $showModerationListsHelp) {
             helpSheet(
@@ -629,6 +672,51 @@ struct BlueskyProfileView: View {
                             .disabled(viewModel.isCreatingList)
                         }
                     }
+
+                    Section {
+                        let memberDID = member.actor.did
+                        let handle = member.actor.handle
+                        let name = member.actor.displayName
+                        let avatar = member.actor.avatarURL?.absoluteString
+                        if internalListStore.lists.isEmpty {
+                            Text(loc("internal.list.empty"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach(internalListStore.lists) { list in
+                                let isOnList = internalListStore.isMember(did: memberDID, in: list.id)
+                                Toggle(isOn: Binding(
+                                    get: { isOnList },
+                                    set: { newValue in
+                                        if newValue {
+                                            internalListStore.addMember(did: memberDID, handle: handle, displayName: name, avatarURL: avatar, to: list.id)
+                                        } else {
+                                            internalListStore.removeMember(did: memberDID, from: list.id)
+                                        }
+                                    }
+                                )) {
+                                    HStack(spacing: 8) {
+                                        Circle()
+                                            .fill(list.color.colorValue)
+                                            .frame(width: 10, height: 10)
+                                        Text(list.name)
+                                    }
+                                }
+                            }
+                        }
+                    } header: {
+                        HStack {
+                            Text(loc("internal.profile.section"))
+                            Spacer()
+                            Button {
+                                showCreateInternalList = true
+                            } label: {
+                                Image(systemName: "plus")
+                                    .font(.subheadline.weight(.semibold))
+                                    .accessibilityLabel(loc("internal.lists.create"))
+                            }
+                        }
+                    }
                 }
 
                 if let profileURL = profile.profileURL {
@@ -712,8 +800,6 @@ struct BlueskyProfileView: View {
                 }
 
                 if !isOwnProfile {
-                    internalTagsSection
-
                     Section {
                         Button {
                             viewModel.selectedReportReason = .simplifiedDefault
@@ -1192,45 +1278,6 @@ struct BlueskyProfileView: View {
         }
 
         return "-"
-    }
-
-    private var internalTagsSection: some View {
-        Section {
-            let memberDID = member.actor.did
-            let handle = member.actor.handle
-            let name = member.actor.displayName
-            let avatar = member.actor.avatarURL?.absoluteString
-            ForEach(internalListStore.lists.prefix(2)) { list in
-                let isOnList = internalListStore.isMember(did: memberDID, in: list.id)
-                Button {
-                    if isOnList {
-                        internalListStore.removeMember(did: memberDID, from: list.id)
-                    } else {
-                        internalListStore.addMember(did: memberDID, handle: handle, displayName: name, avatarURL: avatar, to: list.id)
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(list.color.colorValue)
-                            .frame(width: 12, height: 12)
-                        Text(internalTagLabel(list: list, isOnList: isOnList))
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Image(systemName: isOnList ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(list.color.colorValue)
-                    }
-                }
-            }
-        } header: {
-            Text(loc("internal.profile.section"))
-        }
-    }
-
-    private func internalTagLabel(list: InternalList, isOnList: Bool) -> String {
-        if isOnList {
-            return loc("internal.profile.remove_from").replacingOccurrences(of: "{list}", with: list.name)
-        }
-        return loc("internal.profile.add_to").replacingOccurrences(of: "{list}", with: list.name)
     }
 
     private var isOwnProfile: Bool {
