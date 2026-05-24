@@ -67,7 +67,7 @@ struct BlueskyProfileView: View {
 
     var body: some View {
         Group {
-            if let account = preferredSearchAccount,
+            if let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
                 content(account: account, appPassword: appPassword)
@@ -304,6 +304,14 @@ struct BlueskyProfileView: View {
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
+    private var dataAccount: AppAccount? {
+        preferredSearchAccount ?? accountStore.activeAccount
+    }
+
+    private var dataAppPassword: String? {
+        dataAccount.flatMap { accountStore.appPassword(for: $0) }
+    }
+
     private func content(account: AppAccount, appPassword: String) -> some View {
         List {
             if let profile = viewModel.profile {
@@ -913,8 +921,8 @@ struct BlueskyProfileView: View {
                     startLoadTask {
                         await viewModel.load(
                             did: member.actor.did,
-                            account: account,
-                            appPassword: appPassword,
+                            account: dataAccount ?? account,
+                            appPassword: dataAppPassword ?? appPassword,
                             using: blueskyClient
                         )
                     }
@@ -926,8 +934,8 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.load(
                     did: member.actor.did,
-                    account: account,
-                    appPassword: appPassword,
+                    account: dataAccount ?? account,
+                    appPassword: dataAppPassword ?? appPassword,
                     using: blueskyClient
                 )
             }
@@ -936,8 +944,8 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.loadIfNeeded(
                     did: member.actor.did,
-                    account: account,
-                    appPassword: appPassword,
+                    account: dataAccount ?? account,
+                    appPassword: dataAppPassword ?? appPassword,
                     using: blueskyClient
                 )
             }
