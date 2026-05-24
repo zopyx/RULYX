@@ -116,6 +116,7 @@ struct AccountTabView: View {
                     }
 
                     Section {
+                        Color.clear.frame(height: 24).listRowBackground(Color.clear)
                         Menu {
                             ForEach(accountStore.accounts) { account in
                                 Button {
