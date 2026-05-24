@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "通常のリスト",
   "post.copy": "投稿をクリップボードにコピー",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "投稿の削除",
   "post.delete.confirm": "この投稿を削除しますか?",
   "post.delete.message": "これにより、投稿は Bluesky から永久に削除されます。これを元に戻すことはできません。",

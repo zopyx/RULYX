@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Listas regulares",
   "post.copy": "Copiar publicación al portapapeles",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Eliminar publicación",
   "post.delete.confirm": "¿Eliminar esta publicación?",
   "post.delete.message": "Esto eliminará permanentemente la publicación de Bluesky. Esto no se puede deshacer.",

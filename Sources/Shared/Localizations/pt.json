@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Listas regulares",
   "post.copy": "Copiar postagem para a área de transferência",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Excluir postagem",
   "post.delete.confirm": "Excluir esta postagem?",
   "post.delete.message": "Isso removerá permanentemente a postagem do Bluesky. Isto não pode ser desfeito.",

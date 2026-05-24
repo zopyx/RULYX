@@ -1046,6 +1046,7 @@
   "lists.regular_lists": "القوائم العادية",
   "post.copy": "نسخ المنشور إلى الحافظة",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "حذف المشاركة",
   "post.delete.confirm": "هل تريد حذف هذه المشاركة؟",
   "post.delete.message": "سيؤدي هذا إلى إزالة المنشور نهائيًا من Bluesky. لا يمكن التراجع عن هذا.",
