@@ -19,6 +19,7 @@ struct ListsView: View {
     @State private var showModerationListsHelp = false
     @State private var showListsHelp = false
     @State private var showAdvancedHelp = false
+    @State private var showInternalListsHelp = false
     @State private var internalListName = ""
     @State private var internalListColor = InternalListColor.blue
 
@@ -227,6 +228,10 @@ struct ListsView: View {
                         } header: {
                             HStack(spacing: 4) {
                                 Text(loc("internal.lists.section"))
+                                HelpInfoButton(
+                                    action: { showInternalListsHelp = true },
+                                    accessibilityLabel: loc("internal.lists.section")
+                                )
                                 Spacer()
                                 Button {
                                     presentationState.isShowingCreateInternalList = true
@@ -394,6 +399,12 @@ struct ListsView: View {
                 helpSheet(
                     title: loc("lists.lists"),
                     text: loc("lists.lists.help")
+                )
+            }
+            .sheet(isPresented: $showInternalListsHelp) {
+                helpSheet(
+                    title: loc("internal.lists.section"),
+                    text: loc("internal.lists.help")
                 )
             }
             .sheet(isPresented: $showAdvancedHelp) {

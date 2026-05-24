@@ -786,6 +786,46 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    func reportRecord(
+        uri: String,
+        cid: String,
+        reason: String?,
+        selectedReason: ModerationReportReasonType? = nil,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws {
+        let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = CreateModerationReportRequest(
+                reasonType: (selectedReason ?? ModerationReportReasonType.simplifiedDefault).rawValue,
+                reason: reason,
+                subject: ModerationReportSubject(did: nil, uri: uri, cid: cid),
+                modTool: ModerationReportTool(
+                    name: Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "RULYX",
+                    meta: nil
+                )
+            )
+            let url = authSession.pdsURL.appendingPathComponent("xrpc/com.atproto.moderation.createReport")
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
+            request.setValue("\(Self.bskyLabelerDID)#atproto_labeler", forHTTPHeaderField: "atproto-proxy")
+            request.httpBody = try JSONEncoder().encode(body)
+            let (data, httpResponse) = try await httpClient.data(for: request, source: "Moderation Report")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data) {
+                    throw BlueskyAPIError.server(errorPayload.message ?? errorPayload.error ?? "Report failed.")
+                }
+                throw BlueskyAPIError.invalidResponse
+            }
+            return try JSONDecoder().decode(CreateModerationReportResponse.self, from: data)
+        }
+    }
+
     func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> BlueskyProfile {
         let response: ProfileViewDetailed = try await sessionService.performAuthenticatedRequest(
             account: account,
