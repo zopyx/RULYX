@@ -77,18 +77,22 @@ final class BlueskyProfileViewModel: ObservableObject {
 
     func loadIfNeeded(
         did actorDID: String,
-        account: AppAccount,
-        appPassword: String,
+        viewerAccount: AppAccount,
+        viewerPassword: String,
+        dataAccount: AppAccount,
+        dataPassword: String,
         using client: LiveBlueskyClient
     ) async {
         guard !hasLoadedOnce else { return }
-        await load(did: actorDID, account: account, appPassword: appPassword, using: client)
+        await load(did: actorDID, account: viewerAccount, viewerPassword: viewerPassword, dataAccount: dataAccount, dataPassword: dataPassword, using: client)
     }
 
     func load(
         did actorDID: String,
-        account: AppAccount,
-        appPassword: String,
+        account viewerAccount: AppAccount,
+        viewerPassword: String,
+        dataAccount: AppAccount,
+        dataPassword: String,
         using client: LiveBlueskyClient
     ) async {
         isLoading = true
@@ -99,8 +103,8 @@ final class BlueskyProfileViewModel: ObservableObject {
         do {
             inspection = try await client.inspectProfile(
                 query: actorDID,
-                account: account,
-                appPassword: appPassword
+                account: viewerAccount,
+                appPassword: viewerPassword
             )
         } catch {
             hasLoadedOnce = false
@@ -117,14 +121,14 @@ final class BlueskyProfileViewModel: ObservableObject {
         guard let profile else { return }
 
         async let auditLog = client.fetchPLCAuditLog(did: profile.did)
-        await countMedia(for: profile.did, account: account, appPassword: appPassword, using: client)
+        await countMedia(for: profile.did, account: dataAccount, appPassword: dataPassword, using: client)
 
         if let log = try? await auditLog {
             handleHistory = parseHandleChanges(from: log, currentHandle: profile.handle)
         }
 
         if isFetchingMemberships {
-            let memberships = await client.fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
+            let memberships = await client.fetchListMemberships(for: profile.did, account: dataAccount, appPassword: dataPassword)
             if !memberships.isEmpty {
                 inspection = ProfileInspection(profile: profile, listMemberships: memberships, starterPackMemberships: inspection?.starterPackMemberships ?? [])
             }
@@ -196,7 +200,9 @@ final class BlueskyProfileViewModel: ObservableObject {
             await load(
                 did: profile.did,
                 account: account,
-                appPassword: appPassword,
+                viewerPassword: appPassword,
+                dataAccount: account,
+                dataPassword: appPassword,
                 using: client
             )
         } catch {
@@ -263,7 +269,9 @@ final class BlueskyProfileViewModel: ObservableObject {
             await load(
                 did: profile.did,
                 account: account,
-                appPassword: appPassword,
+                viewerPassword: appPassword,
+                dataAccount: account,
+                dataPassword: appPassword,
                 using: client
             )
         } catch {
@@ -371,7 +379,9 @@ final class BlueskyProfileViewModel: ObservableObject {
             await load(
                 did: profile.did,
                 account: account,
-                appPassword: appPassword,
+                viewerPassword: appPassword,
+                dataAccount: account,
+                dataPassword: appPassword,
                 using: client
             )
         } catch {
@@ -468,7 +478,9 @@ final class BlueskyProfileViewModel: ObservableObject {
             await load(
                 did: profile.did,
                 account: account,
-                appPassword: appPassword,
+                viewerPassword: appPassword,
+                dataAccount: account,
+                dataPassword: appPassword,
                 using: client
             )
         } catch {
@@ -510,7 +522,9 @@ final class BlueskyProfileViewModel: ObservableObject {
             await load(
                 did: profile.did,
                 account: account,
-                appPassword: appPassword,
+                viewerPassword: appPassword,
+                dataAccount: account,
+                dataPassword: appPassword,
                 using: client
             )
         } catch {
