@@ -438,6 +438,7 @@
   "profile.report.hint": "이 계정에 대한 조정 보고서를 제출합니다.",
   "profile.report.sheet_title": "계정 신고",
   "profile.report.reason": "이유",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "증거",
   "profile.report.evidence_placeholder": "문제 설명(선택사항)",
   "profile.report.submit": "보고서 제출",

@@ -438,6 +438,7 @@
   "profile.report.hint": "ส่งรายงานการตรวจสอบสำหรับบัญชีนี้",
   "profile.report.sheet_title": "รายงานบัญชี",
   "profile.report.reason": "เหตุผล",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "หลักฐาน",
   "profile.report.evidence_placeholder": "อธิบายปัญหา (ไม่บังคับ)",
   "profile.report.submit": "ส่งรายงาน",

@@ -438,6 +438,7 @@
   "profile.report.hint": "Bu hesap için bir denetleme raporu gönderir",
   "profile.report.sheet_title": "Hesabı Bildir",
   "profile.report.reason": "Sebep",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Kanıt",
   "profile.report.evidence_placeholder": "Sorunu açıklayın (isteğe bağlı)",
   "profile.report.submit": "Raporu Gönder",
