@@ -16,11 +16,23 @@ struct AccountTabView: View {
         NavigationStack {
             List {
                 if accountStore.accounts.isEmpty {
-                    ContentUnavailableView(
-                        loc("account.no_accounts.title"),
-                        systemImage: "person.crop.circle.badge.plus",
-                        description: Text(loc: "account.no_accounts.desc")
-                    )
+                    VStack(spacing: 16) {
+                        ContentUnavailableView(
+                            loc("account.no_accounts.title"),
+                            systemImage: "person.crop.circle.badge.plus",
+                            description: Text(loc: "account.no_accounts.desc")
+                        )
+                        Button {
+                            isPresentingAddAccount = true
+                        } label: {
+                            Label(loc("account.manage.add"), systemImage: "plus")
+                                .frame(maxWidth: 200)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                    }
+                    .listRowBackground(Color.clear)
+                    .frame(maxWidth: .infinity)
                 } else {
                     Section {
                         ForEach(accountStore.accounts) { account in
