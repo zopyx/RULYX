@@ -162,3 +162,59 @@ Row 2: @handle
 - **Deletion handling**: When the preferred account is removed, `AccountStore.removeAccount()` resets it to `accounts.first?.id`
 - **Search views** (`CustomSearchView`, `MentionsSearchView`): On first appearance, read `preferredSearchAccountID` and set local `searchAccount` state. No inline account switching UI — the search account is purely driven by the global preference set in the Accounts tab
 - **Account row in search forms**: Displays the preferred search account's **avatar** and display name as a static info row (not interactive), showing which account is being used for searches
+
+## Account Context — Which Account for Which Operation
+
+The app distinguishes between **read/search** operations (use `preferredSearchAccount`) and **write/mutation** operations (use `activeAccount`). This separation ensures data discovery uses the configured search perspective while moderation actions always execute as the currently active account.
+
+### Profile Detail View (`BlueskyProfileView`)
+
+| Category | Operation | Account |
+|----------|-----------|---------|
+| **Read** | Viewer state (blocking/muting badges) | `activeAccount` (the acting user's relationship with the profile) |
+| **Read** | Profile inspection | `viewerAccount` (`activeAccount`) |
+| **Read** | List memberships (which lists contain this profile) | `dataAccount` (`preferredSearchAccount` → `activeAccount`) |
+| **Read** | Owned lists (lists the profile created) | `searchAccount` (`preferredSearchAccount`) |
+| **Read** | Subscribed moderation lists | `searchAccount` (`preferredSearchAccount`) |
+| **Read** | Media counts | `dataAccount` (`preferredSearchAccount`) |
+| **Read** | ClearSky lists | No account (public API) |
+| **Read** | Handle audit log | No account (public API) |
+| **Write** | Toggle block / mute / follow | `activeAccount` |
+| **Write** | Toggle list membership | `activeAccount` |
+| **Write** | Create list + add actor | `activeAccount` |
+| **Write** | Block back | `activeAccount` |
+
+**How it works in code:**
+- `content(account:appPassword:)` receives `activeAccount` → all mutation closures inside use `account`
+- `dataAccount = preferredSearchAccount ?? activeAccount` is used for data-loading calls (`load`, `loadIfNeeded`)
+- `load(did:account:viewerPassword:dataAccount:dataPassword:)` splits viewer state (active) from data (preferred search)
+- `.task(id:)` sets `searchAccount = preferredSearchAccount` for owned/subscribed list fetches
+
+### Search Views (`CustomSearchView`, `MentionsSearchView`, `MediaBrowserView`)
+
+| Operation | Account |
+|-----------|---------|
+| Search queries | `preferredSearchAccount` (falls back to `activeAccount`) |
+| Media fetching | `preferredSearchAccount` (falls back to `activeAccount`) |
+
+**How it works in code:**
+- On first appear, reads `accountStore.preferredSearchAccountID` and sets local `searchAccount`
+- No inline account switching — preference set globally in Accounts tab
+
+### Compose / Post Views (`ComposePostView`, `FeedTimelineView`)
+
+| Operation | Account |
+|-----------|---------|
+| Creating posts | `activeAccount` |
+| Editing posts (delete + recreate) | `activeAccount` |
+| Reply / quote | `activeAccount` |
+
+### Account Manager (`AccountTabView`)
+
+| Operation | Account |
+|-----------|---------|
+| Switching accounts | `activeAccount` (set by switch) |
+| Adding accounts | `activeAccount` (newly added) |
+| Setting preferred search | Account selected in `Menu` |
+
+**Empty state rule:** When `accountStore.accounts.isEmpty`, the view MUST show a visible "Add Account" button (`.buttonStyle(.borderedProminent)`). A `ContentUnavailableView` alone is insufficient — users need a tappable action to add the first account.
