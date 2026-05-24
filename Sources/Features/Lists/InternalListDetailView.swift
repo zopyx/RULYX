@@ -42,30 +42,45 @@ struct InternalListDetailView: View {
                     )
                 } else {
                     ForEach(filteredMembers) { member in
-                        HStack(spacing: 10) {
-                            if let avatar = member.avatarURL, let url = URL(string: avatar) {
-                                ThumbnailImageView(url: url, maxPixelSize: 40) {
-                                    Circle().fill(.quaternary)
-                                }
-                                .scaledToFill()
-                                .frame(width: 36, height: 36)
-                                .clipShape(Circle())
-                            } else {
-                                Circle()
-                                    .fill(list.color.colorValue.opacity(0.3))
-                                    .frame(width: 36, height: 36)
-                                    .overlay {
-                                        Text(member.displayName?.prefix(1).uppercased() ?? member.handle.prefix(1).uppercased())
-                                            .font(.caption.weight(.semibold))
-                                            .foregroundStyle(list.color.colorValue)
+                        NavigationLink {
+                            BlueskyProfileView(
+                                member: BlueskyListMember(
+                                    recordURI: "internal://\(list.id)/\(member.id)",
+                                    actor: BlueskyActor(
+                                        did: member.id,
+                                        handle: member.handle,
+                                        displayName: member.displayName,
+                                        avatarURL: member.avatarURL.flatMap(URL.init)
+                                    )
+                                ),
+                                list: nil
+                            )
+                        } label: {
+                            HStack(spacing: 10) {
+                                if let avatar = member.avatarURL, let url = URL(string: avatar) {
+                                    ThumbnailImageView(url: url, maxPixelSize: 40) {
+                                        Circle().fill(.quaternary)
                                     }
-                            }
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(member.displayName ?? member.handle)
-                                    .font(.subheadline)
-                                Text(member.handle)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .scaledToFill()
+                                    .frame(width: 36, height: 36)
+                                    .clipShape(Circle())
+                                } else {
+                                    Circle()
+                                        .fill(list.color.colorValue.opacity(0.3))
+                                        .frame(width: 36, height: 36)
+                                        .overlay {
+                                            Text(member.displayName?.prefix(1).uppercased() ?? member.handle.prefix(1).uppercased())
+                                                .font(.caption.weight(.semibold))
+                                                .foregroundStyle(list.color.colorValue)
+                                        }
+                                }
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(member.displayName ?? member.handle)
+                                        .font(.subheadline)
+                                    Text(member.handle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .swipeActions(edge: .trailing) {
