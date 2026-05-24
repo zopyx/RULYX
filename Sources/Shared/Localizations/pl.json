@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Regularne listy",
   "post.copy": "Skopiuj post do schowka",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Usuń post",
   "post.delete.confirm": "Usunąć ten post?",
   "post.delete.message": "Spowoduje to trwałe usunięcie posta z Bluesky. Tego nie można cofnąć.",

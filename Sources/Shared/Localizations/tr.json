@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Düzenli Listeler",
   "post.copy": "Gönderiyi panoya kopyala",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Gönderiyi Sil",
   "post.delete.confirm": "Bu yayın silinsin mi?",
   "post.delete.message": "Bu, gönderiyi Bluesky'den kalıcı olarak kaldıracaktır. Bu geri alınamaz.",

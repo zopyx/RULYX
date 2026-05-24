@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Elenchi regolari",
   "post.copy": "Copia il post negli appunti",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Elimina messaggio",
   "post.delete.confirm": "Eliminare questo post?",
   "post.delete.message": "Ciò rimuoverà permanentemente il post da Bluesky. Questa operazione non può essere annullata.",

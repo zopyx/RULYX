@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Listes régulières",
   "post.copy": "Copier le message dans le presse-papier",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Supprimer le message",
   "post.delete.confirm": "Supprimer ce message ?",
   "post.delete.message": "Cela supprimera définitivement la publication de Bluesky. Cela ne peut pas être annulé.",

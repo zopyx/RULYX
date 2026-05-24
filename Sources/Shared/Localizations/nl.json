@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Regelmatige lijsten",
   "post.copy": "Kopieer bericht naar klembord",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Bericht verwijderen",
   "post.delete.confirm": "Dit bericht verwijderen?",
   "post.delete.message": "Hierdoor wordt het bericht definitief van Bluesky verwijderd. Dit kan niet ongedaan worden gemaakt.",

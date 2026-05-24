@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "常规列表",
   "post.copy": "将帖子复制到剪贴板",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "删除帖子",
   "post.delete.confirm": "删除这个帖子吗？",
   "post.delete.message": "这将从 Bluesky 中永久删除该帖子。此操作无法撤消。",

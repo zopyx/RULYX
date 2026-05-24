@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "รายการปกติ",
   "post.copy": "คัดลอกโพสต์ไปยังคลิปบอร์ด",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "ลบโพสต์",
   "post.delete.confirm": "ลบโพสต์นี้ใช่ไหม",
   "post.delete.message": "การดำเนินการนี้จะลบโพสต์ออกจาก Bluesky อย่างถาวร สิ่งนี้ไม่สามารถยกเลิกได้",

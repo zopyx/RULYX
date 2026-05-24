@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Danh sách thông thường",
   "post.copy": "Sao chép bài viết vào clipboard",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Xóa bài đăng",
   "post.delete.confirm": "Xóa bài đăng này?",
   "post.delete.message": "Điều này sẽ xóa vĩnh viễn bài đăng khỏi Bluesky. Điều này không thể hoàn tác được.",

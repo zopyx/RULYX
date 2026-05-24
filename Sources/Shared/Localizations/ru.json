@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "Обычные списки",
   "post.copy": "Скопировать сообщение в буфер обмена",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Удалить сообщение",
   "post.delete.confirm": "Удалить этот пост?",
   "post.delete.message": "Это приведет к удалению публикации из Bluesky. Это невозможно отменить.",

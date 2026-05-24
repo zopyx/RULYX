@@ -1046,6 +1046,7 @@
   "lists.regular_lists": "Regelmäßige Listen",
   "post.copy": "Beitrag in die Zwischenablage kopieren",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "Beitrag löschen",
   "post.delete.confirm": "Diesen Beitrag löschen?",
   "post.delete.message": "Dadurch wird der Beitrag dauerhaft aus Bluesky entfernt.Dies kann nicht rückgängig gemacht werden.",

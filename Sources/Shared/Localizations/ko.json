@@ -1047,6 +1047,7 @@
   "lists.regular_lists": "일반 목록",
   "post.copy": "게시물을 클립보드에 복사",
   "post.edit": "Edit Post",
+  "post.report": "Report Post",
   "post.delete": "게시물 삭제",
   "post.delete.confirm": "이 게시물을 삭제하시겠습니까?",
   "post.delete.message": "그러면 Bluesky에서 게시물이 영구적으로 제거됩니다. 이 작업은 취소할 수 없습니다.",
