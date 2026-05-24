@@ -438,6 +438,7 @@
   "profile.report.hint": "Przesyła raport moderacji dla tego konta",
   "profile.report.sheet_title": "Zgłoś konto",
   "profile.report.reason": "Powód",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Dowód",
   "profile.report.evidence_placeholder": "Opisz problem (opcjonalnie)",
   "profile.report.submit": "Prześlij raport",

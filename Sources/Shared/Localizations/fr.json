@@ -438,6 +438,7 @@
   "profile.report.hint": "Soumet un rapport de modération pour ce compte",
   "profile.report.sheet_title": "Signaler le compte",
   "profile.report.reason": "Raison",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Preuve",
   "profile.report.evidence_placeholder": "Décrivez le problème (facultatif)",
   "profile.report.submit": "Soumettre le rapport",

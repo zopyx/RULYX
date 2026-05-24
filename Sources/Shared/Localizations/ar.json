@@ -437,6 +437,7 @@
   "profile.report.hint": "إرسال تقرير الإشراف لهذا الحساب",
   "profile.report.sheet_title": "الإبلاغ عن الحساب",
   "profile.report.reason": "سبب",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "شهادة",
   "profile.report.evidence_placeholder": "وصف المشكلة (اختياري)",
   "profile.report.submit": "إرسال التقرير",

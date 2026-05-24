@@ -438,6 +438,7 @@
   "profile.report.hint": "Envia um relatório de moderação para esta conta",
   "profile.report.sheet_title": "Conta de relatório",
   "profile.report.reason": "Razão",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Evidência",
   "profile.report.evidence_placeholder": "Descreva o problema (opcional)",
   "profile.report.submit": "Enviar relatório",

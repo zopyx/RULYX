@@ -438,6 +438,7 @@
   "profile.report.hint": "Gửi báo cáo kiểm duyệt cho tài khoản này",
   "profile.report.sheet_title": "Báo cáo tài khoản",
   "profile.report.reason": "Lý do",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Chứng cớ",
   "profile.report.evidence_placeholder": "Mô tả vấn đề (tùy chọn)",
   "profile.report.submit": "Gửi báo cáo",

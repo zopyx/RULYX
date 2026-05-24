@@ -438,6 +438,7 @@
   "profile.report.hint": "このアカウントのモデレーションレポートを送信します",
   "profile.report.sheet_title": "アカウントを報告する",
   "profile.report.reason": "理由",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "証拠",
   "profile.report.evidence_placeholder": "問題の説明 (オプション)",
   "profile.report.submit": "レポートの送信",

@@ -438,6 +438,7 @@
   "profile.report.hint": "Отправляет отчет о модерации для этого аккаунта",
   "profile.report.sheet_title": "Сообщить об аккаунте",
   "profile.report.reason": "Причина",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Доказательство",
   "profile.report.evidence_placeholder": "Опишите проблему (необязательно)",
   "profile.report.submit": "Отправить отчет",

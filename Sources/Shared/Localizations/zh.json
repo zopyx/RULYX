@@ -438,6 +438,7 @@
   "profile.report.hint": "提交此帐户的审核报告",
   "profile.report.sheet_title": "举报账户",
   "profile.report.reason": "原因",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "证据",
   "profile.report.evidence_placeholder": "描述问题（可选）",
   "profile.report.submit": "提交报告",

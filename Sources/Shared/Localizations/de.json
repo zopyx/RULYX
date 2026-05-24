@@ -438,6 +438,7 @@
   "profile.report.hint": "Sendet einen Moderationsbericht für dieses Konto",
   "profile.report.sheet_title": "Konto melden",
   "profile.report.reason": "Grund",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Beweis",
   "profile.report.evidence_placeholder": "Beschreiben Sie das Problem (optional)",
   "profile.report.submit": "Bericht einreichen",
