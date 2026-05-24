@@ -921,8 +921,10 @@ struct BlueskyProfileView: View {
                     startLoadTask {
                         await viewModel.load(
                             did: member.actor.did,
-                            account: dataAccount ?? account,
-                            appPassword: dataAppPassword ?? appPassword,
+                            account: account,
+                            viewerPassword: appPassword,
+                            dataAccount: dataAccount ?? account,
+                            dataPassword: dataAppPassword ?? appPassword,
                             using: blueskyClient
                         )
                     }
@@ -934,8 +936,10 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.load(
                     did: member.actor.did,
-                    account: dataAccount ?? account,
-                    appPassword: dataAppPassword ?? appPassword,
+                    account: account,
+                    viewerPassword: appPassword,
+                    dataAccount: dataAccount ?? account,
+                    dataPassword: dataAppPassword ?? appPassword,
                     using: blueskyClient
                 )
             }
@@ -944,8 +948,10 @@ struct BlueskyProfileView: View {
             await runLoad {
                 await viewModel.loadIfNeeded(
                     did: member.actor.did,
-                    account: dataAccount ?? account,
-                    appPassword: dataAppPassword ?? appPassword,
+                    viewerAccount: account,
+                    viewerPassword: appPassword,
+                    dataAccount: dataAccount ?? account,
+                    dataPassword: dataAppPassword ?? appPassword,
                     using: blueskyClient
                 )
             }
