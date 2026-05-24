@@ -11,6 +11,10 @@ struct AccountTabView: View {
     @State private var editMode: EditMode = .inactive
     @State private var switchingAccountID: AppAccount.ID?
     @State private var showPreferredSearchInfo = false
+    @State private var showImportPicker = false
+    @State private var exportFileURL: URL?
+    @State private var importError: String?
+    @State private var importSuccess: String?
 
     var body: some View {
         NavigationStack {
@@ -79,6 +83,22 @@ struct AccountTabView: View {
                                 Image(systemName: "plus")
                             }
                             .accessibilityLabel(loc("account.manage.add"))
+                            Menu {
+                                Button {
+                                    Task { await exportAccounts() }
+                                } label: {
+                                    Label(loc("account.export"), systemImage: "square.and.arrow.up")
+                                }
+                                Button {
+                                    showImportPicker = true
+                                } label: {
+                                    Label(loc("account.import"), systemImage: "square.and.arrow.down")
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis.circle")
+                                    .font(.body.weight(.medium))
+                            }
+                            .accessibilityLabel(loc("account.manage.more"))
                         }
                     }
 
@@ -201,6 +221,101 @@ struct AccountTabView: View {
                 }
                 .presentationDetents([.medium])
             }
+            .fileImporter(
+                isPresented: $showImportPicker,
+                allowedContentTypes: [.json]
+            ) { result in
+                handleImport(result)
+            }
+            .sheet(isPresented: .init(get: { exportFileURL != nil }, set: { if !$0 { exportFileURL = nil } })) {
+                if let url = exportFileURL {
+                    ShareSheet(activityItems: [url])
+                }
+            }
+            .alert(loc("account.import.error"), isPresented: .constant(importError != nil)) {
+                Button("actions.ok") { importError = nil }
+            } message: {
+                Text(importError ?? "")
+            }
+            .alert(loc("account.import.success"), isPresented: .constant(importSuccess != nil)) {
+                Button("actions.ok") { importSuccess = nil }
+            } message: {
+                Text(importSuccess ?? "")
+            }
+        }
+    }
+
+    private func exportAccounts() async {
+        var entries: [[String: String]] = []
+        for account in accountStore.accounts {
+            let password = accountStore.appPassword(for: account) ?? ""
+            var entry: [String: String] = [
+                "handle": account.handle,
+                "displayName": account.displayName,
+                "appPassword": password,
+            ]
+            if let entryway = account.entrywayURL?.host {
+                entry["entrywayURL"] = entryway
+            }
+            entries.append(entry)
+        }
+
+        do {
+            let data = try JSONSerialization.data(withJSONObject: entries, options: [.prettyPrinted, .sortedKeys])
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("bluesky_accounts.json")
+            try data.write(to: tempURL, options: .atomic)
+            exportFileURL = tempURL
+        } catch {
+            importError = error.localizedDescription
+        }
+    }
+
+    private func handleImport(_ result: Result<URL, Error>) {
+        switch result {
+        case let .success(url):
+            do {
+                guard url.startAccessingSecurityScopedResource() else {
+                    importError = loc("account.import.access_error")
+                    return
+                }
+                defer { url.stopAccessingSecurityScopedResource() }
+                let data = try Data(contentsOf: url)
+                guard let entries = try JSONSerialization.jsonObject(with: data) as? [[String: String]] else {
+                    importError = loc("account.import.invalid_format")
+                    return
+                }
+                Task {
+                    var added = 0
+                    var skipped = 0
+                    for entry in entries {
+                        guard let handle = entry["handle"], !handle.isEmpty,
+                              let password = entry["appPassword"], !password.isEmpty
+                        else {
+                            skipped += 1
+                            continue
+                        }
+                        let entrywayHost = entry["entrywayURL"]
+                        let entrywayURL = entrywayHost.flatMap { URL(string: "https://\($0)") }
+                        let success = await accountStore.addAccount(
+                            handle: handle,
+                            appPassword: password,
+                            entrywayURL: entrywayURL,
+                            client: blueskyClient
+                        )
+                        if success { added += 1 } else { skipped += 1 }
+                    }
+                    if added > 0 {
+                        importSuccess = loc("account.import.count").replacingOccurrences(of: "{n}", with: "\(added)")
+                    }
+                    if skipped > 0 {
+                        importError = loc("account.import.skipped").replacingOccurrences(of: "{n}", with: "\(skipped)")
+                    }
+                }
+            } catch {
+                importError = error.localizedDescription
+            }
+        case let .failure(error):
+            importError = error.localizedDescription
         }
     }
 
@@ -231,6 +346,16 @@ struct AccountTabView: View {
             switchingAccountID = nil
         }
     }
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context _: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_: UIActivityViewController, context _: Context) {}
 }
 
 #Preview {
