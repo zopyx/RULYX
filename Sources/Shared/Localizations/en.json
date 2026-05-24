@@ -425,6 +425,7 @@
   "profile.report.hint": "Submits a moderation report for this account",
   "profile.report.sheet_title": "Report Account",
   "profile.report.reason": "Reason",
+  "profile.report.reason_explanation": "Select a reason for this report. This helps moderators prioritize and process your report.",
   "profile.report.evidence": "Evidence",
   "profile.report.evidence_placeholder": "Describe the issue (optional)",
   "profile.report.submit": "Submit Report",

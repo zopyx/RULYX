@@ -260,11 +260,30 @@ struct SimplifiedReportSheet: View {
     @State private var isShowingMailUnavailableAlert = false
     @State private var showSubmitHelp = false
     @State private var showContactHelp = false
+    @State private var reportTab = ReportTab.submit
+
+    private enum ReportTab: String, CaseIterable {
+        case submit
+        case contact
+    }
 
     var body: some View {
         NavigationStack {
             Form {
+                Picker(selection: $reportTab) {
+                    Text(loc("report.option_submit.title")).tag(ReportTab.submit)
+                    Text(loc("report.option_contact.title")).tag(ReportTab.contact)
+                } label: {
+                    Text(loc("report.tab_label"))
+                }
+                .pickerStyle(.segmented)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+
                 Section {
+                    Text(loc("profile.report.reason_explanation"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Picker("profile.report.reason", selection: $selectedReason) {
                         ForEach(ModerationReportReasonType.allCases) { reason in
                             Text(reason.localizedTitle)
@@ -272,105 +291,92 @@ struct SimplifiedReportSheet: View {
                         }
                     }
                     .pickerStyle(.navigationLink)
-
-                    ZStack(alignment: .topLeading) {
-                        if evidenceText.isEmpty {
-                            Text(loc: "profile.report.evidence_placeholder")
-                                .foregroundStyle(.tertiary)
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 8)
-                        }
-                        TextEditor(text: $evidenceText)
-                            .frame(minHeight: 100)
-                            .foregroundStyle(.primary)
-                    }
-
-                    Button(action: onSubmit) {
-                        HStack {
-                            Spacer()
-                            if isSubmitting {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text(loc: "profile.report.submit")
-                                    .fontWeight(.semibold)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .disabled(isSubmitting)
-                    .listRowBackground(isSubmitting ? Color.gray : Color.red)
-                    .foregroundStyle(.white)
-                } header: {
-                    HStack(spacing: 4) {
-                        Text(loc: "report.option_submit.title")
-                        HelpInfoButton(
-                            action: { showSubmitHelp = true },
-                            accessibilityLabel: loc("report.option_submit.title")
-                        )
-                    }
                 }
 
-                Section {
-                    PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 5, matching: .images) {
-                        Label("report.support.attachment.add", systemImage: "paperclip")
+                if reportTab == .submit {
+                    Section {
+                        ZStack(alignment: .topLeading) {
+                            if evidenceText.isEmpty {
+                                Text(loc: "profile.report.evidence_placeholder")
+                                    .foregroundStyle(.tertiary)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 8)
+                            }
+                            TextEditor(text: $evidenceText)
+                                .frame(minHeight: 100)
+                                .foregroundStyle(.primary)
+                        }
+
+                        Button(action: onSubmit) {
+                            HStack {
+                                Spacer()
+                                if isSubmitting {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Text(loc: "profile.report.submit")
+                                        .fontWeight(.semibold)
+                                }
+                                Spacer()
+                            }
+                        }
+                        .disabled(isSubmitting)
+                        .listRowBackground(isSubmitting ? Color.gray : Color.red)
+                        .foregroundStyle(.white)
                     }
+                } else {
+                    Section {
+                        PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 5, matching: .images) {
+                            Label("report.support.attachment.add", systemImage: "paperclip")
+                        }
 
-                    if !supportImages.isEmpty {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 8) {
-                            ForEach(supportImages.indices, id: \.self) { index in
-                                Image(uiImage: supportImages[index])
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 80, height: 80)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                        if !supportImages.isEmpty {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 8) {
+                                ForEach(supportImages.indices, id: \.self) { index in
+                                    Image(uiImage: supportImages[index])
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                                    .overlay(alignment: .topTrailing) {
-                                        Button {
-                                            supportImages.remove(at: index)
-                                        } label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .font(.caption)
-                                                .foregroundStyle(.red)
-                                                .background(Circle().fill(.white.opacity(0.9)))
+                                        .overlay(alignment: .topTrailing) {
+                                            Button {
+                                                supportImages.remove(at: index)
+                                            } label: {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .font(.caption)
+                                                    .foregroundStyle(.red)
+                                                    .background(Circle().fill(.white.opacity(0.9)))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .padding(2)
                                         }
-                                        .buttonStyle(.plain)
-                                        .padding(2)
-                                    }
+                                }
+                            }
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                        }
+                    }
+
+                    Section {
+                        Button {
+                            guard MFMailComposeViewController.canSendMail() else {
+                                isShowingMailUnavailableAlert = true
+                                return
+                            }
+                            mailDraft = makeSupportDraft()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Label("report.support.email", systemImage: "envelope")
+                                    .fontWeight(.semibold)
+                                Spacer()
                             }
                         }
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
+                        .disabled(isSubmitting)
+                        .listRowBackground(isSubmitting ? Color.gray : Color.red)
+                        .foregroundStyle(.white)
                     }
-
-                } header: {
-                    HStack(spacing: 4) {
-                        Text(loc: "report.option_contact.title")
-                        HelpInfoButton(
-                            action: { showContactHelp = true },
-                            accessibilityLabel: loc("report.option_contact.title")
-                        )
-                    }
-                }
-
-                Section {
-                    Button {
-                        guard MFMailComposeViewController.canSendMail() else {
-                            isShowingMailUnavailableAlert = true
-                            return
-                        }
-                        mailDraft = makeSupportDraft()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Label("report.support.email", systemImage: "envelope")
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-                    }
-                    .disabled(isSubmitting)
-                    .listRowBackground(isSubmitting ? Color.gray : Color.red)
-                    .foregroundStyle(.white)
                 }
             }
             .navigationTitle(title)
