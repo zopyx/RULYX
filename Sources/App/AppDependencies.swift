@@ -36,6 +36,7 @@ final class AppDependencies: ObservableObject {
     let pushNotificationCoordinator: PushNotificationCoordinator
     let httpRequestDebugStore: HTTPRequestDebugStore
     let clearskyHeartbeat: ClearskyHeartbeatService
+    let internalListStore: InternalListStore
 
     init() {
         let isUITesting = CommandLine.arguments.contains("--uitesting")
@@ -59,6 +60,7 @@ final class AppDependencies: ObservableObject {
         mutedWordsStore = MutedWordsStore()
         analyticsStore = AnalyticsStore()
         chatStore = ChatStore(chatService: ChatService(requestExecutor: requestExecutor, sessionService: sessionService))
+        internalListStore = InternalListStore()
         pushNotificationCoordinator = PushNotificationCoordinator(
             pushService: BlueskyPushNotificationService(requestExecutor: requestExecutor, sessionService: sessionService),
             accountStore: accountStore,

@@ -10,6 +10,7 @@ struct BlueskyProfileView: View {
     @EnvironmentObject private var chatStore: ChatStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
+    @EnvironmentObject var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = BlueskyProfileViewModel()
     @AppStorage("showBetaFeatures") private var showBetaFeatures = false
@@ -711,13 +712,15 @@ struct BlueskyProfileView: View {
                 }
 
                 if !isOwnProfile {
+                    internalTagsSection
+
                     Section {
                         Button {
                             viewModel.selectedReportReason = .simplifiedDefault
                             reportReasonText = ""
                             viewModel.showReportSheet = true
                         } label: {
-                            Label { Text(loc: "profile.report") } icon: { Image(systemName: "exclamationmark.shield") }
+                            Label { Text(loc("profile.report")) } icon: { Image(systemName: "exclamationmark.shield") }
                         }
                         .disabled(viewModel.isReporting)
                         .accessibilityHint(loc("profile.report.hint"))
@@ -1189,6 +1192,45 @@ struct BlueskyProfileView: View {
         }
 
         return "-"
+    }
+
+    private var internalTagsSection: some View {
+        Section {
+            let memberDID = member.actor.did
+            let handle = member.actor.handle
+            let name = member.actor.displayName
+            let avatar = member.actor.avatarURL?.absoluteString
+            ForEach(internalListStore.lists.prefix(2)) { list in
+                let isOnList = internalListStore.isMember(did: memberDID, in: list.id)
+                Button {
+                    if isOnList {
+                        internalListStore.removeMember(did: memberDID, from: list.id)
+                    } else {
+                        internalListStore.addMember(did: memberDID, handle: handle, displayName: name, avatarURL: avatar, to: list.id)
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(list.color.colorValue)
+                            .frame(width: 12, height: 12)
+                        Text(internalTagLabel(list: list, isOnList: isOnList))
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Image(systemName: isOnList ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(list.color.colorValue)
+                    }
+                }
+            }
+        } header: {
+            Text(loc("internal.profile.section"))
+        }
+    }
+
+    private func internalTagLabel(list: InternalList, isOnList: Bool) -> String {
+        if isOnList {
+            return loc("internal.profile.remove_from").replacingOccurrences(of: "{list}", with: list.name)
+        }
+        return loc("internal.profile.add_to").replacingOccurrences(of: "{list}", with: list.name)
     }
 
     private var isOwnProfile: Bool {
