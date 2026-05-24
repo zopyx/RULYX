@@ -88,30 +88,32 @@ struct AccountTabView: View {
                             }
                             .accessibilityLabel(loc("account.manage.add"))
                         }
-                    }
+                    } footer: {
+                        HStack {
+                            Spacer()
+                            Button {
+                                Task { await exportAccounts() }
+                            } label: {
+                                Text(loc("account.export"))
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .buttonStyle(.plain)
 
-                    HStack(spacing: 12) {
-                        Button {
-                            Task { await exportAccounts() }
-                        } label: {
-                            Text(loc("account.export"))
+                            Text("·")
+                                .font(.caption2)
+                                .foregroundStyle(.quaternary)
+
+                            Button {
+                                showImportPicker = true
+                            } label: {
+                                Text(loc("account.import"))
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.secondary)
-
-                        Text("·")
-                            .foregroundStyle(.tertiary)
-
-                        Button {
-                            showImportPicker = true
-                        } label: {
-                            Text(loc("account.import"))
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.secondary)
                     }
-                    .font(.footnote)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 44, bottom: 4, trailing: 0))
 
                     Section {
                         Menu {
