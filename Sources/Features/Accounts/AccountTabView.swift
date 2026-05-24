@@ -96,13 +96,13 @@ struct AccountTabView: View {
                             } label: {
                                 Text(loc("account.export"))
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                             .buttonStyle(.plain)
 
                             Text("·")
                                 .font(.caption2)
-                                .foregroundStyle(.quaternary)
+                                .foregroundStyle(.tertiary)
 
                             Button {
                                 Task {
@@ -112,7 +112,7 @@ struct AccountTabView: View {
                             } label: {
                                 Text(loc("account.import"))
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                             .buttonStyle(.plain)
                         }

@@ -5,6 +5,7 @@ struct ListsView: View {
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject var internalListStore: InternalListStore
     @StateObject var viewModel = ListsViewModel()
     @State private var presentationState = PresentationState()
     @State private var isShowingUserSearch = false
@@ -18,6 +19,8 @@ struct ListsView: View {
     @State private var showModerationListsHelp = false
     @State private var showListsHelp = false
     @State private var showAdvancedHelp = false
+    @State private var internalListName = ""
+    @State private var internalListColor = InternalListColor.blue
 
     var body: some View {
         NavigationStack {
@@ -194,6 +197,47 @@ struct ListsView: View {
                         }
 
                         Section {
+                            if internalListStore.lists.isEmpty {
+                                Text(loc("internal.list.empty"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(internalListStore.lists) { list in
+                                    NavigationLink {
+                                        InternalListDetailView(list: list)
+                                            .environmentObject(internalListStore)
+                                    } label: {
+                                        HStack(spacing: 10) {
+                                            Circle()
+                                                .fill(list.color.colorValue)
+                                                .frame(width: 10, height: 10)
+                                            Text(list.name)
+                                                .font(.subheadline.weight(.semibold))
+                                            Spacer()
+                                            if list.memberCount > 0 {
+                                                Text("\(list.memberCount)")
+                                                    .font(.subheadline.weight(.semibold))
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                        .padding(.vertical, 4)
+                                    }
+                                }
+                            }
+                        } header: {
+                            HStack(spacing: 4) {
+                                Text(loc("internal.lists.section"))
+                                Spacer()
+                                Button {
+                                    presentationState.isShowingCreateInternalList = true
+                                } label: {
+                                    Image(systemName: "plus")
+                                }
+                                .accessibilityLabel(loc("internal.lists.create"))
+                            }
+                        }
+
+                        Section {
                             Button {
                                 presentationState.showMentionsSearch = true
                             } label: {
@@ -285,6 +329,43 @@ struct ListsView: View {
                 }
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
+            }
+            .sheet(isPresented: $presentationState.isShowingCreateInternalList) {
+                NavigationStack {
+                    Form {
+                        Section {
+                            TextField(loc("internal.lists.name"), text: $internalListName)
+                            Picker(loc("internal.lists.color"), selection: $internalListColor) {
+                                ForEach(InternalListColor.allCases, id: \.self) { color in
+                                    HStack {
+                                        Circle()
+                                            .fill(color.colorValue)
+                                            .frame(width: 16, height: 16)
+                                        Text(color.rawValue.capitalized)
+                                    }
+                                    .tag(color)
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle(loc("internal.lists.create"))
+                    .toolbarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("actions.save") {
+                                internalListStore.addList(name: internalListName, color: internalListColor)
+                                internalListName = ""
+                                internalListColor = .blue
+                                presentationState.isShowingCreateInternalList = false
+                            }
+                            .disabled(internalListName.trimmingCharacters(in: .whitespaces).isEmpty)
+                        }
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("actions.cancel") { presentationState.isShowingCreateInternalList = false }
+                        }
+                    }
+                }
+                .presentationDetents([.medium])
             }
             .sheet(isPresented: $isShowingUserSearch) {
                 NavigationStack {
