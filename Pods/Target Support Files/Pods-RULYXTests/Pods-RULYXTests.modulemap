@@ -1,0 +1,6 @@
+framework module Pods_RULYXTests {
+  umbrella header "Pods-RULYXTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

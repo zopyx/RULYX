@@ -2,12 +2,12 @@ import SwiftUI
 
 struct FeedTimelineView: View {
     @ObservedObject var viewModel: FeedTimelineViewModel
+    @Binding var navigationPath: NavigationPath
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject var mutedWordsStore: MutedWordsStore
     @EnvironmentObject var analyticsStore: AnalyticsStore
-    @State private var selectedPostURI: String?
     @State private var imagePreview: ImagePreviewCollection?
     @State private var videoPreviewURL: URL?
     @State private var showLikesForURI: String?
@@ -26,173 +26,166 @@ struct FeedTimelineView: View {
     @StateObject private var likerActions = PostLikerActionsManager()
 
     var body: some View {
-        NavigationStack {
-            Group {
-                switch viewModel.state {
-                case .initialLoading:
-                    skeletonContent
-                case let .failed(msg):
-                    ContentUnavailableView(
-                        loc("list.detail.alert_title"),
-                        systemImage: "exclamationmark.bubble",
-                        description: Text(msg)
-                    )
-                case .empty:
-                    emptyStateContent
-                default:
-                    listContent
+        Group {
+            switch viewModel.state {
+            case .initialLoading:
+                skeletonContent
+            case let .failed(msg):
+                ContentUnavailableView(
+                    loc("list.detail.alert_title"),
+                    systemImage: "exclamationmark.bubble",
+                    description: Text(msg)
+                )
+            case .empty:
+                emptyStateContent
+            default:
+                listContent
+            }
+        }
+        .navigationTitle(loc("timeline.title"))
+        .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showNewPostComposer = true } label: {
+                    Image(systemName: "square.and.pencil")
                 }
             }
-            .navigationTitle(loc("timeline.title"))
-            .toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showNewPostComposer = true } label: {
-                        Image(systemName: "square.and.pencil")
+        }
+        .fullScreenCover(item: $imagePreview) { preview in
+            ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {
+                imagePreview = nil
+            }
+        }
+        .fullScreenCover(item: $videoPreviewURL) { url in
+            VideoPlayerView(url: url) {
+                videoPreviewURL = nil
+            }
+        }
+        .sheet(item: $showLikesForURI) { uri in
+            LikesListView(uri: uri)
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+        }
+        .sheet(isPresented: $showFeedPicker) {
+            FeedPickerView(feedStore: viewModel.feedStore)
+        }
+        .sheet(isPresented: $showNewPostComposer) {
+            if let account = accountStore.activeAccount,
+               let appPassword = accountStore.appPassword(for: account)
+            {
+                ComposePostView(
+                    account: account,
+                    appPassword: appPassword,
+                    blueskyClient: blueskyClient,
+                    onComplete: { refreshAfterAction() }
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            }
+        }
+        .sheet(item: $composeContext) { context in
+            if context.isReply {
+                ComposePostView(
+                    account: context.account,
+                    appPassword: context.appPassword,
+                    blueskyClient: blueskyClient,
+                    onComplete: { refreshAfterAction() },
+                    replyTo: (context.parentURI, context.parentCID, context.rootURI, context.rootCID)
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            } else {
+                ComposePostView(
+                    account: context.account,
+                    appPassword: context.appPassword,
+                    blueskyClient: blueskyClient,
+                    onComplete: { refreshAfterAction() },
+                    quote: (context.uri, context.cid)
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            }
+        }
+        .sheet(item: $editPostEntry) { entry in
+            if let account = accountStore.activeAccount,
+               let appPassword = accountStore.appPassword(for: account)
+            {
+                ComposePostView(
+                    account: account,
+                    appPassword: appPassword,
+                    blueskyClient: blueskyClient,
+                    onComplete: { refreshAfterAction() },
+                    editPost: entry
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            }
+        }
+        .sheet(item: $profileToShow) { actor in
+            NavigationStack {
+                BlueskyProfileView(
+                    member: BlueskyListMember(
+                        recordURI: "profile:\(actor.did)",
+                        actor: actor
+                    ),
+                    list: nil
+                )
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ToolbarCloseButton(action: { profileToShow = nil })
                     }
                 }
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+                .environmentObject(workspaceStore)
+                .environmentObject(mutedWordsStore)
+                .environmentObject(analyticsStore)
             }
-            .sheet(item: $selectedPostURI) { uri in
-                ThreadView(postURI: uri)
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+        }
+        .confirmationDialog(
+            loc("post.delete.confirm"),
+            isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
+            titleVisibility: .visible,
+            presenting: postToDelete
+        ) { post in
+            Button(loc("post.delete"), role: .destructive) {
+                Task { await deletePost(post) }
             }
-            .fullScreenCover(item: $imagePreview) { preview in
-                ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {
-                    imagePreview = nil
-                }
-            }
-            .fullScreenCover(item: $videoPreviewURL) { url in
-                VideoPlayerView(url: url) {
-                    videoPreviewURL = nil
-                }
-            }
-            .sheet(item: $showLikesForURI) { uri in
-                LikesListView(uri: uri)
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-            }
-            .sheet(isPresented: $showFeedPicker) {
-                FeedPickerView(feedStore: viewModel.feedStore)
-            }
-            .sheet(isPresented: $showNewPostComposer) {
-                if let account = accountStore.activeAccount,
-                   let appPassword = accountStore.appPassword(for: account)
-                {
-                    ComposePostView(
-                        account: account,
-                        appPassword: appPassword,
-                        blueskyClient: blueskyClient,
-                        onComplete: { refreshAfterAction() }
-                    )
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-                }
-            }
-            .sheet(item: $composeContext) { context in
-                if context.isReply {
-                    ComposePostView(
-                        account: context.account,
-                        appPassword: context.appPassword,
-                        blueskyClient: blueskyClient,
-                        onComplete: { refreshAfterAction() },
-                        replyTo: (context.parentURI, context.parentCID, context.rootURI, context.rootCID)
-                    )
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-                } else {
-                    ComposePostView(
-                        account: context.account,
-                        appPassword: context.appPassword,
-                        blueskyClient: blueskyClient,
-                        onComplete: { refreshAfterAction() },
-                        quote: (context.uri, context.cid)
-                    )
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-                }
-            }
-            .sheet(item: $editPostEntry) { entry in
-                if let account = accountStore.activeAccount,
-                   let appPassword = accountStore.appPassword(for: account)
-                {
-                    ComposePostView(
-                        account: account,
-                        appPassword: appPassword,
-                        blueskyClient: blueskyClient,
-                        onComplete: { refreshAfterAction() },
-                        editPost: entry
-                    )
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-                }
-            }
-            .sheet(item: $profileToShow) { actor in
-                NavigationStack {
-                    BlueskyProfileView(
-                        member: BlueskyListMember(
-                            recordURI: "profile:\(actor.did)",
-                            actor: actor
-                        ),
-                        list: nil
-                    )
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            ToolbarCloseButton(action: { profileToShow = nil })
-                        }
-                    }
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
-                    .environmentObject(workspaceStore)
-                    .environmentObject(mutedWordsStore)
-                    .environmentObject(analyticsStore)
-                }
-            }
-            .confirmationDialog(
-                loc("post.delete.confirm"),
-                isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
-                titleVisibility: .visible,
-                presenting: postToDelete
-            ) { post in
-                Button(loc("post.delete"), role: .destructive) {
-                    Task { await deletePost(post) }
-                }
-                Button(loc("actions.cancel"), role: .cancel) {}
-            } message: { _ in
-                Text(loc: "post.delete.message")
-            }
-            .task {
+            Button(loc("actions.cancel"), role: .cancel) {}
+        } message: { _ in
+            Text(loc: "post.delete.message")
+        }
+        .task {
+            await loadInitial()
+            guard let account = accountStore.activeAccount,
+                  let appPassword = accountStore.appPassword(for: account) else { return }
+            viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
+        }
+        .task {
+            guard let account = accountStore.activeAccount,
+                  let appPassword = accountStore.appPassword(for: account) else { return }
+            await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+        }
+        .onDisappear {
+            initialLoadTask?.cancel()
+            loadMoreTask?.cancel()
+            loadMoreTask = nil
+            viewModel.stopPolling()
+        }
+        .onChange(of: viewModel.feedStore.customFeedURI) { _, _ in
+            viewModel.prepareForFeedChange()
+            Task { await refresh() }
+        }
+        .onChange(of: accountStore.activeAccount?.did) { _, _ in
+            viewModel.stopPolling()
+            Task {
                 await loadInitial()
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
                 viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
             }
-            .task {
-                guard let account = accountStore.activeAccount,
-                      let appPassword = accountStore.appPassword(for: account) else { return }
-                await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
-            }
-            .onDisappear {
-                initialLoadTask?.cancel()
-                loadMoreTask?.cancel()
-                loadMoreTask = nil
-                viewModel.stopPolling()
-            }
-            .onChange(of: viewModel.feedStore.customFeedURI) { _, _ in
-                viewModel.prepareForFeedChange()
-                Task { await refresh() }
-            }
-            .onChange(of: accountStore.activeAccount?.did) { _, _ in
-                viewModel.stopPolling()
-                Task {
-                    await loadInitial()
-                    guard let account = accountStore.activeAccount,
-                          let appPassword = accountStore.appPassword(for: account) else { return }
-                    viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
-                }
-            }
-            .postLikerActions(manager: likerActions)
         }
+        .postLikerActions(manager: likerActions)
     }
 
     private var listContent: some View {
@@ -202,7 +195,7 @@ struct FeedTimelineView: View {
                     entry: entry,
                     style: .full,
                     callbacks: PostRowCallbacks(
-                        onTapThread: { selectedPostURI = entry.post.uri },
+                        onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
                         onTapImage: { index in
                             let allImages = entry.post.embed?.images ?? []
                             let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
@@ -502,7 +495,7 @@ struct FeedTimelineView: View {
 }
 
 #Preview {
-    FeedTimelineView(viewModel: FeedTimelineViewModel())
+    FeedTimelineView(viewModel: FeedTimelineViewModel(), navigationPath: .constant(NavigationPath()))
         .environmentObject(AccountStore(preview: true))
         .environmentObject(PreviewBlueskyClient())
 }

@@ -81,9 +81,16 @@ struct UserPostsView: View {
                 }
             }
             .sheet(item: $selectedPostURI) { uri in
-                ThreadView(postURI: uri)
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                NavigationStack {
+                    ThreadView(postURI: uri)
+                        .environmentObject(accountStore)
+                        .environmentObject(blueskyClient)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                ToolbarCloseButton()
+                            }
+                        }
+                }
             }
             .sheet(item: $shareFileURL) { url in
                 ShareSheet(activityItems: [url])

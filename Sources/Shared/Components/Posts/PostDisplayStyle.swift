@@ -5,4 +5,5 @@ enum PostDisplayStyle: Equatable {
     case compact
     case minimal
     case card
+    case threadReply
 }

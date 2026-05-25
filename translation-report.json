@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1083,
+    "total_keys": 1158,
     "total_languages": 16,
-    "untranslated_total": 407
+    "untranslated_total": 1292
   },
   "keys": {
     "account.active": {
@@ -2291,6 +2291,510 @@
         "untranslated": false
       }
     },
+    "account.export": {
+      "en": "Export Accounts",
+      "de": {
+        "text": "Export Accounts (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Export Accounts (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Export Accounts (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Export Accounts (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Export Accounts (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Export Accounts (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Export Accounts (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Export Accounts (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Export Accounts (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Export Accounts (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Export Accounts (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Export Accounts (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Export Accounts (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Export Accounts (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Export Accounts (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import": {
+      "en": "Import Accounts",
+      "de": {
+        "text": "Import Accounts (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Import Accounts (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Import Accounts (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Import Accounts (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Import Accounts (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Import Accounts (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Import Accounts (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Import Accounts (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Import Accounts (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Import Accounts (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Import Accounts (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Import Accounts (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Import Accounts (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Import Accounts (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Import Accounts (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import.access_error": {
+      "en": "Could not access the selected file.",
+      "de": {
+        "text": "Could not access the selected file. (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Could not access the selected file. (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Could not access the selected file. (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Could not access the selected file. (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Could not access the selected file. (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Could not access the selected file. (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Could not access the selected file. (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Could not access the selected file. (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Could not access the selected file. (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Could not access the selected file. (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Could not access the selected file. (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Could not access the selected file. (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Could not access the selected file. (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Could not access the selected file. (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Could not access the selected file. (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import.count": {
+      "en": "{n} account(s) imported successfully.",
+      "de": {
+        "text": "{n} account(s) imported successfully. (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "{n} account(s) imported successfully. (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "{n} account(s) imported successfully. (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "{n} account(s) imported successfully. (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "{n} account(s) imported successfully. (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "{n} account(s) imported successfully. (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "{n} account(s) imported successfully. (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "{n} account(s) imported successfully. (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "{n} account(s) imported successfully. (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "{n} account(s) imported successfully. (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "{n} account(s) imported successfully. (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "{n} account(s) imported successfully. (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "{n} account(s) imported successfully. (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "{n} account(s) imported successfully. (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "{n} account(s) imported successfully. (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import.error": {
+      "en": "Import Error",
+      "de": {
+        "text": "Import Error (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Import Error (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Import Error (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Import Error (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Import Error (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Import Error (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Import Error (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Import Error (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Import Error (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Import Error (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Import Error (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Import Error (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Import Error (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Import Error (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Import Error (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import.invalid_format": {
+      "en": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields.",
+      "de": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import.skipped": {
+      "en": "{n} account(s) were skipped due to missing or duplicate data.",
+      "de": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "{n} account(s) were skipped due to missing or duplicate data. (VI)",
+        "untranslated": false
+      }
+    },
+    "account.import.success": {
+      "en": "Import Successful",
+      "de": {
+        "text": "Import Successful (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Import Successful (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Import Successful (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Import Successful (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Import Successful (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Import Successful (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Import Successful (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Import Successful (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Import Successful (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Import Successful (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Import Successful (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Import Successful (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Import Successful (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Import Successful (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Import Successful (VI)",
+        "untranslated": false
+      }
+    },
     "account.label_suggestions.community": {
       "en": "Community",
       "de": {
@@ -2792,6 +3296,69 @@
       },
       "vi": {
         "text": "Biên tập",
+        "untranslated": false
+      }
+    },
+    "account.manage.more": {
+      "en": "More",
+      "de": {
+        "text": "More (DE)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "More (FR)",
+        "untranslated": false
+      },
+      "it": {
+        "text": "More (IT)",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "More (JA)",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "More (ZH)",
+        "untranslated": false
+      },
+      "es": {
+        "text": "More (ES)",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "More (PT)",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "More (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "More (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "More (AR)",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "More (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "More (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "More (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "More (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "More (VI)",
         "untranslated": false
       }
     },
@@ -6764,6 +7331,1455 @@
         "untranslated": false
       }
     },
+    "ai.classify.no_models": {
+      "en": "No Models Available",
+      "de": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No Models Available",
+        "untranslated": true
+      }
+    },
+    "ai.classify.no_models_desc": {
+      "en": "Download an AI model in Settings to classify posts.",
+      "de": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Download an AI model in Settings to classify posts.",
+        "untranslated": true
+      }
+    },
+    "ai.classify.results": {
+      "en": "Results",
+      "de": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Results",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Results",
+        "untranslated": true
+      }
+    },
+    "ai.classify.run": {
+      "en": "Run Classification",
+      "de": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Run Classification",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Run Classification",
+        "untranslated": true
+      }
+    },
+    "ai.classify.select_models": {
+      "en": "Select Models",
+      "de": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select Models",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select Models",
+        "untranslated": true
+      }
+    },
+    "ai.error.download_failed": {
+      "en": "Download failed.",
+      "de": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Download failed.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Download failed.",
+        "untranslated": true
+      }
+    },
+    "ai.error.not_downloaded": {
+      "en": "Model not downloaded.",
+      "de": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Model not downloaded.",
+        "untranslated": true
+      }
+    },
+    "ai.error.not_loaded": {
+      "en": "Model not loaded.",
+      "de": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Model not loaded.",
+        "untranslated": true
+      }
+    },
+    "ai.error.runtime_not_available": {
+      "en": "AI runtime not yet available.",
+      "de": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "AI runtime not yet available.",
+        "untranslated": true
+      }
+    },
+    "ai.error.unsupported_role": {
+      "en": "Unsupported model role.",
+      "de": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Unsupported model role.",
+        "untranslated": true
+      }
+    },
+    "ai.models.delete": {
+      "en": "Delete",
+      "de": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete",
+        "untranslated": true
+      }
+    },
+    "ai.models.download": {
+      "en": "Download",
+      "de": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Download",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Download",
+        "untranslated": true
+      }
+    },
+    "ai.models.downloading_label": {
+      "en": "Downloading...",
+      "de": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Downloading...",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Downloading...",
+        "untranslated": true
+      }
+    },
+    "ai.models.empty": {
+      "en": "No Models Available",
+      "de": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No Models Available",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No Models Available",
+        "untranslated": true
+      }
+    },
+    "ai.models.empty_desc": {
+      "en": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+      "de": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
+        "untranslated": true
+      }
+    },
+    "ai.models.failed_label": {
+      "en": "Failed",
+      "de": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Failed",
+        "untranslated": true
+      }
+    },
+    "ai.models.not_downloaded_label": {
+      "en": "Not downloaded",
+      "de": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Not downloaded",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Not downloaded",
+        "untranslated": true
+      }
+    },
+    "ai.models.refresh": {
+      "en": "Refresh",
+      "de": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Refresh",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Refresh",
+        "untranslated": true
+      }
+    },
+    "ai.models.retry": {
+      "en": "Retry",
+      "de": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Retry",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Retry",
+        "untranslated": true
+      }
+    },
+    "ai.models.role.classifier": {
+      "en": "Classifier",
+      "de": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Classifier",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Classifier",
+        "untranslated": true
+      }
+    },
+    "ai.models.role.generator": {
+      "en": "Generator",
+      "de": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Generator",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Generator",
+        "untranslated": true
+      }
+    },
+    "ai.models.section": {
+      "en": "Available Models",
+      "de": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Available Models",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Available Models",
+        "untranslated": true
+      }
+    },
+    "ai.models.title": {
+      "en": "AI Models",
+      "de": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "it": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "es": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "th": {
+        "text": "AI Models",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "AI Models",
+        "untranslated": true
+      }
+    },
     "app.name": {
       "en": "Rulyx",
       "de": {
@@ -9536,6 +11552,69 @@
         "untranslated": false
       }
     },
+    "compose.allow_quoting": {
+      "en": "Allow quoting",
+      "de": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Allow quoting",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Allow quoting",
+        "untranslated": true
+      }
+    },
     "compose.alt_placeholder": {
       "en": "Alt text",
       "de": {
@@ -9849,6 +11928,258 @@
       "vi": {
         "text": "GIF",
         "untranslated": false
+      }
+    },
+    "compose.image_resize_message": {
+      "en": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+      "de": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
+        "untranslated": true
+      }
+    },
+    "compose.image_resize_scale": {
+      "en": "Scale Down",
+      "de": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Scale Down",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Scale Down",
+        "untranslated": true
+      }
+    },
+    "compose.image_resize_title": {
+      "en": "Image Size Alert",
+      "de": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Image Size Alert",
+        "untranslated": true
+      }
+    },
+    "compose.image_scaling": {
+      "en": "Scaling images...",
+      "de": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Scaling images...",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Scaling images...",
+        "untranslated": true
       }
     },
     "compose.images_section": {
@@ -10290,6 +12621,510 @@
       "vi": {
         "text": "Trích dẫn một bài viết",
         "untranslated": false
+      }
+    },
+    "compose.reply_controls": {
+      "en": "Who can reply",
+      "de": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Who can reply",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Who can reply",
+        "untranslated": true
+      }
+    },
+    "compose.reply_everyone": {
+      "en": "Everyone",
+      "de": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Everyone",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Everyone",
+        "untranslated": true
+      }
+    },
+    "compose.reply_following": {
+      "en": "People you follow",
+      "de": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "it": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "es": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "th": {
+        "text": "People you follow",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "People you follow",
+        "untranslated": true
+      }
+    },
+    "compose.reply_list": {
+      "en": "Custom list",
+      "de": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Custom list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Custom list",
+        "untranslated": true
+      }
+    },
+    "compose.reply_list_count": {
+      "en": "{n} members",
+      "de": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "it": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "es": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "th": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "{n} members",
+        "untranslated": true
+      }
+    },
+    "compose.reply_list_pick": {
+      "en": "Choose a list",
+      "de": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Choose a list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Choose a list",
+        "untranslated": true
+      }
+    },
+    "compose.reply_mention": {
+      "en": "Mentioned users only",
+      "de": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Mentioned users only",
+        "untranslated": true
+      }
+    },
+    "compose.reply_nobody": {
+      "en": "Nobody",
+      "de": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Nobody",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Nobody",
+        "untranslated": true
       }
     },
     "compose.reply_title": {
@@ -17661,6 +20496,825 @@
       "vi": {
         "text": "Visit website (VI)",
         "untranslated": false
+      }
+    },
+    "internal.list.delete": {
+      "en": "Delete List",
+      "de": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete List",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete List",
+        "untranslated": true
+      }
+    },
+    "internal.list.delete_confirm": {
+      "en": "Delete this internal list?",
+      "de": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete this internal list?",
+        "untranslated": true
+      }
+    },
+    "internal.list.delete_message": {
+      "en": "This cannot be undone.",
+      "de": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "This cannot be undone.",
+        "untranslated": true
+      }
+    },
+    "internal.list.empty": {
+      "en": "No internal lists yet",
+      "de": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No internal lists yet",
+        "untranslated": true
+      }
+    },
+    "internal.list.member_count": {
+      "en": "{n} members",
+      "de": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "it": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "es": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "th": {
+        "text": "{n} members",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "{n} members",
+        "untranslated": true
+      }
+    },
+    "internal.list.no_members": {
+      "en": "No members",
+      "de": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No members",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No members",
+        "untranslated": true
+      }
+    },
+    "internal.lists.color": {
+      "en": "Color",
+      "de": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Color",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Color",
+        "untranslated": true
+      }
+    },
+    "internal.lists.create": {
+      "en": "New List",
+      "de": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "it": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "es": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "th": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "New List",
+        "untranslated": true
+      }
+    },
+    "internal.lists.name": {
+      "en": "Name",
+      "de": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Name",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Name",
+        "untranslated": false
+      }
+    },
+    "internal.lists.section": {
+      "en": "My Internal Lists",
+      "de": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "My Internal Lists",
+        "untranslated": true
+      }
+    },
+    "internal.profile.add_to": {
+      "en": "Add to {list}",
+      "de": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Add to {list}",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Add to {list}",
+        "untranslated": true
+      }
+    },
+    "internal.profile.remove_from": {
+      "en": "Remove from {list}",
+      "de": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Remove from {list}",
+        "untranslated": true
+      }
+    },
+    "internal.profile.section": {
+      "en": "My Internal Tags",
+      "de": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "it": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "es": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "th": {
+        "text": "My Internal Tags",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "My Internal Tags",
+        "untranslated": true
       }
     },
     "label.!hide": {
@@ -27680,6 +31334,69 @@
         "untranslated": false
       }
     },
+    "list.kind.internal": {
+      "en": "Internal Lists",
+      "de": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Internal Lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Internal Lists",
+        "untranslated": true
+      }
+    },
     "list.kind.moderation": {
       "en": "Moderation Lists",
       "de": {
@@ -35678,6 +39395,69 @@
       },
       "vi": {
         "text": "关注中 (VI)",
+        "untranslated": false
+      }
+    },
+    "lists.internal_lists": {
+      "en": "Internal Lists",
+      "de": {
+        "text": "Interne Listen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Listes internes",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Elenchi interni",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "内部リスト",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "内部列表",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Listas internas",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Listas internas",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "내부 목록",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Внутренние списки",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "القوائم الداخلية",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Interne lijsten",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Listy wewnętrzne",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Dahili listeler",
+        "untranslated": false
+      },
+      "th": {
+        "text": "รายการภายใน",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Danh sách nội bộ",
         "untranslated": false
       }
     },
@@ -44123,6 +47903,132 @@
         "untranslated": false
       }
     },
+    "post.classify": {
+      "en": "AI Classification",
+      "de": {
+        "text": "Mit KI klassifizieren",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Classifier avec IA",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Classifica con AI",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "AIで分類",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "用AI分类",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Clasificar con IA",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Classificar com IA",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "AI로 분류",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Классифицировать с ИИ",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تصنيف باستخدام الذكاء الاصطناعي",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Classificeren met AI",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Klasyfikuj za pomocą AI",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "AI ile sınıflandır",
+        "untranslated": false
+      },
+      "th": {
+        "text": "จัดประเภทด้วย AI",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Phân loại bằng AI",
+        "untranslated": false
+      }
+    },
+    "post.classify.content": {
+      "en": "Post Content",
+      "de": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Post Content",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Post Content",
+        "untranslated": true
+      }
+    },
     "post.copy": {
       "en": "Copy post to clipboard",
       "de": {
@@ -44372,6 +48278,195 @@
       },
       "vi": {
         "text": "Điều này sẽ xóa vĩnh viễn bài đăng khỏi Bluesky. Điều này không thể hoàn tác được.",
+        "untranslated": false
+      }
+    },
+    "post.edit": {
+      "en": "Edit Post",
+      "de": {
+        "text": "Beitrag bearbeiten",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Modifier le post",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Modifica post",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "投稿を編集",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "编辑帖子",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Editar publicación",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Editar publicação",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "게시물 수정",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Редактировать",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تعديل المنشور",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Bericht bewerken",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Edytuj post",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Gönderiyi düzenle",
+        "untranslated": false
+      },
+      "th": {
+        "text": "แก้ไขโพสต์",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Chỉnh sửa bài viết",
+        "untranslated": false
+      }
+    },
+    "post.gear_menu": {
+      "en": "Post actions",
+      "de": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Post actions",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Post actions",
+        "untranslated": true
+      }
+    },
+    "post.report": {
+      "en": "Report Post",
+      "de": {
+        "text": "Beitrag melden",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Signaler le post",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Segnala post",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "投稿を報告",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "举报帖子",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Reportar publicación",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Denunciar publicação",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "게시물 신고",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Пожаловаться",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "الإبلاغ عن المنشور",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Bericht rapporteren",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Zgłoś post",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Gönderiyi raporla",
+        "untranslated": false
+      },
+      "th": {
+        "text": "รายงานโพสต์",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Báo cáo bài viết",
         "untranslated": false
       }
     },
@@ -45698,6 +49793,69 @@
         "untranslated": false
       }
     },
+    "profile.badge.blocking_by_list": {
+      "en": "Blocked by {list}",
+      "de": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocked by {list}",
+        "untranslated": true
+      }
+    },
     "profile.badge.blocks_me": {
       "en": "Blocks me",
       "de": {
@@ -46011,6 +50169,69 @@
       "vi": {
         "text": "屏蔽 (VI)",
         "untranslated": false
+      }
+    },
+    "profile.block.by_list_notice": {
+      "en": "Blocked via \"{list}\" — manage from the list instead",
+      "de": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocked via \"{list}\" — manage from the list instead",
+        "untranslated": true
       }
     },
     "profile.block.hint": {
@@ -48153,6 +52374,69 @@
       "vi": {
         "text": "Tin nhắn trực tiếp",
         "untranslated": false
+      }
+    },
+    "profile.dm_blocked_notice": {
+      "en": "Messaging is not available — you are blocking this account.",
+      "de": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
       }
     },
     "profile.edit_note": {
@@ -53762,6 +58046,69 @@
         "untranslated": false
       }
     },
+    "profile.report.reason_explanation": {
+      "en": "Select a reason for this report. This helps moderators prioritize and process your report.",
+      "de": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
+        "untranslated": true
+      }
+    },
     "profile.report.sheet_title": {
       "en": "Report Account",
       "de": {
@@ -55713,6 +60060,258 @@
       "vi": {
         "text": "统计 (VI)",
         "untranslated": false
+      }
+    },
+    "profile.subscribed_lists": {
+      "en": "Subscribed Moderation Lists",
+      "de": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Subscribed Moderation Lists",
+        "untranslated": true
+      }
+    },
+    "profile.subscribed_lists.empty": {
+      "en": "No subscribed moderation lists",
+      "de": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No subscribed moderation lists",
+        "untranslated": true
+      }
+    },
+    "profile.subscribed_lists.loading": {
+      "en": "Loading subscribed lists…",
+      "de": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Loading subscribed lists…",
+        "untranslated": true
+      }
+    },
+    "profile.subscribed_lists.member_count": {
+      "en": "{count} members",
+      "de": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "it": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "es": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "th": {
+        "text": "{count} members",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "{count} members",
+        "untranslated": true
       }
     },
     "profile.tap_to_add": {
@@ -59244,66 +63843,66 @@
       }
     },
     "report.option_contact.title": {
-      "en": "Contact Support",
+      "en": "Report by E-Mail",
       "de": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "fr": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "it": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "ja": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "zh": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "es": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "pt": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "ko": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "ru": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "ar": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "nl": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "pl": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "tr": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "th": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       },
       "vi": {
         "text": "Contact Support",
-        "untranslated": true
+        "untranslated": false
       }
     },
     "report.option_submit.help": {
@@ -60186,6 +64785,69 @@
       "vi": {
         "text": "Support (VI)",
         "untranslated": false
+      }
+    },
+    "report.tab_label": {
+      "en": "Report Method",
+      "de": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Report Method",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Report Method",
+        "untranslated": true
       }
     },
     "report.title": {
@@ -61634,6 +66296,69 @@
       },
       "vi": {
         "text": "值 (VI)",
+        "untranslated": false
+      }
+    },
+    "settings.ai": {
+      "en": "AI / On-Device",
+      "de": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "it": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "es": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "th": {
+        "text": "AI Models",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "AI Models",
         "untranslated": false
       }
     },

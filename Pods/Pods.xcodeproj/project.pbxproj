@@ -1,0 +1,1225 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04E221C43BF8809A6F0EC2765741B58C /* geoip6 in Resources */ = {isa = PBXBuildFile; fileRef = 492A8F13BB35F9725B78ABFF1DA1846C /* geoip6 */; };
+		0871C7B63CA21BBE48F3871B89951753 /* Pods-RULYXUITests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 92613E9359767C5D97CB79538CEDE56F /* Pods-RULYXUITests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0A25F05CF0FD4947839371765A7D4212 /* TORController.h in Headers */ = {isa = PBXBuildFile; fileRef = D693C0919A4E338A745E98B0E4CBB70A /* TORController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0CDEBA937BF2A3EBD18A38ED6D6E278D /* TOROnionAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 593FA9E9E9E07F5D44ACEA9541D5A69E /* TOROnionAuth.m */; };
+		101388B7A2F39783C6ED34D390900620 /* Tor-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0213D3D9B74CB07FCF3CFB645678FCD9 /* Tor-dummy.m */; };
+		10FB35C615A03C1B58D7F659B785D4D5 /* Pods-RULYXUITests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E660FF8BA789E7FF1B348E906630C1D2 /* Pods-RULYXUITests-dummy.m */; };
+		2162CD5FE7EA5292E6CFB6FDF20B2CE0 /* Tor-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0BC21F80AABB829D515C74E420AE71D7 /* Tor-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		26A722C31898BD890A5542CA9B7E5C7A /* TORController.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CC33D934B673AD8208320F2C882109 /* TORController.m */; };
+		2BCB389EB53A6EA1736AB80ED74EC299 /* TORAuthKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E24CCB433CEAF19307E7C6BBCCB433B /* TORAuthKey.m */; };
+		2E14D0A1F78224A88C86E13011FCA50F /* TORLogging.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BE2644CD2AD9DEA854712108D449C47 /* TORLogging.m */; };
+		314E5222115A00D11FFE5218DCA7DBBA /* NSBundle+GeoIP.h in Headers */ = {isa = PBXBuildFile; fileRef = 5CF6CB5CCEC94047B0D23D30F67803D1 /* NSBundle+GeoIP.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3313D862229E1F0ADFD369A57D0226E4 /* NSCharacterSet+PredefinedSets.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A35A8B3A29FA35B2F4FE4E767B9B3A3 /* NSCharacterSet+PredefinedSets.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3FC37C233D1EB768BB342AB9D9A801E2 /* TORLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = B8129C95377F4AB6774444B10B69DEFB /* TORLogging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4A6E70D08368EF92BA89A2DE56C598BF /* TORControlReplyCode.h in Headers */ = {isa = PBXBuildFile; fileRef = 5FFD23FB5EB5550D78F285C6C33A6DF4 /* TORControlReplyCode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4AB19BE944FF947B118B7E01E3C23F71 /* Pods-RULYXTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 38CA3039C2A952EA801F02170CDF566D /* Pods-RULYXTests-dummy.m */; };
+		586162029FB1F10D73AADD22CBF3262F /* Pods-RULYX-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A23C771922F8E763AB1F788D7B09367A /* Pods-RULYX-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		638274362FEC8B1353A775FA7E8EC826 /* TORCircuit.m in Sources */ = {isa = PBXBuildFile; fileRef = E48722740A67EF1D80B5CD4DA88279B4 /* TORCircuit.m */; };
+		64747F0F771D458D6DF77E8C56CF1D68 /* TORConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = BEE05B5A15AE8CB6938A33EDB52E78ED /* TORConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6D5017ADFA58BA1D4F6DF04EA5871B6E /* TORX25519KeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 874CF1A5D6ACD4494C07AF271F0F441D /* TORX25519KeyPair.m */; };
+		7013F10C43E07F5CFD428004E864880C /* TORThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0114752E5A355C89F8D9BE0556AEC /* TORThread.m */; };
+		79706242DB9ED664392FD6E22C8FA430 /* Pods-RULYXTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 55CEA59A9BA7D55DADF821FE7E488E97 /* Pods-RULYXTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7C32EE8EEC8513DEC9424C90272E666C /* NSCharacterSet+PredefinedSets.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E904536EC122BE11994C99A32768B1 /* NSCharacterSet+PredefinedSets.m */; };
+		90FA63DC0395381D3DCC9AEE7DD1178F /* TORThread.h in Headers */ = {isa = PBXBuildFile; fileRef = B5FEFD7ECFC1C0BF612D30F5BC0B3BC8 /* TORThread.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96914BC2DD9CF590053E006F5EF3F283 /* TORConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 0126BA72266C2E6CC4B08645DCBB82D1 /* TORConfiguration.m */; };
+		9F9A4BF211E6CF69D2510C063A0C5327 /* Tor-GeoIP in Resources */ = {isa = PBXBuildFile; fileRef = B194F045FF468B8C1576E27AFCDF0623 /* Tor-GeoIP */; };
+		9FF292F309DC817377C10D12893CF616 /* geoip in Resources */ = {isa = PBXBuildFile; fileRef = 62A60B749168A0F6DFE8B2D5E3726E0F /* geoip */; };
+		A1B7E93BBDC30407F5A34517C3E06E81 /* TORX25519KeyPair.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DF6C1C3FA90494C57DBE4166CA5A945 /* TORX25519KeyPair.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A3A56937CCD80CE293713A83CA800E1A /* TORCircuit.h in Headers */ = {isa = PBXBuildFile; fileRef = 28786188C0C3E1A6F1A267E73DFDA98B /* TORCircuit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA2258F1048D5DF9DD59B1832F45F1A0 /* Pods-RULYX-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = CAE74E5E3BF9C4CB25E9DF555A906BB3 /* Pods-RULYX-dummy.m */; };
+		B1F12F19F15542B8DDD845956A44BFAD /* TORNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B0716FAA70F7D3E2E024C09799A15C4 /* TORNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C6134F243994EE6F6EF12E054152DDFE /* NSBundle+GeoIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F075503A312CF44B27391638CBCD055 /* NSBundle+GeoIP.m */; };
+		CB7595F357A03E27EB55973ADA6D44AA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		D2C19C68B043862D37600F81790F4105 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		D9093E326CF3FF155EC57651BF25109E /* TORAuthKey.h in Headers */ = {isa = PBXBuildFile; fileRef = F54F8858BD1444B1364E22B60EA04A13 /* TORAuthKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DDF6A754AD3094DDF0A372CAF4FF55D2 /* TORControlCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 37A018754340096250DE24ED85E6E90C /* TORControlCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F42B250083DC0E4464722EE8497F8F4F /* TOROnionAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = 91F1BB84D2AE3DFDB2686C2070838181 /* TOROnionAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F50B0B147231209BFC0420BC14A75755 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		F61063D99235C442AE3F95FCC40348EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		F86A4E83A7253FC04C33B677CA9C8111 /* TORNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A76EBB72E4A13283D5A64CD07D7D776 /* TORNode.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3F9EE8F83CEB8D970981BA7D3C31CFF0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AFA4383E7CE3B1B637884AC967B81A0E;
+			remoteInfo = Tor;
+		};
+		7A5A054E5C45E1972861B7FD404C8AE1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B9F32A05694461370B6D7FF71888B0E0;
+			remoteInfo = "Tor-GeoIP";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0126BA72266C2E6CC4B08645DCBB82D1 /* TORConfiguration.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORConfiguration.m; path = Tor/Classes/Core/TORConfiguration.m; sourceTree = "<group>"; };
+		013252791DF8E1AE3870E7FE9A18654E /* Pods-RULYX.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-RULYX.modulemap"; sourceTree = "<group>"; };
+		015D2CB5A68E6A54CEC31E9965660638 /* Pods-RULYXTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RULYXTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		0213D3D9B74CB07FCF3CFB645678FCD9 /* Tor-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Tor-dummy.m"; sourceTree = "<group>"; };
+		0945F5E2FCBD01B8A360CFCFBA28C794 /* Tor-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Tor-xcframeworks.sh"; sourceTree = "<group>"; };
+		094ACE85338F5C47F22612F2747BCFCC /* Pods-RULYXUITests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-RULYXUITests"; path = Pods_RULYXUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0BC21F80AABB829D515C74E420AE71D7 /* Tor-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Tor-umbrella.h"; sourceTree = "<group>"; };
+		1524BBA3D0FF6355F74AA5799336B520 /* Pods-RULYX-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RULYX-acknowledgements.plist"; sourceTree = "<group>"; };
+		19CC33D934B673AD8208320F2C882109 /* TORController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORController.m; path = Tor/Classes/Core/TORController.m; sourceTree = "<group>"; };
+		1DDCB47317473B722771A75BE612E609 /* Tor-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Tor-prefix.pch"; sourceTree = "<group>"; };
+		28786188C0C3E1A6F1A267E73DFDA98B /* TORCircuit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORCircuit.h; path = Tor/Classes/Core/TORCircuit.h; sourceTree = "<group>"; };
+		29B447785C11EF05B75B9D89D735404A /* Pods-RULYXUITests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RULYXUITests-acknowledgements.plist"; sourceTree = "<group>"; };
+		2BE2644CD2AD9DEA854712108D449C47 /* TORLogging.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORLogging.m; path = Tor/Classes/CTor/TORLogging.m; sourceTree = "<group>"; };
+		2C5110B36D946AFB558C334C6EB51D2B /* Pods-RULYXUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RULYXUITests.release.xcconfig"; sourceTree = "<group>"; };
+		37A018754340096250DE24ED85E6E90C /* TORControlCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORControlCommand.h; path = Tor/Classes/Core/TORControlCommand.h; sourceTree = "<group>"; };
+		384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		38CA3039C2A952EA801F02170CDF566D /* Pods-RULYXTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-RULYXTests-dummy.m"; sourceTree = "<group>"; };
+		3C1373E1D2C9574C3EFB72F3DEDF40DF /* Pods-RULYXTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-RULYXTests.modulemap"; sourceTree = "<group>"; };
+		3FC1F29A86ECBB01CA25DFAE5AE9137A /* Tor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Tor.debug.xcconfig; sourceTree = "<group>"; };
+		430DC61606F0DBD09F93C2CBFF43F080 /* Pods-RULYXTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RULYXTests-Info.plist"; sourceTree = "<group>"; };
+		45E904536EC122BE11994C99A32768B1 /* NSCharacterSet+PredefinedSets.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSCharacterSet+PredefinedSets.m"; path = "Tor/Classes/Core/NSCharacterSet+PredefinedSets.m"; sourceTree = "<group>"; };
+		461253F063CCA122F42C3790AD870DC9 /* Tor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Tor.release.xcconfig; sourceTree = "<group>"; };
+		492A8F13BB35F9725B78ABFF1DA1846C /* geoip6 */ = {isa = PBXFileReference; includeInIndex = 1; name = geoip6; path = Tor/Assets/geoip6; sourceTree = "<group>"; };
+		4B0716FAA70F7D3E2E024C09799A15C4 /* TORNode.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORNode.h; path = Tor/Classes/Core/TORNode.h; sourceTree = "<group>"; };
+		4BCB3EF3DC50DD6AFA4918CE386AB417 /* Pods-RULYXTests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-RULYXTests"; path = Pods_RULYXTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F075503A312CF44B27391638CBCD055 /* NSBundle+GeoIP.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSBundle+GeoIP.m"; path = "Tor/Classes/Core/NSBundle+GeoIP.m"; sourceTree = "<group>"; };
+		4F90569495E6DC35BCB584353CFCA5A8 /* Pods-RULYX-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RULYX-Info.plist"; sourceTree = "<group>"; };
+		54FF147DB21B9F7337B4AA2170C9CB96 /* Pods-RULYXTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-RULYXTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		55CEA59A9BA7D55DADF821FE7E488E97 /* Pods-RULYXTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-RULYXTests-umbrella.h"; sourceTree = "<group>"; };
+		593FA9E9E9E07F5D44ACEA9541D5A69E /* TOROnionAuth.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TOROnionAuth.m; path = Tor/Classes/Core/TOROnionAuth.m; sourceTree = "<group>"; };
+		5BA0114752E5A355C89F8D9BE0556AEC /* TORThread.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORThread.m; path = Tor/Classes/CTor/TORThread.m; sourceTree = "<group>"; };
+		5CF6CB5CCEC94047B0D23D30F67803D1 /* NSBundle+GeoIP.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSBundle+GeoIP.h"; path = "Tor/Classes/Core/NSBundle+GeoIP.h"; sourceTree = "<group>"; };
+		5DF6C1C3FA90494C57DBE4166CA5A945 /* TORX25519KeyPair.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORX25519KeyPair.h; path = Tor/Classes/CTor/TORX25519KeyPair.h; sourceTree = "<group>"; };
+		5FFD23FB5EB5550D78F285C6C33A6DF4 /* TORControlReplyCode.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORControlReplyCode.h; path = Tor/Classes/Core/TORControlReplyCode.h; sourceTree = "<group>"; };
+		62A60B749168A0F6DFE8B2D5E3726E0F /* geoip */ = {isa = PBXFileReference; includeInIndex = 1; name = geoip; path = Tor/Assets/geoip; sourceTree = "<group>"; };
+		6A76EBB72E4A13283D5A64CD07D7D776 /* TORNode.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORNode.m; path = Tor/Classes/Core/TORNode.m; sourceTree = "<group>"; };
+		72C6BA43DBC0228462057AB996C467FC /* Pods-RULYXUITests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-RULYXUITests.modulemap"; sourceTree = "<group>"; };
+		7FB16CF295796C3A5A77A51F05C81EF8 /* Pods-RULYX */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-RULYX"; path = Pods_RULYX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		874CF1A5D6ACD4494C07AF271F0F441D /* TORX25519KeyPair.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORX25519KeyPair.m; path = Tor/Classes/CTor/TORX25519KeyPair.m; sourceTree = "<group>"; };
+		8A35A8B3A29FA35B2F4FE4E767B9B3A3 /* NSCharacterSet+PredefinedSets.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSCharacterSet+PredefinedSets.h"; path = "Tor/Classes/Core/NSCharacterSet+PredefinedSets.h"; sourceTree = "<group>"; };
+		91F1BB84D2AE3DFDB2686C2070838181 /* TOROnionAuth.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TOROnionAuth.h; path = Tor/Classes/Core/TOROnionAuth.h; sourceTree = "<group>"; };
+		92613E9359767C5D97CB79538CEDE56F /* Pods-RULYXUITests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-RULYXUITests-umbrella.h"; sourceTree = "<group>"; };
+		92899CBFB07D5FD08FAF80E8CD98D844 /* Pods-RULYX-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-RULYX-acknowledgements.markdown"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9E24CCB433CEAF19307E7C6BBCCB433B /* TORAuthKey.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORAuthKey.m; path = Tor/Classes/Core/TORAuthKey.m; sourceTree = "<group>"; };
+		A23C771922F8E763AB1F788D7B09367A /* Pods-RULYX-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-RULYX-umbrella.h"; sourceTree = "<group>"; };
+		A2A0E750D25B143BE5D4FC7989517DE5 /* tor.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = tor.xcframework; sourceTree = "<group>"; };
+		AA8C17CEE9A4AFE1DECB50587AF4FEEA /* Pods-RULYX.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RULYX.debug.xcconfig"; sourceTree = "<group>"; };
+		AB0D266C08883544A7C350236FA69D99 /* Pods-RULYX.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RULYX.release.xcconfig"; sourceTree = "<group>"; };
+		ADA9ABFC8E11DBA59D385A40C3B2BEF4 /* Tor */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Tor; path = Tor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE35BA8D1CDF0D2509EA479210A57548 /* Tor-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Tor-Info.plist"; sourceTree = "<group>"; };
+		B194F045FF468B8C1576E27AFCDF0623 /* Tor-GeoIP */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "Tor-GeoIP"; path = GeoIP.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5FEFD7ECFC1C0BF612D30F5BC0B3BC8 /* TORThread.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORThread.h; path = Tor/Classes/CTor/TORThread.h; sourceTree = "<group>"; };
+		B8129C95377F4AB6774444B10B69DEFB /* TORLogging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORLogging.h; path = Tor/Classes/CTor/TORLogging.h; sourceTree = "<group>"; };
+		BB9E90B4A80963EEA30E7E0F6FAE5932 /* Pods-RULYXUITests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RULYXUITests-Info.plist"; sourceTree = "<group>"; };
+		BEE05B5A15AE8CB6938A33EDB52E78ED /* TORConfiguration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORConfiguration.h; path = Tor/Classes/Core/TORConfiguration.h; sourceTree = "<group>"; };
+		C6AACDF7C36A53D721A1A244C4555D94 /* Pods-RULYX-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-RULYX-frameworks.sh"; sourceTree = "<group>"; };
+		CAE74E5E3BF9C4CB25E9DF555A906BB3 /* Pods-RULYX-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-RULYX-dummy.m"; sourceTree = "<group>"; };
+		D693C0919A4E338A745E98B0E4CBB70A /* TORController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORController.h; path = Tor/Classes/Core/TORController.h; sourceTree = "<group>"; };
+		E0A5AB3D1B80BE5255DF3F002FED44AF /* Pods-RULYXUITests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-RULYXUITests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		E18AAA7BFC4DD3344A70DC14F88A434A /* ResourceBundle-GeoIP-Tor-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-GeoIP-Tor-Info.plist"; sourceTree = "<group>"; };
+		E230318794FDB8CE7C3DAB46D1162BD7 /* Tor.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Tor.modulemap; sourceTree = "<group>"; };
+		E3468DD723DD3C5FD72D5419939F6CE0 /* Pods-RULYXTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RULYXTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E48722740A67EF1D80B5CD4DA88279B4 /* TORCircuit.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TORCircuit.m; path = Tor/Classes/Core/TORCircuit.m; sourceTree = "<group>"; };
+		E660FF8BA789E7FF1B348E906630C1D2 /* Pods-RULYXUITests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-RULYXUITests-dummy.m"; sourceTree = "<group>"; };
+		F137D59B42DBEFC93F19C60344F0746B /* Pods-RULYXTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RULYXTests.release.xcconfig"; sourceTree = "<group>"; };
+		F54F8858BD1444B1364E22B60EA04A13 /* TORAuthKey.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TORAuthKey.h; path = Tor/Classes/Core/TORAuthKey.h; sourceTree = "<group>"; };
+		F5646BC27291FA2EAD15E339D2A2DB21 /* Pods-RULYXUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RULYXUITests.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		409E23DFA9C6A689A1B8714E9ECBD239 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		76287F1BAC3F3C4FEDD5647EF1882696 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D2C19C68B043862D37600F81790F4105 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B63FC1A1DBEA3761C3DAB99CE1FA35ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F61063D99235C442AE3F95FCC40348EE /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE741FBF4CA2EF26B60EAFBB0639168E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F50B0B147231209BFC0420BC14A75755 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E2D2337CA541739ADCDD2F9F0C0BC44A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB7595F357A03E27EB55973ADA6D44AA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08EAE9CBC81349E79DA86DC28C50A201 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				5CF6CB5CCEC94047B0D23D30F67803D1 /* NSBundle+GeoIP.h */,
+				4F075503A312CF44B27391638CBCD055 /* NSBundle+GeoIP.m */,
+				8A35A8B3A29FA35B2F4FE4E767B9B3A3 /* NSCharacterSet+PredefinedSets.h */,
+				45E904536EC122BE11994C99A32768B1 /* NSCharacterSet+PredefinedSets.m */,
+				F54F8858BD1444B1364E22B60EA04A13 /* TORAuthKey.h */,
+				9E24CCB433CEAF19307E7C6BBCCB433B /* TORAuthKey.m */,
+				28786188C0C3E1A6F1A267E73DFDA98B /* TORCircuit.h */,
+				E48722740A67EF1D80B5CD4DA88279B4 /* TORCircuit.m */,
+				BEE05B5A15AE8CB6938A33EDB52E78ED /* TORConfiguration.h */,
+				0126BA72266C2E6CC4B08645DCBB82D1 /* TORConfiguration.m */,
+				37A018754340096250DE24ED85E6E90C /* TORControlCommand.h */,
+				D693C0919A4E338A745E98B0E4CBB70A /* TORController.h */,
+				19CC33D934B673AD8208320F2C882109 /* TORController.m */,
+				5FFD23FB5EB5550D78F285C6C33A6DF4 /* TORControlReplyCode.h */,
+				4B0716FAA70F7D3E2E024C09799A15C4 /* TORNode.h */,
+				6A76EBB72E4A13283D5A64CD07D7D776 /* TORNode.m */,
+				91F1BB84D2AE3DFDB2686C2070838181 /* TOROnionAuth.h */,
+				593FA9E9E9E07F5D44ACEA9541D5A69E /* TOROnionAuth.m */,
+			);
+			name = Core;
+			sourceTree = "<group>";
+		};
+		15C9D728E39DFE26A3655B220E225A04 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				62A60B749168A0F6DFE8B2D5E3726E0F /* geoip */,
+				492A8F13BB35F9725B78ABFF1DA1846C /* geoip6 */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		1ADFFDB980A593EE55770A1AA9DFA732 /* Pods-RULYXUITests */ = {
+			isa = PBXGroup;
+			children = (
+				72C6BA43DBC0228462057AB996C467FC /* Pods-RULYXUITests.modulemap */,
+				E0A5AB3D1B80BE5255DF3F002FED44AF /* Pods-RULYXUITests-acknowledgements.markdown */,
+				29B447785C11EF05B75B9D89D735404A /* Pods-RULYXUITests-acknowledgements.plist */,
+				E660FF8BA789E7FF1B348E906630C1D2 /* Pods-RULYXUITests-dummy.m */,
+				BB9E90B4A80963EEA30E7E0F6FAE5932 /* Pods-RULYXUITests-Info.plist */,
+				92613E9359767C5D97CB79538CEDE56F /* Pods-RULYXUITests-umbrella.h */,
+				F5646BC27291FA2EAD15E339D2A2DB21 /* Pods-RULYXUITests.debug.xcconfig */,
+				2C5110B36D946AFB558C334C6EB51D2B /* Pods-RULYXUITests.release.xcconfig */,
+			);
+			name = "Pods-RULYXUITests";
+			path = "Target Support Files/Pods-RULYXUITests";
+			sourceTree = "<group>";
+		};
+		20798369AEF162B2DF297662AA847E91 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				E6EB90FF4C77FC11C9B79DEC4AC91205 /* Pods-RULYX */,
+				C674AA3CF5734F87E02F12D464EB9E3C /* Pods-RULYXTests */,
+				1ADFFDB980A593EE55770A1AA9DFA732 /* Pods-RULYXUITests */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		8C5D8DF9A494BBE9C76CBA31C8D4A209 /* Tor */ = {
+			isa = PBXGroup;
+			children = (
+				08EAE9CBC81349E79DA86DC28C50A201 /* Core */,
+				A3831FFF7B40E9A3D9D803FC82193895 /* CTor */,
+				D3C907E16006EDD96FCEAA8818F8299B /* GeoIP */,
+				E1C72468F515738949D46BF546E6D93F /* Support Files */,
+			);
+			name = Tor;
+			path = Tor;
+			sourceTree = "<group>";
+		};
+		A3831FFF7B40E9A3D9D803FC82193895 /* CTor */ = {
+			isa = PBXGroup;
+			children = (
+				B8129C95377F4AB6774444B10B69DEFB /* TORLogging.h */,
+				2BE2644CD2AD9DEA854712108D449C47 /* TORLogging.m */,
+				B5FEFD7ECFC1C0BF612D30F5BC0B3BC8 /* TORThread.h */,
+				5BA0114752E5A355C89F8D9BE0556AEC /* TORThread.m */,
+				5DF6C1C3FA90494C57DBE4166CA5A945 /* TORX25519KeyPair.h */,
+				874CF1A5D6ACD4494C07AF271F0F441D /* TORX25519KeyPair.m */,
+				C8574979F6DD746889D57DBA663708A1 /* Frameworks */,
+			);
+			name = CTor;
+			sourceTree = "<group>";
+		};
+		C182188EBA02C2B34CA79DF3985224C2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7FB16CF295796C3A5A77A51F05C81EF8 /* Pods-RULYX */,
+				4BCB3EF3DC50DD6AFA4918CE386AB417 /* Pods-RULYXTests */,
+				094ACE85338F5C47F22612F2747BCFCC /* Pods-RULYXUITests */,
+				ADA9ABFC8E11DBA59D385A40C3B2BEF4 /* Tor */,
+				B194F045FF468B8C1576E27AFCDF0623 /* Tor-GeoIP */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C674AA3CF5734F87E02F12D464EB9E3C /* Pods-RULYXTests */ = {
+			isa = PBXGroup;
+			children = (
+				3C1373E1D2C9574C3EFB72F3DEDF40DF /* Pods-RULYXTests.modulemap */,
+				54FF147DB21B9F7337B4AA2170C9CB96 /* Pods-RULYXTests-acknowledgements.markdown */,
+				015D2CB5A68E6A54CEC31E9965660638 /* Pods-RULYXTests-acknowledgements.plist */,
+				38CA3039C2A952EA801F02170CDF566D /* Pods-RULYXTests-dummy.m */,
+				430DC61606F0DBD09F93C2CBFF43F080 /* Pods-RULYXTests-Info.plist */,
+				55CEA59A9BA7D55DADF821FE7E488E97 /* Pods-RULYXTests-umbrella.h */,
+				E3468DD723DD3C5FD72D5419939F6CE0 /* Pods-RULYXTests.debug.xcconfig */,
+				F137D59B42DBEFC93F19C60344F0746B /* Pods-RULYXTests.release.xcconfig */,
+			);
+			name = "Pods-RULYXTests";
+			path = "Target Support Files/Pods-RULYXTests";
+			sourceTree = "<group>";
+		};
+		C8574979F6DD746889D57DBA663708A1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A2A0E750D25B143BE5D4FC7989517DE5 /* tor.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CA3756C6019530F59562498AFA7381E2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8C5D8DF9A494BBE9C76CBA31C8D4A209 /* Tor */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				CA3756C6019530F59562498AFA7381E2 /* Pods */,
+				C182188EBA02C2B34CA79DF3985224C2 /* Products */,
+				20798369AEF162B2DF297662AA847E91 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4801F62A6B08CD9B5410329F1A18FDE /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D3C907E16006EDD96FCEAA8818F8299B /* GeoIP */ = {
+			isa = PBXGroup;
+			children = (
+				15C9D728E39DFE26A3655B220E225A04 /* Resources */,
+			);
+			name = GeoIP;
+			sourceTree = "<group>";
+		};
+		E1C72468F515738949D46BF546E6D93F /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				E18AAA7BFC4DD3344A70DC14F88A434A /* ResourceBundle-GeoIP-Tor-Info.plist */,
+				E230318794FDB8CE7C3DAB46D1162BD7 /* Tor.modulemap */,
+				0213D3D9B74CB07FCF3CFB645678FCD9 /* Tor-dummy.m */,
+				AE35BA8D1CDF0D2509EA479210A57548 /* Tor-Info.plist */,
+				1DDCB47317473B722771A75BE612E609 /* Tor-prefix.pch */,
+				0BC21F80AABB829D515C74E420AE71D7 /* Tor-umbrella.h */,
+				0945F5E2FCBD01B8A360CFCFBA28C794 /* Tor-xcframeworks.sh */,
+				3FC1F29A86ECBB01CA25DFAE5AE9137A /* Tor.debug.xcconfig */,
+				461253F063CCA122F42C3790AD870DC9 /* Tor.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Tor";
+			sourceTree = "<group>";
+		};
+		E4801F62A6B08CD9B5410329F1A18FDE /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		E6EB90FF4C77FC11C9B79DEC4AC91205 /* Pods-RULYX */ = {
+			isa = PBXGroup;
+			children = (
+				013252791DF8E1AE3870E7FE9A18654E /* Pods-RULYX.modulemap */,
+				92899CBFB07D5FD08FAF80E8CD98D844 /* Pods-RULYX-acknowledgements.markdown */,
+				1524BBA3D0FF6355F74AA5799336B520 /* Pods-RULYX-acknowledgements.plist */,
+				CAE74E5E3BF9C4CB25E9DF555A906BB3 /* Pods-RULYX-dummy.m */,
+				C6AACDF7C36A53D721A1A244C4555D94 /* Pods-RULYX-frameworks.sh */,
+				4F90569495E6DC35BCB584353CFCA5A8 /* Pods-RULYX-Info.plist */,
+				A23C771922F8E763AB1F788D7B09367A /* Pods-RULYX-umbrella.h */,
+				AA8C17CEE9A4AFE1DECB50587AF4FEEA /* Pods-RULYX.debug.xcconfig */,
+				AB0D266C08883544A7C350236FA69D99 /* Pods-RULYX.release.xcconfig */,
+			);
+			name = "Pods-RULYX";
+			path = "Target Support Files/Pods-RULYX";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4FE3EF6AA38832FA825D300147C6401C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0871C7B63CA21BBE48F3871B89951753 /* Pods-RULYXUITests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61B61317126BD6A179EF06240CFF01F1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				314E5222115A00D11FFE5218DCA7DBBA /* NSBundle+GeoIP.h in Headers */,
+				3313D862229E1F0ADFD369A57D0226E4 /* NSCharacterSet+PredefinedSets.h in Headers */,
+				2162CD5FE7EA5292E6CFB6FDF20B2CE0 /* Tor-umbrella.h in Headers */,
+				D9093E326CF3FF155EC57651BF25109E /* TORAuthKey.h in Headers */,
+				A3A56937CCD80CE293713A83CA800E1A /* TORCircuit.h in Headers */,
+				64747F0F771D458D6DF77E8C56CF1D68 /* TORConfiguration.h in Headers */,
+				DDF6A754AD3094DDF0A372CAF4FF55D2 /* TORControlCommand.h in Headers */,
+				0A25F05CF0FD4947839371765A7D4212 /* TORController.h in Headers */,
+				4A6E70D08368EF92BA89A2DE56C598BF /* TORControlReplyCode.h in Headers */,
+				3FC37C233D1EB768BB342AB9D9A801E2 /* TORLogging.h in Headers */,
+				B1F12F19F15542B8DDD845956A44BFAD /* TORNode.h in Headers */,
+				F42B250083DC0E4464722EE8497F8F4F /* TOROnionAuth.h in Headers */,
+				90FA63DC0395381D3DCC9AEE7DD1178F /* TORThread.h in Headers */,
+				A1B7E93BBDC30407F5A34517C3E06E81 /* TORX25519KeyPair.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71AFF875DFB97BC2D0896CB8F2A6C801 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				586162029FB1F10D73AADD22CBF3262F /* Pods-RULYX-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE0D0A87CF19D44D141C7C80AC63F385 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79706242DB9ED664392FD6E22C8FA430 /* Pods-RULYXTests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		06F5337108653D9B7567DE0505896D5B /* Pods-RULYXTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 21048F0A0997E2A8F2FD2B6822ADC21D /* Build configuration list for PBXNativeTarget "Pods-RULYXTests" */;
+			buildPhases = (
+				CE0D0A87CF19D44D141C7C80AC63F385 /* Headers */,
+				F73621170E01B40BC02AA2ED95F1557C /* Sources */,
+				E2D2337CA541739ADCDD2F9F0C0BC44A /* Frameworks */,
+				73BA17F9891CC1D6CFB5A44792392B64 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-RULYXTests";
+			productName = Pods_RULYXTests;
+			productReference = 4BCB3EF3DC50DD6AFA4918CE386AB417 /* Pods-RULYXTests */;
+			productType = "com.apple.product-type.framework";
+		};
+		107D8BF0F8A6734AA5EAC12CFC869E54 /* Pods-RULYXUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3718A361ED577118D97E8F8424C7157D /* Build configuration list for PBXNativeTarget "Pods-RULYXUITests" */;
+			buildPhases = (
+				4FE3EF6AA38832FA825D300147C6401C /* Headers */,
+				5898A7F4299A74600BF2277CBD5F3543 /* Sources */,
+				B63FC1A1DBEA3761C3DAB99CE1FA35ED /* Frameworks */,
+				04AF7CD5007B1820C3705BD898A0BB49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-RULYXUITests";
+			productName = Pods_RULYXUITests;
+			productReference = 094ACE85338F5C47F22612F2747BCFCC /* Pods-RULYXUITests */;
+			productType = "com.apple.product-type.framework";
+		};
+		5104BBFEC3E18391A7DF8F368AC5ED7F /* Pods-RULYX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78C9AD7F7658C51B847CB3F94DE23240 /* Build configuration list for PBXNativeTarget "Pods-RULYX" */;
+			buildPhases = (
+				71AFF875DFB97BC2D0896CB8F2A6C801 /* Headers */,
+				7ED93769DCBE3F90AC72430B02B56BAA /* Sources */,
+				76287F1BAC3F3C4FEDD5647EF1882696 /* Frameworks */,
+				500EF75D34E0D19E6A633B030CA303D9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F9996B1583D115FF3AD8C3806134819B /* PBXTargetDependency */,
+			);
+			name = "Pods-RULYX";
+			productName = Pods_RULYX;
+			productReference = 7FB16CF295796C3A5A77A51F05C81EF8 /* Pods-RULYX */;
+			productType = "com.apple.product-type.framework";
+		};
+		AFA4383E7CE3B1B637884AC967B81A0E /* Tor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2ECE2DC4D70FE1A12AE0FF175485C49A /* Build configuration list for PBXNativeTarget "Tor" */;
+			buildPhases = (
+				61B61317126BD6A179EF06240CFF01F1 /* Headers */,
+				4C45A73A83CE18DA46E237A34089347A /* [CP] Copy XCFrameworks */,
+				C0B885FC6B3EE1BE817C28FCC3365987 /* Sources */,
+				BE741FBF4CA2EF26B60EAFBB0639168E /* Frameworks */,
+				5C7AC67A684FCBDA66138325E5CCDB07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				50192865E743BE36340C3B2D283A5075 /* PBXTargetDependency */,
+			);
+			name = Tor;
+			productName = Tor;
+			productReference = ADA9ABFC8E11DBA59D385A40C3B2BEF4 /* Tor */;
+			productType = "com.apple.product-type.framework";
+		};
+		B9F32A05694461370B6D7FF71888B0E0 /* Tor-GeoIP */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A6D3134BFE73025DA97F2B8299293986 /* Build configuration list for PBXNativeTarget "Tor-GeoIP" */;
+			buildPhases = (
+				2A3C39D4DB2891D17CC210F657E050D3 /* Sources */,
+				409E23DFA9C6A689A1B8714E9ECBD239 /* Frameworks */,
+				5E21E757DF6607DB9599AE5E5AA8326A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Tor-GeoIP";
+			productName = GeoIP;
+			productReference = B194F045FF468B8C1576E27AFCDF0623 /* Tor-GeoIP */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C182188EBA02C2B34CA79DF3985224C2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5104BBFEC3E18391A7DF8F368AC5ED7F /* Pods-RULYX */,
+				06F5337108653D9B7567DE0505896D5B /* Pods-RULYXTests */,
+				107D8BF0F8A6734AA5EAC12CFC869E54 /* Pods-RULYXUITests */,
+				AFA4383E7CE3B1B637884AC967B81A0E /* Tor */,
+				B9F32A05694461370B6D7FF71888B0E0 /* Tor-GeoIP */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		04AF7CD5007B1820C3705BD898A0BB49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		500EF75D34E0D19E6A633B030CA303D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C7AC67A684FCBDA66138325E5CCDB07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F9A4BF211E6CF69D2510C063A0C5327 /* Tor-GeoIP in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5E21E757DF6607DB9599AE5E5AA8326A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9FF292F309DC817377C10D12893CF616 /* geoip in Resources */,
+				04E221C43BF8809A6F0EC2765741B58C /* geoip6 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		73BA17F9891CC1D6CFB5A44792392B64 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4C45A73A83CE18DA46E237A34089347A /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Tor/Tor-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Tor/Tor-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Tor/Tor-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2A3C39D4DB2891D17CC210F657E050D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5898A7F4299A74600BF2277CBD5F3543 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10FB35C615A03C1B58D7F659B785D4D5 /* Pods-RULYXUITests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7ED93769DCBE3F90AC72430B02B56BAA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA2258F1048D5DF9DD59B1832F45F1A0 /* Pods-RULYX-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0B885FC6B3EE1BE817C28FCC3365987 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C6134F243994EE6F6EF12E054152DDFE /* NSBundle+GeoIP.m in Sources */,
+				7C32EE8EEC8513DEC9424C90272E666C /* NSCharacterSet+PredefinedSets.m in Sources */,
+				101388B7A2F39783C6ED34D390900620 /* Tor-dummy.m in Sources */,
+				2BCB389EB53A6EA1736AB80ED74EC299 /* TORAuthKey.m in Sources */,
+				638274362FEC8B1353A775FA7E8EC826 /* TORCircuit.m in Sources */,
+				96914BC2DD9CF590053E006F5EF3F283 /* TORConfiguration.m in Sources */,
+				26A722C31898BD890A5542CA9B7E5C7A /* TORController.m in Sources */,
+				2E14D0A1F78224A88C86E13011FCA50F /* TORLogging.m in Sources */,
+				F86A4E83A7253FC04C33B677CA9C8111 /* TORNode.m in Sources */,
+				0CDEBA937BF2A3EBD18A38ED6D6E278D /* TOROnionAuth.m in Sources */,
+				7013F10C43E07F5CFD428004E864880C /* TORThread.m in Sources */,
+				6D5017ADFA58BA1D4F6DF04EA5871B6E /* TORX25519KeyPair.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F73621170E01B40BC02AA2ED95F1557C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AB19BE944FF947B118B7E01E3C23F71 /* Pods-RULYXTests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		50192865E743BE36340C3B2D283A5075 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Tor-GeoIP";
+			target = B9F32A05694461370B6D7FF71888B0E0 /* Tor-GeoIP */;
+			targetProxy = 7A5A054E5C45E1972861B7FD404C8AE1 /* PBXContainerItemProxy */;
+		};
+		F9996B1583D115FF3AD8C3806134819B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Tor;
+			target = AFA4383E7CE3B1B637884AC967B81A0E /* Tor */;
+			targetProxy = 3F9EE8F83CEB8D970981BA7D3C31CFF0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		20C3A27874F21CEDDE7F954076C6E8E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB0D266C08883544A7C350236FA69D99 /* Pods-RULYX.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-RULYX/Pods-RULYX-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RULYX/Pods-RULYX.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		298B87C562553639B20E7E0E526D5EA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA8C17CEE9A4AFE1DECB50587AF4FEEA /* Pods-RULYX.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-RULYX/Pods-RULYX-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RULYX/Pods-RULYX.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		44F9C59C0CB0C2CE1927C658C9738086 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F5646BC27291FA2EAD15E339D2A2DB21 /* Pods-RULYXUITests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-RULYXUITests/Pods-RULYXUITests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RULYXUITests/Pods-RULYXUITests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		4666EDD745637E1889895230107A5D04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 461253F063CCA122F42C3790AD870DC9 /* Tor.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/Tor/Tor-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/Tor/Tor-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/Tor/Tor.modulemap";
+				PRODUCT_MODULE_NAME = Tor;
+				PRODUCT_NAME = Tor;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		557196BEE74312F9C64816EC6F557462 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F137D59B42DBEFC93F19C60344F0746B /* Pods-RULYXTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-RULYXTests/Pods-RULYXTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RULYXTests/Pods-RULYXTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		557687B0905365412229288A06F69729 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3FC1F29A86ECBB01CA25DFAE5AE9137A /* Tor.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Tor";
+				IBSC_MODULE = Tor;
+				INFOPLIST_FILE = "Target Support Files/Tor/ResourceBundle-GeoIP-Tor-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = GeoIP;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		6A5C026ED62BBFE3380CD257EEFAEB20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		79AAF5540046FB143F979B0870463AB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2C5110B36D946AFB558C334C6EB51D2B /* Pods-RULYXUITests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-RULYXUITests/Pods-RULYXUITests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RULYXUITests/Pods-RULYXUITests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		884D5469B30306B284DA847F4476A804 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3FC1F29A86ECBB01CA25DFAE5AE9137A /* Tor.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/Tor/Tor-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/Tor/Tor-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/Tor/Tor.modulemap";
+				PRODUCT_MODULE_NAME = Tor;
+				PRODUCT_NAME = Tor;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8A5A436DDEA23C899325FDBBBED6D8B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 461253F063CCA122F42C3790AD870DC9 /* Tor.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Tor";
+				IBSC_MODULE = Tor;
+				INFOPLIST_FILE = "Target Support Files/Tor/ResourceBundle-GeoIP-Tor-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = GeoIP;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		BC7F16B0FEE8EF622A8CA3CB2152E2E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E3468DD723DD3C5FD72D5419939F6CE0 /* Pods-RULYXTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-RULYXTests/Pods-RULYXTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RULYXTests/Pods-RULYXTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		E873CA97BD124B21839AF13C9BE1CD18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		21048F0A0997E2A8F2FD2B6822ADC21D /* Build configuration list for PBXNativeTarget "Pods-RULYXTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC7F16B0FEE8EF622A8CA3CB2152E2E1 /* Debug */,
+				557196BEE74312F9C64816EC6F557462 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2ECE2DC4D70FE1A12AE0FF175485C49A /* Build configuration list for PBXNativeTarget "Tor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				884D5469B30306B284DA847F4476A804 /* Debug */,
+				4666EDD745637E1889895230107A5D04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3718A361ED577118D97E8F8424C7157D /* Build configuration list for PBXNativeTarget "Pods-RULYXUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				44F9C59C0CB0C2CE1927C658C9738086 /* Debug */,
+				79AAF5540046FB143F979B0870463AB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A5C026ED62BBFE3380CD257EEFAEB20 /* Debug */,
+				E873CA97BD124B21839AF13C9BE1CD18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		78C9AD7F7658C51B847CB3F94DE23240 /* Build configuration list for PBXNativeTarget "Pods-RULYX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				298B87C562553639B20E7E0E526D5EA0 /* Debug */,
+				20C3A27874F21CEDDE7F954076C6E8E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A6D3134BFE73025DA97F2B8299293986 /* Build configuration list for PBXNativeTarget "Tor-GeoIP" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				557687B0905365412229288A06F69729 /* Debug */,
+				8A5A436DDEA23C899325FDBBBED6D8B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}

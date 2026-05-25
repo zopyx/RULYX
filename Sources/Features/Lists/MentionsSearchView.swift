@@ -155,9 +155,16 @@ struct MentionsSearchView: View {
         .navigationTitle(Text(loc: "mentions.title"))
         .toolbarTitleDisplayMode(.inline)
         .sheet(item: $selectedPostURI) { uri in
-            ThreadView(postURI: uri)
-                .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+            NavigationStack {
+                ThreadView(postURI: uri)
+                    .environmentObject(accountStore)
+                    .environmentObject(blueskyClient)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            ToolbarCloseButton()
+                        }
+                    }
+            }
         }
         .fullScreenCover(item: $imagePreview) { preview in
             ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {

@@ -12,9 +12,16 @@ struct SearchSheetsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .sheet(item: $selectedPostURI) { uri in
-                ThreadView(postURI: uri)
-                    .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                NavigationStack {
+                    ThreadView(postURI: uri)
+                        .environmentObject(accountStore)
+                        .environmentObject(blueskyClient)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                ToolbarCloseButton()
+                            }
+                        }
+                }
             }
             .fullScreenCover(item: $imagePreview) { preview in
                 ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {

@@ -7,21 +7,35 @@ struct TimelineTab: View {
     @EnvironmentObject var mutedWordsStore: MutedWordsStore
     @EnvironmentObject var analyticsStore: AnalyticsStore
     @StateObject private var viewModel = FeedTimelineViewModel()
+    @State private var navigationPath = NavigationPath()
 
     var body: some View {
-        FeedTimelineView(viewModel: viewModel)
-            .environmentObject(accountStore)
-            .environmentObject(blueskyClient)
-            .environmentObject(workspaceStore)
-            .environmentObject(mutedWordsStore)
-            .environmentObject(analyticsStore)
-            .onAppear {
-                syncFeedStore()
-            }
-            .onChange(of: accountStore.activeAccount?.did) { _, _ in
-                viewModel.prepareForAccountChange()
-                syncFeedStore()
-            }
+        NavigationStack(path: $navigationPath) {
+            FeedTimelineView(viewModel: viewModel, navigationPath: $navigationPath)
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+                .environmentObject(workspaceStore)
+                .environmentObject(mutedWordsStore)
+                .environmentObject(analyticsStore)
+                .navigationDestination(for: TimelineRoute.self) { route in
+                    switch route {
+                    case .thread(let postURI):
+                        ThreadView(postURI: postURI)
+                            .environmentObject(accountStore)
+                            .environmentObject(blueskyClient)
+                            .environmentObject(workspaceStore)
+                            .environmentObject(mutedWordsStore)
+                            .environmentObject(analyticsStore)
+                    }
+                }
+        }
+        .onAppear {
+            syncFeedStore()
+        }
+        .onChange(of: accountStore.activeAccount?.did) { _, _ in
+            viewModel.prepareForAccountChange()
+            syncFeedStore()
+        }
     }
 
     private func syncFeedStore() {

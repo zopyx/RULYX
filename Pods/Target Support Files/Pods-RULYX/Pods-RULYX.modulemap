@@ -1,0 +1,6 @@
+framework module Pods_RULYX {
+  umbrella header "Pods-RULYX-umbrella.h"
+
+  export *
+  module * { export * }
+}
