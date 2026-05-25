@@ -407,6 +407,7 @@
   "list.edit.name_label": "Name",
   "list.edit.name_placeholder": "My List",
   "list.edit.desc_label": "Description",
+  "list.edit.metadata": "Metadata",
   "list.edit.desc_placeholder": "Optional description",
   "list.edit.cancel": "Cancel",
   "list.edit.save": "Save",

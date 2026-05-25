@@ -1157,5 +1157,10 @@
   "ai.classify.no_models_desc": "Download an AI model in Settings to classify posts.",
   "ai.classify.select_models": "Select Models",
   "ai.classify.run": "Run Classification",
-  "ai.classify.results": "Results"
+  "ai.classify.results": "Results",
+  "post.mute_user": "Mute %@",
+  "post.block_user": "Block %@",
+  "post.share": "Share post",
+  "timeline.show_replies": "Show {n} replies",
+  "timeline.view_all_replies": "View all replies"
 }

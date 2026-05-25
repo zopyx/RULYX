@@ -989,7 +989,6 @@
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "chat.error.title": "Falha ao carregar conversas",
   "lists.lists_on_profile": "Perfil incluído em listas...",
-  "Search for posts mentioning your handle or run custom searches across Bluesky.": "Search for posts mentioning your handle or run custom searches across Bluesky.",
   "lists.advanced.mentions_button": "Pesquisar posts que me mencionam",
   "mentions.title": "Posts que me mencionam",
   "mentions.loading": "Pesquisando...",
@@ -1158,5 +1157,10 @@
   "ai.classify.no_models_desc": "Download an AI model in Settings to classify posts.",
   "ai.classify.select_models": "Select Models",
   "ai.classify.run": "Run Classification",
-  "ai.classify.results": "Results"
+  "ai.classify.results": "Results",
+  "post.mute_user": "Mute %@",
+  "post.block_user": "Block %@",
+  "post.share": "Share post",
+  "timeline.show_replies": "Show {n} replies",
+  "timeline.view_all_replies": "View all replies"
 }
