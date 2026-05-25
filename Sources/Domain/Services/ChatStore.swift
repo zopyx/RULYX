@@ -13,6 +13,7 @@ final class ChatStore: ObservableObject {
     @Published private(set) var isSendingMessage = false
     @Published private(set) var hasMoreMessages: [String: Bool] = [:]
     @Published var error: Error?
+    @Published var messageError: Error?
 
     private let chatService: ChatServicing
     private var convosCursor: String?
@@ -51,6 +52,7 @@ final class ChatStore: ObservableObject {
             convosCursor = result.cursor
             isLoadingConvos = false
         } catch {
+            guard !AppError.isCancellation(error) else { return }
             self.error = error
             isLoadingConvos = false
         }
@@ -72,7 +74,7 @@ final class ChatStore: ObservableObject {
     func loadMessages(convoId: String) async {
         guard let account = activeAccount else { return }
         isLoadingMessages = true
-        error = nil
+        messageError = nil
         do {
             let result = try await chatService.getMessages(convoId: convoId, cursor: nil, limit: 50, account: account, appPassword: activeAppPassword)
             messages[convoId] = result.messages.reversed()
@@ -89,7 +91,7 @@ final class ChatStore: ObservableObject {
             }
         } catch {
             AppLogger.persistence.error("Failed to load messages for \(convoId, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            self.error = error
+            self.messageError = error
             isLoadingMessages = false
         }
     }
@@ -108,7 +110,7 @@ final class ChatStore: ObservableObject {
             messages[convoId] = newMessages + existing
             isLoadingMoreMessages = false
         } catch {
-            self.error = error
+            self.messageError = error
             isLoadingMoreMessages = false
         }
     }

@@ -61,6 +61,7 @@ final class ListsViewModel: ObservableObject {
         do {
             listsByKind = try await Dictionary(grouping: listsTask, by: \.kind)
         } catch {
+            guard !AppError.isCancellation(error) else { return }
             if listsByKind.isEmpty {
                 listsByKind = [:]
                 errorMessage = AppError.userMessage(from: error)
