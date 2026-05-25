@@ -22,6 +22,8 @@ targets:
       path: Sources/App/Info.plist
       properties:
         CFBundleDisplayName: RULYX
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UIApplicationSupportsIndirectInputEvents: true
@@ -33,8 +35,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ajung.RULYX
-        MARKETING_VERSION: "1.0.1"
-        CURRENT_PROJECT_VERSION: "55"
+        MARKETING_VERSION: "1.0.2"
+        CURRENT_PROJECT_VERSION: "56"
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     scheme:
