@@ -1138,7 +1138,7 @@
   "profile.block_back.preview.empty": "No accounts to block back",
   "profile.block_back.preview.blocks_me": "Blocks me",
   "profile.block_back.preview.not_blocked": "Not blocked back",
-  "settings.ai": "AI Models",
+  "settings.ai": "AI / On-Device",
   "ai.models.title": "AI Models",
   "ai.models.section": "Available Models",
   "ai.models.download": "Download",
