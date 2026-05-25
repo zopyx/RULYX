@@ -164,6 +164,7 @@ struct PostActionBar: View {
                 .font(.body.weight(.medium))
                 .foregroundStyle(.tertiary)
         }
+        .accessibilityLabel(loc("post.gear_menu"))
     }
 
     @ViewBuilder
