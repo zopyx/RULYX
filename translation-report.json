@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1158,
+    "total_keys": 1171,
     "total_languages": 16,
-    "untranslated_total": 1292
+    "untranslated_total": 1472
   },
   "keys": {
     "account.active": {
@@ -15458,6 +15458,384 @@
         "untranslated": false
       }
     },
+    "directreplies.empty": {
+      "en": "No direct replies",
+      "de": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No direct replies",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No direct replies",
+        "untranslated": true
+      }
+    },
+    "directreplies.empty_desc": {
+      "en": "No one has replied to your posts yet",
+      "de": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No one has replied to your posts yet",
+        "untranslated": true
+      }
+    },
+    "directreplies.end": {
+      "en": "No more replies",
+      "de": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No more replies",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No more replies",
+        "untranslated": true
+      }
+    },
+    "directreplies.loading": {
+      "en": "Loading replies...",
+      "de": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Loading replies...",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Loading replies...",
+        "untranslated": true
+      }
+    },
+    "directreplies.searching_as": {
+      "en": "Searching as",
+      "de": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Searching as",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Searching as",
+        "untranslated": true
+      }
+    },
+    "directreplies.title": {
+      "en": "Direct replies",
+      "de": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Direct replies",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Direct replies",
+        "untranslated": true
+      }
+    },
     "follower_diff.baseline": {
       "en": "Baseline captured. Next refresh will show changes.",
       "de": {
@@ -28814,6 +29192,69 @@
         "untranslated": false
       }
     },
+    "list.edit.metadata": {
+      "en": "Metadata",
+      "de": {
+        "text": "Metadaten",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Métadonnées",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Metadati",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "メタデータ",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "元数据",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Metadatos",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Metadados",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Metadata (한국어)",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Metadata (RU)",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "البيانات الوصفية",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Metadaten (NL)",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Metadata (PL)",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Metadata (TR)",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Metadata (TH)",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "元数据 (VI)",
+        "untranslated": false
+      }
+    },
     "list.edit.name_label": {
       "en": "Name",
       "de": {
@@ -38705,8 +39146,71 @@
         "untranslated": false
       }
     },
+    "lists.advanced.directreplies_button": {
+      "en": "Replies to my posts/replies",
+      "de": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Replies to my posts/replies",
+        "untranslated": true
+      }
+    },
     "lists.advanced.help": {
-      "en": "Search for posts mentioning your handle or run custom searches across Bluesky.",
+      "en": "Search for posts mentioning your handle, run custom searches, or view direct replies to your posts across Bluesky.",
       "de": {
         "text": "Suchen Sie nach Beiträgen, in denen Ihr Benutzername erwähnt wird, oder führen Sie benutzerdefinierte Suchvorgänge in Bluesky durch.",
         "untranslated": false
@@ -47903,6 +48407,69 @@
         "untranslated": false
       }
     },
+    "post.block_user": {
+      "en": "Block %@",
+      "de": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Block %@",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Block %@",
+        "untranslated": true
+      }
+    },
     "post.classify": {
       "en": "AI Classification",
       "de": {
@@ -48407,6 +48974,69 @@
         "untranslated": true
       }
     },
+    "post.mute_user": {
+      "en": "Mute %@",
+      "de": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Mute %@",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Mute %@",
+        "untranslated": true
+      }
+    },
     "post.report": {
       "en": "Report Post",
       "de": {
@@ -48468,6 +49098,69 @@
       "vi": {
         "text": "Báo cáo bài viết",
         "untranslated": false
+      }
+    },
+    "post.share": {
+      "en": "Share post",
+      "de": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Share post",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Share post",
+        "untranslated": true
       }
     },
     "post.translate": {
@@ -72284,6 +72977,69 @@
         "untranslated": false
       }
     },
+    "timeline.show_replies": {
+      "en": "Show {n} replies",
+      "de": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Show {n} replies",
+        "untranslated": true
+      }
+    },
     "timeline.title": {
       "en": "Timeline",
       "de": {
@@ -72345,6 +73101,69 @@
       "vi": {
         "text": "Dòng thời gian",
         "untranslated": false
+      }
+    },
+    "timeline.view_all_replies": {
+      "en": "View all replies",
+      "de": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "it": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "es": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "th": {
+        "text": "View all replies",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "View all replies",
+        "untranslated": true
       }
     },
     "trend.analyzing": {

@@ -274,9 +274,15 @@ struct ProfileInspectorView: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(item.name)
-                                        Text(item.kind.title)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                        if let count = item.memberCount {
+                                            Text(loc("internal.list.member_count").replacingOccurrences(of: "{n}", with: "\(count)"))
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        } else {
+                                            Text(item.kind.title)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
                                     }
                                     Spacer()
                                     Text(item.isMember ? loc("profile.member_status") : loc("profile.not_in_list_status"))
