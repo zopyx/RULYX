@@ -62,6 +62,29 @@ final class FeedTimelineViewModel: ObservableObject {
     @Published private var optimisticReposts: [String: Bool] = [:]
     @Published private var optimisticLikeURIs: [String: String] = [:]
     @Published private var optimisticRepostURIs: [String: String] = [:]
+    @Published var expandedThreadURIs: Set<String> = []
+    @Published var inlineThreads: [String: ThreadNode] = [:]
+
+    func toggleInlineThread(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        if expandedThreadURIs.contains(uri) {
+            expandedThreadURIs.remove(uri)
+            inlineThreads.removeValue(forKey: uri)
+            return
+        }
+        if let cached = ThreadCacheService.shared.get(uri: uri) {
+            inlineThreads[uri] = cached
+            expandedThreadURIs.insert(uri)
+            return
+        }
+        do {
+            let response = try await client.fetchPostThread(uri: uri, account: account, appPassword: appPassword)
+            ThreadCacheService.shared.set(uri: uri, thread: response.thread)
+            inlineThreads[uri] = response.thread
+            expandedThreadURIs.insert(uri)
+        } catch {
+            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .public)")
+        }
+    }
 
     func effectiveIsLiked(uri: String) -> Bool {
         optimisticLikes[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isLikedByMe ?? false
@@ -146,6 +169,9 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticReposts.removeAll()
         optimisticLikeURIs.removeAll()
         optimisticRepostURIs.removeAll()
+        expandedThreadURIs.removeAll()
+        inlineThreads.removeAll()
+        ThreadCacheService.shared.invalidateAll()
         let previousState = state
         state = .refreshing
         let oldKnown = knownURIs
@@ -190,6 +216,8 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticReposts.removeAll()
         optimisticLikeURIs.removeAll()
         optimisticRepostURIs.removeAll()
+        expandedThreadURIs.removeAll()
+        inlineThreads.removeAll()
     }
 
     func prepareForFeedChange() {
@@ -203,6 +231,8 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticReposts.removeAll()
         optimisticLikeURIs.removeAll()
         optimisticRepostURIs.removeAll()
+        expandedThreadURIs.removeAll()
+        inlineThreads.removeAll()
     }
 
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
