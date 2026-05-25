@@ -72,12 +72,12 @@ struct UserPostsView: View {
             .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ToolbarCloseButton()
-                }
-                ToolbarItem(placement: .topBarTrailing) {
                     if !viewModel.posts.isEmpty {
                         exportMenu
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
                 }
             }
             .sheet(item: $selectedPostURI) { uri in
