@@ -44,6 +44,7 @@
 		22A4A150E9859AA06A459020 /* ComposeContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6FDB05B05B579AA328BF56 /* ComposeContext.swift */; };
 		23E168529534A0F98C8FE234 /* AccountStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6571FE9481793C96679D91 /* AccountStoreTests.swift */; };
 		2437CAA488C1815E9265C741 /* CustomSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D4561994799AE58C89450A /* CustomSearchView.swift */; };
+		24488F154C53147D5126ED66 /* ReplyComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692C913A711E686C56BD6A7 /* ReplyComposerView.swift */; };
 		2488A9706FF1B7AFC18FBADC /* PluralRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B4BA42B59065562FF3217C /* PluralRulesTests.swift */; };
 		24A9806D5010F4F7233F1BD5 /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824692A0A8442A52D569C6EC /* AccountStore.swift */; };
 		24F88ED026A54E1FF5EEA8CF /* TimelineRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14AA0B5C81138EBB739694C3 /* TimelineRoute.swift */; };
@@ -467,6 +468,7 @@
 		B4335C3F5814E3BDB0B9DF67 /* UserAgentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentProvider.swift; sourceTree = "<group>"; };
 		B5316102E1628DF01DEDFC7D /* BlueskyAPIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPIError.swift; sourceTree = "<group>"; };
 		B57216AC94F6167441B648F4 /* RULYXUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RULYXUITests.swift; sourceTree = "<group>"; };
+		B692C913A711E686C56BD6A7 /* ReplyComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyComposerView.swift; sourceTree = "<group>"; };
 		B86842F73E92AB0406429E65 /* ListImportControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListImportControllerTests.swift; sourceTree = "<group>"; };
 		B8DA9DA73813F661EB4F6BD6 /* LoadableStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadableStateTests.swift; sourceTree = "<group>"; };
 		B9F8024F2606E01EAC5C0AF3 /* ActionQueueStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionQueueStoreTests.swift; sourceTree = "<group>"; };
@@ -808,6 +810,7 @@
 				68C97F905D78C83E4BE674AB /* FeedPickerView.swift */,
 				A0BE169952D43B0D6F3941A5 /* FeedTimelineView.swift */,
 				F72120E2FE66B0CBAB1969A4 /* FeedTimelineViewModel.swift */,
+				B692C913A711E686C56BD6A7 /* ReplyComposerView.swift */,
 				397A58D8FCDB62DEDFB1E850 /* ThreadView.swift */,
 				14AA0B5C81138EBB739694C3 /* TimelineRoute.swift */,
 				14DC5D9D6263FDF264240662 /* TimelineState.swift */,
@@ -1395,6 +1398,7 @@
 				CB92F8BAC45E4EDD80C3DFE2 /* RULYXApp.swift in Sources */,
 				5508A861BFC224F7CFDBF650 /* RelationshipCache.swift in Sources */,
 				4160D219B6BFFD02231A897A /* RelationshipsView.swift in Sources */,
+				24488F154C53147D5126ED66 /* ReplyComposerView.swift in Sources */,
 				BB720FEA1BCF4B1685689ACC /* ReportGeneratorView.swift in Sources */,
 				79DC8865B65E060924692E1A /* RootView.swift in Sources */,
 				3D953E56E782CF08D579BF0B /* SearchToken.swift in Sources */,

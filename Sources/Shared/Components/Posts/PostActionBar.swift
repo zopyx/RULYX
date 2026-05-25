@@ -45,6 +45,8 @@ struct PostActionBar: View {
                         Image(systemName: isLiked ? "heart.fill" : "heart")
                             .font(.body.weight(.medium))
                             .foregroundStyle(isLiked ? Color.red : Color.gray.opacity(0.6))
+                            .scaleEffect(isLiked ? 1.1 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
                     }
                 }
                 if let count = likeCount {

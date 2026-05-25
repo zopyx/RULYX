@@ -28,7 +28,7 @@ final class FeedTimelineViewModel: ObservableObject {
     private var lastRefreshHadPosts = false
     private var pollingTask: Task<Void, Never>?
 
-    func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 15) {
+    func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 8) {
         stopPolling()
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -47,7 +47,7 @@ final class FeedTimelineViewModel: ObservableObject {
     private func checkForNewPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !knownURIs.isEmpty, state != .initialLoading else { return }
         do {
-            let response = try await fetchFeed(account: account, appPassword: appPassword, cursor: nil, limit: 5, using: client)
+            let response = try await fetchFeed(account: account, appPassword: appPassword, cursor: nil, limit: 10, using: client)
             let newURIs = Set(response.feed.map(\.post.uri)).subtracting(knownURIs)
             guard !newURIs.isEmpty else { return }
             knownURIs.formUnion(newURIs)
