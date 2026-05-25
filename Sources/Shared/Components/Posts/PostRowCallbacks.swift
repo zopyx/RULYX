@@ -20,6 +20,8 @@ struct PostRowCallbacks {
     var onClassify: (() -> Void)?
     var isLiked: Bool = false
     var isReposted: Bool = false
+    var overrideLikeCount: Int?
+    var overrideRepostCount: Int?
     var availableLikerTargetLists: [BlueskyList] = []
 
     init(
@@ -42,6 +44,8 @@ struct PostRowCallbacks {
         onClassify: (() -> Void)? = nil,
         isLiked: Bool = false,
         isReposted: Bool = false,
+        overrideLikeCount: Int? = nil,
+        overrideRepostCount: Int? = nil,
         availableLikerTargetLists: [BlueskyList] = []
     ) {
         self.onTapThread = onTapThread
@@ -63,6 +67,8 @@ struct PostRowCallbacks {
         self.onClassify = onClassify
         self.isLiked = isLiked
         self.isReposted = isReposted
+        self.overrideLikeCount = overrideLikeCount
+        self.overrideRepostCount = overrideRepostCount
         self.availableLikerTargetLists = availableLikerTargetLists
     }
 }

@@ -8,6 +8,14 @@ struct PostActionBar: View {
     var isReposted: Bool
     let callbacks: PostRowCallbacks
 
+    private var effectiveLikeCount: Int? {
+        callbacks.overrideLikeCount ?? likeCount
+    }
+
+    private var effectiveRepostCount: Int? {
+        callbacks.overrideRepostCount ?? repostCount
+    }
+
     private var moderationLikerTargetLists: [BlueskyList] {
         callbacks.availableLikerTargetLists.filter { $0.kind == .moderation }
     }
@@ -30,7 +38,7 @@ struct PostActionBar: View {
                     HStack(spacing: 4) {
                         Image(systemName: isReposted ? "repeat.circle.fill" : "repeat")
                             .font(.body.weight(.medium))
-                        if let count = repostCount {
+                        if let count = effectiveRepostCount {
                             Text("\(count)")
                                 .font(.callout)
                         }
@@ -49,7 +57,7 @@ struct PostActionBar: View {
                             .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
                     }
                 }
-                if let count = likeCount {
+                if let count = effectiveLikeCount {
                     Button(action: { callbacks.onShowLikes?() }) {
                         Text("\(count)")
                             .font(.callout)

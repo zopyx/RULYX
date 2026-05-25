@@ -62,6 +62,8 @@ final class FeedTimelineViewModel: ObservableObject {
     @Published private var optimisticReposts: [String: Bool] = [:]
     @Published private var optimisticLikeURIs: [String: String] = [:]
     @Published private var optimisticRepostURIs: [String: String] = [:]
+    @Published private var optimisticLikeCounts: [String: Int] = [:]
+    @Published private var optimisticRepostCounts: [String: Int] = [:]
     @Published var expandedThreadURIs: Set<String> = []
     @Published var inlineThreads: [String: ThreadNode] = [:]
 
@@ -98,10 +100,22 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticLikeURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
     }
 
+    func effectiveLikeCount(uri: String) -> Int {
+        if let count = optimisticLikeCounts[uri] { return count }
+        return entries.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
+    }
+
+    func effectiveRepostCount(uri: String) -> Int {
+        if let count = optimisticRepostCounts[uri] { return count }
+        return entries.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
+    }
+
     func toggleLike(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let cid = entries.first(where: { $0.post.uri == uri })?.post.cid else { return }
         let wasLiked = effectiveIsLiked(uri: uri)
+        let oldCount = effectiveLikeCount(uri: uri)
         optimisticLikes[uri] = !wasLiked
+        optimisticLikeCounts[uri] = oldCount + (wasLiked ? -1 : 1)
         do {
             if wasLiked, let likeURI = effectiveMyLikeURI(uri: uri) {
                 _ = try await client.deleteRecord(recordURI: likeURI, account: account, appPassword: appPassword)
@@ -112,6 +126,7 @@ final class FeedTimelineViewModel: ObservableObject {
             }
         } catch {
             optimisticLikes.removeValue(forKey: uri)
+            optimisticLikeCounts.removeValue(forKey: uri)
             if wasLiked { optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI }
             AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -120,7 +135,9 @@ final class FeedTimelineViewModel: ObservableObject {
     func toggleRepost(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let cid = entries.first(where: { $0.post.uri == uri })?.post.cid else { return }
         let wasReposted = effectiveIsReposted(uri: uri)
+        let oldCount = effectiveRepostCount(uri: uri)
         optimisticReposts[uri] = !wasReposted
+        optimisticRepostCounts[uri] = oldCount + (wasReposted ? -1 : 1)
         do {
             if wasReposted, let repostURI = effectiveMyRepostURI(uri: uri) {
                 _ = try await client.deleteRecord(recordURI: repostURI, account: account, appPassword: appPassword)
@@ -131,6 +148,7 @@ final class FeedTimelineViewModel: ObservableObject {
             }
         } catch {
             optimisticReposts.removeValue(forKey: uri)
+            optimisticRepostCounts.removeValue(forKey: uri)
             if wasReposted { optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI }
             AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -169,6 +187,8 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticReposts.removeAll()
         optimisticLikeURIs.removeAll()
         optimisticRepostURIs.removeAll()
+        optimisticLikeCounts.removeAll()
+        optimisticRepostCounts.removeAll()
         expandedThreadURIs.removeAll()
         inlineThreads.removeAll()
         ThreadCacheService.shared.invalidateAll()
@@ -216,6 +236,8 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticReposts.removeAll()
         optimisticLikeURIs.removeAll()
         optimisticRepostURIs.removeAll()
+        optimisticLikeCounts.removeAll()
+        optimisticRepostCounts.removeAll()
         expandedThreadURIs.removeAll()
         inlineThreads.removeAll()
     }
@@ -231,6 +253,8 @@ final class FeedTimelineViewModel: ObservableObject {
         optimisticReposts.removeAll()
         optimisticLikeURIs.removeAll()
         optimisticRepostURIs.removeAll()
+        optimisticLikeCounts.removeAll()
+        optimisticRepostCounts.removeAll()
         expandedThreadURIs.removeAll()
         inlineThreads.removeAll()
     }

@@ -300,6 +300,8 @@ struct FeedTimelineView: View {
                     onClassify: { likerActions.postToClassify = entry },
                     isLiked: viewModel.effectiveIsLiked(uri: entry.post.uri),
                     isReposted: viewModel.effectiveIsReposted(uri: entry.post.uri),
+                    overrideLikeCount: viewModel.effectiveLikeCount(uri: entry.post.uri),
+                    overrideRepostCount: viewModel.effectiveRepostCount(uri: entry.post.uri),
                     availableLikerTargetLists: likerActions.availableTargetLists
                 )
             )
