@@ -1,0 +1,13 @@
+{
+  "models": [
+    {
+      "id": "phi-3-mini-q4",
+      "name": "Phi-3 Mini (Q4)",
+      "role": "textGenerator",
+      "downloadURL": "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf",
+      "fileSize": 2350000000,
+      "description": "Microsoft Phi-3 mini 3.8B parameter model, 4-bit quantized. Suitable for moderation suggestions and content analysis.",
+      "requires": "17.0"
+    }
+  ]
+}
