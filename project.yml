@@ -16,6 +16,8 @@ targets:
       - Sources
       - Assets/Assets.xcassets
       - Sources/App/PrivacyInfo.xcprivacy
+    resources:
+      - Sources/Domain/AI/model_manifest.json
     info:
       path: Sources/App/Info.plist
       properties:
