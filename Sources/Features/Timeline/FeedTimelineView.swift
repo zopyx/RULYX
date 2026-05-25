@@ -21,6 +21,7 @@ struct FeedTimelineView: View {
     @State private var postToDelete: RichFeedEntry?
     @State private var editPostEntry: RichFeedEntry?
     @State private var profileToShow: BlueskyActor?
+    @State private var postToShare: RichFeedEntry?
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @StateObject private var likerActions = PostLikerActionsManager()
@@ -142,6 +143,11 @@ struct FeedTimelineView: View {
                 .environmentObject(analyticsStore)
             }
         }
+        .sheet(item: $postToShare) { entry in
+            if let url = shareURL(for: entry) {
+                ShareSheet(activityItems: [url])
+            }
+        }
         .confirmationDialog(
             loc("post.delete.confirm"),
             isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
@@ -191,64 +197,7 @@ struct FeedTimelineView: View {
     private var listContent: some View {
         List {
             ForEach(viewModel.visibleEntries, id: \.post.uri) { entry in
-                PostRowView(
-                    entry: entry,
-                    style: .full,
-                    callbacks: PostRowCallbacks(
-                        onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
-                        onTapImage: { index in
-                            let allImages = entry.post.embed?.images ?? []
-                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                            guard index < urls.count else { return }
-                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                        },
-                        onPlayVideo: {
-                            if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
-                                videoPreviewURL = url
-                            }
-                        },
-                        onOpenProfile: { handle in openProfile(handle) },
-                        onReply: { handleReply(entry) },
-                        onLike: { handleLike(entry) },
-                        onShowLikes: { showLikesForURI = entry.post.uri },
-                        onRepost: { handleRepost(entry) },
-                        onQuote: { handleQuote(entry) },
-                        onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
-                        onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
-                        onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
-                        onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
-                        onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
-                        onBlockAllLikers: {
-                            guard let account = accountStore.activeAccount,
-                                  let appPassword = accountStore.appPassword(for: account) else { return }
-                            likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
-                        },
-                        onAddAllLikersToList: { list in
-                            guard let fetchAccount = accountStore.activeAccount,
-                                  let fetchPassword = accountStore.appPassword(for: fetchAccount),
-                                  let activeAccount = accountStore.activeAccount,
-                                  let activePassword = accountStore.appPassword(for: activeAccount) else { return }
-                            likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
-                        },
-                        onClassify: { likerActions.postToClassify = entry },
-                        isLiked: entry.post.isLikedByMe,
-                        isReposted: entry.post.isRepostedByMe,
-                        availableLikerTargetLists: likerActions.availableTargetLists
-                    )
-                )
-                .contextMenu {
-                    if let word = muteWord(from: entry) {
-                        Button {
-                            viewModel.mutedWords.add(word)
-                        } label: {
-                            Label {
-                                Text(verbatim: loc("timeline.mute_word").replacingOccurrences(of: "{word}", with: word))
-                            } icon: {
-                                Image(systemName: "eye.slash")
-                            }
-                        }
-                    }
-                }
+                postRowView(for: entry)
             }
             if viewModel.state.hasMore {
                 Color.clear
@@ -302,6 +251,112 @@ struct FeedTimelineView: View {
             if viewModel.newPostCount > 0 {
                 newPostsBanner
             }
+        }
+    }
+
+    private func postRowView(for entry: RichFeedEntry) -> some View {
+        PostRowView(
+            entry: entry,
+            style: .full,
+            callbacks: PostRowCallbacks(
+                onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
+                onTapImage: { index in
+                    let allImages = entry.post.embed?.images ?? []
+                    let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                    guard index < urls.count else { return }
+                    imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                },
+                onPlayVideo: {
+                    if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
+                        videoPreviewURL = url
+                    }
+                },
+                onOpenProfile: { handle in openProfile(handle) },
+                onReply: { handleReply(entry) },
+                onLike: { handleLike(entry) },
+                onShowLikes: { showLikesForURI = entry.post.uri },
+                onRepost: { handleRepost(entry) },
+                onQuote: { handleQuote(entry) },
+                onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
+                onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
+                onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
+                onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
+                onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
+                onBlockAllLikers: {
+                    guard let account = accountStore.activeAccount,
+                          let appPassword = accountStore.appPassword(for: account) else { return }
+                    likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+                },
+                onAddAllLikersToList: { list in
+                    guard let fetchAccount = accountStore.activeAccount,
+                          let fetchPassword = accountStore.appPassword(for: fetchAccount),
+                          let activeAccount = accountStore.activeAccount,
+                          let activePassword = accountStore.appPassword(for: activeAccount) else { return }
+                    likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+                },
+                onClassify: { likerActions.postToClassify = entry },
+                isLiked: entry.post.isLikedByMe,
+                isReposted: entry.post.isRepostedByMe,
+                availableLikerTargetLists: likerActions.availableTargetLists
+            )
+        )
+        .contextMenu {
+            if let text = entry.post.safeRecord.text {
+                Button { UIPasteboard.general.string = text } label: {
+                    Label(loc("post.copy"), systemImage: "doc.on.doc")
+                }
+            }
+            Button { postToShare = entry } label: {
+                Label(loc("post.share"), systemImage: "square.and.arrow.up")
+            }
+            Divider()
+            if let handle = entry.post.author?.handle {
+                Button {
+                    Task { await muteUser(handle: handle, did: entry.post.author?.did) }
+                } label: {
+                    Label(String(format: loc("post.mute_user"), "@\(handle)"), systemImage: "eye.slash")
+                }
+                Button {
+                    Task { await blockUser(handle: handle, did: entry.post.author?.did) }
+                } label: {
+                    Label(String(format: loc("post.block_user"), "@\(handle)"), systemImage: "hand.raised")
+                }
+            }
+            Divider()
+            if !isOwnPost(entry) {
+                Button { likerActions.postToReport = entry } label: {
+                    Label(loc("post.report"), systemImage: "exclamationmark.bubble")
+                }
+            }
+            if let text = entry.post.safeRecord.text {
+                Button { translateText(text) } label: {
+                    Label(loc("post.translate"), systemImage: "globe")
+                }
+            }
+            if let word = muteWord(from: entry) {
+                Divider()
+                Button {
+                    viewModel.mutedWords.add(word)
+                } label: {
+                    Label(loc("timeline.mute_word").replacingOccurrences(of: "{word}", with: word), systemImage: "textformat.subscript")
+                }
+            }
+        }
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            Button {
+                handleLike(entry)
+            } label: {
+                Image(systemName: entry.post.isLikedByMe ? "heart.slash" : "heart")
+            }
+            .tint(entry.post.isLikedByMe ? .gray : .pink)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button {
+                handleReply(entry)
+            } label: {
+                Image(systemName: "arrowshape.turn.up.left")
+            }
+            .tint(.blue)
         }
     }
 
@@ -492,6 +547,47 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
     }
+
+    private func muteUser(handle: String, did: String?) async {
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account),
+              let did else { return }
+        do {
+            try await blueskyClient.muteActor(did: did, account: account, appPassword: appPassword)
+            AppLogger.moderation.info("Muted @\(handle, privacy: .public)")
+        } catch {
+            AppLogger.moderation.error("Failed to mute @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func blockUser(handle: String, did: String?) async {
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account),
+              let did else { return }
+        do {
+            try await blueskyClient.blockActor(did: did, account: account, appPassword: appPassword)
+            AppLogger.moderation.info("Blocked @\(handle, privacy: .public)")
+        } catch {
+            AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func shareURL(for entry: RichFeedEntry) -> URL? {
+        let uri = entry.post.uri
+        guard let did = entry.post.author?.did else { return nil }
+        let rkey = uri.split(separator: "/").last.map(String.init) ?? ""
+        return URL(string: "https://bsky.app/profile/\(did)/post/\(rkey)")
+    }
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context _: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_: UIActivityViewController, context _: Context) {}
 }
 
 #Preview {
