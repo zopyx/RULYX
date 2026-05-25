@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "ลบโพสต์นี้ใช่ไหม",
   "post.delete.message": "การดำเนินการนี้จะลบโพสต์ออกจาก Bluesky อย่างถาวร สิ่งนี้ไม่สามารถยกเลิกได้",
   "post.translate": "แปลโพสต์",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "การปิดกั้น",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "บล็อกฉัน",

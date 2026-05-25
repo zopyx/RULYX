@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "Dit bericht verwijderen?",
   "post.delete.message": "Hierdoor wordt het bericht definitief van Bluesky verwijderd. Dit kan niet ongedaan worden gemaakt.",
   "post.translate": "Vertaal bericht",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Blokkeren",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Blokkeert mij",

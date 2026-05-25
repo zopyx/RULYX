@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "Usunąć ten post?",
   "post.delete.message": "Spowoduje to trwałe usunięcie posta z Bluesky. Tego nie można cofnąć.",
   "post.translate": "Przetłumacz post",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Bloking",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Blokuje mnie",

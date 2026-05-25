@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "Удалить этот пост?",
   "post.delete.message": "Это приведет к удалению публикации из Bluesky. Это невозможно отменить.",
   "post.translate": "Перевести сообщение",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Блокировка",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Блокирует меня",

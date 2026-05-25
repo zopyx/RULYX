@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "Xóa bài đăng này?",
   "post.delete.message": "Điều này sẽ xóa vĩnh viễn bài đăng khỏi Bluesky. Điều này không thể hoàn tác được.",
   "post.translate": "Dịch bài đăng",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Chặn",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Chặn tôi",
