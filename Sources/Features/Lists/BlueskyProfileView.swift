@@ -289,6 +289,7 @@ struct BlueskyProfileView: View {
                                 .tag(color)
                             }
                         }
+                        .pickerStyle(.navigationLink)
                     }
                 }
                 .navigationTitle(loc("internal.lists.create"))

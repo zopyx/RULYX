@@ -95,7 +95,7 @@ struct NotificationRow: View {
     private func relatedPostCard(_ post: RichPost) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                avatar(for: post)
+                smallAvatar(for: post.safeAuthor)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(post.safeAuthor.displayName ?? post.safeAuthor.handle ?? "")
                         .font(.caption.weight(.semibold))
@@ -119,11 +119,11 @@ struct NotificationRow: View {
             }
 
             if let text = post.safeRecord.text, !text.isEmpty {
-                Text(text.replacingOccurrences(of: "\n", with: " "))
-                    .font(.caption)
-                    .foregroundStyle(.primary)
-                    .lineLimit(4)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                PostTextContent(
+                    text: text.replacingOccurrences(of: "\n", with: " "),
+                    font: .caption,
+                    lineLimit: 4
+                )
             }
 
             if let imageURL = previewImageURL(for: post) {
@@ -169,9 +169,9 @@ struct NotificationRow: View {
         }
     }
 
-    private func avatar(for post: RichPost) -> some View {
+    private func smallAvatar(for author: RichAuthor) -> some View {
         Group {
-            if let avatarURL = post.safeAuthor.avatar.flatMap(URL.init) {
+            if let avatarURL = author.avatar.flatMap(URL.init) {
                 ThumbnailImageView(url: avatarURL, maxPixelSize: 64) {
                     Circle().fill(Color.skyPrimary.opacity(0.16))
                 }
@@ -180,7 +180,7 @@ struct NotificationRow: View {
                 Circle()
                     .fill(Color.skyPrimary.opacity(0.16))
                     .overlay {
-                        Text((post.safeAuthor.displayName ?? post.safeAuthor.handle ?? "?").prefix(1).uppercased())
+                        Text((author.displayName ?? author.handle ?? "?").prefix(1).uppercased())
                             .font(.caption2.weight(.bold))
                             .foregroundStyle(Color.skyPrimary)
                     }
