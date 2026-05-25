@@ -86,15 +86,17 @@ struct FeedTimelineView: View {
         }
         .sheet(item: $composeContext) { context in
             if context.isReply {
-                ComposePostView(
+                ReplyComposerView(
                     account: context.account,
                     appPassword: context.appPassword,
                     blueskyClient: blueskyClient,
-                    onComplete: { refreshAfterAction() },
-                    replyTo: (context.parentURI, context.parentCID, context.rootURI, context.rootCID)
+                    parentURI: context.parentURI,
+                    parentCID: context.parentCID,
+                    rootURI: context.rootURI,
+                    rootCID: context.rootCID,
+                    onComplete: { refreshAfterAction() }
                 )
-                .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .presentationDetents([.medium, .large])
             } else {
                 ComposePostView(
                     account: context.account,
