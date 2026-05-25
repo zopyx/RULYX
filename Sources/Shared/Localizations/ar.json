@@ -1053,6 +1053,7 @@
   "post.delete.confirm": "هل تريد حذف هذه المشاركة؟",
   "post.delete.message": "سيؤدي هذا إلى إزالة المنشور نهائيًا من Bluesky. لا يمكن التراجع عن هذا.",
   "post.translate": "ترجمة المنشور",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "الحظر",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "يمنعني",

@@ -1053,6 +1053,7 @@
   "post.delete.confirm": "Diesen Beitrag löschen?",
   "post.delete.message": "Dadurch wird der Beitrag dauerhaft aus Bluesky entfernt.Dies kann nicht rückgängig gemacht werden.",
   "post.translate": "Beitrag übersetzen",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Blockierung",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Blockiert mich",

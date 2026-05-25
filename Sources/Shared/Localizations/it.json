@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "Eliminare questo post?",
   "post.delete.message": "Ciò rimuoverà permanentemente il post da Bluesky. Questa operazione non può essere annullata.",
   "post.translate": "Traduci il messaggio",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Blocco",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Mi blocca",

@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "이 게시물을 삭제하시겠습니까?",
   "post.delete.message": "그러면 Bluesky에서 게시물이 영구적으로 제거됩니다. 이 작업은 취소할 수 없습니다.",
   "post.translate": "게시물 번역",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "블로킹",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "나를 차단합니다",

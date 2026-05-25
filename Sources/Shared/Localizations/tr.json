@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "Bu yayın silinsin mi?",
   "post.delete.message": "Bu, gönderiyi Bluesky'den kalıcı olarak kaldıracaktır. Bu geri alınamaz.",
   "post.translate": "Gönderiyi çevir",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Engelleme",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "Beni engelle",

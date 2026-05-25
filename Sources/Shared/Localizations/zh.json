@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "删除这个帖子吗？",
   "post.delete.message": "这将从 Bluesky 中永久删除该帖子。此操作无法撤消。",
   "post.translate": "翻译帖子",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "阻塞",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "阻止我",

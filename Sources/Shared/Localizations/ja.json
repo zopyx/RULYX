@@ -1054,6 +1054,7 @@
   "post.delete.confirm": "この投稿を削除しますか?",
   "post.delete.message": "これにより、投稿は Bluesky から永久に削除されます。これを元に戻すことはできません。",
   "post.translate": "投稿を翻訳する",
+  "post.gear_menu": "Post actions",
   "profile.badge.blocking": "ブロッキング",
   "profile.badge.blocking_by_list": "Blocked by {list}",
   "profile.badge.blocks_me": "私をブロックします",
