@@ -3,13 +3,24 @@ import Foundation
 struct BlueskyList: Identifiable, Hashable, Codable {
     enum Kind: String, CaseIterable, Hashable, Codable {
         case moderation
+        case `internal`
         case regular
+
+        var sortOrder: Int {
+            switch self {
+            case .moderation: 0
+            case .internal: 1
+            case .regular: 2
+            }
+        }
 
         @MainActor
         var title: String {
             switch self {
             case .moderation:
                 String.localized("list.kind.moderation")
+            case .internal:
+                String.localized("list.kind.internal")
             case .regular:
                 String.localized("list.kind.regular")
             }
@@ -19,6 +30,8 @@ struct BlueskyList: Identifiable, Hashable, Codable {
             switch self {
             case .moderation:
                 "shield.lefthalf.filled"
+            case .internal:
+                "tray.full"
             case .regular:
                 "person.3"
             }
@@ -28,6 +41,8 @@ struct BlueskyList: Identifiable, Hashable, Codable {
             switch self {
             case .moderation:
                 "app.bsky.graph.defs#modlist"
+            case .internal:
+                "app.bsky.graph.defs#curatelist"
             case .regular:
                 "app.bsky.graph.defs#curatelist"
             }

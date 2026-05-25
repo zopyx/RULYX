@@ -314,34 +314,18 @@ struct ComposePostView: View {
 
     private func postPreviewRow(_ post: ThreadPostNode) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                if let avatarURL = post.author?.avatar, let url = URL(string: avatarURL) {
-                    ThumbnailImageView(url: url, maxPixelSize: 48) {
-                        Circle().fill(.quaternary)
-                    }
-                    .scaledToFill()
-                    .frame(width: 24, height: 24)
-                    .clipShape(Circle())
-                } else {
-                    Circle()
-                        .fill(.quaternary)
-                        .frame(width: 24, height: 24)
-                }
-                Text(post.author?.displayName ?? post.author?.handle ?? "")
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                if let handle = post.author?.handle {
-                    Text("@\(handle)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-            }
+            let author = post.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
+            PostAuthorHeader(
+                author: author,
+                createdAt: post.indexedAt ?? post.record?.createdAt,
+                onOpenProfile: nil,
+                avatarSize: 24
+            )
             if let text = post.record?.text, !text.isEmpty {
-                Text(text)
-                    .font(.body)
-                    .lineLimit(6)
-                    .foregroundStyle(.primary)
+                PostTextContent(
+                    text: text,
+                    lineLimit: 6
+                )
             }
         }
     }
