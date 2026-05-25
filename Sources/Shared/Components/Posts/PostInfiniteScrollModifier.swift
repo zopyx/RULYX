@@ -10,7 +10,7 @@ struct PostInfiniteScrollModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onAppear {
-                guard hasMore else { return }
+                guard hasMore, !isLoadingMore else { return }
                 if entry.post.uri == entries.last?.post.uri {
                     Task { await loadMore() }
                 }

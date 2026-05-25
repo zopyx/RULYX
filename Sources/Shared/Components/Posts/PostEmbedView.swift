@@ -26,11 +26,12 @@ struct PostEmbedView: View {
 
             if let external = embed.external, let uri = external.uri, let url = URL(string: uri) {
                 if external.isTenorEmbed, let gifURL = external.preferredInlineMediaURL {
-                    InlineAnimatedMediaView(url: gifURL, allowsInteraction: true)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
-                        }
+                    Button {
+                        openURL(url)
+                    } label: {
+                        tenorEmbedCard(previewURL: gifURL, external: external)
+                    }
+                    .buttonStyle(.plain)
                 } else {
                     Button {
                         openURL(url)
@@ -40,6 +41,50 @@ struct PostEmbedView: View {
                     .buttonStyle(.plain)
                 }
             }
+        }
+    }
+
+    private func tenorEmbedCard(previewURL: URL, external: RichEmbedExternal) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            ThumbnailImageView(url: previewURL, maxPixelSize: 720) {
+                RoundedRectangle(cornerRadius: 12).fill(Color.skyPrimary.opacity(0.08))
+            }
+            .scaledToFill()
+            .frame(height: 220)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.55)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            HStack(spacing: 8) {
+                Label {
+                    Text("GIF")
+                        .font(.caption.weight(.semibold))
+                } icon: {
+                    Image(systemName: "play.circle.fill")
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.black.opacity(0.35), in: Capsule())
+
+                if let title = external.title, !title.isEmpty {
+                    Text(title)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.92))
+                        .lineLimit(1)
+                }
+            }
+            .padding(12)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
         }
     }
 
