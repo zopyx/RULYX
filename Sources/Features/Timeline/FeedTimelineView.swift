@@ -295,8 +295,8 @@ struct FeedTimelineView: View {
                     likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
                 },
                 onClassify: { likerActions.postToClassify = entry },
-                isLiked: entry.post.isLikedByMe,
-                isReposted: entry.post.isRepostedByMe,
+                isLiked: viewModel.effectiveIsLiked(uri: entry.post.uri),
+                isReposted: viewModel.effectiveIsReposted(uri: entry.post.uri),
                 availableLikerTargetLists: likerActions.availableTargetLists
             )
         )
@@ -346,9 +346,9 @@ struct FeedTimelineView: View {
             Button {
                 handleLike(entry)
             } label: {
-                Image(systemName: entry.post.isLikedByMe ? "heart.slash" : "heart")
+                Image(systemName: viewModel.effectiveIsLiked(uri: entry.post.uri) ? "heart.slash" : "heart")
             }
-            .tint(entry.post.isLikedByMe ? .gray : .pink)
+            .tint(viewModel.effectiveIsLiked(uri: entry.post.uri) ? .gray : .pink)
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button {
@@ -397,38 +397,18 @@ struct FeedTimelineView: View {
 
     private func handleLike(_ entry: RichFeedEntry) {
         guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account),
-              let cid = entry.post.cid else { return }
+              let appPassword = accountStore.appPassword(for: account) else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         Task {
-            do {
-                if entry.post.isLikedByMe, let likeURI = entry.post.myLikeURI {
-                    _ = try await blueskyClient.deleteRecord(recordURI: likeURI, account: account, appPassword: appPassword)
-                } else {
-                    _ = try await blueskyClient.createLike(uri: entry.post.uri, cid: cid, account: account, appPassword: appPassword)
-                }
-                await refresh()
-            } catch {
-                AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
-            }
+            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: blueskyClient)
         }
     }
 
     private func handleRepost(_ entry: RichFeedEntry) {
         guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account),
-              let cid = entry.post.cid else { return }
+              let appPassword = accountStore.appPassword(for: account) else { return }
         Task {
-            do {
-                if entry.post.isRepostedByMe, let repostURI = entry.post.myRepostURI {
-                    _ = try await blueskyClient.deleteRecord(recordURI: repostURI, account: account, appPassword: appPassword)
-                } else {
-                    _ = try await blueskyClient.createRepost(uri: entry.post.uri, cid: cid, account: account, appPassword: appPassword)
-                }
-                await refresh()
-            } catch {
-                AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
-            }
+            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: blueskyClient)
         }
     }
 

@@ -58,6 +58,65 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    @Published private var optimisticLikes: [String: Bool] = [:]
+    @Published private var optimisticReposts: [String: Bool] = [:]
+    @Published private var optimisticLikeURIs: [String: String] = [:]
+    @Published private var optimisticRepostURIs: [String: String] = [:]
+
+    func effectiveIsLiked(uri: String) -> Bool {
+        optimisticLikes[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isLikedByMe ?? false
+    }
+
+    func effectiveIsReposted(uri: String) -> Bool {
+        optimisticReposts[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isRepostedByMe ?? false
+    }
+
+    func effectiveMyLikeURI(uri: String) -> String? {
+        optimisticLikeURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
+    }
+
+    func toggleLike(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        guard let cid = entries.first(where: { $0.post.uri == uri })?.post.cid else { return }
+        let wasLiked = effectiveIsLiked(uri: uri)
+        optimisticLikes[uri] = !wasLiked
+        do {
+            if wasLiked, let likeURI = effectiveMyLikeURI(uri: uri) {
+                _ = try await client.deleteRecord(recordURI: likeURI, account: account, appPassword: appPassword)
+                optimisticLikeURIs.removeValue(forKey: uri)
+            } else {
+                let response = try await client.createLike(uri: uri, cid: cid, account: account, appPassword: appPassword)
+                optimisticLikeURIs[uri] = response.uri
+            }
+        } catch {
+            optimisticLikes.removeValue(forKey: uri)
+            if wasLiked { optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI }
+            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func toggleRepost(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        guard let cid = entries.first(where: { $0.post.uri == uri })?.post.cid else { return }
+        let wasReposted = effectiveIsReposted(uri: uri)
+        optimisticReposts[uri] = !wasReposted
+        do {
+            if wasReposted, let repostURI = effectiveMyRepostURI(uri: uri) {
+                _ = try await client.deleteRecord(recordURI: repostURI, account: account, appPassword: appPassword)
+                optimisticRepostURIs.removeValue(forKey: uri)
+            } else {
+                let response = try await client.createRepost(uri: uri, cid: cid, account: account, appPassword: appPassword)
+                optimisticRepostURIs[uri] = response.uri
+            }
+        } catch {
+            optimisticReposts.removeValue(forKey: uri)
+            if wasReposted { optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI }
+            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func effectiveMyRepostURI(uri: String) -> String? {
+        optimisticRepostURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
+    }
+
     private func fetchFeed(account: AppAccount, appPassword: String, cursor: String?, limit: Int = 50, using client: LiveBlueskyClient) async throws -> RichFeedResponse {
         if let feedURI = feedStore.customFeedURI, feedStore.isUsingCustomFeed {
             return try await client.fetchFeed(feedURI: feedURI, cursor: cursor, limit: limit, account: account, appPassword: appPassword)
@@ -83,6 +142,10 @@ final class FeedTimelineViewModel: ObservableObject {
 
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard state != .refreshing, state != .loadingMore else { return }
+        optimisticLikes.removeAll()
+        optimisticReposts.removeAll()
+        optimisticLikeURIs.removeAll()
+        optimisticRepostURIs.removeAll()
         let previousState = state
         state = .refreshing
         let oldKnown = knownURIs
@@ -123,6 +186,10 @@ final class FeedTimelineViewModel: ObservableObject {
         lastRefreshHadPosts = false
         newPostCount = 0
         state = .initialLoading
+        optimisticLikes.removeAll()
+        optimisticReposts.removeAll()
+        optimisticLikeURIs.removeAll()
+        optimisticRepostURIs.removeAll()
     }
 
     func prepareForFeedChange() {
@@ -132,6 +199,10 @@ final class FeedTimelineViewModel: ObservableObject {
         lastRefreshHadPosts = false
         newPostCount = 0
         state = .initialLoading
+        optimisticLikes.removeAll()
+        optimisticReposts.removeAll()
+        optimisticLikeURIs.removeAll()
+        optimisticRepostURIs.removeAll()
     }
 
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
