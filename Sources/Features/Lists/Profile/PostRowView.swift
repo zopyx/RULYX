@@ -19,7 +19,6 @@ struct PostRowView: View {
         post.safeAuthor
     }
 
-    @EnvironmentObject private var localizationManager: LocalizationManager
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             PostAuthorHeader(
@@ -64,7 +63,9 @@ struct PostRowView: View {
 
 func mentionAttributedString(from text: String) -> AttributedString {
     var attributed = AttributedString(text)
-    guard let regex = try? NSRegularExpression(pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?") else { return attributed }
+    guard text.contains("@") else { return attributed }
+
+    let regex = MentionTextRegex.shared
     let nsRange = NSRange(text.startIndex..., in: text)
     for match in regex.matches(in: text, range: nsRange).reversed() {
         guard let range = Range(match.range, in: text),
@@ -75,4 +76,10 @@ func mentionAttributedString(from text: String) -> AttributedString {
         attributed[attrRange].underlineStyle = .single
     }
     return attributed
+}
+
+private enum MentionTextRegex {
+    static let shared = try! NSRegularExpression(
+        pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?"
+    )
 }

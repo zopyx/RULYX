@@ -302,7 +302,7 @@ struct CustomSearchView: View {
     @ViewBuilder
     private func postRows(entries: [RichFeedEntry], isLoadingMore: Bool, hasMore: Bool, loadMore: @escaping () async -> Void) -> some View {
         ForEach(entries, id: \.post.uri) { entry in
-            postRowView(entry: entry, entries: entries, loadMore: loadMore)
+            postRowView(entry: entry, entries: entries, isLoadingMore: isLoadingMore, hasMore: hasMore, loadMore: loadMore)
         }
         if isLoadingMore {
             HStack {
@@ -322,10 +322,12 @@ struct CustomSearchView: View {
         }
     }
 
-    private func postRowView(entry: RichFeedEntry, entries: [RichFeedEntry], loadMore: @escaping () async -> Void) -> some View {
+    private func postRowView(entry: RichFeedEntry, entries: [RichFeedEntry], isLoadingMore: Bool, hasMore: Bool, loadMore: @escaping () async -> Void) -> some View {
         CustomSearchPostRow(
             entry: entry,
             entries: entries,
+            hasMore: hasMore,
+            isLoadingMore: isLoadingMore,
             loadMore: loadMore,
             imagePreview: $imagePreview,
             videoPreviewURL: $videoPreviewURL,
