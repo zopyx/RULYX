@@ -34,7 +34,7 @@ struct ConversationDetailView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if let error = chatStore.error, convoMessages.isEmpty {
+            if let error = chatStore.messageError ?? chatStore.error, convoMessages.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.title2)
