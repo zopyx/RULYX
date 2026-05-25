@@ -9,9 +9,12 @@ class LiveAIService: ObservableObject {
     private let engine = InferenceEngine()
 
     init() {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let modelsDir = caches.appendingPathComponent("com.ajung.RULYX/models", isDirectory: true)
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        var modelsDir = support.appendingPathComponent("com.ajung.RULYX/models", isDirectory: true)
         try? FileManager.default.createDirectory(at: modelsDir, withIntermediateDirectories: true)
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+        try? modelsDir.setResourceValues(resourceValues)
         fileManager = ModelFileManager(modelsDirectory: modelsDir)
         downloadManager = ModelDownloadManager(fileManager: fileManager)
     }

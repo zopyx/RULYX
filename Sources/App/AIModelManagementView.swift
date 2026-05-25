@@ -46,6 +46,12 @@ struct AIModelManagementView: View {
         }
         .navigationTitle(loc("ai.models.title"))
         .toolbarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                ToolbarCloseButton()
+            }
+        }
         .task { await refresh() }
     }
 
