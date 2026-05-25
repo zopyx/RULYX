@@ -3,6 +3,8 @@ import SwiftUI
 struct CustomSearchPostRow: View {
     let entry: RichFeedEntry
     let entries: [RichFeedEntry]
+    let hasMore: Bool
+    let isLoadingMore: Bool
     let loadMore: () async -> Void
     @Binding var imagePreview: ImagePreviewCollection?
     @Binding var videoPreviewURL: URL?
@@ -50,7 +52,8 @@ struct CustomSearchPostRow: View {
         .postInfiniteScroll(
             entry: entry,
             entries: entries,
-            hasMore: true,
+            hasMore: hasMore,
+            isLoadingMore: isLoadingMore,
             loadMore: loadMore
         )
     }
