@@ -111,8 +111,8 @@ struct UserPostsView: View {
                 loadMoreTask?.cancel()
             }
             .task {
-                let account = searchAccount ?? accountStore.activeAccount
-                guard let account, let appPassword = accountStore.appPassword(for: account) else { return }
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
                 await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
             }
             .postLikerActions(manager: likerActions)
