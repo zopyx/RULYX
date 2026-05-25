@@ -5,6 +5,7 @@ struct SettingsView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var appLockManager: AppLockManager
     @EnvironmentObject private var httpRequestDebugStore: HTTPRequestDebugStore
+    @EnvironmentObject private var aiService: LiveAIService
     @AppStorage("debugMode") private var debugMode = false
     @AppStorage("showBetaFeatures") private var showBetaFeatures = false
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
@@ -85,6 +86,22 @@ struct SettingsView: View {
                             Text(loc("settings.biometric_footer").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
                         }
                     }
+                }
+
+                Section {
+                    NavigationLink {
+                        AIModelManagementView()
+                            .environmentObject(aiService)
+                            .environmentObject(localizationManager)
+                    } label: {
+                        Label {
+                            Text(localizationManager.localized("ai.models.title"))
+                        } icon: {
+                            Image(systemName: "brain")
+                        }
+                    }
+                } header: {
+                    Text(localizationManager.localized("settings.ai"))
                 }
 
                 Section {
