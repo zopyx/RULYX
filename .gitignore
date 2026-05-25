@@ -13,6 +13,8 @@ feedback.json
 build/
 .derived-aifix/
 .derived-direct/
+.derived-device/
+.derived/
 .module-cache/
 
 # Large binary pods (Tor framework exceeds GitHub's 100 MB limit)
