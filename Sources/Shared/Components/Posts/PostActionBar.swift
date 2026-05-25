@@ -84,13 +84,17 @@ struct PostActionBar: View {
                 Button {
                     onBlockAllLikers()
                 } label: {
-                    Label("post.block_likers", systemImage: "hand.raised.slash")
+                    Label {
+                        Text(loc: "post.block_likers")
+                    } icon: {
+                        Image(systemName: "hand.raised.slash")
+                    }
                 }
             }
             if let onAddAllLikersToList = callbacks.onAddAllLikersToList, !callbacks.availableLikerTargetLists.isEmpty {
                 Menu {
                     if !moderationLikerTargetLists.isEmpty {
-                        Menu("lists.moderation_lists") {
+                        Menu {
                             ForEach(moderationLikerTargetLists) { list in
                                 Button {
                                     onAddAllLikersToList(list)
@@ -98,10 +102,12 @@ struct PostActionBar: View {
                                     Label(list.name, systemImage: list.kind.symbolName)
                                 }
                             }
+                        } label: {
+                            Text(loc: "lists.moderation_lists")
                         }
                     }
                     if !internalLikerTargetLists.isEmpty {
-                        Menu("lists.internal_lists") {
+                        Menu {
                             ForEach(internalLikerTargetLists) { list in
                                 Button {
                                     onAddAllLikersToList(list)
@@ -109,10 +115,12 @@ struct PostActionBar: View {
                                     Label(list.name, systemImage: list.kind.symbolName)
                                 }
                             }
+                        } label: {
+                            Text(loc: "lists.internal_lists")
                         }
                     }
                     if !regularLikerTargetLists.isEmpty {
-                        Menu("lists.lists") {
+                        Menu {
                             ForEach(regularLikerTargetLists) { list in
                                 Button {
                                     onAddAllLikersToList(list)
@@ -120,30 +128,52 @@ struct PostActionBar: View {
                                     Label(list.name, systemImage: list.kind.symbolName)
                                 }
                             }
+                        } label: {
+                            Text(loc: "lists.lists")
                         }
                     }
                 } label: {
-                    Label("post.add_likers_to_list", systemImage: "text.badge.plus")
+                    Label {
+                        Text(loc: "post.add_likers_to_list")
+                    } icon: {
+                        Image(systemName: "text.badge.plus")
+                    }
                 }
             }
             if let onClassify = callbacks.onClassify {
                 Button(action: onClassify) {
-                    Label("post.classify", systemImage: "sparkles")
+                    Label {
+                        Text(loc: "post.classify")
+                    } icon: {
+                        Image(systemName: "sparkles")
+                    }
                 }
             }
             if let onCopy = callbacks.onCopy {
                 Button(action: onCopy) {
-                    Label("post.copy", systemImage: "doc.on.doc")
+                    Label {
+                        Text(loc: "post.copy")
+                    } icon: {
+                        Image(systemName: "doc.on.doc")
+                    }
                 }
             }
             if let onTranslate = callbacks.onTranslate {
                 Button(action: onTranslate) {
-                    Label("post.translate", systemImage: "globe")
+                    Label {
+                        Text(loc: "post.translate")
+                    } icon: {
+                        Image(systemName: "globe")
+                    }
                 }
             }
             if let onReportPost = callbacks.onReportPost {
                 Button(action: onReportPost) {
-                    Label("post.report", systemImage: "exclamationmark.shield")
+                    Label {
+                        Text(loc: "post.report")
+                    } icon: {
+                        Image(systemName: "exclamationmark.shield")
+                    }
                 }
             }
             if callbacks.onEditPost != nil || callbacks.onDeletePost != nil {
@@ -151,12 +181,20 @@ struct PostActionBar: View {
             }
             if let onEditPost = callbacks.onEditPost {
                 Button(action: onEditPost) {
-                    Label("post.edit", systemImage: "pencil")
+                    Label {
+                        Text(loc: "post.edit")
+                    } icon: {
+                        Image(systemName: "pencil")
+                    }
                 }
             }
             if let onDeletePost = callbacks.onDeletePost {
                 Button(role: .destructive, action: onDeletePost) {
-                    Label("post.delete", systemImage: "trash")
+                    Label {
+                        Text(loc: "post.delete")
+                    } icon: {
+                        Image(systemName: "trash")
+                    }
                 }
             }
         } label: {
