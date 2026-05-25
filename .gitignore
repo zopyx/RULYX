@@ -8,3 +8,12 @@ xcuserdata/
 .claude/
 crashlog.crash
 feedback.json
+
+# Build artifacts
+build/
+.derived-aifix/
+.derived-direct/
+.module-cache/
+
+# Large binary pods (Tor framework exceeds GitHub's 100 MB limit)
+Pods/Tor/tor.xcframework/
