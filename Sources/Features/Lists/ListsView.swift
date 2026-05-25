@@ -271,6 +271,20 @@ struct ListsView: View {
                                 }
                                 .padding(.vertical, 4)
                             }
+                            Button {
+                                presentationState.showDirectReplies = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: "arrowshape.turn.up.left")
+                                    Text(loc: "lists.advanced.directreplies_button")
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .flipsForRightToLeftLayoutDirection(true)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 4)
+                            }
                         } header: {
                             HStack(spacing: 4) {
                                 Text(loc: "lists.advanced")
@@ -468,6 +482,17 @@ struct ListsView: View {
                 CustomSearchView()
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
+            }
+            .navigationDestination(isPresented: $presentationState.showDirectReplies) {
+                if let activeAccount = accountStore.activeAccount {
+                    DirectRepliesView(
+                        did: activeAccount.did ?? activeAccount.handle,
+                        handle: activeAccount.handle,
+                        displayName: activeAccount.displayName
+                    )
+                    .environmentObject(accountStore)
+                    .environmentObject(blueskyClient)
+                }
             }
         }
         .id(workspaceStore.moderationNavigationResetToken)

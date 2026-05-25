@@ -4,6 +4,7 @@ struct PostTextContent: View {
     let text: String
     var onTapThread: (() -> Void)?
     var onOpenProfile: ((String) -> Void)?
+    var onOpenURL: ((URL) -> Void)?
     var font: Font = .body
     var lineLimit: Int?
     var foregroundStyle: Color = .primary
@@ -13,6 +14,7 @@ struct PostTextContent: View {
         text: String,
         onTapThread: (() -> Void)? = nil,
         onOpenProfile: ((String) -> Void)? = nil,
+        onOpenURL: ((URL) -> Void)? = nil,
         font: Font = .body,
         lineLimit: Int? = nil,
         foregroundStyle: Color = .primary
@@ -20,10 +22,11 @@ struct PostTextContent: View {
         self.text = text
         self.onTapThread = onTapThread
         self.onOpenProfile = onOpenProfile
+        self.onOpenURL = onOpenURL
         self.font = font
         self.lineLimit = lineLimit
         self.foregroundStyle = foregroundStyle
-        _attributedText = State(initialValue: mentionAttributedString(from: text))
+        _attributedText = State(initialValue: postAttributedString(from: text))
     }
 
     var body: some View {
@@ -38,10 +41,14 @@ struct PostTextContent: View {
                     onOpenProfile?(handle)
                     return .handled
                 }
+                if let onOpenURL {
+                    onOpenURL(url)
+                    return .handled
+                }
                 return .systemAction
             })
             .onChange(of: text) {
-                attributedText = mentionAttributedString(from: text)
+                attributedText = postAttributedString(from: text)
             }
         if let onTapThread {
             textContent

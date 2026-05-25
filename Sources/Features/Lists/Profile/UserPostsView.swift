@@ -27,6 +27,7 @@ struct UserPostsView: View {
     @State private var imagePreview: ImagePreviewCollection?
     @State private var videoPreviewURL: URL?
     @State private var showLikesForURI: String?
+    @State private var showProfileFor: BlueskyActor?
     @State private var shareFileURL: URL?
     @State private var initialLoadTask: Task<Void, Never>?
     @State private var loadMoreTask: Task<Void, Never>?
@@ -110,6 +111,14 @@ struct UserPostsView: View {
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
             }
+            .navigationDestination(item: $showProfileFor) { actor in
+                BlueskyProfileView(
+                    member: BlueskyListMember(recordURI: "userposts:\(actor.did)", actor: actor),
+                    list: nil
+                )
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+            }
             .task {
                 await loadInitial()
             }
@@ -135,7 +144,6 @@ struct UserPostsView: View {
                     entry: entry,
                     style: .compact,
                     callbacks: PostRowCallbacks(
-                        onTapThread: { selectedPostURI = entry.post.uri },
                         onTapImage: { index in
                             let allImages = entry.post.embed?.images ?? []
                             let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
@@ -146,6 +154,14 @@ struct UserPostsView: View {
                             if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
                                 videoPreviewURL = url
                             }
+                        },
+                        onOpenProfile: { handle in
+                            showProfileFor = BlueskyActor(
+                                did: handle,
+                                handle: handle,
+                                displayName: nil,
+                                avatarURL: nil
+                            )
                         },
                         onShowLikes: { showLikesForURI = entry.post.uri },
                         onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },

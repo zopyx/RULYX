@@ -5,6 +5,7 @@ struct PostRowCallbacks {
     var onTapImage: ((Int) -> Void)?
     var onPlayVideo: (() -> Void)?
     var onOpenProfile: ((String) -> Void)?
+    var onOpenURL: ((URL) -> Void)?
     var onReply: (() -> Void)?
     var onLike: (() -> Void)?
     var onShowLikes: (() -> Void)?
@@ -29,6 +30,7 @@ struct PostRowCallbacks {
         onTapImage: ((Int) -> Void)? = nil,
         onPlayVideo: (() -> Void)? = nil,
         onOpenProfile: ((String) -> Void)? = nil,
+        onOpenURL: ((URL) -> Void)? = nil,
         onReply: (() -> Void)? = nil,
         onLike: (() -> Void)? = nil,
         onShowLikes: (() -> Void)? = nil,
@@ -52,6 +54,7 @@ struct PostRowCallbacks {
         self.onTapImage = onTapImage
         self.onPlayVideo = onPlayVideo
         self.onOpenProfile = onOpenProfile
+        self.onOpenURL = onOpenURL
         self.onReply = onReply
         self.onLike = onLike
         self.onShowLikes = onShowLikes

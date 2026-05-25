@@ -95,9 +95,10 @@ private struct HTTPRequestDebugRow: View {
                     Text(entry.method)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
-                    Text(entry.startedAt, style: .time)
+                    Text("#\(entry.sequenceNumber)  \(entry.startedAt, format: .dateTime.day(.twoDigits).month(.twoDigits))")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                        .monospacedDigit()
                     if let code = entry.statusCode {
                         Text("\(code)")
                             .font(.caption2)

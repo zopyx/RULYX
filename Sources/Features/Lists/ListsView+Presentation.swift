@@ -16,6 +16,7 @@ extension ListsView {
         var isShowingAccountManagement = false
         var showMentionsSearch = false
         var showCustomSearch = false
+        var showDirectReplies = false
         var isShowingCreateInternalList = false
     }
 }

@@ -35,7 +35,8 @@ struct PostRowView: View {
                 PostTextContent(
                     text: text,
                     onTapThread: callbacks.onTapThread,
-                    onOpenProfile: callbacks.onOpenProfile
+                    onOpenProfile: callbacks.onOpenProfile,
+                    onOpenURL: callbacks.onOpenURL
                 )
             }
 
@@ -61,13 +62,14 @@ struct PostRowView: View {
     }
 }
 
-func mentionAttributedString(from text: String) -> AttributedString {
+func postAttributedString(from text: String) -> AttributedString {
     var attributed = AttributedString(text)
-    guard text.contains("@") else { return attributed }
+    guard text.contains("@") || text.contains("://") || text.contains("www.") else { return attributed }
 
-    let regex = MentionTextRegex.shared
     let nsRange = NSRange(text.startIndex..., in: text)
-    for match in regex.matches(in: text, range: nsRange).reversed() {
+
+    let mentionRegex = MentionTextRegex.shared
+    for match in mentionRegex.matches(in: text, range: nsRange).reversed() {
         guard let range = Range(match.range, in: text),
               let attrRange = Range(match.range, in: attributed) else { continue }
         let handle = String(text[range].dropFirst())
@@ -75,6 +77,17 @@ func mentionAttributedString(from text: String) -> AttributedString {
         attributed[attrRange].foregroundColor = Color.skyPrimary
         attributed[attrRange].underlineStyle = .single
     }
+
+    if let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) {
+        for match in detector.matches(in: text, range: nsRange).reversed() {
+            guard let url = match.url,
+                  let attrRange = Range(match.range, in: attributed) else { continue }
+            attributed[attrRange].link = url
+            attributed[attrRange].foregroundColor = Color.skyPrimary
+            attributed[attrRange].underlineStyle = .single
+        }
+    }
+
     return attributed
 }
 
