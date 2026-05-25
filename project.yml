@@ -7,7 +7,7 @@ settings:
   base:
     PRODUCT_NAME: RULYX
     SWIFT_VERSION: "6.0"
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: "4PC9Z56E47"
 targets:
   RULYX:
     type: application
