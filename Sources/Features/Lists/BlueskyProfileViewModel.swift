@@ -30,8 +30,24 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published private(set) var isUpdatingListMembership = false
     @Published private(set) var subscribedLists: [SubscribedListInfo]?
     @Published private(set) var subscribedListBlockingNames: [String] = []
+    @Published private(set) var combinedBlockingNames: [String] = []
     @Published private(set) var isFetchingSubscribedLists = false
     @Published private(set) var isCreatingList = false
+    
+    var isBlockedByList: Bool {
+        !combinedBlockingNames.isEmpty
+    }
+
+    private func recomputeCombinedBlockingNames(from viewerState: BlueskyViewerState?) {
+        var names = Set(viewerState?.blockingByListName ?? [])
+        for membership in listMemberships where membership.kind == .moderation && membership.isMember {
+            names.insert(membership.name)
+        }
+        for name in subscribedListBlockingNames {
+            names.insert(name)
+        }
+        combinedBlockingNames = Array(names).sorted()
+    }
 
     func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         isFetchingOwnedLists = true
@@ -71,6 +87,7 @@ final class BlueskyProfileViewModel: ObservableObject {
                     }
                 }
                 subscribedListBlockingNames = blockingNames.sorted()
+                recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
             }
         } catch {
             AppLogger.moderation.error("Subscribed lists fetch failed: \(error.localizedDescription, privacy: .public)")
@@ -128,20 +145,22 @@ final class BlueskyProfileViewModel: ObservableObject {
         hasLoadedOnce = true
 
         do {
-            inspection = try await client.inspectProfile(
+            let result = try await client.inspectProfile(
                 query: actorDID,
                 account: viewerAccount,
                 appPassword: viewerPassword
             )
+            inspection = result
+            if !result.listMemberships.isEmpty {
+                recomputeCombinedBlockingNames(from: result.profile.viewerState)
+            } else {
+                isFetchingMemberships = true
+            }
         } catch {
             hasLoadedOnce = false
             errorMessage = AppError.userMessage(from: error)
             isLoading = false
             return
-        }
-
-        if inspection?.listMemberships.isEmpty ?? true {
-            isFetchingMemberships = true
         }
 
         isLoading = false
@@ -161,6 +180,8 @@ final class BlueskyProfileViewModel: ObservableObject {
             }
             isFetchingMemberships = false
         }
+        
+        recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
     }
 
     private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {

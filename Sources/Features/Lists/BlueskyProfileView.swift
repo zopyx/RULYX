@@ -425,8 +425,7 @@ struct BlueskyProfileView: View {
                         }
 
                         if !isOwnProfile, let state = profile.viewerState {
-                            let blockingNames = combinedBlockingListNames(from: state)
-                            relationshipBadges(state: state, blockingListNames: blockingNames)
+                            relationshipBadges(state: state, blockingListNames: viewModel.combinedBlockingNames)
                         }
                     }
                     .padding(.vertical, 6)
@@ -610,7 +609,6 @@ struct BlueskyProfileView: View {
                             }
                             .disabled(viewModel.isUpdatingModeration)
 
-                            let isBlockedByList = !combinedBlockingListNames(from: viewerState).isEmpty
                             Toggle(isOn: Binding(
                                 get: { viewModel.pendingBlockState ?? viewerState.isBlocking },
                                 set: { _ in
@@ -625,11 +623,10 @@ struct BlueskyProfileView: View {
                             )) {
                                 Label { Text(loc: "profile.block") } icon: { Image(systemName: "hand.raised") }
                             }
-                            .disabled(viewModel.isUpdatingModeration || isBlockedByList)
+                            .disabled(viewModel.isUpdatingModeration || viewModel.isBlockedByList)
                             .accessibilityHint(viewerState.isBlocking ? loc("profile.unblock.hint") : loc("profile.block.hint"))
-                            if isBlockedByList {
-                                let names = combinedBlockingListNames(from: viewerState)
-                                let displayText = Self.formattedBlockingList(names)
+                            if viewModel.isBlockedByList {
+                                let displayText = Self.formattedBlockingList(viewModel.combinedBlockingNames)
                                 Text(displayText)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -1531,26 +1528,13 @@ struct BlueskyProfileView: View {
         if state.isFollowing {
             badges.append((loc("profile.badge.following"), "heart.fill", .blue))
         }
-        if state.isBlocking {
-            if !blockingListNames.isEmpty {
-                let label = Self.formattedBlockingListShort(blockingListNames)
-                badges.append((label, "list.bullet", .orange))
-            } else {
-                badges.append((loc("profile.badge.blocking"), "hand.raised.fill", .orange))
-            }
+        if !blockingListNames.isEmpty {
+            let label = Self.formattedBlockingListShort(blockingListNames)
+            badges.append((label, "list.bullet", .orange))
+        } else if state.isBlocking {
+            badges.append((loc("profile.badge.blocking"), "hand.raised.fill", .orange))
         }
         return badges
-    }
-
-    private func combinedBlockingListNames(from viewerState: BlueskyViewerState) -> [String] {
-        var names = Set(viewerState.blockingByListName)
-        for membership in viewModel.listMemberships where membership.kind == .moderation && membership.isMember {
-            names.insert(membership.name)
-        }
-        for name in viewModel.subscribedListBlockingNames {
-            names.insert(name)
-        }
-        return Array(names).sorted()
     }
 
     private static func formattedBlockingList(_ names: [String]) -> String {
