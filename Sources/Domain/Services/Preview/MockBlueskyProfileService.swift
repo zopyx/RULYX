@@ -38,7 +38,7 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
             listsCount: 3, starterPacksCount: 1,
             createdAt: .now.addingTimeInterval(-86400 * 200),
             labels: ["spam", "bot"],
-            viewerState: BlueskyViewerState(muted: false, blockedBy: false, isBlocking: false, blockingRecordURI: nil, isFollowing: true, followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1", followsYou: false, mutedByListName: nil, blockingByListName: nil)
+            viewerState: BlueskyViewerState(muted: false, blockedBy: false, isBlocking: false, blockingRecordURI: nil, isFollowing: true, followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1", followsYou: false, mutedByListName: nil, blockingByListName: [])
         )
     }
 
@@ -56,7 +56,7 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
                 createdAt: .now.addingTimeInterval(-86400 * 500),
                 labels: ["bot", "spam"],
                 // swiftlint:disable:next line_length
-                viewerState: BlueskyViewerState(muted: false, blockedBy: false, isBlocking: true, blockingRecordURI: "at://did:plc:preview/app.bsky.graph.block/1", isFollowing: true, followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1", followsYou: false, mutedByListName: nil, blockingByListName: "Reply Filters")
+                viewerState: BlueskyViewerState(muted: false, blockedBy: false, isBlocking: true, blockingRecordURI: "at://did:plc:preview/app.bsky.graph.block/1", isFollowing: true, followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1", followsYou: false, mutedByListName: nil, blockingByListName: ["Reply Filters"])
             ),
             listMemberships: [
                 ProfileListMembership(listURI: "at://did:plc:preview/app.bsky.graph.list/1", name: "Reply Filters", kind: .moderation, memberCount: 42, isMember: true, listItemRecordURI: "at://did:plc:preview/app.bsky.graph.listitem/42"),

@@ -1063,6 +1063,7 @@
   "post.gear_menu": "Post actions",
   "profile.badge.blocking": "Blocco",
   "profile.badge.blocking_by_list": "Blocked by {list}",
+  "profile.badge.blocking_by_my_lists": "Block my moderation lists ({n})",
   "profile.badge.blocks_me": "Mi blocca",
   "profile.badge.following": "Seguente",
   "profile.badge.follows_me": "Mi segue",
@@ -1169,5 +1170,7 @@
   "post.block_user": "Block %@",
   "post.share": "Share post",
   "timeline.show_replies": "Show {n} replies",
-  "timeline.view_all_replies": "View all replies"
+  "timeline.view_all_replies": "View all replies",
+  "profile.blocking_lists.panel_title": "Moderation Lists",
+  "profile.blocking_lists.section_header": "Lists blocking this profile"
 }

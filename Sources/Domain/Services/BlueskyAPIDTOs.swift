@@ -383,7 +383,7 @@ func mapViewerState(_ viewer: ProfileViewerState?) -> BlueskyViewerState? {
         followingRecordURI: viewer.following,
         followsYou: viewer.followedBy != nil,
         mutedByListName: viewer.mutedByList?.name,
-        blockingByListName: viewer.blockingByList?.name
+        blockingByListName: [viewer.blockingByList?.name].compactMap(\.self)
     )
 }
 

@@ -1169,15 +1169,19 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
-    func fetchPostThread(uri: String, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
+    func fetchPostThread(uri: String, depth: Int? = nil, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
         ) { authSession in
-            try await requestExecutor.send(
+            var queryItems = [URLQueryItem(name: "uri", value: uri)]
+            if let depth {
+                queryItems.append(URLQueryItem(name: "depth", value: "\(depth)"))
+            }
+            return try await requestExecutor.send(
                 path: "app.bsky.feed.getPostThread",
                 method: "GET",
-                queryItems: [URLQueryItem(name: "uri", value: uri)],
+                queryItems: queryItems,
                 accessToken: authSession.accessJWT,
                 hostURL: authSession.pdsURL
             )

@@ -25,7 +25,7 @@ struct AccountRowView: View {
         HStack(spacing: 12) {
             avatarView
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(account.displayName)
                         .font(.headline)
@@ -108,7 +108,7 @@ struct AccountRowView: View {
                 .foregroundStyle(.red)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
         .opacity(isDeactivated ? 0.6 : 1)
     }
 

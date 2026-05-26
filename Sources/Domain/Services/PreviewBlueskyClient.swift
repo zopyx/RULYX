@@ -317,7 +317,7 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
                 followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1",
                 followsYou: false,
                 mutedByListName: nil,
-                blockingByListName: nil
+                blockingByListName: []
             )
         )
     }
@@ -355,7 +355,7 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
                     followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1",
                     followsYou: false,
                     mutedByListName: nil,
-                    blockingByListName: "Reply Filters"
+                    blockingByListName: ["Reply Filters"]
                 )
             ),
             listMemberships: [
