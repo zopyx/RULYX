@@ -12,6 +12,8 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published var statusMessage: String?
     @Published var errorMessage: String?
     @Published private(set) var isExportingPosts = false
+    @Published private(set) var exportProgressLabel: String?
+    @Published var exportError: String?
     @Published private(set) var clearskyLists: [ClearskyListEntry] = []
     @Published private(set) var isFetchingLists = false
     @Published var listError: String?
@@ -27,6 +29,7 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published private(set) var isFetchingMemberships = false
     @Published private(set) var isUpdatingListMembership = false
     @Published private(set) var subscribedLists: [SubscribedListInfo]?
+    @Published private(set) var subscribedListBlockingNames: [String] = []
     @Published private(set) var isFetchingSubscribedLists = false
     @Published private(set) var isCreatingList = false
 
@@ -41,10 +44,34 @@ final class BlueskyProfileViewModel: ObservableObject {
         isFetchingOwnedLists = false
     }
 
-    func fetchSubscribedLists(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+    func fetchSubscribedLists(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, targetDID: String? = nil) async {
         isFetchingSubscribedLists = true
         do {
             subscribedLists = try await client.fetchSubscribedModerationLists(account: account, appPassword: appPassword)
+
+            if let targetDID, let lists = subscribedLists {
+                let moderationSubs = lists.filter { $0.kind == .moderation }
+                var blockingNames: [String] = []
+                for list in moderationSubs {
+                    if let page = try? await client.fetchListMembersPage(
+                        list: BlueskyList(
+                            id: list.listURI,
+                            name: list.name,
+                            description: list.description ?? "",
+                            memberCount: list.memberCount,
+                            kind: list.kind
+                        ),
+                        cursor: nil,
+                        account: account,
+                        appPassword: appPassword
+                    ) {
+                        if page.members.contains(where: { $0.actor.did == targetDID }) {
+                            blockingNames.append(list.name)
+                        }
+                    }
+                }
+                subscribedListBlockingNames = blockingNames.sorted()
+            }
         } catch {
             AppLogger.moderation.error("Subscribed lists fetch failed: \(error.localizedDescription, privacy: .public)")
             subscribedLists = []
@@ -535,23 +562,47 @@ final class BlueskyProfileViewModel: ObservableObject {
     func exportPosts(as format: ExportFileFormat, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async -> URL? {
         guard let profile else { return nil }
         isExportingPosts = true
-        defer { isExportingPosts = false }
+        exportError = nil
+        defer {
+            isExportingPosts = false
+            exportProgressLabel = nil
+        }
 
         var allPosts: [RichFeedEntry] = []
         var cursor: String?
+        var pageCount = 0
         while true {
+            guard !Task.isCancelled else { return nil }
+            pageCount += 1
+            let postCount = allPosts.count
+            exportProgressLabel = loc("profile.export.loading")
+                .replacingOccurrences(of: "{n}", with: "\(pageCount)")
+                .replacingOccurrences(of: "{posts}", with: "\(postCount)")
+
+            let response: RichFeedResponse
             do {
-                guard !Task.isCancelled else { return nil }
-                let response = try await client.fetchRichFeed(did: profile.did, cursor: cursor, account: account, appPassword: appPassword)
-                allPosts += response.feed
-                guard let next = response.cursor else { break }
-                cursor = next
+                response = try await client.fetchRichFeed(did: profile.did, cursor: cursor, account: account, appPassword: appPassword)
             } catch is CancellationError {
                 return nil
             } catch {
-                break
+                AppLogger.moderation.error("Export page \(pageCount) failed: \(error.localizedDescription, privacy: .public)")
+                if cursor == nil {
+                    exportError = AppError.userMessage(from: error)
+                    return nil
+                }
+                try? await Task.sleep(for: .seconds(2))
+                continue
             }
+
+            let profilePosts = response.feed.filter { $0.post.author?.did == profile.did }
+            allPosts += profilePosts
+
+            guard let next = response.cursor, !next.isEmpty else { break }
+            cursor = next
         }
+
+        guard !Task.isCancelled else { return nil }
+        exportProgressLabel = loc("profile.export.writing")
 
         let sanitized = profile.handle.replacingOccurrences(of: ".", with: "-")
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(sanitized)-posts.\(format.rawValue)")
@@ -594,7 +645,7 @@ final class BlueskyProfileViewModel: ObservableObject {
                     "has_video": p.embed?.video != nil,
                 ] as [String: Any]
             }
-            let data = (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys])) ?? Data()
+            let data = (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes])) ?? Data()
             try? data.write(to: url, options: .atomic)
         }
         return url

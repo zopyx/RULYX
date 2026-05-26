@@ -34,6 +34,9 @@ struct BlueskyProfileView: View {
     @State private var showBlockBackResult = false
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
+    @State private var showExportSheet = false
+    @State private var downloadFormat: ExportFileFormat = .csv
+    @State private var isExportActive = false
     @State private var showClearskyLists = false
     @State private var showOwnedLists = false
     @State private var reportReasonText = ""
@@ -127,6 +130,48 @@ struct BlueskyProfileView: View {
         }
         .sheet(item: $shareFileURL) { url in
             ShareSheet(activityItems: [url])
+        }
+        .sheet(isPresented: $showExportSheet) {
+            NavigationStack {
+                VStack(spacing: 20) {
+                    if let error = viewModel.exportError {
+                        ContentUnavailableView(
+                            label: { Label(loc("list.detail.alert_title"), systemImage: "exclamationmark.triangle") },
+                            description: { Text(error) }
+                        )
+                    } else if isExportActive || viewModel.isExportingPosts {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .padding(.top, 40)
+                        if let label = viewModel.exportProgressLabel {
+                            Text(label)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        Button(loc("actions.cancel"), role: .destructive) {
+                            exportTask?.cancel()
+                            exportTask = nil
+                            showExportSheet = false
+                        }
+                        .buttonStyle(.bordered)
+                    } else {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.green)
+                        Text(loc("profile.export.complete"))
+                            .font(.headline)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .navigationTitle(loc("profile.export.download_posts"))
+                .toolbarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ToolbarCloseButton()
+                    }
+                }
+            }
+            .presentationDetents([.height(260)])
         }
         .sheet(isPresented: $showMediaBrowser) {
             if let profile = viewModel.profile {
@@ -380,7 +425,8 @@ struct BlueskyProfileView: View {
                         }
 
                         if !isOwnProfile, let state = profile.viewerState {
-                            relationshipBadges(state: state)
+                            let blockingNames = combinedBlockingListNames(from: state)
+                            relationshipBadges(state: state, blockingListNames: blockingNames)
                         }
                     }
                     .padding(.vertical, 6)
@@ -414,6 +460,38 @@ struct BlueskyProfileView: View {
                             Text(loc: "profile.stats.posts")
                             Spacer()
                             Text(statText(profile.postsCount))
+                                .foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right")
+                                .flipsForRightToLeftLayoutDirection(true)
+                                .appFont(.subheading)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    Menu {
+                        Button {
+                            guard let dataAccount, let dataPassword = dataAppPassword else { return }
+                            downloadFormat = .csv
+                            isExportActive = true
+                            showExportSheet = true
+                            runExport(.csv, account: dataAccount, appPassword: dataPassword)
+                        } label: {
+                            Label { Text(loc: "profile.export.csv") } icon: { Image(systemName: "arrow.down.doc") }
+                        }
+                        Button {
+                            guard let dataAccount, let dataPassword = dataAppPassword else { return }
+                            downloadFormat = .json
+                            isExportActive = true
+                            showExportSheet = true
+                            runExport(.json, account: dataAccount, appPassword: dataPassword)
+                        } label: {
+                            Label { Text(loc: "profile.export.json") } icon: { Image(systemName: "arrow.down.doc") }
+                        }
+                    } label: {
+                        HStack {
+                            Text(loc: "profile.export.download_posts")
+                            Spacer()
+                            Image(systemName: "arrow.down.doc")
                                 .foregroundStyle(.secondary)
                             Image(systemName: "chevron.right")
                                 .flipsForRightToLeftLayoutDirection(true)
@@ -532,7 +610,7 @@ struct BlueskyProfileView: View {
                             }
                             .disabled(viewModel.isUpdatingModeration)
 
-                            let isBlockedByList = viewerState.blockingByListName != nil
+                            let isBlockedByList = !combinedBlockingListNames(from: viewerState).isEmpty
                             Toggle(isOn: Binding(
                                 get: { viewModel.pendingBlockState ?? viewerState.isBlocking },
                                 set: { _ in
@@ -549,8 +627,10 @@ struct BlueskyProfileView: View {
                             }
                             .disabled(viewModel.isUpdatingModeration || isBlockedByList)
                             .accessibilityHint(viewerState.isBlocking ? loc("profile.unblock.hint") : loc("profile.block.hint"))
-                            if isBlockedByList, let listName = viewerState.blockingByListName {
-                                Text(loc("profile.block.by_list_notice").replacingOccurrences(of: "{list}", with: listName))
+                            if isBlockedByList {
+                                let names = combinedBlockingListNames(from: viewerState)
+                                let displayText = Self.formattedBlockingList(names)
+                                Text(displayText)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .listRowInsets(EdgeInsets(top: 0, leading: 48, bottom: 0, trailing: 0))
@@ -818,7 +898,7 @@ struct BlueskyProfileView: View {
                         }
 
                         if showBetaFeatures {
-                            let isBlockedDM = profile.viewerState?.isBlocking == true || profile.viewerState?.blockingByListName != nil
+                            let isBlockedDM = profile.viewerState?.isBlocking == true || (profile.viewerState?.blockingByListName.isEmpty == false)
                             Button {
                                 Task {
                                     chatStore.setAccount(account, appPassword: appPassword)
@@ -1065,7 +1145,7 @@ struct BlueskyProfileView: View {
                 async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: blueskyClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
                     async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: blueskyClient)
-                    async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password)
+                    async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password, targetDID: did)
 
                     _ = await (blocks, clearsky, owned, subscribed)
                 } else {
@@ -1319,9 +1399,9 @@ struct BlueskyProfileView: View {
         blockPreviewActors = []
     }
 
-    private func fetchSubscribedListsIfOwn(account: AppAccount, appPassword: String) async {
+    private func fetchSubscribedListsIfOwn(account: AppAccount, appPassword: String, targetDID: String? = nil) async {
         guard isOwnProfile else { return }
-        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: blueskyClient)
+        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: blueskyClient, targetDID: targetDID)
     }
 
     private func fetchBlockCounts() async {
@@ -1432,32 +1512,15 @@ struct BlueskyProfileView: View {
         isBlockingBack = false
     }
 
-    private func relationshipBadges(state: BlueskyViewerState) -> some View {
-        let badges = Self.computeBadges(state: state)
-        if badges.isEmpty {
-            return AnyView(EmptyView())
+    @ViewBuilder
+    private func relationshipBadges(state: BlueskyViewerState, blockingListNames: [String]) -> some View {
+        let badges = Self.computeBadges(state: state, blockingListNames: blockingListNames)
+        if !badges.isEmpty {
+            WrappingBadgeView(badges: badges)
         }
-        return AnyView(
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(badges, id: \.label) { badge in
-                        HStack(spacing: 4) {
-                            Image(systemName: badge.icon)
-                                .font(.caption2)
-                            Text(badge.label)
-                                .appFont(.caption)
-                        }
-                        .foregroundStyle(badge.color)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(badge.color.opacity(0.12), in: Capsule())
-                    }
-                }
-            }
-        )
     }
 
-    private static func computeBadges(state: BlueskyViewerState) -> [(label: String, icon: String, color: Color)] {
+    private static func computeBadges(state: BlueskyViewerState, blockingListNames: [String]) -> [(label: String, icon: String, color: Color)] {
         var badges: [(label: String, icon: String, color: Color)] = []
         if state.followsYou {
             badges.append((loc("profile.badge.follows_me"), "person.crop.circle.badge.checkmark", .green))
@@ -1469,14 +1532,51 @@ struct BlueskyProfileView: View {
             badges.append((loc("profile.badge.following"), "heart.fill", .blue))
         }
         if state.isBlocking {
-            if let listName = state.blockingByListName {
-                let label = loc("profile.badge.blocking_by_list").replacingOccurrences(of: "{list}", with: listName)
+            if !blockingListNames.isEmpty {
+                let label = Self.formattedBlockingListShort(blockingListNames)
                 badges.append((label, "list.bullet", .orange))
             } else {
                 badges.append((loc("profile.badge.blocking"), "hand.raised.fill", .orange))
             }
         }
         return badges
+    }
+
+    private func combinedBlockingListNames(from viewerState: BlueskyViewerState) -> [String] {
+        var names = Set(viewerState.blockingByListName)
+        for membership in viewModel.listMemberships where membership.kind == .moderation && membership.isMember {
+            names.insert(membership.name)
+        }
+        for name in viewModel.subscribedListBlockingNames {
+            names.insert(name)
+        }
+        return Array(names).sorted()
+    }
+
+    private static func formattedBlockingList(_ names: [String]) -> String {
+        guard !names.isEmpty else { return "" }
+        let maxDisplay = 5
+        if names.count <= maxDisplay {
+            return loc("profile.block.by_list_notice").replacingOccurrences(of: "{list}", with: names.joined(separator: ", "))
+        }
+        let firstFive = names.prefix(maxDisplay).joined(separator: ", ")
+        let remainder = names.count - maxDisplay
+        return loc("profile.block.by_list_more")
+            .replacingOccurrences(of: "{list}", with: firstFive)
+            .replacingOccurrences(of: "{n}", with: "\(remainder)")
+    }
+
+    private static func formattedBlockingListShort(_ names: [String]) -> String {
+        guard !names.isEmpty else { return "" }
+        let maxDisplay = 5
+        if names.count <= maxDisplay {
+            return loc("profile.badge.blocking_by_list").replacingOccurrences(of: "{list}", with: names.joined(separator: ", "))
+        }
+        let firstFive = names.prefix(maxDisplay).joined(separator: ", ")
+        let remainder = names.count - maxDisplay
+        return loc("profile.badge.blocking_by_list_more")
+            .replacingOccurrences(of: "{list}", with: firstFive)
+            .replacingOccurrences(of: "{n}", with: "\(remainder)")
     }
 
     private func statusChip(title: String, tint: Color, emphasized: Bool) -> some View {
@@ -1504,8 +1604,11 @@ struct BlueskyProfileView: View {
     private func runExport(_ format: ExportFileFormat, account: AppAccount, appPassword: String) {
         exportTask?.cancel()
         exportTask = Task {
+            defer { isExportActive = false }
             if let url = await viewModel.exportPosts(as: format, account: account, appPassword: appPassword, using: blueskyClient) {
+                try? await Task.sleep(for: .milliseconds(600))
                 shareFileURL = url
+                showExportSheet = false
             }
         }
     }
@@ -1568,6 +1671,35 @@ private struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_: UIActivityViewController, context _: Context) {}
+}
+
+// MARK: - Wrapping Badge View
+
+private struct WrappingBadgeView: View {
+    let badges: [(label: String, icon: String, color: Color)]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(badges.indices, id: \.self) { index in
+                badgeView(badges[index])
+            }
+        }
+    }
+
+    private func badgeView(_ badge: (label: String, icon: String, color: Color)) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: badge.icon)
+                .font(.caption2)
+            Text(badge.label)
+                .appFont(.caption)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundStyle(badge.color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .background(badge.color.opacity(0.12), in: Capsule())
+    }
 }
 
 #Preview {
