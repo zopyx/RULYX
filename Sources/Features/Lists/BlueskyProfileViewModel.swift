@@ -69,22 +69,27 @@ final class BlueskyProfileViewModel: ObservableObject {
                 let moderationSubs = lists.filter { $0.kind == .moderation }
                 var blockingNames: [String] = []
                 for list in moderationSubs {
-                    if let page = try? await client.fetchListMembersPage(
-                        list: BlueskyList(
-                            id: list.listURI,
-                            name: list.name,
-                            description: list.description ?? "",
-                            memberCount: list.memberCount,
-                            kind: list.kind
-                        ),
-                        cursor: nil,
-                        account: account,
-                        appPassword: appPassword
-                    ) {
-                        if page.members.contains(where: { $0.actor.did == targetDID }) {
-                            blockingNames.append(list.name)
-                        }
+                    var cursor: String?
+                    var found = false
+                    var pagesChecked = 0
+                    let bskyList = BlueskyList(
+                        id: list.listURI,
+                        name: list.name,
+                        description: list.description ?? "",
+                        memberCount: list.memberCount,
+                        kind: list.kind
+                    )
+                    while !found, pagesChecked < 5 {
+                        guard let page = try? await client.fetchListMembersPage(
+                            list: bskyList, cursor: cursor,
+                            account: account, appPassword: appPassword
+                        ) else { break }
+                        found = page.members.contains(where: { $0.actor.did == targetDID })
+                        cursor = page.cursor
+                        pagesChecked += 1
+                        if cursor == nil { break }
                     }
+                    if found { blockingNames.append(list.name) }
                 }
                 subscribedListBlockingNames = blockingNames.sorted()
                 recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
