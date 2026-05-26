@@ -53,6 +53,7 @@ struct BlueskyProfileView: View {
     @State private var showCreateInternalList = false
     @State private var newInternalListName = ""
     @State private var newInternalListColor = InternalListColor.blue
+    @State private var showBlockingListsPanel = false
 
     private var preferredSearchAccount: AppAccount? {
         if let prefID = accountStore.preferredSearchAccountID,
@@ -370,6 +371,39 @@ struct BlueskyProfileView: View {
                 title: loc("profile.on_my_lists"),
                 text: loc("profile.on_my_lists.help")
             )
+        }
+        .sheet(isPresented: $showBlockingListsPanel) {
+            NavigationStack {
+                List {
+                    Section(loc("profile.blocking_lists.section_header")) {
+                        ForEach(viewModel.blockingLists) { info in
+                            if let uri = info.listURI {
+                                NavigationLink {
+                                    ListDetailView(
+                                        list: BlueskyList(id: uri, name: info.name, description: "", memberCount: info.memberCount, kind: .moderation),
+                                        onListUpdated: { _ in }
+                                    )
+                                    .environmentObject(accountStore)
+                                    .environmentObject(blueskyClient)
+                                    .environmentObject(workspaceStore)
+                                } label: {
+                                    Text(info.name)
+                                }
+                            } else {
+                                Text(info.name)
+                            }
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .navigationTitle(loc("profile.blocking_lists.panel_title"))
+                .toolbarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ToolbarCloseButton()
+                    }
+                }
+            }
         }
         .confirmationDialog(
             loc("profile.create_list_confirm.title"),
@@ -1512,8 +1546,39 @@ struct BlueskyProfileView: View {
     private func relationshipBadges(state: BlueskyViewerState, blockingListNames: [String]) -> some View {
         let badges = Self.computeBadges(state: state, blockingListNames: blockingListNames)
         if !badges.isEmpty {
-            WrappingBadgeView(badges: badges)
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(badges.indices, id: \.self) { index in
+                    let badge = badges[index]
+                    if badge.icon == "list.bullet" {
+                        Button {
+                            showBlockingListsPanel = true
+                        } label: {
+                            badgeContent(label: badge.label, icon: badge.icon, color: badge.color)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(badge.label)
+                        .accessibilityAddTraits(.isButton)
+                    } else {
+                        badgeContent(label: badge.label, icon: badge.icon, color: badge.color)
+                    }
+                }
+            }
         }
+    }
+
+    private func badgeContent(label: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption2)
+            Text(label)
+                .appFont(.caption)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .background(color.opacity(0.12), in: Capsule())
     }
 
     private static func computeBadges(state: BlueskyViewerState, blockingListNames: [String]) -> [(label: String, icon: String, color: Color)] {
@@ -1528,9 +1593,11 @@ struct BlueskyProfileView: View {
             badges.append((loc("profile.badge.following"), "heart.fill", .blue))
         }
         if !blockingListNames.isEmpty {
-            let label = Self.formattedBlockingListShort(blockingListNames)
+            let count = blockingListNames.count
+            let label = loc("profile.badge.blocking_by_my_lists").replacingOccurrences(of: "{n}", with: "\(count)")
             badges.append((label, "list.bullet", .orange))
-        } else if state.isBlocking {
+        }
+        if state.isBlocking {
             badges.append((loc("profile.badge.blocking"), "hand.raised.fill", .orange))
         }
         return badges
@@ -1539,19 +1606,6 @@ struct BlueskyProfileView: View {
     private static func formattedBlockingList(_ names: [String]) -> String {
         guard !names.isEmpty else { return "" }
         return loc("profile.block.by_list_notice").replacingOccurrences(of: "{list}", with: names.joined(separator: ", "))
-    }
-
-    private static func formattedBlockingListShort(_ names: [String]) -> String {
-        guard !names.isEmpty else { return "" }
-        let maxDisplay = 5
-        if names.count <= maxDisplay {
-            return loc("profile.badge.blocking_by_list").replacingOccurrences(of: "{list}", with: names.joined(separator: ", "))
-        }
-        let firstFive = names.prefix(maxDisplay).joined(separator: ", ")
-        let remainder = names.count - maxDisplay
-        return loc("profile.badge.blocking_by_list_more")
-            .replacingOccurrences(of: "{list}", with: firstFive)
-            .replacingOccurrences(of: "{n}", with: "\(remainder)")
     }
 
     private func statusChip(title: String, tint: Color, emphasized: Bool) -> some View {
@@ -1646,35 +1700,6 @@ private struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_: UIActivityViewController, context _: Context) {}
-}
-
-// MARK: - Wrapping Badge View
-
-private struct WrappingBadgeView: View {
-    let badges: [(label: String, icon: String, color: Color)]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(badges.indices, id: \.self) { index in
-                badgeView(badges[index])
-            }
-        }
-    }
-
-    private func badgeView(_ badge: (label: String, icon: String, color: Color)) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: badge.icon)
-                .font(.caption2)
-            Text(badge.label)
-                .appFont(.caption)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .foregroundStyle(badge.color)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(badge.color.opacity(0.12), in: Capsule())
-    }
 }
 
 #Preview {

@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1171,
+    "total_keys": 1183,
     "total_languages": 16,
-    "untranslated_total": 1472
+    "untranslated_total": 1502
   },
   "keys": {
     "account.active": {
@@ -15647,67 +15647,256 @@
         "untranslated": true
       }
     },
+    "directreplies.fetching_page": {
+      "en": "Fetching page {n}...",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "directreplies.loading": {
-      "en": "Loading replies...",
+      "en": "Scanning your posts...",
       "de": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "fr": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "it": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "ja": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "zh": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "es": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "pt": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "ko": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "ru": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "ar": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "nl": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "pl": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "tr": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "th": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
       },
       "vi": {
         "text": "Loading replies...",
-        "untranslated": true
+        "untranslated": false
+      }
+    },
+    "directreplies.scanning_posts": {
+      "en": "Fetching your posts...",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "directreplies.scanning_progress": {
+      "en": "Scanning post {n} of {total}...",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
       }
     },
     "directreplies.searching_as": {
@@ -50549,6 +50738,132 @@
         "untranslated": true
       }
     },
+    "profile.badge.blocking_by_list_more": {
+      "en": "Blocked by {list} …and {n} more",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.badge.blocking_by_my_lists": {
+      "en": "Block my moderation lists ({n})",
+      "de": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Block my moderation lists ({n})",
+        "untranslated": true
+      }
+    },
     "profile.badge.blocks_me": {
       "en": "Blocks me",
       "de": {
@@ -50861,6 +51176,69 @@
       },
       "vi": {
         "text": "屏蔽 (VI)",
+        "untranslated": false
+      }
+    },
+    "profile.block.by_list_more": {
+      "en": "Blocked via {list} …and {n} more — manage from the list instead",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -52628,6 +53006,132 @@
         "untranslated": false
       }
     },
+    "profile.blocking_lists.panel_title": {
+      "en": "Moderation Lists",
+      "de": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Moderation Lists",
+        "untranslated": true
+      }
+    },
+    "profile.blocking_lists.section_header": {
+      "en": "Lists blocking this profile",
+      "de": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Lists blocking this profile",
+        "untranslated": true
+      }
+    },
     "profile.create_list_confirm.create": {
       "en": "Create List",
       "de": {
@@ -53195,6 +53699,69 @@
         "untranslated": false
       }
     },
+    "profile.export.complete": {
+      "en": "Export complete",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "profile.export.csv": {
       "en": "CSV",
       "de": {
@@ -53258,6 +53825,69 @@
         "untranslated": false
       }
     },
+    "profile.export.download_posts": {
+      "en": "Download Posts",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "profile.export.json": {
       "en": "JSON",
       "de": {
@@ -53318,6 +53948,132 @@
       },
       "vi": {
         "text": "JSON",
+        "untranslated": false
+      }
+    },
+    "profile.export.loading": {
+      "en": "Page {n} · {posts} posts...",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.export.writing": {
+      "en": "Writing file...",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },

@@ -1,5 +1,12 @@
 import Foundation
 
+struct BlockingListInfo: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let listURI: String?
+    let memberCount: Int?
+}
+
 @MainActor
 final class BlueskyProfileViewModel: ObservableObject {
     @Published private(set) var inspection: ProfileInspection?
@@ -31,6 +38,7 @@ final class BlueskyProfileViewModel: ObservableObject {
     @Published private(set) var subscribedLists: [SubscribedListInfo]?
     @Published private(set) var subscribedListBlockingNames: [String] = []
     @Published private(set) var combinedBlockingNames: [String] = []
+    @Published private(set) var blockingLists: [BlockingListInfo] = []
     @Published private(set) var isFetchingSubscribedLists = false
     @Published private(set) var isCreatingList = false
     
@@ -47,6 +55,19 @@ final class BlueskyProfileViewModel: ObservableObject {
             names.insert(name)
         }
         combinedBlockingNames = Array(names).sorted()
+        blockingLists = buildBlockingLists(from: combinedBlockingNames)
+    }
+
+    private func buildBlockingLists(from names: [String]) -> [BlockingListInfo] {
+        names.map { name in
+            if let membership = listMemberships.first(where: { $0.name == name && $0.kind == .moderation }) {
+                return BlockingListInfo(id: membership.listURI, name: name, listURI: membership.listURI, memberCount: membership.memberCount)
+            }
+            if let info = subscribedLists?.first(where: { $0.name == name && $0.kind == .moderation }) {
+                return BlockingListInfo(id: info.listURI, name: name, listURI: info.listURI, memberCount: info.memberCount)
+            }
+            return BlockingListInfo(id: name, name: name, listURI: nil, memberCount: nil)
+        }
     }
 
     func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {

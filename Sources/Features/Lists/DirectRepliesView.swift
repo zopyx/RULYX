@@ -51,7 +51,11 @@ struct DirectRepliesView: View {
             if viewModel.isLoading, viewModel.entries.isEmpty {
                 HStack {
                     Spacer()
-                    LoadingPanel(message: loc("directreplies.loading"))
+                    VStack(spacing: 8) {
+                        LoadingPanel(message: viewModel.progressLabel ?? loc("directreplies.loading"))
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    }
                     Spacer()
                 }
                 .listRowSeparator(.hidden)
@@ -133,8 +137,15 @@ struct DirectRepliesView: View {
                 if viewModel.isLoadingMore {
                     HStack {
                         Spacer()
-                        ProgressView()
-                            .scaleEffect(0.8)
+                        VStack(spacing: 6) {
+                            if let label = viewModel.progressLabel {
+                                Text(label)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        }
                         Spacer()
                     }
                     .listRowSeparator(.hidden)
