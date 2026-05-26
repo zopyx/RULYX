@@ -19,3 +19,10 @@ build/
 
 # Large binary pods (Tor framework exceeds GitHub's 100 MB limit)
 Pods/Tor/tor.xcframework/
+
+# Screenshots
+screenshots/
+
+# Fastlane
+fastlane/output/
+fastlane/test_output/

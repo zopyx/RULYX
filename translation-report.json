@@ -20,7 +20,7 @@
     ],
     "total_keys": 1183,
     "total_languages": 16,
-    "untranslated_total": 1502
+    "untranslated_total": 1637
   },
   "keys": {
     "account.active": {
@@ -15650,64 +15650,64 @@
     "directreplies.fetching_page": {
       "en": "Fetching page {n}...",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching page {n}...",
+        "untranslated": true
       }
     },
     "directreplies.loading": {
@@ -15776,127 +15776,127 @@
     "directreplies.scanning_posts": {
       "en": "Fetching your posts...",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Fetching your posts...",
+        "untranslated": true
       }
     },
     "directreplies.scanning_progress": {
       "en": "Scanning post {n} of {total}...",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Scanning post {n} of {total}...",
+        "untranslated": true
       }
     },
     "directreplies.searching_as": {
@@ -50741,64 +50741,64 @@
     "profile.badge.blocking_by_list_more": {
       "en": "Blocked by {list} …and {n} more",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked by {list} …and {n} more",
+        "untranslated": true
       }
     },
     "profile.badge.blocking_by_my_lists": {
@@ -51182,64 +51182,64 @@
     "profile.block.by_list_more": {
       "en": "Blocked via {list} …and {n} more — manage from the list instead",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Blocked via {list} …and {n} more — manage from the list instead",
+        "untranslated": true
       }
     },
     "profile.block.by_list_notice": {
@@ -53702,64 +53702,64 @@
     "profile.export.complete": {
       "en": "Export complete",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Export complete",
+        "untranslated": true
       }
     },
     "profile.export.csv": {
@@ -53828,64 +53828,64 @@
     "profile.export.download_posts": {
       "en": "Download Posts",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Download Posts",
+        "untranslated": true
       }
     },
     "profile.export.json": {
@@ -53954,127 +53954,127 @@
     "profile.export.loading": {
       "en": "Page {n} · {posts} posts...",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Page {n} · {posts} posts...",
+        "untranslated": true
       }
     },
     "profile.export.writing": {
       "en": "Writing file...",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Writing file...",
+        "untranslated": true
       }
     },
     "profile.followers": {

@@ -4,7 +4,7 @@ GENERIC_DESTINATION := generic/platform=iOS Simulator
 SIMULATOR_DESTINATION := platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5
 DERIVED_DATA_PATH := /private/tmp/RULYX-TestDerivedData
 
-.PHONY: help generate build build-for-testing test test-sim test-fresh lint format translations-export translations-sync translations-repair translations-validate translations-validate-ci
+.PHONY: help generate build build-for-testing test test-sim test-fresh lint format screenshots translations-export translations-sync translations-repair translations-validate translations-validate-ci
 
 help:
 	@printf '%s\n' \
@@ -17,6 +17,7 @@ help:
 		'  make test-fresh        Run tests on iPhone 16 Pro with a fresh derived data path' \
 		'  make lint              Run swiftformat --lint and swiftlint' \
 		'  make format            Format Sources and Tests with swiftformat' \
+		'  make screenshots       Capture App Store screenshots via fastlane snapshot (1260x2736)' \
 		'  make translations-sync Sync JSON bundles into Localizable.xcstrings' \
 		'  make translations-repair Repair placeholder mismatches via English fallback'
 
@@ -44,6 +45,9 @@ lint:
 
 format:
 	swiftformat Sources Tests
+
+screenshots:
+	bundle exec fastlane snapshot
 
 translations-export:
 	python3 scripts/export-translations.py

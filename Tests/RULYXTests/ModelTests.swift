@@ -203,7 +203,7 @@ final class BlueskyProfileTests: XCTestCase {
     }
 
     func testViewerStateMutedNotBlocking() {
-        let state = BlueskyViewerState(muted: true, blockedBy: false, isBlocking: false, blockingRecordURI: nil, isFollowing: true, followingRecordURI: "at://follow/1", followsYou: false, mutedByListName: nil, blockingByListName: nil)
+        let state = BlueskyViewerState(muted: true, blockedBy: false, isBlocking: false, blockingRecordURI: nil, isFollowing: true, followingRecordURI: "at://follow/1", followsYou: false, mutedByListName: nil, blockingByListName: [])
         XCTAssertTrue(state.muted)
         XCTAssertFalse(state.isBlocking)
         XCTAssertTrue(state.isFollowing)

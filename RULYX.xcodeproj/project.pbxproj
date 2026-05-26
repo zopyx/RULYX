@@ -110,9 +110,11 @@
 		574E7B89AFEA877046E57551 /* ProfileInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6578B3A3E0D7B991826A37B9 /* ProfileInspectorView.swift */; };
 		580ECD61C1B323F245F5E349 /* DateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE61BB0D0695717F8D386676 /* DateFormatters.swift */; };
 		58F40A634244FD0E9CA72366 /* ListBatchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463861EF57B66C6208DE4BFA /* ListBatchController.swift */; };
+		59A432DA1F2D1777A8098127 /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A01CF9D21FCBD47F2A951D /* ScreenshotTests.swift */; };
 		59B068AABE0259BAA9943B7A /* BlueskyProfileInspecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F443E8F0147C2FBD6E44906 /* BlueskyProfileInspecting.swift */; };
 		59E344BF7453EEB9E12F5D97 /* MentionsSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8230452C82C6F12684AC1C95 /* MentionsSearchViewModel.swift */; };
 		5A64C4FD3DB769CA13549E32 /* BlueskyProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6410F5E8B465A4948FA8CE8D /* BlueskyProfile.swift */; };
+		5B4C23380734C07FA3F6D87F /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C653D72FC931E1C3CCFE6 /* SnapshotHelper.swift */; };
 		5CE364B178AB794B461C5F99 /* NewConversationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D74D2314222D92AA8ED0E4 /* NewConversationSheet.swift */; };
 		5F13A54CFA97C76A18D2FDF3 /* HTTPRequestDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2BA4F453710A4F661A13B6 /* HTTPRequestDebugView.swift */; };
 		60818976997EB79EF0F84EC2 /* ListsView+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AB5243A902E67DBF19206E /* ListsView+Presentation.swift */; };
@@ -466,6 +468,7 @@
 		AD6FDB05B05B579AA328BF56 /* ComposeContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeContext.swift; sourceTree = "<group>"; };
 		AD71E462B3813717C210808C /* MockBlueskyProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBlueskyProfileService.swift; sourceTree = "<group>"; };
 		B00D6BF1B960E99C69C24A7B /* PostClassificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostClassificationView.swift; sourceTree = "<group>"; };
+		B0A01CF9D21FCBD47F2A951D /* ScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTests.swift; sourceTree = "<group>"; };
 		B131B0D0C00FB51A153387EE /* BlueskyProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileService.swift; sourceTree = "<group>"; };
 		B1EFF3E877712C5E630AEDA1 /* FeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStore.swift; sourceTree = "<group>"; };
 		B2AC0D09E873DD0CF1C2AC34 /* BlueskySession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskySession.swift; sourceTree = "<group>"; };
@@ -499,6 +502,7 @@
 		CC9175EDE69D7111DF25CC02 /* PreviewBlueskyClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewBlueskyClient.swift; sourceTree = "<group>"; };
 		CCEF8AED13F2B79D85FD49B9 /* BlueskyAPIDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPIDTOs.swift; sourceTree = "<group>"; };
 		CE27B69BC0BBFEAA05CBC8A7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		D01C653D72FC931E1C3CCFE6 /* SnapshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
 		D0230DA7EE94FF126CB5EF0B /* ClearskyHeartbeatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearskyHeartbeatService.swift; sourceTree = "<group>"; };
 		D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileViewModel.swift; sourceTree = "<group>"; };
 		D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
@@ -680,6 +684,8 @@
 		78E0A25C1818E6C10B4FAB9F /* UITests */ = {
 			isa = PBXGroup;
 			children = (
+				B0A01CF9D21FCBD47F2A951D /* ScreenshotTests.swift */,
+				D01C653D72FC931E1C3CCFE6 /* SnapshotHelper.swift */,
 				279C2D603EA614B8FBCDEB63 /* RULYXUITests */,
 			);
 			path = UITests;
@@ -1185,6 +1191,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				526AFA31EF025C9B5F928313 /* RULYXUITests.swift in Sources */,
+				59A432DA1F2D1777A8098127 /* ScreenshotTests.swift in Sources */,
+				5B4C23380734C07FA3F6D87F /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1568,13 +1576,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 57;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1586,13 +1594,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 57;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;

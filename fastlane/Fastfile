@@ -1,0 +1,34 @@
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    setup_simulator_env
+  end
+
+  lane :screenshots do
+    capture_screenshots(
+      output_directory: "./screenshots",
+      clear_previous_screenshots: true,
+      stop_after_first_error: false
+    )
+
+    resize_screenshots
+  end
+
+  lane :resize_screenshots do
+    target_width = 1260
+    target_height = 2736
+    source_dir = "./screenshots"
+
+    Dir.glob("#{source_dir}/**/*.png").each do |file|
+      next if file.include?("_1260x2736")
+
+      basename = File.basename(file, File.extname(file))
+      dir = File.dirname(file)
+      out = File.join(dir, "#{basename}_1260x2736.png")
+
+      sh "sips -z #{target_height} #{target_width} \"#{file}\" --out \"#{out}\""
+      UI.success "Resized: #{file} → #{out} (#{target_width}x#{target_height})"
+    end
+  end
+end
