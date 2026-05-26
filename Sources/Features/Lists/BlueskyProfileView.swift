@@ -1397,7 +1397,6 @@ struct BlueskyProfileView: View {
     }
 
     private func fetchSubscribedListsIfOwn(account: AppAccount, appPassword: String, targetDID: String? = nil) async {
-        guard isOwnProfile else { return }
         await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: blueskyClient, targetDID: targetDID)
     }
 
@@ -1539,15 +1538,7 @@ struct BlueskyProfileView: View {
 
     private static func formattedBlockingList(_ names: [String]) -> String {
         guard !names.isEmpty else { return "" }
-        let maxDisplay = 5
-        if names.count <= maxDisplay {
-            return loc("profile.block.by_list_notice").replacingOccurrences(of: "{list}", with: names.joined(separator: ", "))
-        }
-        let firstFive = names.prefix(maxDisplay).joined(separator: ", ")
-        let remainder = names.count - maxDisplay
-        return loc("profile.block.by_list_more")
-            .replacingOccurrences(of: "{list}", with: firstFive)
-            .replacingOccurrences(of: "{n}", with: "\(remainder)")
+        return loc("profile.block.by_list_notice").replacingOccurrences(of: "{list}", with: names.joined(separator: ", "))
     }
 
     private static func formattedBlockingListShort(_ names: [String]) -> String {
