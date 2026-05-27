@@ -1,6 +1,10 @@
 import SwiftUI
 
 extension ListDetailView {
+    // MARK: - ListSnapshotSection
+
+    /// Placeholder section for comparing list membership snapshots
+    /// (currently not implemented — renders an empty Group).
     struct ListSnapshotSection: View {
         @ObservedObject var viewModel: ListDetailViewModel
         let snapshotSummary: ListMembershipSnapshotSummary?
@@ -12,6 +16,8 @@ extension ListDetailView {
         @EnvironmentObject var accountStore: AccountStore
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
+
+        // MARK: - Body
 
         var body: some View {
             Group {}

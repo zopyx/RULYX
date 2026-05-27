@@ -1,5 +1,6 @@
 import Foundation
 
+/// A notification with an optional resolved related post.
 struct NotificationEntry: Identifiable {
     var notification: NotificationItem
     let relatedPostURI: String?
@@ -10,14 +11,29 @@ struct NotificationEntry: Identifiable {
     }
 }
 
+/// Manages the notification list: loading, pagination, marking as read, and unread count.
+///
+/// State machine: `.initialLoading → .loadingMore → .loaded | .exhausted | .failed | .loadMoreFailed | .refreshing | .empty`
+/// Each notification is enriched with its related post (if applicable) by batch-fetching post data.
 @MainActor
 final class NotificationViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// Loaded notifications, newest first.
     @Published private(set) var entries: [NotificationEntry] = []
+    /// Current state of the notification loading lifecycle.
     @Published private(set) var state: TimelineState = .initialLoading
+    /// Number of unread notifications.
     @Published private(set) var unreadCount = 0
 
+    // MARK: - Private Properties
+
+    /// Cursor for paginating through notifications.
     private var cursor: String?
 
+    // MARK: - Public Methods
+
+    /// Performs the initial load of notifications. Only fires when `state == .initialLoading`.
     func load(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard state == .initialLoading else { return }
         do {
@@ -32,6 +48,7 @@ final class NotificationViewModel: ObservableObject {
         }
     }
 
+    /// Pull-to-refresh: reloads all notifications from scratch.
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         state = .refreshing
         do {
@@ -46,6 +63,7 @@ final class NotificationViewModel: ObservableObject {
         }
     }
 
+    /// Loads the next page of notifications.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let cursor, state != .loadingMore else { return }
         state = .loadingMore
@@ -62,6 +80,7 @@ final class NotificationViewModel: ObservableObject {
         }
     }
 
+    /// Marks all loaded notifications as read via the `updateSeen` API and updates local state.
     func markAllRead(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         do {
             try await client.updateSeen(at: .now, account: account, appPassword: appPassword)
@@ -74,11 +93,13 @@ final class NotificationViewModel: ObservableObject {
         }
     }
 
+    /// Fetches the current unread count from the server.
     func updateUnreadCount(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let count = try? await client.getUnreadCount(account: account, appPassword: appPassword) else { return }
         unreadCount = count
     }
 
+    /// Resets all state to initial values (e.g. on account switch).
     func reset() {
         entries = []
         state = .initialLoading
@@ -86,6 +107,9 @@ final class NotificationViewModel: ObservableObject {
         unreadCount = 0
     }
 
+    // MARK: - Private Helpers
+
+    /// Enriches `NotificationItem` array with related post data fetched in batch.
     private func buildEntries(
         for notifications: [NotificationItem],
         account: AppAccount,
@@ -103,6 +127,8 @@ final class NotificationViewModel: ObservableObject {
         }
     }
 
+    /// Batch-fetches all posts referenced by the notification list.
+    /// Falls back to individual fetches for any URIs that fail in the batch request.
     private func fetchRelevantPosts(
         for notifications: [NotificationItem],
         account _: AppAccount,
@@ -123,6 +149,7 @@ final class NotificationViewModel: ObservableObject {
             AppLogger.moderation.error("Batch notification post fetch failed: \(error.localizedDescription, privacy: .public)")
         }
 
+        // Individually fetch any URIs that were missing from the batch result
         let missingURIs = postURIs.filter { resolvedPosts[$0] == nil }
         guard !missingURIs.isEmpty else { return resolvedPosts }
 
@@ -148,6 +175,8 @@ final class NotificationViewModel: ObservableObject {
         return resolvedPosts
     }
 
+    /// Extracts the relevant post URI from a notification based on its reason type.
+    /// - Returns: The URI of the post to show as context, or `nil` for follows.
     private func postURI(for notification: NotificationItem) -> String? {
         switch notification.reason {
         case "like", "repost":

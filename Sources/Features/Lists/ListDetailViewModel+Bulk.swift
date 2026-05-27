@@ -3,57 +3,73 @@ import Foundation
 // MARK: - Bulk selection, add/remove/mute/block/transfer, and batch operations
 
 extension ListDetailViewModel {
+    // MARK: - Selection Helpers
+
+    /// True if the actor is selected in the search results for bulk add.
     func isSelectedForBulkAdd(_ actor: BlueskyActor) -> Bool {
         selectedSearchActorIDs.contains(actor.id)
     }
 
+    /// True if the member is selected for bulk removal.
     func isSelectedForBulkRemoval(_ member: BlueskyListMember) -> Bool {
         selectedMemberIDs.contains(member.id)
     }
 
+    /// Toggles an actor's selection in the search results.
     func toggleSearchSelection(for actor: BlueskyActor) {
         if !selectedSearchActorIDs.insert(actor.id).inserted {
             selectedSearchActorIDs.remove(actor.id)
         }
     }
 
+    /// Toggles a member's selection in the member list.
     func toggleMemberSelection(for member: BlueskyListMember) {
         if !selectedMemberIDs.insert(member.id).inserted {
             selectedMemberIDs.remove(member.id)
         }
     }
 
+    /// Toggles an actor DID in the comparison selection.
     func toggleComparisonSelection(for actorDID: String) {
         if !selectedComparisonActorDIDs.insert(actorDID).inserted {
             selectedComparisonActorDIDs.remove(actorDID)
         }
     }
 
+    /// Selects all search results for bulk add.
     func selectAllSearchResults() {
         selectedSearchActorIDs = Set(searchResults.map(\.id))
     }
 
+    /// Clears the search result selection.
     func clearSearchSelection() {
         selectedSearchActorIDs.removeAll()
     }
 
+    /// Selects all members matching the current filter.
     func selectAllFilteredMembers() {
         selectedMemberIDs = Set(filteredMembers.map(\.id))
     }
 
+    /// Clears the member selection.
     func clearMemberSelection() {
         selectedMemberIDs.removeAll()
     }
 
+    /// Selects all members in a given comparison bucket.
     func selectComparisonBucket(_ bucket: ComparisonBucket) {
         guard let comparisonReport else { return }
         selectedComparisonActorDIDs = diffController.selectComparisonBucket(bucket, in: comparisonReport)
     }
 
+    /// Clears the comparison selection.
     func clearComparisonSelection() {
         selectedComparisonActorDIDs.removeAll()
     }
 
+    // MARK: - Bulk Operations
+
+    /// Adds all selected search-result actors to the list.
     func bulkAddSelectedActors(
         to list: BlueskyList,
         account: AppAccount,
@@ -85,6 +101,7 @@ extension ListDetailViewModel {
         onMembersChanged()
     }
 
+    /// Removes all selected members from the list.
     func bulkRemoveSelectedMembers(
         account: AppAccount,
         appPassword: String,
@@ -121,6 +138,7 @@ extension ListDetailViewModel {
         bulkActionResult = result
     }
 
+    /// Blocks all selected members.
     func bulkBlockSelectedMembers(
         account: AppAccount,
         appPassword: String,
@@ -145,6 +163,7 @@ extension ListDetailViewModel {
         bulkActionResult = result
     }
 
+    /// Mutes all selected members.
     func bulkMuteSelectedMembers(
         account: AppAccount,
         appPassword: String,
@@ -169,6 +188,7 @@ extension ListDetailViewModel {
         bulkActionResult = result
     }
 
+    /// Unblocks all selected members.
     func bulkUnblockSelectedMembers(
         account: AppAccount,
         appPassword: String,
@@ -192,6 +212,7 @@ extension ListDetailViewModel {
         bulkActionResult = result
     }
 
+    /// Unmutes all selected members.
     func bulkUnmuteSelectedMembers(
         account: AppAccount,
         appPassword: String,
@@ -216,6 +237,7 @@ extension ListDetailViewModel {
         bulkActionResult = result
     }
 
+    /// Adds all actors selected in the comparison report to the target list.
     func bulkAddComparisonSelection(
         to list: BlueskyList,
         account: AppAccount,
@@ -244,6 +266,8 @@ extension ListDetailViewModel {
         onMembersChanged()
     }
 
+    /// Transfers (moves or copies) selected members to another list.
+    /// - Parameter move: If true, members are removed from the source list after adding to the target.
     func transferSelectedMembers(
         from _: BlueskyList,
         to targetList: BlueskyList,
@@ -287,7 +311,7 @@ extension ListDetailViewModel {
         bulkActionResult = result
     }
 
-    // swiftlint:disable:next function_body_length
+    /// Retries all actors that failed in a previous bulk action.
     func retryFailures(
         from result: ListBulkActionResult,
         currentList: BlueskyList,
@@ -451,6 +475,9 @@ extension ListDetailViewModel {
         }
     }
 
+    // MARK: - Batch Execution
+
+    /// Executes an async action for each actor in the batch with progress and cancellation support.
     func performActorBatch(
         title: String,
         actors: [BlueskyActor],

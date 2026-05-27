@@ -1,9 +1,17 @@
 import SwiftUI
 
+// MARK: - PostReplyContextView
+
+/// A compact preview of the parent post in a reply chain: shows a vertical connector line,
+/// the parent author's name + handle, and the first two lines of their text.
+/// Placed above the reply composer or the replying post in a thread view.
 struct PostReplyContextView: View {
+    /// The parent post being replied to.
     let parent: RichPost
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         let parentAuthor = parent.safeAuthor

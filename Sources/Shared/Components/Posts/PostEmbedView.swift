@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Renders the embed content of a post — images (up to 4 in a grid), videos (with play overlay),
+/// external link cards, and Tenor GIF embeds (with inline preview play button).
 struct PostEmbedView: View {
     let embed: RichEmbed
     var onTapImage: ((Int) -> Void)?
@@ -43,6 +45,8 @@ struct PostEmbedView: View {
             }
         }
     }
+
+    // MARK: - Tenor / GIF Embed
 
     private func tenorEmbedCard(previewURL: URL, external: RichEmbedExternal) -> some View {
         ZStack(alignment: .bottomLeading) {
@@ -88,6 +92,9 @@ struct PostEmbedView: View {
         }
     }
 
+    // MARK: - Image Grid
+
+    /// Up to 4 images in a flexible grid. Single images render full-width; 2+ render in 2-column layout.
     private func imageGrid(images: [RichEmbedImage]) -> some View {
         let isSingle = images.count == 1
         let cols = isSingle ? 1 : 2
@@ -130,6 +137,9 @@ struct PostEmbedView: View {
         }
     }
 
+    // MARK: - External Link Card
+
+    /// Standard link preview: thumbnail, title, description, host.
     private func externalEmbedCard(_ external: RichEmbedExternal) -> some View {
         HStack(spacing: 12) {
             if let thumb = external.thumb, let url = URL(string: thumb) {
@@ -171,6 +181,9 @@ struct PostEmbedView: View {
         }
     }
 
+    // MARK: - Video Embed
+
+    /// Video thumbnail with play button overlay. Falls back to a gradient + film icon when no thumbnail.
     private func videoEmbedCard(_ video: RichEmbedVideo) -> some View {
         ZStack {
             if let thumb = video.thumbnail, let url = URL(string: thumb) {

@@ -1,11 +1,17 @@
 import SwiftUI
 
+// MARK: - ReportGeneratorView
+
+/// Generates a text report from the workspace operation log, optionally
+/// including summary stats, with a ShareLink for export.
 struct ReportGeneratorView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var reportText = ""
     @State private var includeStats = true
+
+    // MARK: - Body
 
     var body: some View {
         List {
@@ -46,6 +52,7 @@ struct ReportGeneratorView: View {
         .navigationTitle(loc("report.title"))
     }
 
+    /// Builds a formatted report string from the workspace operation log.
     private func generateReport() {
         var lines: [String] = []
         lines.append(loc("report.doc_title"))

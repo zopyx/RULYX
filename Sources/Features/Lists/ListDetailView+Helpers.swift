@@ -3,10 +3,12 @@ import SwiftUI
 // MARK: - Computed properties, helpers, and view builders for ListDetailView
 
 extension ListDetailView {
+    /// Ordered snapshot history for the current list, newest first.
     var snapshotHistory: [ListMembershipSnapshot] {
         workspaceStore.snapshotHistory(for: currentList.id)
     }
 
+    /// Diff summary between the two selected snapshots, or nil if invalid.
     var selectedSnapshotComparison: ListMembershipSnapshotSummary? {
         guard let newerID = comparisonState.selectedNewerSnapshotID,
               let olderID = comparisonState.selectedOlderSnapshotID,
@@ -22,10 +24,12 @@ extension ListDetailView {
         )
     }
 
+    /// The Bluesky list selected for comparison in the diff section.
     var comparisonList: BlueskyList? {
         viewModel.availableLists.first { $0.id == comparisonState.selectedComparisonListID }
     }
 
+    /// Cached temporary URL for the full-member CSV export.
     var exportFileURL: URL? {
         if let cached = exportState.cachedExportFileURL { return cached }
         let url = fileURL(named: exportFileName, rows: ["handle,did,display_name"] + viewModel.exportRows())
@@ -33,6 +37,7 @@ extension ListDetailView {
         return url
     }
 
+    /// Cached temporary URL for the comparison-diff CSV export.
     var diffExportFileURL: URL? {
         if let cached = exportState.cachedDiffExportFileURL { return cached }
         guard viewModel.comparisonReport != nil else { return nil }
@@ -44,6 +49,7 @@ extension ListDetailView {
         return url
     }
 
+    /// Sanitized file name for exports (e.g. `"my-list-members.csv"`).
     var exportFileName: String {
         let sanitizedName = currentList.name
             .lowercased()

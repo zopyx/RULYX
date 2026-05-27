@@ -1,7 +1,13 @@
 import SwiftUI
 
+// MARK: - GIFPickerView
+
+/// Full-screen GIF picker with a manual search bar (not `.searchable()` — always visible)
+/// and a 3-column grid of results. Shows trending GIFs on first load, then searches on text input.
+/// Requires the Klipy API key to be present in the keychain.
 struct GIFPickerView: View {
     @Environment(\.dismiss) private var dismiss
+    /// Called with the selected `GIFResult` when the user taps a GIF.
     let onSelect: (GIFResult) -> Void
 
     @State private var searchText = ""
@@ -21,6 +27,9 @@ struct GIFPickerView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -31,6 +40,7 @@ struct GIFPickerView: View {
                         description: Text(loc: "gif.missing_key_desc")
                     )
                 } else {
+                    // Manual search bar pinned above the grid (not .searchable)
                     HStack(spacing: 8) {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(.secondary)
@@ -112,6 +122,8 @@ struct GIFPickerView: View {
             }
         }
     }
+
+    // MARK: - Private Helpers
 
     private var hasAPIKey: Bool {
         KlipyKeychainHelper.exists()

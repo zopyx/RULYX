@@ -1,9 +1,18 @@
 import SwiftUI
 
+// MARK: - AccountSummaryCard
+
+/// A larger, prominent card showing an account's avatar, display name, and handle
+/// with an accent gradient background and disclosure chevron.
+/// Used in account detail / profile summary areas.
 struct AccountSummaryCard: View {
+    /// The account to display.
     let account: AppAccount
+    /// Optional URL for the account's avatar image.
     let avatarURL: URL?
     @ScaledMetric(relativeTo: .title2) private var avatarSize = 60.0
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 14) {
@@ -37,6 +46,8 @@ struct AccountSummaryCard: View {
                 .stroke(Color.skyPrimary.opacity(0.14), lineWidth: 1)
         }
     }
+
+    // MARK: - Private Helpers
 
     @ViewBuilder
     private var avatarView: some View {

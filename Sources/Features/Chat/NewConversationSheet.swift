@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Sheet for starting a new chat conversation — search for a user by
+/// handle/display name, select them, and create (or get existing) conversation.
 struct NewConversationSheet: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient

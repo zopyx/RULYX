@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Lists all chat conversations for the active account with search,
+/// swipe-to-mute/delete, batch edit (mute/unmute/delete), and navigation
+/// to conversation detail or the new-conversation sheet.
 struct ConversationListView: View {
     @EnvironmentObject var chatStore: ChatStore
     @EnvironmentObject var accountStore: AccountStore
@@ -10,6 +13,9 @@ struct ConversationListView: View {
     @State private var editMode: EditMode = .inactive
     @State private var selectedConvos: Set<String> = []
 
+    // MARK: - Computed properties
+
+    /// Conversations filtered by the search text.
     private var filteredConvos: [ChatConversation] {
         guard !searchText.isEmpty else { return chatStore.conversations }
         return chatStore.conversations.filter { convo in
@@ -21,6 +27,9 @@ struct ConversationListView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         NavigationStack(path: $navPath) {
             Group {

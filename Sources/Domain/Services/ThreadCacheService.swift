@@ -1,5 +1,9 @@
 import Foundation
 
+// MARK: - ThreadCacheService
+
+/// An in-memory cache for thread data (`ThreadNode`) keyed by post URI.
+/// Entries expire after 60 seconds. Uses `NSCache` with a limit of 50 entries.
 @MainActor
 final class ThreadCacheService {
     static let shared = ThreadCacheService()

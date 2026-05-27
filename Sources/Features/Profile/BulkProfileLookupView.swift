@@ -1,10 +1,17 @@
 import SwiftUI
 
+// MARK: - BulkProfileLookupView
+
+/// Bulk-resolve handles or DIDs entered as a block of text. Shows each
+/// resolved profile (with avatar, display name, handle) or an error for
+/// unresolvable entries.
 struct BulkProfileLookupView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var viewModel = BulkProfileLookupViewModel()
+
+    // MARK: - Body
 
     var body: some View {
         List {
@@ -89,6 +96,7 @@ struct BulkProfileLookupView: View {
         }
     }
 
+    /// Triggers the viewModel lookup with the active account.
     private func runLookup() async {
         await viewModel.lookup(
             account: accountStore.activeAccount,
@@ -98,6 +106,9 @@ struct BulkProfileLookupView: View {
     }
 }
 
+// MARK: - ProfileLookupResultRow
+
+/// Row showing a resolved profile (avatar, name, handle) or an error state.
 private struct ProfileLookupResultRow: View {
     let result: ProfileLookupResult
     let profile: BlueskyProfile?

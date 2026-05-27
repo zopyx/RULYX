@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - ActionPresetsView
+
+/// Lists saved action presets (block, mute, report, add-to-list combinations)
+/// with swipe-to-delete/duplicate and a sheet for creating new presets.
 struct ActionPresetsView: View {
     @StateObject private var store = ActionPresetStore()
     @State private var isCreating = false
@@ -47,6 +51,9 @@ struct ActionPresetsView: View {
     }
 }
 
+// MARK: - Tag
+
+/// Small colored badge showing the action type (Block, Mute, Report, etc.).
 private struct Tag: View {
     let text: String
     let color: Color
@@ -68,6 +75,9 @@ private struct Tag: View {
     }
 }
 
+// MARK: - EditActionPresetView
+
+/// Form sheet for creating or editing an action preset.
 struct EditActionPresetView: View {
     @ObservedObject var store: ActionPresetStore
     @Environment(\.dismiss) private var dismiss

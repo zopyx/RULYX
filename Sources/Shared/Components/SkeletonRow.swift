@@ -1,6 +1,12 @@
 import SwiftUI
 
+// MARK: - SkeletonRow
+
+/// A placeholder row matching the layout of `BlueskyActorRow` — circle + two text lines.
+/// Used as a shimmer/skeleton loading state while data is being fetched.
 struct SkeletonRow: View {
+    // MARK: - Body
+
     var body: some View {
         HStack(spacing: 12) {
             Circle()
@@ -23,7 +29,12 @@ struct SkeletonRow: View {
     }
 }
 
+// MARK: - SkeletonCard
+
+/// A card-shaped skeleton placeholder with circle avatar and two text bars.
 struct SkeletonCard: View {
+    // MARK: - Body
+
     var body: some View {
         HStack(spacing: 12) {
             Circle()
@@ -48,7 +59,12 @@ struct SkeletonCard: View {
     }
 }
 
+// MARK: - SkeletonGrid
+
+/// A 2-column grid of `SkeletonCard` placeholders.
 struct SkeletonGrid: View {
+    // MARK: - Body
+
     var body: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
             ForEach(0 ..< 4) { _ in

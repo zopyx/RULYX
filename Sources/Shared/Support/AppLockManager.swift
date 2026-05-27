@@ -1,13 +1,21 @@
 import LocalAuthentication
 import SwiftUI
 
+// MARK: - AppLockManager
+
+/// Manages app-lock via Face ID / Touch ID / device passcode.
+/// Locks the app on background entry (configurable timeout) and authenticates on foreground.
+/// Includes lockout after 5 consecutive failed attempts (60s cooldown).
 @MainActor
 final class AppLockManager: ObservableObject {
     static let shared = AppLockManager()
 
+    /// Whether the app is currently locked.
     @Published var isLocked = false
+    /// Whether an authentication attempt is in progress.
     @Published var isAuthenticating = false
 
+    /// Master toggle stored in `UserDefaults` via `@AppStorage`.
     @AppStorage("appLockEnabled") var isEnabled = false {
         didSet {
             if !isEnabled {
@@ -16,6 +24,8 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    /// Timeout in minutes before the app auto-locks after entering background.
+    /// 0 = lock immediately on background.
     @AppStorage("appLockTimeout") var timeoutMinutes: Int = 1
 
     private var backgroundEntryTime: Date?
@@ -23,7 +33,10 @@ final class AppLockManager: ObservableObject {
     private var consecutiveFailedAttempts = 0
     private var lockoutUntil: Date?
 
+    /// Injectable date provider for testing.
     var now: () -> Date = { Date() }
+
+    // MARK: - Init
 
     private init() {
         if isEnabled {
@@ -31,6 +44,9 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    // MARK: - Public
+
+    /// The type of biometrics available on the device.
     var biometricType: LABiometryType {
         let context = LAContext()
         var error: NSError?
@@ -40,12 +56,14 @@ final class AppLockManager: ObservableObject {
         return context.biometryType
     }
 
+    /// Whether biometric authentication is available.
     var isBiometricsAvailable: Bool {
         let context = LAContext()
         var error: NSError?
         return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
     }
 
+    /// Human-readable label for the available biometric type.
     var biometricLabel: String {
         switch biometricType {
         case .touchID: "Touch ID"
@@ -54,6 +72,7 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    /// Record the background entry time. Locks immediately if timeout is 0.
     func appDidEnterBackground() {
         backgroundEntryTime = now()
         didEnterBackground = true
@@ -62,6 +81,8 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    /// On becoming active, check if the timeout has elapsed and lock if needed.
+    /// If already locked, trigger authentication.
     func appDidBecomeActive() {
         guard isEnabled else { return }
         guard didEnterBackground else {
@@ -80,6 +101,8 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    /// Authenticate using biometrics. Returns success/failure.
+    /// Implements a 60-second lockout after 5 consecutive failures.
     func authenticate() async -> Bool {
         guard isEnabled else {
             isLocked = false
@@ -115,11 +138,14 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    /// Manually lock the app (if lock is enabled).
     func lock() {
         guard isEnabled else { return }
         isLocked = true
     }
 
+    /// Authenticate with device passcode as fallback (used for sensitive operations).
+    /// Does NOT set `isLocked`.
     func authenticateSensitive() async -> Bool {
         isAuthenticating = true
         defer { isAuthenticating = false }

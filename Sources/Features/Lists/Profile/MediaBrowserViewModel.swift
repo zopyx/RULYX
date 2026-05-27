@@ -7,10 +7,12 @@ protocol MediaFeedFetching {
 
 extension LiveBlueskyClient: MediaFeedFetching {}
 
+/// Types of media content that can appear in the browser.
 enum MediaType {
     case image, video
 }
 
+/// Filter options for the media browser.
 enum MediaFilter: String, CaseIterable {
     case images
     case videos
@@ -24,6 +26,7 @@ enum MediaFilter: String, CaseIterable {
     }
 }
 
+/// Represents a single media item extracted from a post.
 struct MediaItem: Identifiable {
     let id: String
     let url: String
@@ -39,12 +42,14 @@ struct MediaItem: Identifiable {
     let ageText: String?
 }
 
+/// Outcome of downloading a single media asset.
 struct DownloadResult {
     let index: Int
     let name: String?
     let error: String?
 }
 
+/// Summary of a completed media download operation.
 struct DownloadSummary: Identifiable {
     let id = UUID()
     let directory: URL
@@ -57,36 +62,62 @@ struct DownloadSummary: Identifiable {
     }
 }
 
+/// A 256MB memory / 2GB disk cache for media thumbnails.
 private let sharedCache: URLCache = {
     let cache = URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
     URLCache.shared = cache
     return cache
 }()
 
+/// Browses and downloads media (images and videos) from a user's feed.
+///
+/// Loads pages from `fetchRichFeed`, extracts embeds into `MediaItem` structs,
+/// supports filtering by type, multi-select, and batch download with progress.
 @MainActor
 final class MediaBrowserViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// All loaded media items, sorted newest-first.
     @Published private(set) var items: [MediaItem] = []
+    /// Items matching the current `filter` selection.
     @Published private(set) var filteredItems: [MediaItem] = []
+    /// True while the initial load is in progress.
     @Published private(set) var isLoading = false
+    /// True while loading the next page.
     @Published private(set) var isLoadingMore = false
+    /// True while scanning for media (searching, not just loading pages).
     @Published private(set) var isScanning = false
+    /// False when there are no more pages on the server.
     @Published private(set) var hasMore = true
+    /// Total image count across all loaded items.
     @Published private(set) var imageCount = 0
+    /// Total video count across all loaded items.
     @Published private(set) var videoCount = 0
+    /// Summary text (currently unused, always empty).
     @Published private(set) var summaryText = ""
+    /// Set of media item IDs selected for download.
     @Published var selectedIDs = Set<String>()
+    /// User-facing error message.
     @Published var errorMessage: String?
+    /// True while a download operation is in progress.
     @Published var isDownloading = false
+    /// Tracks (completed, total) during download for progress UI.
     @Published var downloadProgress: (current: Int, total: Int)?
+    /// Detailed status of the current download (last file name or error).
     @Published var downloadStatusDetail: String?
+    /// Active media type filter; triggers `rebuildDerivedState`.
     @Published var filter: MediaFilter = .images {
         didSet {
             rebuildDerivedState()
         }
     }
 
+    /// Summary shown after download completes.
     @Published var downloadSummary: DownloadSummary?
 
+    // MARK: - Computed Properties
+
+    /// Filters that have at least one matching item.
     var availableFilters: [MediaFilter] {
         var result = [MediaFilter]()
         if items.contains(where: { $0.type == .image }) { result.append(.images) }
@@ -94,16 +125,7 @@ final class MediaBrowserViewModel: ObservableObject {
         return result
     }
 
-    private var cursor: String?
-    private let did: String
-    private let downloadService: MediaDownloadService
-
-    init(did: String, downloadService: MediaDownloadService = .shared) {
-        self.did = did
-        self.downloadService = downloadService
-        _ = sharedCache
-    }
-
+    /// Whether all filtered items are selected.
     var selectAll: Bool {
         get { selectedIDs.count == filteredItems.count && !filteredItems.isEmpty }
         set {
@@ -115,10 +137,33 @@ final class MediaBrowserViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Private Properties
+
+    /// Cursor for paginating through the feed.
+    private var cursor: String?
+    /// The DID of the profile whose media is being browsed.
+    private let did: String
+    /// Service used for downloading media files.
+    private let downloadService: MediaDownloadService
+
+    // MARK: - Init
+
+    init(did: String, downloadService: MediaDownloadService = .shared) {
+        self.did = did
+        self.downloadService = downloadService
+        _ = sharedCache
+    }
+
+    // MARK: - Selection
+
+    /// Removes selection IDs for items no longer in the filtered set.
     func pruneSelection() {
         selectedIDs = Set(filteredItems.filter { selectedIDs.contains($0.id) }.map(\.id))
     }
 
+    // MARK: - Data Loading
+
+    /// Loads the first page of media, replacing all existing items.
     func load(account: AppAccount, appPassword: String, using client: some MediaFeedFetching) async {
         guard !isLoading else { return }
         isLoading = true
@@ -131,6 +176,7 @@ final class MediaBrowserViewModel: ObservableObject {
         isLoading = false
     }
 
+    /// Loads the next page of media and appends to existing items.
     func loadMore(account: AppAccount, appPassword: String, using client: some MediaFeedFetching) async {
         guard !isLoadingMore, cursor != nil else { return }
         isLoadingMore = true
@@ -138,6 +184,9 @@ final class MediaBrowserViewModel: ObservableObject {
         isLoadingMore = false
     }
 
+    // MARK: - Private Helpers
+
+    /// Fetches one page of the author feed and extracts media embeds into items.
     private func fetchPage(account: AppAccount, appPassword: String, using client: some MediaFeedFetching) async {
         do {
             guard !Task.isCancelled else { return }
@@ -166,10 +215,13 @@ final class MediaBrowserViewModel: ObservableObject {
         }
     }
 
+    /// Extracts media items from an embed directly into the `items` array (legacy path).
     private func extractMedia(from embed: RichEmbed, postURI: String, postText: String?, createdAt: String?, indexedAt: String?) {
         extractMedia(from: embed, postURI: postURI, postText: postText, createdAt: createdAt, indexedAt: indexedAt, into: &items)
     }
 
+    /// Extracts images and videos from a post embed into a mutable batch array.
+    /// Images get one `MediaItem` per image; videos get a single item with playlist URL.
     private func extractMedia(
         from embed: RichEmbed,
         postURI: String,
@@ -219,17 +271,20 @@ final class MediaBrowserViewModel: ObservableObject {
         }
     }
 
+    /// Replaces all items with a sorted new set and rebuilds derived state.
     private func replaceItems(_ newItems: [MediaItem]) {
         items = Self.sortedItems(newItems)
         rebuildDerivedState()
     }
 
+    /// Appends new items, sorts the combined array, and rebuilds derived state.
     private func appendItems(_ newItems: [MediaItem]) {
         guard !newItems.isEmpty else { return }
         items = Self.sortedItems(items + newItems)
         rebuildDerivedState()
     }
 
+    /// Recomputes image/video counts, filtered items, and clears summary text.
     private func rebuildDerivedState() {
         imageCount = items.reduce(into: 0) { count, item in
             if item.type == .image {
@@ -248,6 +303,7 @@ final class MediaBrowserViewModel: ObservableObject {
         summaryText = ""
     }
 
+    /// Sorts items newest-first by indexed date, falling back to ID comparison.
     private static func sortedItems(_ items: [MediaItem]) -> [MediaItem] {
         items.sorted { a, b in
             switch (a.indexedDate, b.indexedDate) {
@@ -263,6 +319,7 @@ final class MediaBrowserViewModel: ObservableObject {
         }
     }
 
+    /// Converts a `Date` to a compact relative age string (e.g. "3d", "2w", "1mo").
     private static func makeAgeText(from date: Date?) -> String? {
         guard let date else { return nil }
         let interval = max(0, date.distance(to: .now))
@@ -274,6 +331,9 @@ final class MediaBrowserViewModel: ObservableObject {
         return "\(Int(interval / 31_536_000))y"
     }
 
+    // MARK: - Download
+
+    /// Downloads all selected media items to `directory/handle/` with progress tracking.
     func downloadSelected(to directory: URL, handle: String) async {
         let selected = items.filter { selectedIDs.contains($0.id) }
         guard !selected.isEmpty else { return }
@@ -336,10 +396,14 @@ final class MediaBrowserViewModel: ObservableObject {
         )
     }
 
+    /// Clears the download summary after it has been shown.
     func clearDownloadSummary() {
         downloadSummary = nil
     }
 
+    // MARK: - Private Download Helpers
+
+    /// Date formatter for filenames: `yyyy-MM-dd_HH-mm-ss` in UTC.
     private static let filenameDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
@@ -349,6 +413,7 @@ final class MediaBrowserViewModel: ObservableObject {
         return formatter
     }()
 
+    /// Generates a unique filename stem for a media item based on its timestamp, post ID, and type.
     private static func filenameStem(for item: MediaItem, counts: inout [String: (images: Int, videos: Int)]) -> String {
         let timestamp = parseDate(item.createdAt)
             .map { filenameDateFormatter.string(from: $0) }
@@ -370,6 +435,7 @@ final class MediaBrowserViewModel: ObservableObject {
         }
     }
 
+    /// Removes non-alphanumeric characters (except `-` and `_`) from a filename component.
     private static func sanitizeFilenameComponent(_ value: String) -> String {
         let sanitizedScalars = value.unicodeScalars.map { scalar -> Character in
             if CharacterSet.alphanumerics.contains(scalar) || scalar == "-" || scalar == "_" {

@@ -1,22 +1,28 @@
 import Foundation
 
-// MARK: - File Manager
+// MARK: - ModelFileManager
 
+/// Manages on-disk storage and enumeration of downloaded AI model files.
 struct ModelFileManager {
+    /// The directory where model files are stored.
     private let modelsDirectory: URL
 
+    /// Creates a file manager rooted at the given models directory.
     init(modelsDirectory: URL) {
         self.modelsDirectory = modelsDirectory
     }
 
+    /// Returns the on-disk URL for a given model ID.
     func localURL(for modelID: String) -> URL {
         modelsDirectory.appendingPathComponent(modelID)
     }
 
+    /// Checks whether a model file exists on disk.
     func isDownloaded(_ modelID: String) -> Bool {
         FileManager.default.fileExists(atPath: localURL(for: modelID).path)
     }
 
+    /// Lists all downloaded model IDs by enumerating the models directory.
     func downloadedIDs() -> [String] {
         guard let enumerator = FileManager.default.enumerator(
             at: modelsDirectory,
@@ -26,6 +32,7 @@ struct ModelFileManager {
         return enumerator.compactMap { ($0 as? URL)?.lastPathComponent }
     }
 
+    /// Deletes a downloaded model file from disk.
     func delete(_ modelID: String) throws {
         let url = localURL(for: modelID)
         if FileManager.default.fileExists(atPath: url.path) {
@@ -33,6 +40,7 @@ struct ModelFileManager {
         }
     }
 
+    /// Calculates the total disk usage of all downloaded model files in bytes.
     func totalDiskUsage() -> UInt64 {
         guard let enumerator = FileManager.default.enumerator(
             at: modelsDirectory,
@@ -51,11 +59,15 @@ struct ModelFileManager {
     }
 }
 
-// MARK: - Download Manager
+// MARK: - TaskRegistry
 
+/// An actor that maps URLSession task identifiers to their associated model
+/// IDs and Swift continuations for async/await bridging.
 private actor TaskRegistry {
+    /// Internal storage mapping task identifiers to model ID + continuation pairs.
     var map: [Int: (modelID: String, continuation: CheckedContinuation<URL, Error>)] = [:]
 
+    /// Registers a download task's continuation for later resumption.
     func register(taskID: Int, modelID: String, continuation: CheckedContinuation<URL, Error>) {
         map[taskID] = (modelID, continuation)
     }
@@ -73,21 +85,34 @@ private actor TaskRegistry {
     }
 }
 
+/// Manages the actual HTTP download of model files using URLSession download
+/// tasks with progress tracking and failure reporting.
 @MainActor
 final class ModelDownloadManager: NSObject {
+    /// Registry for bridging URLSession delegates to Swift concurrency.
     private let registry = TaskRegistry()
+    /// File manager for on-disk model storage.
     private let fileManager: ModelFileManager
 
+    /// The URLSession used for model downloads, configured lazily.
     private lazy var session: URLSession = .init(configuration: .default, delegate: self, delegateQueue: nil)
 
+    /// Current download progress for each model ID (0.0–1.0).
     private(set) var progress: [String: Double] = [:]
+    /// Failure messages keyed by model ID.
     private(set) var failures: [String: String] = [:]
 
+    /// Creates the download manager with the given file manager.
     init(fileManager: ModelFileManager) {
         self.fileManager = fileManager
         super.init()
     }
 
+    /// Begins downloading a model file from the given URL.
+    /// - Parameters:
+    ///   - id: The model identifier for tracking.
+    ///   - url: The remote URL to download from.
+    /// - Returns: The local file URL of the downloaded model.
     func downloadModel(id: String, from url: URL) async throws -> URL {
         let task = session.downloadTask(with: url)
         failures.removeValue(forKey: id)
@@ -100,11 +125,15 @@ final class ModelDownloadManager: NSObject {
         }
     }
 
+    /// Cancels tracking for a download (clears progress and failures for the ID).
+    /// Does not cancel the underlying URLSession task.
     func cancelDownload(id: String) {
         progress.removeValue(forKey: id)
         failures.removeValue(forKey: id)
     }
 }
+
+// MARK: - URLSessionDownloadDelegate
 
 extension ModelDownloadManager: URLSessionDownloadDelegate {
     nonisolated func urlSession(

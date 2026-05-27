@@ -1,5 +1,6 @@
 import Foundation
 
+/// Metadata about a moderation list that is blocking the inspected profile.
 struct BlockingListInfo: Identifiable, Hashable {
     let id: String
     let name: String
@@ -7,45 +8,90 @@ struct BlockingListInfo: Identifiable, Hashable {
     let memberCount: Int?
 }
 
+/// Manages inspection, moderation actions, and data export for a single Bluesky profile.
+///
+/// Supports reading viewer state (block/mute/follow), toggling moderation actions,
+/// fetching list memberships, owned/subscribed lists, ClearSky data, media counts,
+/// handle history, and post export. Uses optimistic pending states for instant UI feedback.
 @MainActor
 final class BlueskyProfileViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// The full profile inspection result (profile + list memberships + starter packs).
     @Published private(set) var inspection: ProfileInspection?
+    /// True while the initial profile load is in progress.
     @Published private(set) var isLoading = false
+    /// True while a moderation toggles (block/mute/follow) is executing.
     @Published private(set) var isUpdatingModeration = false
+    /// Handle change history from the PLC audit log.
     @Published private(set) var handleHistory: [HandleChange] = []
+    /// Total image count across all scanned posts.
     @Published private(set) var mediaImageCount = 0
+    /// Total video count across all scanned posts.
     @Published private(set) var mediaVideoCount = 0
+    /// True while scanning posts for media content.
     @Published private(set) var isScanningMedia = false
+    /// User-facing success message (e.g. "Account muted."), auto-cleared on next load.
     @Published var statusMessage: String?
+    /// User-facing error message.
     @Published var errorMessage: String?
+    /// True while generating a post export file.
     @Published private(set) var isExportingPosts = false
+    /// Localized label shown during export (page count / writing status).
     @Published private(set) var exportProgressLabel: String?
+    /// Error that occurred during post export.
     @Published var exportError: String?
+    /// Lists from ClearSky that contain this profile.
     @Published private(set) var clearskyLists: [ClearskyListEntry] = []
+    /// True while fetching ClearSky list data.
     @Published private(set) var isFetchingLists = false
+    /// Error from ClearSky list fetch.
     @Published var listError: String?
+    /// Optimistic pending state for follow toggle (nil = resolved).
     @Published private(set) var pendingFollowingState: Bool?
+    /// Optimistic pending state for block toggle (nil = resolved).
     @Published private(set) var pendingBlockState: Bool?
+    /// Optimistic pending state for mute toggle (nil = resolved).
     @Published private(set) var pendingMuteState: Bool?
+    /// Per-list optimistic pending states for membership toggles (nil = resolved).
     @Published private(set) var pendingListMemberStates: [String: Bool] = [:]
+    /// True when the report sheet is presented.
     @Published var showReportSheet = false
+    /// True while a report is being submitted.
     @Published var isReporting = false
+    /// The selected report reason for the current report.
     @Published var selectedReportReason = ModerationReportReasonType.simplifiedDefault
+    /// Lists owned/created by this profile.
     @Published private(set) var ownedLists: [BlueskyList]?
+    /// True while fetching owned lists.
     @Published private(set) var isFetchingOwnedLists = false
+    /// True while fetching list memberships after initial load.
     @Published private(set) var isFetchingMemberships = false
+    /// True while toggling a list membership.
     @Published private(set) var isUpdatingListMembership = false
+    /// Moderation lists that the viewer subscribes to.
     @Published private(set) var subscribedLists: [SubscribedListInfo]?
+    /// Names of subscribed moderation lists blocking this profile.
     @Published private(set) var subscribedListBlockingNames: [String] = []
+    /// Combined list of all blocking names (owned memberships + subscribed lists).
     @Published private(set) var combinedBlockingNames: [String] = []
+    /// Structs combining name, URI, and count for each blocking list.
     @Published private(set) var blockingLists: [BlockingListInfo] = []
+    /// True while fetching subscribed moderation lists.
     @Published private(set) var isFetchingSubscribedLists = false
+    /// True while creating a new list and adding the profile to it.
     @Published private(set) var isCreatingList = false
-    
+
+    // MARK: - Computed Properties
+
+    /// True if the profile is blocked by at least one moderation list.
     var isBlockedByList: Bool {
         !combinedBlockingNames.isEmpty
     }
 
+    // MARK: - Private Methods
+
+    /// Merges blocking-by-list names from viewer state, owned list memberships, and subscribed lists.
     private func recomputeCombinedBlockingNames(from viewerState: BlueskyViewerState?) {
         var names = Set(viewerState?.blockingByListName ?? [])
         for membership in listMemberships where membership.kind == .moderation && membership.isMember {
@@ -58,6 +104,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         blockingLists = buildBlockingLists(from: combinedBlockingNames)
     }
 
+    /// Converts blocking list names into `BlockingListInfo` structs with URI and member count if available.
     private func buildBlockingLists(from names: [String]) -> [BlockingListInfo] {
         names.map { name in
             if let membership = listMemberships.first(where: { $0.name == name && $0.kind == .moderation }) {
@@ -70,6 +117,9 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    // MARK: - List Data Fetching
+
+    /// Fetches lists that the profile owns/created.
     func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         isFetchingOwnedLists = true
         do {
@@ -81,6 +131,8 @@ final class BlueskyProfileViewModel: ObservableObject {
         isFetchingOwnedLists = false
     }
 
+    /// Fetches the viewer's subscribed moderation lists and checks if the target profile appears in any of them.
+    /// - Parameter targetDID: The profile DID to check against each list; if nil, skips membership checking.
     func fetchSubscribedLists(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, targetDID: String? = nil) async {
         isFetchingSubscribedLists = true
         do {
@@ -100,6 +152,7 @@ final class BlueskyProfileViewModel: ObservableObject {
                         memberCount: list.memberCount,
                         kind: list.kind
                     )
+                    // Check up to 5 pages of each list to find the target
                     while !found, pagesChecked < 5 {
                         guard let page = try? await client.fetchListMembersPage(
                             list: bskyList, cursor: cursor,
@@ -122,6 +175,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         isFetchingSubscribedLists = false
     }
 
+    /// Fetches ClearSky public lists that contain the given handle.
     func fetchClearskyLists(handle: String, using client: LiveBlueskyClient) async {
         isFetchingLists = true
         listError = nil
@@ -134,17 +188,27 @@ final class BlueskyProfileViewModel: ObservableObject {
         isFetchingLists = false
     }
 
+    // MARK: - Private Properties
+
+    /// Guards against re-loading the profile data on every view appearance.
     private var hasLoadedOnce = false
     private let downloadService = MediaDownloadService.shared
 
+    // MARK: - Convenience Accessors
+
+    /// The decoded `BlueskyProfile` from the current inspection.
     var profile: BlueskyProfile? {
         inspection?.profile
     }
 
+    /// List memberships from the current inspection.
     var listMemberships: [ProfileListMembership] {
         inspection?.listMemberships ?? []
     }
 
+    // MARK: - Profile Loading
+
+    /// Loads profile data only if it hasn't been loaded yet (guarded by `hasLoadedOnce`).
     func loadIfNeeded(
         did actorDID: String,
         viewerAccount: AppAccount,
@@ -157,6 +221,11 @@ final class BlueskyProfileViewModel: ObservableObject {
         await load(did: actorDID, account: viewerAccount, viewerPassword: viewerPassword, dataAccount: dataAccount, dataPassword: dataPassword, using: client)
     }
 
+    /// Loads (or reloads) the full profile inspection: profile data, viewer state, handle history, media counts, and list memberships.
+    ///
+    /// - Parameters:
+    ///   - viewerAccount: Account used for viewer-state queries (block/mute/follow status).
+    ///   - dataAccount: Account used for data queries (list memberships, media counting).
     func load(
         did actorDID: String,
         account viewerAccount: AppAccount,
@@ -192,6 +261,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         isLoading = false
         guard let profile else { return }
 
+        // Fetch handle history and media counts in parallel
         async let auditLog = client.fetchPLCAuditLog(did: profile.did)
         await countMedia(for: profile.did, account: dataAccount, appPassword: dataPassword, using: client)
 
@@ -199,6 +269,7 @@ final class BlueskyProfileViewModel: ObservableObject {
             handleHistory = parseHandleChanges(from: log, currentHandle: profile.handle)
         }
 
+        // Deferred membership fetch if not available from inspection
         if isFetchingMemberships {
             let memberships = await client.fetchListMemberships(for: profile.did, account: dataAccount, appPassword: dataPassword)
             if !memberships.isEmpty {
@@ -206,10 +277,13 @@ final class BlueskyProfileViewModel: ObservableObject {
             }
             isFetchingMemberships = false
         }
-        
+
         recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
     }
 
+    // MARK: - Private Helpers
+
+    /// Scans the user's feed counting images and videos. Stops when all pages are exhausted or cancelled.
     private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         isScanningMedia = true
         defer { isScanningMedia = false }
@@ -239,6 +313,9 @@ final class BlueskyProfileViewModel: ObservableObject {
         mediaVideoCount = videos
     }
 
+    // MARK: - Moderation Actions
+
+    /// Optimistically toggles the mute state for the profile.
     func toggleMute(
         account: AppAccount,
         appPassword: String,
@@ -284,6 +361,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    /// Submits a moderation report for the profile with the selected reason.
     func reportAccount(reason: String?, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let profile else { return }
 
@@ -307,6 +385,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    /// Optimistically toggles the follow state for the profile.
     func toggleFollow(
         account: AppAccount,
         appPassword: String,
@@ -353,9 +432,13 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    /// True while downloading the latest images from the profile's feed.
     @Published var isDownloadingImages = false
+    /// Tracks (currentBatch, totalBatches, totalImages) during image download.
     @Published var downloadProgress: (currentBatch: Int, totalBatches: Int, totalImages: Int)?
 
+    /// Downloads up to 500 images from the profile's recent posts to the specified directory.
+    /// - Parameter directory: The parent directory; images are saved to `directory/handle/`.
     func downloadLatestImages(to directory: URL, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let profile else { return }
 
@@ -416,6 +499,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         statusMessage = "Downloaded \(succeeded) images to \(profile.handle)/."
     }
 
+    /// Optimistically toggles the block state for the profile.
     func toggleBlock(
         account: AppAccount,
         appPassword: String,
@@ -463,9 +547,12 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    /// True while fetching and queueing followers for blocking.
     @Published var isBlockingFollowers = false
+    /// Progress information for the block-followers operation.
     @Published var blockFollowersProgress: BatchProgress?
 
+    /// Fetches all followers and enqueues them as block operations in the `ActionQueueStore`.
     func blockAllFollowers(
         account: AppAccount,
         appPassword: String,
@@ -507,6 +594,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    /// Optimistically toggles whether the profile is a member of a specific list.
     func toggleListMembership(
         _ membership: ProfileListMembership,
         account: AppAccount,
@@ -562,6 +650,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    /// Creates a new list (of the given kind) and immediately adds the profile to it.
     func createListAndAddActor(
         name: String,
         description: String,
@@ -606,6 +695,10 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Export
+
+    /// Enumerates all pages of the profile's posts and exports them as CSV or JSON.
+    /// - Returns: The file URL of the exported file, or nil if cancelled or failed.
     func exportPosts(as format: ExportFileFormat, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async -> URL? {
         guard let profile else { return nil }
         isExportingPosts = true
@@ -699,7 +792,10 @@ final class BlueskyProfileViewModel: ObservableObject {
     }
 }
 
+/// Supported post export file formats.
 enum ExportFileFormat: String, CaseIterable {
+    /// Comma-separated values with a header row.
     case csv
+    /// Pretty-printed JSON array of post objects.
     case json
 }

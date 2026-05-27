@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Searches for posts that @-mention the given user's handle, collecting
+/// them for moderation review. Similar to DirectRepliesView but for mentions
+/// across the network rather than direct replies to the user's own posts.
 struct MentionsSearchView: View {
     let did: String
     let handle: String
@@ -34,6 +37,9 @@ struct MentionsSearchView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         List {
             searchAccountSection
@@ -224,7 +230,8 @@ struct MentionsSearchView: View {
             if !hasAppeared {
                 hasAppeared = true
                 if let prefID = accountStore.preferredSearchAccountID,
-                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+                {
                     searchAccount = prefAccount
                 } else {
                     searchAccount = accountStore.activeAccount

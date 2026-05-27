@@ -1,12 +1,54 @@
 import Foundation
 
+/// Manages Bluesky authentication, session persistence, and authenticated request execution.
+/// Implementations handle the full session lifecycle: login, token refresh, keychain persistence,
+/// cache management, and automatic retry with credential recovery on 401 responses.
 @MainActor
 protocol BlueskySessionServicing {
+    // MARK: - Authentication
+
+    /// Authenticates with the Bluesky AT Protocol using a handle and app password.
+    /// Resolves the PDS (Personal Data Server) URL via DID document lookup and
+    /// creates a session with access and refresh JWTs.
+    /// - Parameters:
+    ///   - handle: The Bluesky handle (e.g. `user.bsky.social`).
+    ///   - appPassword: The app password for authentication.
+    ///   - entrywayURL: An optional custom entryway URL; if `nil`, resolves automatically via handle domain.
+    /// - Returns: A `BlueskySession` containing DIDs, JWTs, and the resolved PDS URL.
+    /// - Throws: If authentication fails or the PDS URL cannot be resolved.
     func authenticate(handle: String, appPassword: String, entrywayURL: URL?) async throws -> BlueskySession
+
+    /// Persists a session to the keychain for the given account and caches it in memory.
+    /// - Parameters:
+    ///   - session: The session to persist.
+    ///   - account: The account associated with the session.
     func persistSession(_ session: BlueskySession, for account: AppAccount) async throws
+
+    /// Removes a persisted session from the keychain and clears the in-memory cache.
+    /// - Parameter account: The account whose session to delete.
     func deletePersistedSession(for account: AppAccount) throws
+
+    /// Restores sessions from the keychain for all provided accounts.
+    /// Populates the in-memory cache so subsequent requests don't need keychain lookups.
+    /// - Parameter accounts: The accounts whose sessions to restore.
     func restoreSessions(for accounts: [AppAccount]) async
+
+    /// Clears all cached sessions from memory without touching keychain storage.
     func clearSessionCache()
+
+    // MARK: - Authenticated Requests
+
+    /// Executes an authenticated request, automatically handling token refresh and retry.
+    /// On 401 responses, attempts to refresh the JWT via the refresh token; if that fails,
+    /// re-authenticates with the app password. Posts `accountDeactivated` or `accountReactivated`
+    /// notifications as appropriate.
+    /// - Parameters:
+    ///   - account: The account to authenticate as.
+    ///   - appPassword: The app password for fallback re-authentication, or `nil`.
+    ///   - operation: An async closure that receives a valid `BlueskySession` and returns a response.
+    /// - Returns: The response from the operation.
+    /// - Throws: `BlueskyAPIError.deactivated` if the account is deactivated, or `BlueskyAPIError.unauthorized`
+    ///           if all retry attempts fail.
     func performAuthenticatedRequest<Response>(
         account: AppAccount,
         appPassword: String?,
@@ -103,7 +145,7 @@ final class BlueskySessionService: BlueskySessionServicing {
                     userInfo: ["accountID": account.id.uuidString]
                 )
                 return response
-            } catch BlueskyAPIError.deactivated(let message) {
+            } catch let BlueskyAPIError.deactivated(message) {
                 NotificationCenter.default.post(
                     name: .accountDeactivated,
                     object: nil,

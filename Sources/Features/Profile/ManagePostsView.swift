@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - ManagePostsView
+
+/// View for browsing, searching, filtering by date, and deleting posts
+/// (single, bulk-selected, or "nuclear" delete-all) for a given account.
 struct ManagePostsView: View {
     let did: String
     @StateObject private var viewModel: ManagePostsViewModel
@@ -11,6 +15,8 @@ struct ManagePostsView: View {
         self.did = did
         _viewModel = StateObject(wrappedValue: ManagePostsViewModel(did: did))
     }
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -175,6 +181,7 @@ struct ManagePostsView: View {
         }
     }
 
+    /// Main list with search, date filter, bulk/nuclear delete, and posts.
     private var listContent: some View {
         List {
             searchSection
@@ -264,6 +271,7 @@ struct ManagePostsView: View {
         .environment(\.editMode, .constant(viewModel.isSelecting ? .active : .inactive))
     }
 
+    /// Search text field with clear button.
     private var searchSection: some View {
         Section {
             HStack(spacing: 10) {
@@ -287,6 +295,7 @@ struct ManagePostsView: View {
         }
     }
 
+    /// Preset date range filter chips and custom date pickers.
     private var dateFilterSection: some View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -334,6 +343,7 @@ struct ManagePostsView: View {
         }
     }
 
+    /// From/to date pickers for custom date range filtering.
     private var dateFilterPickers: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
@@ -378,6 +388,7 @@ struct ManagePostsView: View {
         .padding(.bottom, 6)
     }
 
+    /// A single post row with optional selection checkbox.
     private func postRow(for entry: RichFeedEntry) -> some View {
         HStack(spacing: 12) {
             if viewModel.isSelecting {
@@ -412,6 +423,7 @@ struct ManagePostsView: View {
         }
     }
 
+    /// Modal overlay showing deletion progress with a progress bar.
     private func deleteProgressOverlay(progress: (current: Int, total: Int)) -> some View {
         ZStack {
             Color.black.opacity(0.3)

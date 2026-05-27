@@ -1,38 +1,72 @@
 import Combine
 import Foundation
 
+/// Searches Bluesky posts and users with three tabs: Top, Newest, and Users.
+///
+/// Manages separate loading/pagination state per tab, search history
+/// persisted in UserDefaults (up to 10 recent queries), and concurrent
+/// search via `searchAll()`.
 @MainActor
 final class CustomSearchViewModel: ObservableObject {
+    // MARK: - Types
+
+    /// The three search result tabs.
     enum Tab: String, CaseIterable {
         case top = "Top"
         case newest = "Newest"
         case users = "Users"
     }
 
+    // MARK: - Properties
+
+    /// The search query text.
     @Published var query = ""
+    /// Top-rated search results.
     @Published private(set) var topEntries: [RichFeedEntry] = []
+    /// Newest search results.
     @Published private(set) var newestEntries: [RichFeedEntry] = []
+    /// Actor (user) search results.
     @Published private(set) var users: [BlueskyActor] = []
+    /// True while loading the Top tab.
     @Published private(set) var isLoadingTop = false
+    /// True while loading the Newest tab.
     @Published private(set) var isLoadingNewest = false
+    /// True while loading more Top results.
     @Published private(set) var isLoadingMoreTop = false
+    /// True while loading more Newest results.
     @Published private(set) var isLoadingMoreNewest = false
+    /// True while loading Users tab.
     @Published private(set) var isLoadingUsers = false
+    /// False when no more Top pages are available.
     @Published private(set) var hasMoreTop = true
+    /// False when no more Newest pages are available.
     @Published private(set) var hasMoreNewest = true
+    /// User-facing error message.
     @Published var errorMessage: String?
 
+    // MARK: - Private Properties
+
+    /// Cursor for Top tab pagination.
     private var topCursor: String?
+    /// Cursor for Newest tab pagination.
     private var newestCursor: String?
+    /// UserDefaults key for search history.
     private let historyKey = "custom_search_history"
+    /// Maximum number of history entries.
     private let maxHistory = 10
 
+    /// Recent search queries, newest first.
     @Published private(set) var searchHistory: [String] = []
+
+    // MARK: - Init
 
     init() {
         loadHistory()
     }
 
+    // MARK: - Public Methods
+
+    /// Resets all search results and cursors.
     func reset() {
         topEntries = []
         newestEntries = []
@@ -44,6 +78,7 @@ final class CustomSearchViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    /// Searches posts sorted by "top" (engagement).
     func searchTop(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -65,6 +100,7 @@ final class CustomSearchViewModel: ObservableObject {
         }
     }
 
+    /// Searches posts sorted by "latest" (newest first).
     func searchNewest(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -85,6 +121,7 @@ final class CustomSearchViewModel: ObservableObject {
         }
     }
 
+    /// Loads the next page of Top results.
     func loadMoreTop(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, let topCursor else { return }
@@ -102,6 +139,7 @@ final class CustomSearchViewModel: ObservableObject {
         }
     }
 
+    /// Loads the next page of Newest results.
     func loadMoreNewest(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, let newestCursor else { return }
@@ -119,6 +157,7 @@ final class CustomSearchViewModel: ObservableObject {
         }
     }
 
+    /// Searches for actors (users) matching the query.
     func searchUsers(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -135,6 +174,7 @@ final class CustomSearchViewModel: ObservableObject {
         }
     }
 
+    /// Runs all three searches (Top, Newest, Users) concurrently in a single task group.
     func searchAll(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         reset()
         await withTaskGroup(of: Void.self) { group in
@@ -144,16 +184,21 @@ final class CustomSearchViewModel: ObservableObject {
         }
     }
 
+    /// Removes a single item from search history.
     func deleteHistoryItem(_ item: String) {
         searchHistory.removeAll { $0 == item }
         saveHistory()
     }
 
+    /// Clears all search history.
     func clearHistory() {
         searchHistory.removeAll()
         saveHistory()
     }
 
+    // MARK: - Private Helpers
+
+    /// Saves a query to the top of the history list, capped at `maxHistory`.
     private func saveQuery(_ q: String) {
         searchHistory.removeAll { $0 == q }
         searchHistory.insert(q, at: 0)
@@ -163,10 +208,12 @@ final class CustomSearchViewModel: ObservableObject {
         saveHistory()
     }
 
+    /// Loads search history from UserDefaults.
     private func loadHistory() {
         searchHistory = UserDefaults.standard.stringArray(forKey: historyKey) ?? []
     }
 
+    /// Persists search history to UserDefaults.
     private func saveHistory() {
         UserDefaults.standard.set(searchHistory, forKey: historyKey)
     }

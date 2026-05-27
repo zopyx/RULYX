@@ -3,6 +3,7 @@ import Foundation
 // MARK: - Member loading, search, comparison, import, export, and metadata
 
 extension ListDetailViewModel {
+    /// Summary string describing the current member loading state.
     var loadedMemberSummary: String {
         if hasMoreMembers {
             return "Loaded \(members.count) members so far."
@@ -11,6 +12,7 @@ extension ListDetailViewModel {
         return "\(members.count) member\(members.count == 1 ? "" : "s") loaded."
     }
 
+    /// Loads all members of the given list from the API.
     func loadMembers(
         for list: BlueskyList,
         account: AppAccount,
@@ -42,6 +44,7 @@ extension ListDetailViewModel {
         isLoadingMembers = false
     }
 
+    /// Loads more members if the last visible member is near the end of the list (triggers infinite scroll).
     func loadMoreMembersIfNeeded(
         currentMember: BlueskyListMember?,
         list: BlueskyList,
@@ -76,6 +79,7 @@ extension ListDetailViewModel {
         }
     }
 
+    /// Fetches all lists the user has, excluding the current one (for comparison/transfer).
     func loadAvailableLists(
         excluding currentList: BlueskyList,
         account: AppAccount,
@@ -96,11 +100,13 @@ extension ListDetailViewModel {
         isLoadingAvailableLists = false
     }
 
+    /// Updates the client-side member filter query and recomputes the filtered list.
     func updateMemberFilter(_ query: String) {
         currentMemberFilterQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         recomputeFilteredMembers()
     }
 
+    /// Recomputes `filteredMembers` from `members` using the current filter query.
     func recomputeFilteredMembers() {
         let trimmed = currentMemberFilterQuery.lowercased()
         guard !trimmed.isEmpty else {
@@ -113,11 +119,13 @@ extension ListDetailViewModel {
         }
     }
 
+    /// Called after members change to prune stale selections and recompute the filtered list.
     func onMembersChanged() {
         selectedMemberIDs = selectedMemberIDs.intersection(Set(members.map(\.id)))
         recomputeFilteredMembers()
     }
 
+    /// Parses raw multi-line/semicolon/comma input, resolves actors, and generates an import preview.
     func prepareImportPreview(
         from rawInput: String,
         sourceDescription: String,
@@ -143,6 +151,7 @@ extension ListDetailViewModel {
         }
     }
 
+    /// Commits a prepared import preview by adding all eligible actors to the list.
     func commitImportPreview(
         to list: BlueskyList,
         account: AppAccount,
@@ -187,10 +196,12 @@ extension ListDetailViewModel {
         onMembersChanged()
     }
 
+    /// Discards the current import preview without importing.
     func discardImportPreview() {
         importPreview = nil
     }
 
+    /// Compares the current list's members with another list and generates a diff report.
     func compare(
         currentList: BlueskyList,
         otherList: BlueskyList,
@@ -220,16 +231,19 @@ extension ListDetailViewModel {
         AppLogger.performance.debug("compare for '\(currentList.name, privacy: .public)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
     }
 
+    /// Clears the current comparison report.
     func clearComparison() {
         comparisonReport = nil
         selectedComparisonActorDIDs = []
     }
 
+    /// Returns members from the comparison report that belong to the given bucket.
     func comparisonMembers(for bucket: ComparisonBucket) -> [BlueskyListMember] {
         guard let comparisonReport else { return [] }
         return diffController.comparisonMembers(for: bucket, in: comparisonReport)
     }
 
+    /// Returns the comparison members currently selected by DID.
     func selectedComparisonMembers() -> [BlueskyListMember] {
         guard let comparisonReport else { return [] }
         return diffController.selectedComparisonMembers(
@@ -238,6 +252,7 @@ extension ListDetailViewModel {
         )
     }
 
+    /// Exports all members as CSV rows.
     func exportRows() -> [String] {
         members.map { member in
             [
@@ -248,11 +263,14 @@ extension ListDetailViewModel {
         }
     }
 
+    /// Exports the diff between two lists as CSV rows.
     func exportDiffRows() -> [String] {
         guard let comparisonReport else { return [] }
         return diffController.exportDiffRows(from: comparisonReport)
     }
 
+    /// Updates the list's title and description on the server.
+    /// - Returns: The updated `BlueskyList` on success, or `nil` on failure.
     func updateMetadata(
         for list: BlueskyList,
         title: String,

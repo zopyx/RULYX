@@ -1,5 +1,8 @@
 import Foundation
 
+/// JSON file-based cache for relationship data (followers/following lists),
+/// keyed by account identifier and relationship type. Stores data in the
+/// app's caches directory.
 enum RelationshipCache {
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]

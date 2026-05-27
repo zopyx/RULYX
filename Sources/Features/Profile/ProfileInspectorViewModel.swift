@@ -1,16 +1,33 @@
 import Foundation
 
+/// Searches for Bluesky profiles and inspects them with full moderation context.
+///
+/// Supports two modes:
+/// - **Inspect**: Looks up a single handle/DID and returns a full `ProfileInspection`.
+/// - **Search**: Type-ahead actor search with client-side filtering and stale-query cancellation.
 @MainActor
 final class ProfileInspectorViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// The user's query text (handle, DID, or name fragment).
     @Published var query = ""
+    /// Type-ahead search results (actors matching the query).
     @Published private(set) var searchResults: [BlueskyActor] = []
+    /// Full profile inspection result after an `inspect` call.
     @Published private(set) var inspection: ProfileInspection?
+    /// True while a profile inspection is loading.
     @Published private(set) var isLoading = false
+    /// True while a type-ahead search is in progress.
     @Published private(set) var isSearching = false
+    /// User-facing error message.
     @Published var errorMessage: String?
 
+    /// The current search token used to discard stale responses.
     private var searchToken: SearchToken?
 
+    // MARK: - Public Methods
+
+    /// Inspects a profile by handle or DID with full moderation context (viewer state, list memberships, etc.).
     func inspect(
         account: AppAccount?,
         appPassword: String?,
@@ -48,6 +65,8 @@ final class ProfileInspectorViewModel: ObservableObject {
         isLoading = false
     }
 
+    /// Type-ahead actor search with stale-query cancellation.
+    /// Only searches if the query is >= 2 characters.
     func search(
         account: AppAccount?,
         appPassword: String?,
@@ -89,6 +108,7 @@ final class ProfileInspectorViewModel: ObservableObject {
                 return
             }
 
+            // Client-side filter: only include actors matching handle, displayName, or DID
             let lowered = requestQuery.lowercased()
             searchResults = actors.filter {
                 $0.handle.lowercased().contains(lowered) ||
@@ -120,6 +140,7 @@ final class ProfileInspectorViewModel: ObservableObject {
         }
     }
 
+    /// Inspects a profile given a selected actor, setting the query to their handle.
     func inspect(
         actor: BlueskyActor,
         account: AppAccount?,
@@ -130,6 +151,9 @@ final class ProfileInspectorViewModel: ObservableObject {
         await inspect(query: actor.did, account: account, appPassword: appPassword, using: client)
     }
 
+    // MARK: - Private Methods
+
+    /// Internal inspect-by-DID used by the public `inspect(actor:)` variant.
     private func inspect(
         query: String,
         account: AppAccount?,

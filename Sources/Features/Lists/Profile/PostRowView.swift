@@ -1,8 +1,15 @@
 import SwiftUI
 
+// MARK: - PostRowView
+
+/// Composable post row with configurable display style (full, compact, minimal),
+/// embedding author header, reply context, text content, media, and action bar.
 struct PostRowView: View {
+    /// The post data to display.
     let entry: RichFeedEntry
+    /// How the post should be rendered (full, compact, minimal).
     let style: PostDisplayStyle
+    /// Callbacks for user interactions (tap image, play video, open profile, etc.).
     let callbacks: PostRowCallbacks
 
     init(entry: RichFeedEntry, style: PostDisplayStyle = .full, callbacks: PostRowCallbacks = PostRowCallbacks()) {
@@ -11,13 +18,17 @@ struct PostRowView: View {
         self.callbacks = callbacks
     }
 
+    /// Convenience accessor for the underlying post.
     private var post: RichPost {
         entry.post
     }
 
+    /// Convenience accessor for the post author.
     private var author: RichAuthor {
         post.safeAuthor
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -62,6 +73,9 @@ struct PostRowView: View {
     }
 }
 
+// MARK: - Helpers
+
+/// Converts @mentions and URLs in post text to tappable attributed links.
 func postAttributedString(from text: String) -> AttributedString {
     var attributed = AttributedString(text)
     guard text.contains("@") || text.contains("://") || text.contains("www.") else { return attributed }
@@ -91,6 +105,7 @@ func postAttributedString(from text: String) -> AttributedString {
     return attributed
 }
 
+/// Regex for matching @mention patterns in post text.
 private enum MentionTextRegex {
     static let shared = try! NSRegularExpression(
         pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?"

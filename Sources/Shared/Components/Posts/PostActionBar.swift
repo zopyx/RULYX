@@ -1,5 +1,10 @@
 import SwiftUI
 
+/// The interactive bottom bar for a post row: reply, repost, like, quote buttons
+/// plus a gear menu with advanced actions (block likers, add to list, classify, copy, translate, report, edit, delete).
+///
+/// Each button/action is conditionally shown based on whether its callback is non-nil in `PostRowCallbacks`.
+/// Like and repost buttons show filled icons when active, with spring animation on like toggle.
 struct PostActionBar: View {
     let replyCount: Int?
     let repostCount: Int?
@@ -7,6 +12,8 @@ struct PostActionBar: View {
     var isLiked: Bool
     var isReposted: Bool
     let callbacks: PostRowCallbacks
+
+    // MARK: - Computed Properties
 
     private var effectiveLikeCount: Int? {
         callbacks.overrideLikeCount ?? likeCount
@@ -77,6 +84,8 @@ struct PostActionBar: View {
         .foregroundStyle(.tertiary)
     }
 
+    // MARK: - Gear Menu
+
     private var hasGearMenuItems: Bool {
         callbacks.onBlockAllLikers != nil
             || (!callbacks.availableLikerTargetLists.isEmpty && callbacks.onAddAllLikersToList != nil)
@@ -88,6 +97,7 @@ struct PostActionBar: View {
             || callbacks.onDeletePost != nil
     }
 
+    /// Context menu with advanced actions, nested by list kind for "add likers to list".
     private var gearMenu: some View {
         Menu {
             if let onBlockAllLikers = callbacks.onBlockAllLikers {
@@ -215,6 +225,10 @@ struct PostActionBar: View {
         .accessibilityLabel(loc("post.gear_menu"))
     }
 
+    // MARK: - Private Helpers
+
+    /// An action button with an SF Symbol icon and optional count label.
+    /// If no action is provided, only the icon+count are shown (no tappable area).
     @ViewBuilder
     private func actionButton(icon: String, count: Int?, action: (() -> Void)?) -> some View {
         if let action {

@@ -1,5 +1,8 @@
 import Foundation
 
+// MARK: - SplitCriterion
+
+/// Criteria for splitting list members into matching vs. non-matching groups.
 enum SplitCriterion: String, CaseIterable, Identifiable {
     case youngAccounts = "Young Accounts (< 4 weeks)"
     case lowFollowers = "Low Followers (< 100)"
@@ -11,8 +14,13 @@ enum SplitCriterion: String, CaseIterable, Identifiable {
     }
 }
 
+// MARK: - ListMergeController
+
+/// Handles merging members from one list into another, and splitting members
+/// by criteria (young accounts, low/high followers, handle pattern).
 @MainActor
 final class ListMergeController {
+    /// Copies all members from a source list into a target list via batch operation.
     func merge(
         sourceList _: BlueskyList,
         into targetList: BlueskyList,
@@ -34,6 +42,7 @@ final class ListMergeController {
         }
     }
 
+    /// Splits members into matching/rest based on the given criterion and optional pattern.
     func split(
         members: [BlueskyListMember],
         criterion: SplitCriterion,

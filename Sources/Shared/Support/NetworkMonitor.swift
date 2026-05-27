@@ -1,14 +1,22 @@
 import Network
 import SwiftUI
 
+// MARK: - NetworkMonitor
+
+/// Singleton that monitors network connectivity using `NWPathMonitor`.
+/// Publishes `isConnected` and `connectionDescription` for SwiftUI views to react to.
 @MainActor
 final class NetworkMonitor: ObservableObject {
     static let shared = NetworkMonitor()
+    /// Whether the device has an active internet connection.
     @Published var isConnected = true
+    /// Human-readable description of the current connection state.
     @Published var connectionDescription = ""
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "network.monitor")
+
+    // MARK: - Init
 
     private init() {
         monitor.start(queue: queue)

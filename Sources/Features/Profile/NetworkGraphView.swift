@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Compares the follower/following relationships between two accounts,
+/// showing mutual followers, mutual following, and whether each follows the other.
 struct NetworkGraphView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
@@ -16,6 +18,8 @@ struct NetworkGraphView: View {
     @State private var searchQueryB = ""
     @State private var searchResultsA: [BlueskyActor] = []
     @State private var searchResultsB: [BlueskyActor] = []
+
+    // MARK: - Computed properties
 
     private var mutualFollowers: [String] {
         Array(aFollowers.intersection(bFollowers)).sorted()

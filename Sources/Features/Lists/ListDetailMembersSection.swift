@@ -1,6 +1,10 @@
 import SwiftUI
 
 extension ListDetailView {
+    // MARK: - ListMembersSection
+
+    /// Section for filtering and browsing existing list members, with
+    /// swipe-to-remove and pagination.
     struct ListMembersSection: View {
         @ObservedObject var viewModel: ListDetailViewModel
         @ObservedObject var batchState: ListBatchProgressState
@@ -15,6 +19,8 @@ extension ListDetailView {
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
         @EnvironmentObject private var localizationManager: LocalizationManager
 
+        // MARK: - Body
+
         var body: some View {
             findMembersSection
             membersSection
@@ -22,6 +28,7 @@ extension ListDetailView {
 
         @FocusState private var memberFilterFocused: Bool
 
+        /// Text field for filtering members and a matching count display.
         private var findMembersSection: some View {
             Section {
                 TextField("list.members.filter_placeholder", text: $memberSearchQuery)
@@ -46,6 +53,7 @@ extension ListDetailView {
             }
         }
 
+        /// The paginated list of members with loading/error/empty states.
         private var membersSection: some View {
             Section {
                 if viewModel.isLoadingMembers, viewModel.members.isEmpty {

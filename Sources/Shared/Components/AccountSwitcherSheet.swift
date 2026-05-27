@@ -1,7 +1,12 @@
 import SwiftUI
 import UIKit
 
+// MARK: - AccountSwitcherSheet
+
+/// Full account management sheet — lists all saved accounts with active/switch/edit/delete actions.
+/// Includes drag-to-reorder, swipe-to-delete, label editing, and an add-account entry point.
 struct AccountSwitcherSheet: View {
+    /// Controls whether the sheet is presented.
     @Binding var isPresented: Bool
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
@@ -13,6 +18,8 @@ struct AccountSwitcherSheet: View {
     @State private var editLabelText = ""
     @State private var switchingAccountID: AppAccount.ID?
     @State private var editMode: EditMode = .inactive
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -159,6 +166,9 @@ struct AccountSwitcherSheet: View {
         .presentationDetents([.large])
     }
 
+    // MARK: - Private Helpers
+
+    /// Switch to the given account with haptic feedback, then dismiss the sheet.
     private func switchAccount(to account: AppAccount) {
         switchingAccountID = account.id
         let generator = UISelectionFeedbackGenerator()

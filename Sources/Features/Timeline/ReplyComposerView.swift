@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - ReplyComposerView
+
+/// Composes a reply to a post — shows the parent post preview, a text editor
+/// with character count, and posts via the Bluesky API.
 struct ReplyComposerView: View {
     let account: AppAccount
     let appPassword: String
@@ -17,6 +21,8 @@ struct ReplyComposerView: View {
     @State private var errorMessage: String?
 
     private let maxChars = 300
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -87,6 +93,7 @@ struct ReplyComposerView: View {
         .interactiveDismissDisabled(!postText.isEmpty)
     }
 
+    /// Shows the parent post author, avatar, and truncated text.
     @ViewBuilder
     private func parentPreview(_ post: RichPost) -> some View {
         let author = post.safeAuthor
@@ -125,6 +132,7 @@ struct ReplyComposerView: View {
         .padding(.bottom, 4)
     }
 
+    /// Fetches the parent post from the API to display as context.
     private func loadParentPost() async {
         do {
             let response = try await blueskyClient.fetchPostThread(uri: parentURI, account: account, appPassword: appPassword)
@@ -146,6 +154,7 @@ struct ReplyComposerView: View {
         }
     }
 
+    /// Sends the reply via the Bluesky API and dismisses on success.
     private func post() async {
         let text = postText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }

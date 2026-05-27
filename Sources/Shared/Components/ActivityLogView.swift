@@ -1,15 +1,24 @@
 import SwiftUI
 
+// MARK: - ActivityLogView
+
+/// A searchable, filterable activity log that displays `ModerationOperationLogEntry` records
+/// from the `ModerationWorkspaceStore`. Supports filtering by operation type and text search
+/// across titles, summaries, and succeeded/failed handles.
 struct ActivityLogView: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var searchQuery = ""
     @State private var selectedType: String?
 
+    // MARK: - Computed Properties
+
+    /// Unique operation titles sorted alphabetically.
     private var types: [String] {
         Array(Set(workspaceStore.operationLog.map(\.title))).sorted()
     }
 
+    /// Entries matching the current search query and type filter.
     private var filtered: [ModerationOperationLogEntry] {
         let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return workspaceStore.operationLog.filter { entry in
@@ -74,10 +83,18 @@ struct ActivityLogView: View {
     }
 }
 
+// MARK: - FilterChip
+
+/// A small pill-shaped filter chip that toggles selection on tap.
 private struct FilterChip: View {
+    /// The chip label text.
     let title: String
+    /// Whether this chip is currently selected.
     let isSelected: Bool
+    /// Called when the chip is tapped.
     let action: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         Button(action: action) {

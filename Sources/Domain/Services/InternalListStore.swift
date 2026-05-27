@@ -1,7 +1,13 @@
 import Foundation
 
+// MARK: - InternalListStore
+
+/// Manages user-created internal (local-only) lists that are not synced to
+/// Bluesky. Persisted via `UserDefaults` with automatic seeding of default
+/// lists ("Hostile" and "Friends") on first launch.
 @MainActor
 final class InternalListStore: ObservableObject {
+    /// The list of internal lists, published for SwiftUI observation.
     @Published var lists: [InternalList] = [] {
         didSet { persist() }
     }

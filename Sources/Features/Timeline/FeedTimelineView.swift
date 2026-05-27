@@ -1,5 +1,9 @@
 import SwiftUI
 
+/// Main timeline feed view — renders the active account's following feed
+/// (or a custom Bluesky feed) with inline threads, like/repost/reply/quote
+/// actions, post interactions (mute, block, report, translate, share),
+/// and a "new posts" banner.
 struct FeedTimelineView: View {
     @ObservedObject var viewModel: FeedTimelineViewModel
     @Binding var navigationPath: NavigationPath
@@ -25,6 +29,8 @@ struct FeedTimelineView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @StateObject private var likerActions = PostLikerActionsManager()
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -196,6 +202,8 @@ struct FeedTimelineView: View {
         .postLikerActions(manager: likerActions)
     }
 
+    // MARK: - List content
+
     private var listContent: some View {
         List {
             ForEach(viewModel.visibleEntries, id: \.post.uri) { entry in
@@ -255,6 +263,8 @@ struct FeedTimelineView: View {
             }
         }
     }
+
+    // MARK: - Post row
 
     private func postRowView(for entry: RichFeedEntry) -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -426,6 +436,8 @@ struct FeedTimelineView: View {
         }
     }
 
+    // MARK: - State views
+
     private var skeletonContent: some View {
         List {
             ForEach(0 ..< 10) { _ in
@@ -444,6 +456,8 @@ struct FeedTimelineView: View {
             Text(verbatim: isCustomFeed ? loc("timeline.empty_custom_desc") : loc("timeline.empty_desc"))
         }
     }
+
+    // MARK: - Actions
 
     private func handleReply(_ entry: RichFeedEntry) {
         guard let account = accountStore.activeAccount,

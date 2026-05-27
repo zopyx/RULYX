@@ -1,5 +1,10 @@
 import Foundation
 
+// MARK: - MockBlueskyProfileService
+
+/// A mock implementation of `BlueskyProfileInspecting` that returns
+/// deterministic profile data with simulated network latency. Uses the
+/// same `previewActors` from `MockBlueskyListService`.
 @MainActor
 final class MockBlueskyProfileService: BlueskyProfileInspecting {
     func searchActors(query: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {

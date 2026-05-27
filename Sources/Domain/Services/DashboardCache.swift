@@ -1,12 +1,20 @@
 import Foundation
 
+/// Data persisted by the dashboard cache, containing lists, profile, and
+/// blocking/blocked-by counts.
 struct DashboardCacheData: Codable {
+    /// Cached moderation lists.
     let lists: [BlueskyList]
+    /// Cached profile data.
     let profile: BlueskyProfile?
+    /// Cached blocking count.
     let blockingCount: Int?
+    /// Cached blocked-by count.
     let blockedByCount: Int?
 }
 
+/// JSON file-based cache for dashboard data, keyed by account identifier.
+/// Stores/loads data from the app's caches directory.
 enum DashboardCache {
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]

@@ -1,6 +1,10 @@
 import SwiftUI
 
 extension ListDetailView {
+    // MARK: - ListComparisonSection
+
+    /// Section for comparing this list's members against another list,
+    /// showing overlap/missing counts and enabling copy/move operations.
     struct ListComparisonSection: View {
         @ObservedObject var viewModel: ListDetailViewModel
         @ObservedObject var batchState: ListBatchProgressState
@@ -17,6 +21,7 @@ extension ListDetailView {
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
 
+        /// Returns the localization key for a given comparison bucket.
         private func bucketLocKey(_ bucket: ComparisonBucket) -> String {
             switch bucket {
             case .overlap: "list.compare.bucket_overlap"
@@ -26,6 +31,9 @@ extension ListDetailView {
         }
 
         @EnvironmentObject private var localizationManager: LocalizationManager
+
+        // MARK: - Body
+
         var body: some View {
             DisclosureGroup {
                 if viewModel.isLoadingAvailableLists {
@@ -157,6 +165,8 @@ extension ListDetailView {
             }
         }
 
+        // MARK: - Subviews
+
         private func comparisonSummary(report: ListComparisonReport) -> some View {
             VStack(alignment: .leading, spacing: 10) {
                 Text(loc("list.compare.compared_with").replacingOccurrences(of: "{name}", with: report.otherList.name))
@@ -168,6 +178,7 @@ extension ListDetailView {
             }
         }
 
+        /// Toolbar with bucket filter, clear, and export buttons.
         private var comparisonToolbar: some View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -221,6 +232,7 @@ extension ListDetailView {
             .padding(.vertical, 4)
         }
 
+        /// Lists members in a given comparison bucket with selection checkboxes.
         private func comparisonBucketSection(_ bucket: ComparisonBucket) -> some View {
             let members = viewModel.comparisonMembers(for: bucket)
 

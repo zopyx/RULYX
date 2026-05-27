@@ -1,10 +1,14 @@
 import Foundation
 
+// MARK: - ListMembersController
+
+/// Manages paginated fetching of list members with deduplication and cursor tracking.
 @MainActor
 final class ListMembersController {
     private(set) var cursor: String?
     private(set) var hasMore = false
 
+    /// Loads the first page of members, resetting cursor state.
     func loadMembers(
         for list: BlueskyList,
         account: AppAccount,
@@ -24,6 +28,7 @@ final class ListMembersController {
         return deduplicatedMembers(page.members)
     }
 
+    /// Loads the next page of members using the stored cursor.
     func loadMoreMembers(
         for list: BlueskyList,
         account: AppAccount,
@@ -44,11 +49,13 @@ final class ListMembersController {
         return deduplicatedMembers(page.members)
     }
 
+    /// Resets cursor and hasMore to initial state.
     func reset() {
         cursor = nil
         hasMore = false
     }
 
+    /// Removes duplicate members by ID, keeping the first occurrence.
     private func deduplicatedMembers(_ members: [BlueskyListMember]) -> [BlueskyListMember] {
         var deduplicated: [BlueskyListMember] = []
         var seen: Set<String> = []

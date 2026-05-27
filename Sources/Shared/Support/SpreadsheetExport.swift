@@ -1,6 +1,11 @@
 import Foundation
 
+// MARK: - SpreadsheetExport
+
+/// Generates `.xlsx` (Office Open XML) and `.ods` (OpenDocument Spreadsheet) files
+/// from header+row data, using stored-method ZIP with CRC-32.
 enum SpreadsheetExport {
+    /// Generate an `.xlsx` file in memory from headers and rows.
     static func generateXLSX(headers: [String], rows: [[String]]) -> Data? {
         let contentTypes = """
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -72,6 +77,7 @@ enum SpreadsheetExport {
         return createZip(entries: entries)
     }
 
+    /// Generate an `.ods` file in memory from headers and rows.
     static func generateODS(headers: [String], rows: [[String]]) -> Data? {
         let manifest = """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -123,6 +129,7 @@ enum SpreadsheetExport {
 
     // MARK: - ZIP generation (stored method, no compression)
 
+    /// Build a valid ZIP archive using stored (uncompressed) entries.
     private static func createZip(entries: [(name: String, data: Data)]) -> Data? {
         var zipData = Data()
         var centralDirectory = Data()
@@ -191,6 +198,7 @@ enum SpreadsheetExport {
         return zipData
     }
 
+    /// Convert a 1-indexed column number to an Excel column letter (A, B, …, Z, AA, …).
     private static func columnRef(index: Int) -> String {
         var result = ""
         var n = index

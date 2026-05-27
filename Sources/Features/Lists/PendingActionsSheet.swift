@@ -1,5 +1,8 @@
 import SwiftUI
 
+// MARK: - PendingActionsSheet
+
+/// Sheet showing queued moderation actions with progress, cancel, and retry.
 struct PendingActionsSheet: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -87,6 +90,7 @@ struct PendingActionsSheet: View {
         .presentationDetents([.medium, .large])
     }
 
+    /// Renders a badge for the current status (pending, running, completed with/without failures).
     @ViewBuilder
     private func statusBadge(_ status: QueuedActionStatus) -> some View {
         switch status {

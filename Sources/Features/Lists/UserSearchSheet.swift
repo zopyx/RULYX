@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - UserSearchSheet
+
+/// Search sheet for finding Bluesky users by handle or display name,
+/// with results linking to profile views.
 struct UserSearchSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
@@ -69,6 +73,7 @@ struct UserSearchSheet: View {
         }
     }
 
+    /// Searches for actors using the Bluesky API, debounced via onChange.
     private func performSearch(_ query: String) async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)

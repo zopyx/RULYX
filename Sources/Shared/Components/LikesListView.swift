@@ -1,6 +1,11 @@
 import SwiftUI
 
+// MARK: - LikesListView
+
+/// A sheet showing the list of users who liked a post, with infinite-scroll pagination.
+/// Displays each liker's avatar, display name, and handle.
 struct LikesListView: View {
+    /// The AT Protocol URI of the post whose likes to display.
     let uri: String
 
     @EnvironmentObject var accountStore: AccountStore
@@ -11,6 +16,8 @@ struct LikesListView: View {
     @State private var errorMessage: String?
     @State private var cursor: String?
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -64,6 +71,7 @@ struct LikesListView: View {
                             }
                             .padding(.vertical, 4)
                         }
+                        // Infinite scroll trigger
                         if cursor != nil {
                             HStack {
                                 Spacer()
@@ -92,6 +100,9 @@ struct LikesListView: View {
         }
     }
 
+    // MARK: - Private Helpers
+
+    /// Fetch the first page of likes.
     private func loadLikes() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
@@ -108,6 +119,7 @@ struct LikesListView: View {
         isLoading = false
     }
 
+    /// Fetch the next page of likes using the cursor.
     private func loadMore() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account),

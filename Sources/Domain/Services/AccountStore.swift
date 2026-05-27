@@ -1,29 +1,53 @@
 import Foundation
 
+/// Manages Bluesky accounts: persistence, activation, authentication, and iCloud sync.
+///
+/// Responsibilities:
+/// - Persists accounts to UserDefaults (encoded JSON).
+/// - Stores passwords in the Keychain (not UserDefaults).
+/// - Tracks the active account and preferred search account.
+/// - Syncs accounts via iCloud (`iCloudAccountSync`).
+/// - Reacts to account deactivation/reactivation notifications.
 @MainActor
 final class AccountStore: ObservableObject {
+    /// All saved accounts. The first account in the array is the most recently added.
+    /// Persisted to UserDefaults as encoded JSON under `"bluesky.savedAccounts"`.
     @Published private(set) var accounts: [AppAccount] = []
+    /// The ID of the currently active (selected) account. `nil` when no accounts exist.
     @Published private(set) var activeAccountID: AppAccount.ID?
+    /// The ID of the account used for search operations. Defaults to `activeAccount`.
+    /// Persisted to UserDefaults under `"bluesky.preferredSearchAccountID"`.
     @Published var preferredSearchAccountID: AppAccount.ID? {
         didSet {
             defaults.set(preferredSearchAccountID?.uuidString, forKey: preferredSearchKey)
         }
     }
 
+    /// A user-facing error message from the last operation. Set on failure, nil on success.
     @Published var errorMessage: String?
+    /// `true` while an account authentication request is in progress.
     @Published private(set) var isAddingAccount = false
+    /// Set of account IDs that have been reported as deactivated (via push notification).
     @Published var deactivatedAccountIDs: Set<UUID> = []
 
+    /// The currently active account object. `nil` when no account is active.
     var activeAccount: AppAccount? {
         accounts.first { $0.id == activeAccountID }
     }
 
+    // MARK: - Dependencies
+
     private let defaults: UserDefaults
     private let keychain: KeychainServicing
+
+    // MARK: - UserDefaults Keys
+
     private let accountsKey = "bluesky.savedAccounts"
     private let activeAccountKey = "bluesky.activeAccountID"
     private let preferredSearchKey = "bluesky.preferredSearchAccountID"
     private let passwordService = "com.ajung.RULYX.password"
+
+    // MARK: - Init
 
     init(
         defaults: UserDefaults = .standard,
@@ -44,6 +68,8 @@ final class AccountStore: ObservableObject {
         }
 
         load()
+
+        // Listen for iCloud account sync.
         NotificationCenter.default.addObserver(
             forName: .iCloudAccountsReceived,
             object: nil,
@@ -54,6 +80,8 @@ final class AccountStore: ObservableObject {
                 self?.mergeCloudAccounts(entries)
             }
         }
+
+        // Listen for account deactivation.
         NotificationCenter.default.addObserver(
             forName: .accountDeactivated,
             object: nil,
@@ -66,6 +94,8 @@ final class AccountStore: ObservableObject {
                 self?.deactivatedAccountIDs.insert(accountID)
             }
         }
+
+        // Listen for account reactivation.
         NotificationCenter.default.addObserver(
             forName: .accountReactivated,
             object: nil,
@@ -80,6 +110,19 @@ final class AccountStore: ObservableObject {
         }
     }
 
+    // MARK: - Account Management
+
+    /// Authenticates a new account and adds it to the store.
+    ///
+    /// - Parameters:
+    ///   - handle: The Bluesky handle (e.g., `user.bsky.social`).
+    ///   - appPassword: The app password for authentication.
+    ///   - entrywayURL: Optional PDS entryway URL for custom PDS accounts.
+    ///   - client: The authentication client.
+    /// - Returns: `true` on success, `false` on failure (`errorMessage` is set).
+    ///
+    /// Validates inputs, checks for duplicates, authenticates against the PDS,
+    /// saves the password to Keychain, persists the session, and inserts the account.
     func addAccount(
         handle: String,
         appPassword: String,
@@ -128,6 +171,9 @@ final class AccountStore: ObservableObject {
         }
     }
 
+    /// Removes an account from the store, deletes its Keychain entry, and optionally
+    /// deletes its persisted session. If it was the active or preferred search account,
+    /// falls back to the first remaining account.
     func removeAccount(_ account: AppAccount, client: BlueskyAuthenticating? = nil) {
         do {
             try keychain.delete(service: passwordService, account: account.id.uuidString)
@@ -152,6 +198,7 @@ final class AccountStore: ObservableObject {
         persist()
     }
 
+    /// Sets the active account and updates its `lastUsedAt` timestamp.
     func setActiveAccount(_ account: AppAccount) {
         guard accounts.contains(account) else { return }
 
@@ -162,6 +209,7 @@ final class AccountStore: ObservableObject {
         persist()
     }
 
+    /// Switches the active account and clears all caches (HTTP cache, DashboardCache, RelationshipCache).
     func switchAccount(to account: AppAccount, using client: LiveBlueskyClient) async {
         guard accounts.contains(account) else { return }
         client.clearCache()
@@ -176,25 +224,30 @@ final class AccountStore: ObservableObject {
         persist()
     }
 
+    /// Returns `true` if the given account has been flagged as deactivated.
     func isDeactivated(_ account: AppAccount) -> Bool {
         deactivatedAccountIDs.contains(account.id)
     }
 
+    /// Sets or clears a user-defined label for an account.
     func setLabel(for account: AppAccount, label: String?) {
         guard let index = accounts.firstIndex(of: account) else { return }
         accounts[index].label = label?.isEmpty == true ? nil : label
         persist()
     }
 
+    /// Reorders accounts by moving from the given source offsets to the given destination.
     func moveAccount(from source: IndexSet, to destination: Int) {
         accounts.move(fromOffsets: source, toOffset: destination)
         persist()
     }
 
+    /// Retrieves the app password for an account from the Keychain.
     func appPassword(for account: AppAccount) -> String? {
         try? keychain.read(service: passwordService, account: account.id.uuidString)
     }
 
+    /// Fetches profile data for all accounts and updates their display names, avatars, and DIDs.
     func refreshAccountProfiles(using client: BlueskyProfileInspecting) async {
         guard !accounts.isEmpty else { return }
 
@@ -237,6 +290,9 @@ final class AccountStore: ObservableObject {
         }
     }
 
+    // MARK: - Persistence
+
+    /// Loads accounts and preferences from UserDefaults.
     private func load() {
         guard let data = defaults.data(forKey: accountsKey) else {
             return
@@ -263,6 +319,8 @@ final class AccountStore: ObservableObject {
         }
     }
 
+    /// Persists accounts and active account ID to UserDefaults.
+    /// Also pushes the account list to iCloud sync.
     private func persist() {
         do {
             let data = try JSONEncoder().encode(accounts)
@@ -274,6 +332,8 @@ final class AccountStore: ObservableObject {
         iCloudAccountSync.shared.pushAccounts(accounts)
     }
 
+    /// Merges accounts received from iCloud sync into the local store.
+    /// New accounts are appended; existing accounts have their labels updated.
     private func mergeCloudAccounts(_ entries: [[String: String]]) {
         for entry in entries {
             guard let idString = entry["id"], let id = UUID(uuidString: idString),

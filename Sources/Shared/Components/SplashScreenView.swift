@@ -1,8 +1,20 @@
 import SwiftUI
 
+// MARK: - SplashScreenView
+
+/// An animated launch screen with the RULYX logo, tagline, particle star field,
+/// and animated background orbs. Auto-dismisses after the animation sequence completes.
+///
+/// Supports:
+/// - Dismiss button (`showDismissButton`) for manual dismissal
+/// - Auto-dismiss (`dismissAutomatically`) after the animation finishes
+/// - Reduce Motion accessibility — skips animation entirely
 struct SplashScreenView: View {
+    /// Controls whether the splash is shown.
     @Binding var isActive: Bool
+    /// Shows a close button for manual dismissal.
     var showDismissButton = false
+    /// Automatically dismisses after the animation sequence finishes.
     var dismissAutomatically = true
 
     private let reduceMotion = UIAccessibility.isReduceMotionEnabled
@@ -19,6 +31,8 @@ struct SplashScreenView: View {
     @State private var subtaglineOffset: CGFloat = 16
     @State private var footerOpacity: CGFloat = 0
     @State private var showParticles = false
+
+    // MARK: - Private Helpers
 
     private var versionString: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
@@ -37,6 +51,9 @@ struct SplashScreenView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         ZStack {
             SplashBackground()
@@ -69,6 +86,7 @@ struct SplashScreenView: View {
                     .scaledToFit()
                     .frame(height: 240)
                     .scaleEffect(logoScale * logoBreathing)
+                    // Multi-layered glow effect
                     .shadow(color: .blue.opacity(logoGlow * 0.5), radius: logoGlow * 50)
                     .shadow(color: .purple.opacity(logoGlow * 0.25), radius: logoGlow * 70)
                     .shadow(color: .cyan.opacity(logoGlow * 0.15), radius: logoGlow * 90)
@@ -120,6 +138,8 @@ struct SplashScreenView: View {
             await animate()
         }
     }
+
+    // MARK: - Animation Sequence
 
     private func animate() async {
         withAnimation(.easeOut(duration: 0.8)) {
@@ -175,6 +195,8 @@ struct SplashScreenView: View {
 
 // MARK: - Animated Background
 
+/// A `TimelineView` that renders slowly-drifting colored orbs with a blur effect
+/// against a deep navy background.
 private struct SplashBackground: View {
     var body: some View {
         TimelineView(.animation) { timeline in
@@ -224,6 +246,7 @@ private struct SplashBackground: View {
     }
 }
 
+/// A single blurred orb that drifts based on time-driven sine/cosine functions.
 private struct SplashOrb: View {
     let color: Color
     let position: CGPoint
@@ -245,6 +268,7 @@ private struct SplashOrb: View {
 
 // MARK: - Star Particles
 
+/// A `TimelineView` + `Canvas` rendering 60 drifting, twinkling star particles.
 private struct StarField: View {
     private let stars: [Star] = (0 ..< 60).map { _ in
         Star(
@@ -274,11 +298,13 @@ private struct StarField: View {
                 let t = timeline.date.timeIntervalSince1970
 
                 for star in stars {
+                    // Gentle vertical drift with wrap-around
                     let driftY = star.y + sin(t * star.speed + star.twinklePhase) * 0.04
                     let normalizedY = driftY.truncatingRemainder(dividingBy: 1.0)
                     let xPos = star.x * size.width
                     let yPos = normalizedY * size.height
 
+                    // Twinkle via sine wave
                     let twinkle = (sin(t * star.twinkleSpeed + star.twinklePhase) + 1) * 0.5
                     let alpha = star.baseOpacity * (0.3 + twinkle * 0.7)
 

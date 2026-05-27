@@ -1,5 +1,8 @@
 import SwiftUI
 
+// MARK: - Types
+
+/// A single target identified by DID and optional handle for batch operations.
 struct PendingLikerTarget: Identifiable {
     let did: String
     let handle: String?
@@ -9,17 +12,22 @@ struct PendingLikerTarget: Identifiable {
     }
 }
 
+/// Configuration for a batch operation (block or add-to-list) with targets and mode.
 struct BatchOperationConfig: Identifiable {
     let id = UUID()
     let targets: [PendingLikerTarget]
     let mode: Mode
 
+    /// Distinguishes between blocking all targets and adding them to a list.
     enum Mode {
         case block(account: AppAccount, appPassword: String)
         case addToList(list: BlueskyList, account: AppAccount, appPassword: String)
     }
 }
 
+// MARK: - BatchOperationProgressView
+
+/// Two-phase progress UI: first checks which targets need processing, then executes the operation.
 @MainActor
 struct BatchOperationProgressView: View {
     let config: BatchOperationConfig
@@ -37,6 +45,8 @@ struct BatchOperationProgressView: View {
 
     @State private var isCheckComplete = false
     @State private var isExecuteComplete = false
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -159,6 +169,8 @@ struct BatchOperationProgressView: View {
         }
     }
 
+    // MARK: - Computed Properties
+
     private var navTitle: String {
         switch config.mode {
         case .block:
@@ -186,6 +198,8 @@ struct BatchOperationProgressView: View {
         }
     }
 
+    // MARK: - Subviews
+
     private func phaseHeader(title: String, isComplete: Bool) -> some View {
         HStack(spacing: 10) {
             if isComplete {
@@ -201,6 +215,7 @@ struct BatchOperationProgressView: View {
         }
     }
 
+    /// Shows a summary of completed/blocked/failed counts after the operation finishes.
     @ViewBuilder
     private var completionSummary: some View {
         let blockedCount = completedCount
@@ -256,6 +271,9 @@ struct BatchOperationProgressView: View {
         .multilineTextAlignment(.center)
     }
 
+    // MARK: - Operations
+
+    /// Dispatches to the correct execution path based on config mode.
     private func runOperation() async {
         switch config.mode {
         case let .block(account, appPassword):
@@ -265,6 +283,8 @@ struct BatchOperationProgressView: View {
         }
     }
 
+    /// Phase 1: fetch existing blocks, filter out already-blocked targets.
+    /// Phase 2: block each remaining target.
     private func runBlock(account: AppAccount, appPassword: String) async {
         let blockedDIDs: Set<String>
         do {
@@ -310,6 +330,8 @@ struct BatchOperationProgressView: View {
         isExecuteComplete = true
     }
 
+    /// Phase 1: fetch existing list members, filter out already-present targets.
+    /// Phase 2: add each remaining target to the list.
     private func runAddToList(list: BlueskyList, account: AppAccount, appPassword: String) async {
         let memberDIDs: Set<String>
         do {
@@ -355,6 +377,7 @@ struct BatchOperationProgressView: View {
         isExecuteComplete = true
     }
 
+    /// Returns "@handle" if available, otherwise falls back to the DID.
     private func displayHandle(for target: PendingLikerTarget) -> String {
         if let handle = target.handle, !handle.isEmpty {
             return "@\(handle)"

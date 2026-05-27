@@ -2,6 +2,9 @@ import PhotosUI
 import SwiftUI
 import UIKit
 
+/// Full compose view for creating, replying to, quoting, or editing posts.
+/// Supports text, images (up to 4), GIFs, video, alt text, reply controls
+/// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
     let account: AppAccount
     let appPassword: String
@@ -41,6 +44,8 @@ struct ComposePostView: View {
     private let maxImageDimension: CGFloat = 3600
     private let maxImageFileSize = 1_887_437
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -159,14 +164,14 @@ struct ComposePostView: View {
             .sheet(isPresented: $showListPicker) {
                 NavigationStack {
                     List(userLists) { list in
-                            Button {
-                                if let cid = list.cid {
-                                    replyRule = .listRule(list: list.id)
-                                }
-                                showListPicker = false
-                            } label: {
-                                listRowLabel(list)
+                        Button {
+                            if let cid = list.cid {
+                                replyRule = .listRule(list: list.id)
                             }
+                            showListPicker = false
+                        } label: {
+                            listRowLabel(list)
+                        }
                     }
                     .navigationTitle(loc("compose.reply_list_pick"))
                     .toolbarTitleDisplayMode(.inline)
@@ -212,6 +217,8 @@ struct ComposePostView: View {
             }
         }
     }
+
+    // MARK: - Section builders
 
     @ViewBuilder private var imageAttachmentsSection: some View {
         if !selectedImages.isEmpty {
@@ -330,6 +337,8 @@ struct ComposePostView: View {
         }
     }
 
+    // MARK: - Computed properties
+
     private var navigationTitleString: String {
         if editPost != nil { return loc("post.edit") }
         if (editReplyTo ?? replyTo) != nil { return loc("compose.reply_title") }
@@ -372,6 +381,8 @@ struct ComposePostView: View {
             }
         }
     }
+
+    // MARK: - Post loading
 
     private func loadReferencedPost() async {
         let activeReplyTo = editReplyTo ?? replyTo
@@ -419,7 +430,8 @@ struct ComposePostView: View {
         }
 
         if editReplyTo == nil, let reply = editPost.reply, let rootURI = reply.root?.uri, let rootCID = reply.root?.cid,
-           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid {
+           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid
+        {
             editReplyTo = (parentURI, parentCID, rootURI, rootCID)
         }
     }
@@ -432,6 +444,8 @@ struct ComposePostView: View {
             AppLogger.moderation.error("Failed to load lists: \(error.localizedDescription, privacy: .public)")
         }
     }
+
+    // MARK: - Image handling
 
     private func loadImages(from items: [PhotosPickerItem]) async {
         var newImages: [(Data, String)] = []
@@ -491,7 +505,7 @@ struct ComposePostView: View {
         var currentMax = Int(maxDimension)
         var result = data
 
-        for _ in 0..<5 {
+        for _ in 0 ..< 5 {
             let opts: [CFString: Any] = [
                 kCGImageSourceCreateThumbnailWithTransform: true,
                 kCGImageSourceCreateThumbnailFromImageAlways: true,
@@ -530,6 +544,8 @@ struct ComposePostView: View {
         return result
     }
 
+    // MARK: - GIF handling
+
     private func handleGIFSelection(_ gif: GIFResult) async {
         guard !gif.mp4URL.isEmpty else { return }
         isDownloadingGIF = true
@@ -553,6 +569,8 @@ struct ComposePostView: View {
             errorMessage = error.localizedDescription
         }
     }
+
+    // MARK: - Posting
 
     private func post() async {
         isPosting = true

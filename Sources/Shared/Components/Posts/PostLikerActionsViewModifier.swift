@@ -1,11 +1,26 @@
 import SwiftUI
 
+// MARK: - PostLikerActionsViewModifier
+
+/// ViewModifier that wires up all the sheets, alerts, and progress views
+/// driven by `PostLikerActionsManager`. Apply this at the feed/timeline level
+/// so that any post row can trigger bulk liker actions.
+///
+/// Manages:
+/// - AI classification sheet (`postToClassify`)
+/// - Report sheet (`postToReport`) with `SimplifiedReportSheet`
+/// - Batch operation progress (`batchOperationConfig`) via `BatchOperationProgressView`
+/// - Block-likers confirmation alert
+/// - Block errors alert
 struct PostLikerActionsViewModifier: ViewModifier {
+    /// The manager driving liker actions state.
     @ObservedObject var manager: PostLikerActionsManager
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var aiService: LiveAIService
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - ViewModifier
 
     func body(content: Content) -> some View {
         content
@@ -85,6 +100,7 @@ struct PostLikerActionsViewModifier: ViewModifier {
 }
 
 extension View {
+    /// Apply all liker-action sheets and alerts driven by the given manager.
     func postLikerActions(manager: PostLikerActionsManager) -> some View {
         modifier(PostLikerActionsViewModifier(manager: manager))
     }

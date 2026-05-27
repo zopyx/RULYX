@@ -1,14 +1,27 @@
 import Foundation
 
+// MARK: - ListBatchController
+
+/// Executes bulk moderation actions (add, remove, block, mute, etc.) on
+/// lists of actors with batching, retry, progress callbacks, and cancellation support.
 @MainActor
 final class ListBatchController {
     private let baseDelay: UInt64
     private let batchSize = 5
 
+    /// - Parameter baseDelay: Nanoseconds to wait between batches and retries.
     init(baseDelay: UInt64 = 300_000_000) {
         self.baseDelay = baseDelay
     }
 
+    /// Performs a batch action across all actors with retry (3 attempts per actor).
+    /// - Parameters:
+    ///   - actors: Actors to process.
+    ///   - operation: Label for the result summary.
+    ///   - onProgress: Called after each actor completes.
+    ///   - onActorComplete: Called immediately after each actor finishes.
+    ///   - isCancelled: Closure checked between batches.
+    ///   - action: The async action to perform on each actor.
     func performBatch(
         title: String,
         actors: [BlueskyActor],
@@ -95,6 +108,7 @@ final class ListBatchController {
     }
 }
 
+/// Wraps a Sendable closure for use with TaskGroup.
 private struct ActionBox: @unchecked Sendable {
     let action: (BlueskyActor) async throws -> Void
 }

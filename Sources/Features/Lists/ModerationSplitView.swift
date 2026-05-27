@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Thin wrapper that always delegates to `ListsView` for the Moderation tab.
+/// Previously used `NavigationSplitView` for iPad; now iPhone-only with a direct
+/// `ListsView` pass-through.
 struct ModerationSplitView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient

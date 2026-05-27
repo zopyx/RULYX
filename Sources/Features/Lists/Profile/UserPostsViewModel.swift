@@ -1,16 +1,33 @@
 import Foundation
 
+/// Manages a user's posts with search/filter and CSV/JSON export capabilities.
+///
+/// Loads paginated feed data via `fetchRichFeed`, supports client-side text and date filtering,
+/// and provides `sortedFilteredPosts` for display. Exports to CSV or JSON strings.
 @MainActor
 final class UserPostsViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// All loaded posts, unsorted. Display via `sortedFilteredPosts`.
     @Published private(set) var posts: [RichFeedEntry] = []
+    /// True while the initial load is in progress.
     @Published private(set) var isLoading = false
+    /// True while loading the next page.
     @Published private(set) var isLoadingMore = false
+    /// False when no more pages are available.
     @Published private(set) var hasMore = true
+    /// User-facing error message.
     @Published var errorMessage: String?
+    /// Filter text for client-side post body search.
     @Published var searchText = ""
+    /// Inclusive start date for filtering posts.
     @Published var fromDate: Date?
+    /// Inclusive end date for filtering posts.
     @Published var toDate: Date?
 
+    // MARK: - Computed Properties
+
+    /// Posts filtered by search text and date range, sorted newest-first.
     var sortedFilteredPosts: [RichFeedEntry] {
         var result = posts
 
@@ -44,13 +61,22 @@ final class UserPostsViewModel: ObservableObject {
         return result
     }
 
+    // MARK: - Private Properties
+
+    /// Cursor for paginating through the author feed.
     private var cursor: String?
+    /// The DID of the profile whose posts are being viewed.
     private let did: String
+
+    // MARK: - Init
 
     init(did: String) {
         self.did = did
     }
 
+    // MARK: - Public Methods
+
+    /// Pull-to-refresh: resets pagination and reloads the first page, preserving cursor on failure.
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
@@ -75,6 +101,7 @@ final class UserPostsViewModel: ObservableObject {
         }
     }
 
+    /// Loads the first page of posts, replacing any existing data.
     func loadPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
@@ -93,6 +120,7 @@ final class UserPostsViewModel: ObservableObject {
         }
     }
 
+    /// Loads the next page of posts and appends to `posts`.
     func loadMorePosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoadingMore, let cursor else { return }
         isLoadingMore = true
@@ -110,6 +138,9 @@ final class UserPostsViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Export
+
+    /// Exports the filtered/sorted posts as a CSV string with header row.
     func exportCSV() -> String {
         let header = "uri,author_did,author_handle,text,created_at,reply_count,repost_count,like_count"
         let rows = sortedFilteredPosts.map { entry -> String in
@@ -131,6 +162,7 @@ final class UserPostsViewModel: ObservableObject {
         return ([header] + rows).joined(separator: "\n")
     }
 
+    /// Exports the filtered/sorted posts as a pretty-printed JSON data object.
     func exportJSON() -> Data {
         let objects = sortedFilteredPosts.map { entry -> [String: Any] in
             let p = entry.post

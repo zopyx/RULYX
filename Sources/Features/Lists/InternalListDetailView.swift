@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - InternalListDetailView
+
+/// Detail view for an internal (local-only) list — shows members,
+/// supports search, swipe-to-remove, CSV/JSON export, and editing.
 struct InternalListDetailView: View {
     let list: InternalList
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -18,19 +22,22 @@ struct InternalListDetailView: View {
         _editColor = State(initialValue: list.color)
     }
 
+    /// Filters members by search text against handle or display name.
     private var filteredMembers: [InternalListMember] {
         let members = internalListStore.lists.first(where: { $0.id == list.id })?.members ?? list.members
         guard !searchText.isEmpty else { return members }
         return members.filter {
             $0.handle.localizedCaseInsensitiveContains(searchText) ||
-            ($0.displayName ?? "").localizedCaseInsensitiveContains(searchText)
+                ($0.displayName ?? "").localizedCaseInsensitiveContains(searchText)
         }
     }
+
+    // MARK: - Body
 
     var body: some View {
         List {
             Section {
-                if filteredMembers.isEmpty && !searchText.isEmpty {
+                if filteredMembers.isEmpty, !searchText.isEmpty {
                     EmptyStatePanel(
                         title: loc("list.members.no_matches"),
                         message: loc("list.members.no_matches_desc")
@@ -198,6 +205,8 @@ struct InternalListDetailView: View {
         }
     }
 
+    // MARK: - Export
+
     private func exportCSV() {
         let members = internalListStore.lists.first(where: { $0.id == list.id })?.members ?? list.members
         let header = "handle,display_name,did"
@@ -222,6 +231,7 @@ struct InternalListDetailView: View {
         }
     }
 
+    /// Writes data to a temp file and triggers the share sheet.
     private func writeAndShare(data: Data, name: String) {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
         try? data.write(to: url, options: .atomic)
@@ -229,6 +239,9 @@ struct InternalListDetailView: View {
     }
 }
 
+// MARK: - ShareSheet
+
+/// Bridge to UIActivityViewController for sharing exported files.
 private struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
 

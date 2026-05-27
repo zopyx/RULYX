@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - Retroactive conformances
+
 extension String: @retroactive Identifiable {
     public var id: String {
         self
@@ -12,6 +14,10 @@ extension URL: @retroactive Identifiable {
     }
 }
 
+// MARK: - UserPostsView
+
+/// Browse and search posts for a given user DID, with pagination,
+/// date filtering, image/video preview, and post liker actions.
 struct UserPostsView: View {
     let did: String
     let displayName: String
@@ -40,6 +46,9 @@ struct UserPostsView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         NavigationStack {
             Group {
@@ -135,6 +144,7 @@ struct UserPostsView: View {
         }
     }
 
+    /// Main list with search bar, date filter, and paginated post rows.
     private var listContent: some View {
         List {
             searchSection
@@ -225,6 +235,7 @@ struct UserPostsView: View {
         }
     }
 
+    /// Search text field and date filter toggle button.
     private var searchSection: some View {
         Section {
             HStack(spacing: 10) {
@@ -253,6 +264,7 @@ struct UserPostsView: View {
         }
     }
 
+    /// Toggle for activating/deactivating the date range filter.
     private var dateFilterButton: some View {
         let isActive = viewModel.fromDate != nil || viewModel.toDate != nil
         return Button {
@@ -271,6 +283,7 @@ struct UserPostsView: View {
         }
     }
 
+    /// From/to date pickers for filtering posts by date range.
     private var dateFilterPickers: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
@@ -309,6 +322,7 @@ struct UserPostsView: View {
         .padding(.bottom, 6)
     }
 
+    /// Export menu with CSV and JSON options.
     private var exportMenu: some View {
         Menu {
             Button {
@@ -332,6 +346,7 @@ struct UserPostsView: View {
         }
     }
 
+    /// Loads the first page of posts, cancelling any existing load task.
     private func loadInitial() async {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
@@ -343,6 +358,7 @@ struct UserPostsView: View {
         await task.value
     }
 
+    /// Loads the next page of posts, guarding against duplicate calls.
     private func loadMore() async {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
@@ -355,18 +371,22 @@ struct UserPostsView: View {
         loadMoreTask = nil
     }
 
+    /// Pull-to-refresh that resets and reloads all posts.
     private func refresh() async {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
     }
 
+    /// Opens Google Translate in the browser with the selected text.
     private func translateText(_ text: String) {
         guard let encoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let url = URL(string: "https://translate.google.com/?text=\(encoded)") else { return }
         UIApplication.shared.open(url)
     }
 }
+
+// MARK: - ShareSheet
 
 private struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
@@ -378,6 +398,9 @@ private struct ShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_: UIActivityViewController, context _: Context) {}
 }
 
+// MARK: - ImagePreviewView
+
+/// Full-screen image viewer with pinch-to-zoom, pan, and double-tap to reset.
 private struct ImagePreviewView: View {
     let url: URL
     let onDismiss: () -> Void

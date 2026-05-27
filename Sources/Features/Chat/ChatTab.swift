@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// The Chat tab wrapper — hosts the conversation list and syncs the
+/// `ChatStore` account on active-account changes.
 struct ChatTab: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var chatStore: ChatStore

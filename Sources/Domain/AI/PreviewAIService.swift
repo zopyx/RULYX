@@ -1,10 +1,15 @@
 import Foundation
 
+/// A preview/mock AI service that overrides `LiveAIService` with deterministic
+/// behavior and simulated latency. Used in SwiftUI previews and tests.
 @MainActor
 final class PreviewAIService: LiveAIService {
+    /// Overridden catalog used instead of loading from the bundle.
     private var catalogOverride: [ModelBundle]
+    /// Set of model IDs that are considered "downloaded".
     private var downloaded: Set<String> = []
 
+    /// Initializes with the preview catalog.
     override init() {
         catalogOverride = Self.previewCatalog
         super.init()
@@ -31,6 +36,7 @@ final class PreviewAIService: LiveAIService {
         ),
     ]
 
+    /// Rebuilds `downloadStates` based on the `downloaded` set.
     private func updateStates() {
         var states: [String: ModelDownloadState] = [:]
         for model in catalogOverride {

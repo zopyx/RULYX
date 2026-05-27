@@ -1,8 +1,9 @@
 import SwiftUI
 
-// MARK: - Button Styles
+// MARK: - Glass Button Styles
 
 extension View {
+    /// Prominent button style — uses iOS 26 glass effect or falls back to `.borderedProminent`.
     @ViewBuilder
     func glassProminentButton() -> some View {
         if #available(iOS 26, *) {
@@ -12,6 +13,7 @@ extension View {
         }
     }
 
+    /// Bordered button style — uses iOS 26 glass effect or falls back to `.bordered`.
     @ViewBuilder
     func glassBorderedButton() -> some View {
         if #available(iOS 26, *) {
@@ -25,6 +27,8 @@ extension View {
 // MARK: - Glass Background
 
 extension View {
+    /// Apply a glass/material background with the given shape.
+    /// Uses iOS 26 `glassEffect` or falls back to `.thinMaterial`.
     @ViewBuilder
     func glassBackground(in shape: some Shape = RoundedRectangle(cornerRadius: 12)) -> some View {
         if #available(iOS 26, *) {
@@ -34,6 +38,7 @@ extension View {
         }
     }
 
+    /// Apply a tinted glass background with the given tint color and shape.
     @ViewBuilder
     func glassTintedBackground(tint: Color, in shape: some Shape = RoundedRectangle(cornerRadius: 12)) -> some View {
         if #available(iOS 26, *) {
@@ -47,6 +52,8 @@ extension View {
 // MARK: - Account Switcher Toolbar
 
 extension View {
+    /// Toolbar content for an account switcher button in `.topBarLeading` position.
+    /// Shows the active account's avatar, display name, and chevron.
     func accountSwitcherToolbar(isPresented: Binding<Bool>, accountStore: AccountStore, localizationManager: LocalizationManager) -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             Button {
@@ -77,6 +84,7 @@ extension View {
         }
     }
 
+    /// Render the active account's avatar (async image or initial-letter placeholder).
     @ViewBuilder
     func accountAvatarView(for account: AppAccount) -> some View {
         let avatarSize: CGFloat = 28

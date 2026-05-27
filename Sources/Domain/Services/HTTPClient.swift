@@ -14,7 +14,7 @@ private actor InflightManager {
     }
 }
 
-struct HTTPClient: Sendable {
+struct HTTPClient {
     private let session: URLSession
     private let debugStore: HTTPRequestDebugStore?
     private static let inflightManager = InflightManager()
@@ -30,7 +30,7 @@ struct HTTPClient: Sendable {
     func dedupedData(for request: URLRequest, source: String) async throws -> (Data, HTTPURLResponse) {
         let cacheKey = "\(request.httpMethod ?? "GET"):\(request.url?.absoluteString ?? "")"
         return try await Self.inflightManager.dedup(key: cacheKey) {
-            try await self.data(for: request, source: source)
+            try await data(for: request, source: source)
         }
     }
 

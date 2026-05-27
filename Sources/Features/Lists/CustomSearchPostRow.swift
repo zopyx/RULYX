@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - CustomSearchPostRow
+
+/// A post row for custom search results, wrapping `PostRowView` with
+/// image preview, video playback, profile navigation, and liker actions.
 struct CustomSearchPostRow: View {
     let entry: RichFeedEntry
     let entries: [RichFeedEntry]
@@ -15,6 +19,8 @@ struct CustomSearchPostRow: View {
     var onAddAllLikersToList: ((BlueskyList) -> Void)?
     var onClassify: (() -> Void)?
     var onReportPost: (() -> Void)?
+
+    // MARK: - Body
 
     var body: some View {
         PostRowView(

@@ -1,13 +1,27 @@
 import Foundation
 
+/// Manages the main timeline feed with polling, pagination, optimistic likes/reposts, inline thread expansion, and analytics.
+///
+/// State machine: `.initialLoading → .loadingMore → .loaded | .exhausted | .failed | .loadMoreFailed | .refreshing | .empty`
+/// Supports periodic polling for new post count, optimistic interaction toggles, and account/feed switching.
 @MainActor
 final class FeedTimelineViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// Store of muted words used to filter visible entries.
     let mutedWords: MutedWordsStore
+    /// Store managing the active custom feed selection.
     let feedStore: FeedStore
+    /// Store for recording engagement analytics.
     let analytics: AnalyticsStore
+    /// All loaded timeline entries, unfiltered. Use `visibleEntries` for display.
     @Published private(set) var entries: [RichFeedEntry] = []
+    /// Current state of the timeline loading lifecycle.
     @Published private(set) var state: TimelineState = .initialLoading
+    /// Number of new posts discovered since the last refresh (via polling).
     @Published var newPostCount = 0
+
+    // MARK: - Init
 
     init(
         mutedWords: MutedWordsStore = MutedWordsStore(),
@@ -19,15 +33,27 @@ final class FeedTimelineViewModel: ObservableObject {
         self.analytics = analytics
     }
 
+    // MARK: - Computed Properties
+
+    /// Entries with their post text checked against muted words; muted entries are excluded.
     var visibleEntries: [RichFeedEntry] {
         entries.filter { !mutedWords.contains($0.post.safeRecord.text ?? "") }
     }
 
+    // MARK: - Private Properties
+
+    /// Cursor for paginating through the timeline.
     private var cursor: String?
+    /// Set of known post URIs, used to detect new posts during polling.
     private var knownURIs: Set<String> = []
+    /// Whether the last refresh produced any posts; used for `newPostCount` calculation.
     private var lastRefreshHadPosts = false
+    /// The running polling task.
     private var pollingTask: Task<Void, Never>?
 
+    // MARK: - Polling
+
+    /// Starts a background polling task that checks for new posts at the given interval.
     func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 8) {
         stopPolling()
         pollingTask = Task { [weak self] in
@@ -39,11 +65,14 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    /// Cancels the active polling task.
     func stopPolling() {
         pollingTask?.cancel()
         pollingTask = nil
     }
 
+    /// Checks for posts newer than the currently known URIs.
+    /// Increments `newPostCount` for each new URI discovered.
     private func checkForNewPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !knownURIs.isEmpty, state != .initialLoading else { return }
         do {
@@ -58,15 +87,27 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Optimistic Interactions / Inline Threads
+
+    /// Stores optimistic like state per post URI.
     @Published private var optimisticLikes: [String: Bool] = [:]
+    /// Stores optimistic repost state per post URI.
     @Published private var optimisticReposts: [String: Bool] = [:]
+    /// Stores the record URI for a like that was created optimistically.
     @Published private var optimisticLikeURIs: [String: String] = [:]
+    /// Stores the record URI for a repost that was created optimistically.
     @Published private var optimisticRepostURIs: [String: String] = [:]
+    /// Stores optimistic like counts per post URI.
     @Published private var optimisticLikeCounts: [String: Int] = [:]
+    /// Stores optimistic repost counts per post URI.
     @Published private var optimisticRepostCounts: [String: Int] = [:]
+    /// Set of post URIs with their inline thread expanded.
     @Published var expandedThreadURIs: Set<String> = []
+    /// Cached inline thread nodes for expanded posts.
     @Published var inlineThreads: [String: ThreadNode] = [:]
 
+    /// Toggles the inline thread expansion for a post URI.
+    /// Uses `ThreadCacheService` to cache fetched threads.
     func toggleInlineThread(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         if expandedThreadURIs.contains(uri) {
             expandedThreadURIs.remove(uri)
@@ -88,28 +129,34 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    /// Returns the effective like state, preferring optimistic value over server data.
     func effectiveIsLiked(uri: String) -> Bool {
         optimisticLikes[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isLikedByMe ?? false
     }
 
+    /// Returns the effective repost state, preferring optimistic value over server data.
     func effectiveIsReposted(uri: String) -> Bool {
         optimisticReposts[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isRepostedByMe ?? false
     }
 
+    /// Returns the effective like record URI, preferring optimistic value over server data.
     func effectiveMyLikeURI(uri: String) -> String? {
         optimisticLikeURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
     }
 
+    /// Returns the effective like count, preferring optimistic value over server data.
     func effectiveLikeCount(uri: String) -> Int {
         if let count = optimisticLikeCounts[uri] { return count }
         return entries.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
     }
 
+    /// Returns the effective repost count, preferring optimistic value over server data.
     func effectiveRepostCount(uri: String) -> Int {
         if let count = optimisticRepostCounts[uri] { return count }
         return entries.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
     }
 
+    /// Optimistically toggles the like state. Rolls back on server failure.
     func toggleLike(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let cid = entries.first(where: { $0.post.uri == uri })?.post.cid else { return }
         let wasLiked = effectiveIsLiked(uri: uri)
@@ -132,6 +179,7 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    /// Optimistically toggles the repost state. Rolls back on server failure.
     func toggleRepost(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let cid = entries.first(where: { $0.post.uri == uri })?.post.cid else { return }
         let wasReposted = effectiveIsReposted(uri: uri)
@@ -154,10 +202,14 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    /// Returns the effective repost record URI, preferring optimistic value over server data.
     func effectiveMyRepostURI(uri: String) -> String? {
         optimisticRepostURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
     }
 
+    // MARK: - Feed Loading
+
+    /// Fetches feed data from either the custom feed or the main timeline.
     private func fetchFeed(account: AppAccount, appPassword: String, cursor: String?, limit: Int = 50, using client: LiveBlueskyClient) async throws -> RichFeedResponse {
         if let feedURI = feedStore.customFeedURI, feedStore.isUsingCustomFeed {
             return try await client.fetchFeed(feedURI: feedURI, cursor: cursor, limit: limit, account: account, appPassword: appPassword)
@@ -165,6 +217,7 @@ final class FeedTimelineViewModel: ObservableObject {
         return try await client.fetchTimeline(cursor: cursor, limit: limit, account: account, appPassword: appPassword)
     }
 
+    /// Performs the initial timeline load. Only fires when `state == .initialLoading`.
     func loadTimeline(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard state == .initialLoading else { return }
         do {
@@ -181,6 +234,7 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    /// Pull-to-refresh: resets optimistic state, reloads the first page of the timeline.
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard state != .refreshing, state != .loadingMore else { return }
         optimisticLikes.removeAll()
@@ -217,14 +271,17 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    /// Removes an entry from the timeline by URI (e.g. after deletion).
     func removeEntry(uri: String) {
         entries.removeAll { $0.post.uri == uri }
     }
 
+    /// Inserts an entry at the given index (used for optimistic post creation).
     func insertEntry(_ entry: RichFeedEntry, at index: Int) {
         entries.insert(entry, at: min(index, entries.count))
     }
 
+    /// Resets all state for an account switch (clears data, cache, optimistics).
     func prepareForAccountChange() {
         entries = []
         cursor = nil
@@ -242,6 +299,7 @@ final class FeedTimelineViewModel: ObservableObject {
         inlineThreads.removeAll()
     }
 
+    /// Resets all state for a feed switch (same as account change but for feed change).
     func prepareForFeedChange() {
         entries = []
         cursor = nil
@@ -259,6 +317,7 @@ final class FeedTimelineViewModel: ObservableObject {
         inlineThreads.removeAll()
     }
 
+    /// Loads the next page of timeline entries.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard let cursor, state.hasMore else { return }
         state = .loadingMore
@@ -276,6 +335,9 @@ final class FeedTimelineViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Private Helpers
+
+    /// Records engagement analytics (likes, reposts, replies) for every loaded entry.
     private func recordAnalytics() {
         for entry in entries {
             let post = entry.post

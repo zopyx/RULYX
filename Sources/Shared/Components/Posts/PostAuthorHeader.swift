@@ -1,18 +1,32 @@
 import SwiftUI
 
+// MARK: - PostAuthorHeader
+
+/// The author section of a post row: avatar, display name, handle, and relative timestamp.
+/// Tapping the avatar or name triggers `onOpenProfile` with the author's DID/handle.
 struct PostAuthorHeader: View {
+    /// The author data to display.
     let author: RichAuthor
+    /// ISO 8601 timestamp string for relative date display.
     let createdAt: String?
+    /// Triggered when the avatar or display name is tapped, passing the DID/handle.
     var onOpenProfile: ((String) -> Void)?
+    /// Diameter of the avatar circle.
     var avatarSize: CGFloat = 36
 
+    // MARK: - Private Helpers
+
+    /// The display name falling back to the handle if unavailable.
     private var displayName: String {
         author.displayName ?? author.handle ?? ""
     }
 
+    /// The author's handle, if available.
     private var handle: String? {
         author.handle
     }
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 8) {

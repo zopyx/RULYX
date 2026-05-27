@@ -1,11 +1,15 @@
 import SwiftUI
 
+// MARK: - NotificationTab
+
 struct NotificationTab: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @StateObject private var viewModel = NotificationViewModel()
     @State private var selectedActor: BlueskyActor?
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -61,6 +65,7 @@ struct NotificationTab: View {
         .badge(viewModel.unreadCount > 0 ? viewModel.unreadCount : 0)
     }
 
+    /// Paginated list of notification rows with load-more on last item appear.
     private var listContent: some View {
         List {
             ForEach(viewModel.entries) { entry in
@@ -84,6 +89,7 @@ struct NotificationTab: View {
         }
     }
 
+    /// Sets the selected actor to open the profile sheet.
     private func openProfile(for entry: NotificationEntry) {
         selectedActor = BlueskyActor(
             did: entry.notification.author.did,
@@ -93,6 +99,7 @@ struct NotificationTab: View {
         )
     }
 
+    /// Placeholder skeleton UI shown during initial load.
     private var skeletonContent: some View {
         VStack(spacing: 16) {
             ForEach(0 ..< 10, id: \.self) { _ in
@@ -116,6 +123,7 @@ struct NotificationTab: View {
         .padding(.top)
     }
 
+    /// Pull-to-refresh: marks all read then reloads.
     private func refresh() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
@@ -125,6 +133,7 @@ struct NotificationTab: View {
         await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: blueskyClient)
     }
 
+    /// Triggers pagination load of older notifications.
     private func loadMore() {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)

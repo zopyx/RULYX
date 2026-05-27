@@ -1,5 +1,8 @@
 import SwiftUI
 
+// MARK: - ImportHandlesSheet
+
+/// Sheet for pasting handles/DIDs to import into a list.
 struct ImportHandlesSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var rawInput = ""
@@ -67,6 +70,9 @@ struct ImportHandlesSheet: View {
     }
 }
 
+// MARK: - ImportPreviewSheet
+
+/// Previews parsed import items grouped by classification before committing.
 struct ImportPreviewSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showImportPreviewHelp = false
@@ -113,8 +119,10 @@ struct ImportPreviewSheet: View {
             .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ToolbarCloseButton(action: { dismissAction(); dismiss() })
-                        .disabled(isImporting)
+                    ToolbarCloseButton(action: { dismissAction()
+                        dismiss()
+                    })
+                    .disabled(isImporting)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -149,6 +157,7 @@ struct ImportPreviewSheet: View {
         }
     }
 
+    /// Renders a section of import preview items under a given heading.
     @ViewBuilder
     private func previewSection(_ title: String, items: [ImportPreviewItem]) -> some View {
         if !items.isEmpty {
@@ -173,9 +182,13 @@ struct ImportPreviewSheet: View {
     }
 }
 
+// MARK: - ListMetadataSheet
+
+/// Sheet for creating or editing a list's name, description, and kind.
 struct ListMetadataSheet: View {
     @Environment(\.dismiss) private var dismiss
 
+    /// Whether the sheet is in create or edit mode.
     enum Mode: Equatable {
         case create(kind: BlueskyList.Kind)
         case edit(list: BlueskyList, isSaving: Bool)
@@ -210,6 +223,8 @@ struct ListMetadataSheet: View {
         if case let .edit(_, saving) = mode { return saving }
         return false
     }
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -283,6 +298,7 @@ struct ListMetadataSheet: View {
         return false
     }
 
+    /// Shows "{count}/{max}" with color feedback near the limit.
     private func counterBadge(count: Int, max: Int) -> some View {
         HStack {
             Spacer()

@@ -1,9 +1,15 @@
 import SwiftUI
 
+// MARK: - ListsExportFormat
+
+/// Supported export formats for list data.
 enum ListsExportFormat: String, CaseIterable {
     case csv, json, xlsx, ods
 }
 
+// MARK: - ListsShareSheet
+
+/// Bridge to UIActivityViewController for sharing exported files.
 struct ListsShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
 
@@ -15,6 +21,9 @@ struct ListsShareSheet: UIViewControllerRepresentable {
 }
 
 extension ListsView {
+    // MARK: - Export UI
+
+    /// Sheet for picking a list to export with format selection and progress.
     var exportListPickerSheet: some View {
         NavigationStack {
             let lists = allListsWithMembers
@@ -97,6 +106,7 @@ extension ListsView {
         }
     }
 
+    /// All lists that have at least one member, sorted alphabetically.
     var allListsWithMembers: [BlueskyList] {
         viewModel.listsByKind.values
             .flatMap(\.self)
@@ -104,6 +114,7 @@ extension ListsView {
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    /// Fetches all members, resolves profile stats, and writes the export file.
     func performExport(list: BlueskyList) async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account),
@@ -188,6 +199,7 @@ extension ListsView {
         shareFileURL = url
     }
 
+    /// Generates CSV string from members with optional profile stats.
     func generateCSV(from members: [BlueskyListMember], stats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]) -> String {
         let header = "handle,did,display_name,followers,following,posts,description"
         let rows = members.map { member in
@@ -205,6 +217,7 @@ extension ListsView {
         return ([header] + rows).joined(separator: "\n")
     }
 
+    /// Generates JSON data from members with optional profile stats.
     func generateJSON(from members: [BlueskyListMember], stats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]) -> Data {
         let objects = members.map { member in
             let s = stats[member.actor.did]

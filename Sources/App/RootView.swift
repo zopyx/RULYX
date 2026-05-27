@@ -1,6 +1,34 @@
 import SwiftUI
 
+// MARK: - Root View
+
+/// The main tab-based view hierarchy. Shows the `TabView` with all tabs,
+/// conditionally including beta features (Timeline, Notifications, Chat).
+///
+/// ## Tab Structure
+/// - **Always visible**: Moderation, Info, Settings, Accounts (4 tabs)
+/// - **Beta-gated** (when `showBetaFeatures` is enabled): Timeline, Notifications, Chat
+/// - iOS tab bar supports at most 5 visible tabs before showing "More". The 4 permanent
+///   + 3 beta tabs = 7 total, which is why screenshot tests split them across
+///   two test methods (`testCaptureCoreTabs` / `testCaptureBetaTabs`).
+///
+/// ## Account Switching
+/// Account switching is handled at the `RULYXApp` level via `.task(id: activeAccountID)`.
+/// This view reads `activeAccount` from the environment but does not manage it directly.
+/// The `TabView` selection is persisted via `workspaceStore.selectedTab`.
+///
+/// ## Onboarding Flow
+/// On first launch (`hasSeenOnboarding` is false), a full-screen onboarding sheet
+/// is presented explaining the app's core features and tabs. Dismissing it
+/// permanently sets `hasSeenOnboarding = true`.
+///
+/// ## Beta Features Gate
+/// When `showBetaFeatures` is toggled off in Settings, the `.onChange` handler
+/// resets the selected tab to Moderation if the current tab is a beta-only tab,
+/// preventing a blank body from being displayed.
 struct RootView: View {
+    // MARK: - Properties
+
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
@@ -9,10 +37,21 @@ struct RootView: View {
     @EnvironmentObject private var analyticsStore: AnalyticsStore
     @EnvironmentObject private var chatStore: ChatStore
     @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
+
+    /// UserDefaults key `"hasSeenOnboarding"`: whether the first-launch onboarding
+    /// has been shown. Suppresses the onboarding sheet on subsequent launches.
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+
+    /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
+    /// Values: `"light"`, `"dark"`, or `"system"` (default).
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
+
+    /// UserDefaults key `"showBetaFeatures"`: gates access to Timeline, Notifications,
+    /// and Chat tabs. When disabled, only Moderation, Info, Settings, and Accounts appear.
     @AppStorage("showBetaFeatures") private var showBetaFeatures = false
 
+    /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
+    /// Returns `.light`, `.dark`, or `nil` for system-following mode.
     private var preferredScheme: ColorScheme? {
         switch appearanceMode {
         case "light": .light
@@ -21,13 +60,23 @@ struct RootView: View {
         }
     }
 
+    // MARK: - Body
+
     var body: some View {
         VStack(spacing: 0) {
+            // MARK: Clearsky Outage Banner
+
+            // Warning banner at the top when Clearsky API is unreachable.
             if !clearskyHeartbeat.isClearskyAvailable {
                 ClearskyBanner()
                     .environmentObject(localizationManager)
             }
+
+            // MARK: Tab Bar
+
             TabView(selection: $workspaceStore.selectedTab) {
+                // MARK: Moderation Tab (always visible)
+
                 ModerationSplitView()
                     .tag(WorkspaceTab.moderation)
                     .tabItem {
@@ -37,6 +86,8 @@ struct RootView: View {
                             Image(systemName: "checklist.checked")
                         }
                     }
+
+                // MARK: Beta Tabs (gated by showBetaFeatures)
 
                 if showBetaFeatures {
                     TimelineTab()
@@ -70,6 +121,8 @@ struct RootView: View {
                         }
                 }
 
+                // MARK: Info Tab (always visible)
+
                 InfoView()
                     .tag(WorkspaceTab.info)
                     .tabItem {
@@ -79,6 +132,8 @@ struct RootView: View {
                             Image(systemName: "sparkles.rectangle.stack")
                         }
                     }
+
+                // MARK: Settings Tab (always visible)
 
                 SettingsView()
                     .tag(WorkspaceTab.settings)
@@ -90,6 +145,8 @@ struct RootView: View {
                         }
                     }
 
+                // MARK: Accounts Tab (always visible)
+
                 AccountTabView()
                     .tag(WorkspaceTab.account)
                     .tabItem {
@@ -100,19 +157,34 @@ struct RootView: View {
                         }
                     }
             }
+            // Tint changes to red when Clearsky is unavailable, providing a
+            // visual cue that Clearsky-dependent features will not work.
             .tint(clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7))
             .preferredColorScheme(preferredScheme)
             .environment(\.locale, localizationManager.locale)
             .environment(\.layoutDirection, localizationManager.layoutDirection)
+
+            // MARK: Beta Gate — Tab Reset
+
+            // When beta features are disabled and the current tab is one of the
+            // beta-only tabs, reset to the Moderation tab to prevent a blank view.
             .onChange(of: showBetaFeatures) { _, newValue in
                 if !newValue, workspaceStore.selectedTab == .timeline || workspaceStore.selectedTab == .notifications || workspaceStore.selectedTab == .chat {
                     workspaceStore.selectedTab = .moderation
                 }
             }
+
+            // MARK: Onboarding Sheet
+
+            // On first-ever launch, presents an onboarding sheet that introduces
+            // the app's tabs and core features. Dismissing it sets `hasSeenOnboarding`
+            // to true, preventing future showings.
             .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
                 NavigationStack {
                     ScrollView {
                         VStack(spacing: 20) {
+                            // MARK: Header
+
                             VStack(spacing: 8) {
                                 Image(systemName: "checklist.checked")
                                     .font(.system(size: 48))
@@ -131,12 +203,16 @@ struct RootView: View {
                             }
                             .padding(.top, 32)
 
+                            // MARK: Feature Rows
+
                             VStack(alignment: .leading, spacing: 16) {
                                 OnboardingRow(icon: "checklist.checked", color: .skyPrimary, title: localizationManager.localized("tab.moderation"), description: localizationManager.localized("onboarding.moderation.desc"))
                                 OnboardingRow(icon: "person.circle", color: .skyPrimary, title: localizationManager.localized("tab.accounts"), description: localizationManager.localized("onboarding.accounts.desc"))
                                 OnboardingRow(icon: "gearshape", color: .orange, title: localizationManager.localized("tab.settings"), description: localizationManager.localized("onboarding.settings.desc"))
                                 OnboardingRow(icon: "sparkles.rectangle.stack", color: .purple, title: localizationManager.localized("tab.info"), description: localizationManager.localized("onboarding.info.desc"))
                             }
+
+                            // MARK: Get Started Button
 
                             Button {
                                 hasSeenOnboarding = true
@@ -147,6 +223,8 @@ struct RootView: View {
                                     .padding()
                             }
                             .buttonStyle(.borderedProminent)
+                            // Custom glass-material prominent button style used consistently
+                            // throughout the app for primary action buttons.
                             .glassProminentButton()
                             .padding(.horizontal)
                         }
@@ -166,6 +244,11 @@ struct RootView: View {
         }
     }
 
+    // MARK: - Private Helpers
+
+    /// Returns the ordered list of tabs for the given beta state. Currently
+    /// unused by `TabView` (tabs are hardcoded above) but available for
+    /// future dynamic tab ordering or testing.
     private func orderedTabs(showBeta: Bool) -> [WorkspaceTab] {
         if showBeta {
             [.moderation, .timeline, .notifications, .chat, .info, .settings, .account]
@@ -174,6 +257,8 @@ struct RootView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     RootView()

@@ -1,6 +1,12 @@
 import Foundation
 
+/// A keyword- and heuristic-based text classification engine used for on-device
+/// content moderation without requiring a downloaded model. Provides toxicity,
+/// harassment, spam, and sentiment scoring via pattern matching.
 struct InferenceEngine {
+    /// Classifies text into score categories (safe, toxic, harassment, spam).
+    /// - Parameter text: The input text to classify.
+    /// - Returns: A dictionary mapping category names to confidence scores (0.0–1.0).
     func classify(text: String) -> [String: Double] {
         let lower = text.lowercased()
         let words = lower.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
@@ -67,6 +73,11 @@ struct InferenceEngine {
         return scores
     }
 
+    /// Performs a full natural-language analysis of the given text, including
+    /// topic detection, sentiment scoring, risk assessment, and a moderation
+    /// recommendation.
+    /// - Parameter text: The input text to analyze.
+    /// - Returns: A human-readable analysis report string.
     func analyze(text: String) -> String {
         let lower = text.lowercased()
         let words = lower.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
@@ -93,6 +104,8 @@ struct InferenceEngine {
         return parts.joined(separator: "\n")
     }
 
+    /// Detects topic categories present in the text by matching against
+    /// known keyword lists (Technology, Politics, Health, etc.).
     private func detectTopics(text: String) -> [String] {
         var topics: [String] = []
         let topicKeywords: [(String, [String])] = [
@@ -112,6 +125,8 @@ struct InferenceEngine {
         return topics
     }
 
+    /// Determines overall sentiment by counting positive vs negative keywords.
+    /// Returns "Positive", "Negative", or "Neutral".
     private func detectSentiment(text: String) -> String {
         let positiveWords: Set = [
             "good", "great", "awesome", "amazing", "love", "wonderful", "excellent",
@@ -131,6 +146,9 @@ struct InferenceEngine {
         return "Neutral"
     }
 
+    /// Assesses risk by scanning for violent language, weapons references,
+    /// hate speech, and link-only spam patterns.
+    /// - Returns: A concatenated risk description, or `nil` if no risks found.
     private func assessRisk(text: String, wordCount: Int) -> String? {
         let lower = text.lowercased()
         var risks: [String] = []
@@ -150,6 +168,7 @@ struct InferenceEngine {
         return risks.isEmpty ? nil : risks.joined(separator: "; ")
     }
 
+    /// Produces a moderation recommendation based on sentiment and post length.
     private func recommendation(sentiment: String, wordCount: Int) -> String {
         if sentiment == "Negative" || wordCount < 3 {
             return "Review for moderation"

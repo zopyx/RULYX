@@ -1,7 +1,13 @@
 import Foundation
 
+// MARK: - ListImportController
+
+/// Parses raw text input (handles, DIDs, profile URLs), resolves them via
+/// the Bluesky API, and produces an `ImportPreview` grouped by classification.
 @MainActor
 final class ListImportController {
+    /// Parses identifiers, resolves them via batch profile fetch, and returns
+    /// a preview with items classified as ready/duplicate/already-present/unresolved.
     func preparePreview(
         from rawInput: String,
         sourceDescription: String,
@@ -105,6 +111,7 @@ final class ListImportController {
         )
     }
 
+    /// Splits raw input by newlines, commas, semicolons, or whitespace.
     private func importedIdentifiers(from rawInput: String) -> [String] {
         let separators = CharacterSet.newlines
         return rawInput
@@ -127,6 +134,7 @@ final class ListImportController {
             .filter { !$0.isEmpty }
     }
 
+    /// Strips whitespace/quotes, handles bsky.app/profile/ URLs, removes @ prefix.
     private func normalizedImportedIdentifier(_ value: String) -> String {
         let trimmed = value
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -153,6 +161,7 @@ final class ListImportController {
         return trimmed
     }
 
+    /// Extracts the handle/DID from a bsky.app/profile/ URL.
     private func extractProfileIdentifier(from value: String) -> String {
         guard let url = URL(string: value),
               let profileIndex = url.pathComponents.firstIndex(of: "profile"),

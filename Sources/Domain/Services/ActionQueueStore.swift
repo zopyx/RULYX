@@ -1,18 +1,29 @@
 import Foundation
 
+/// Tracks the execution state of a queued bulk action.
 enum QueuedActionStatus: Equatable {
+    /// Waiting to be processed.
     case pending
+    /// Currently executing. Associated values: (completedCount, totalCount, currentHandle).
     case running(Int, Int, String?)
+    /// Finished execution. Associated values: (succeededCount, failedCount).
     case completed(Int, Int)
 }
 
+/// A bulk action queued for asynchronous processing against a list of actors.
 struct QueuedAction: Identifiable {
     let id: UUID
+    /// A human-readable title shown in the UI (e.g., "Add to Mod List").
     let title: String
+    /// When this action was enqueued.
     let createdAt: Date
+    /// The actors this action will be applied to.
     let actors: [BlueskyActor]
+    /// The type of operation for result tracking.
     let operation: ListBulkActionResult.Operation
+    /// The closure that performs the action for a single actor.
     let action: @Sendable (BlueskyActor) async throws -> Void
+    /// The current execution status.
     var status: QueuedActionStatus
 
     init(
@@ -42,12 +53,20 @@ extension QueuedAction: Hashable {
     }
 }
 
+/// A serial action queue that processes one bulk action at a time.
+/// Each action is a closure applied to an array of actors sequentially.
+/// The queue automatically processes the next pending action when the current one completes.
 @MainActor
 final class ActionQueueStore: ObservableObject {
+    /// All queued actions. The first pending action is processed automatically.
     @Published private(set) var actions: [QueuedAction] = []
 
+    /// The currently executing processing task (nil when idle).
     private var processingTask: Task<Void, Never>?
 
+    // MARK: - Public Methods
+
+    /// Adds an action to the queue and starts processing if idle.
     func enqueue(_ action: QueuedAction) {
         actions.append(action)
         if processingTask == nil {
@@ -55,6 +74,8 @@ final class ActionQueueStore: ObservableObject {
         }
     }
 
+    /// Cancels and removes an action from the queue.
+    /// If the action is currently running, the processing task is cancelled.
     func cancel(_ id: UUID) {
         if let idx = actions.firstIndex(where: { $0.id == id }) {
             if case .running = actions[idx].status {
@@ -68,6 +89,7 @@ final class ActionQueueStore: ObservableObject {
         }
     }
 
+    /// Re-queues a completed action by removing it and enqueuing a fresh copy.
     func retry(_ id: UUID) {
         guard let idx = actions.firstIndex(where: { $0.id == id }),
               case .completed = actions[idx].status else { return }
@@ -76,6 +98,9 @@ final class ActionQueueStore: ObservableObject {
         enqueue(action)
     }
 
+    // MARK: - Private Helpers
+
+    /// Finds the next pending action and starts processing it via `ListBatchController`.
     private func processNext() {
         guard processingTask == nil else { return }
         guard let idx = actions.firstIndex(where: { if case .pending = $0.status { true } else { false } }) else { return }

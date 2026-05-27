@@ -1,5 +1,10 @@
 import Foundation
 
+// MARK: - MockBlueskyListService
+
+/// A mock implementation of `BlueskyListServicing` that returns deterministic
+/// data with simulated network latency. Shared `previewActors` are also used
+/// by `MockBlueskyProfileService`.
 @MainActor
 final class MockBlueskyListService: BlueskyListServicing {
     nonisolated static let previewActors = [

@@ -2,6 +2,11 @@ import ImageIO
 import SwiftUI
 import UIKit
 
+// MARK: - ThumbnailPipeline
+
+/// Shared pipeline for fetching and downsampling remote images.
+/// Uses an `NSCache` for in-memory caching and ImageIO for efficient downsampling
+/// without decoding full-resolution images.
 private actor ThumbnailPipeline {
     static let shared = ThumbnailPipeline()
 
@@ -14,6 +19,9 @@ private actor ThumbnailPipeline {
         return HTTPClient(session: URLSession(configuration: config))
     }()
 
+    // MARK: - Public
+
+    /// Fetch and downsample an image to fit within `maxPixelSize` at the given display scale.
     func image(for url: URL, maxPixelSize: CGFloat, scale: CGFloat) async throws -> UIImage {
         let cacheKey = "\(url.absoluteString)|\(Int(maxPixelSize))|\(Int(scale))" as NSString
         if let cached = cache.object(forKey: cacheKey) {
@@ -30,6 +38,7 @@ private actor ThumbnailPipeline {
         return image
     }
 
+    /// Downsample image data to the target pixel size using ImageIO (avoids full decode).
     private func downsample(data: Data, maxPixelSize: CGFloat) throws -> UIImage {
         let options = [kCGImageSourceShouldCache: false] as CFDictionary
         guard let source = CGImageSourceCreateWithData(data as CFData, options) else {
@@ -51,14 +60,25 @@ private actor ThumbnailPipeline {
     }
 }
 
+// MARK: - ThumbnailImageView
+
+/// An efficient thumbnail image view that downloads and down-samples remote images
+/// using ImageIO, with in-memory caching. Shows a `Placeholder` view while loading.
+///
+/// Use this instead of plain `AsyncImage` for consistent sizing and memory efficiency.
 struct ThumbnailImageView<Placeholder: View>: View {
+    /// The remote image URL.
     let url: URL
+    /// Maximum pixel dimension for the downsampled thumbnail.
     let maxPixelSize: CGFloat
+    /// Placeholder view shown while loading.
     @ViewBuilder let placeholder: () -> Placeholder
 
     @Environment(\.displayScale) private var displayScale
     @State private var image: UIImage?
     @State private var loadedTaskID: String?
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -74,10 +94,15 @@ struct ThumbnailImageView<Placeholder: View>: View {
         }
     }
 
+    // MARK: - Private Helpers
+
+    /// Stable task identifier combining URL, pixel size, and display scale so the task
+    /// restarts only when one of these changes.
     private var taskID: String {
         "\(url.absoluteString)|\(Int(maxPixelSize))|\(Int(displayScale))"
     }
 
+    /// Load the thumbnail via the shared pipeline.
     private func loadImage() async {
         if loadedTaskID != taskID {
             image = nil

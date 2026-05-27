@@ -1,14 +1,40 @@
 import Foundation
 import Security
 
+/// Errors that can occur during Keychain operations.
 enum KeychainError: Error {
+    /// The Keychain operation returned an unexpected OSStatus.
     case unexpectedStatus(OSStatus)
+    /// The data retrieved from the Keychain could not be decoded as a UTF-8 string.
     case invalidData
 }
 
+/// Provides secure credential storage via the iOS Keychain (Security framework).
+/// Implementations handle save, read, and delete operations for generic passwords
+/// using service/account key pairs.
 protocol KeychainServicing: Sendable {
+    /// Saves a string value to the Keychain, replacing any existing entry
+    /// for the same service and account combination.
+    /// - Parameters:
+    ///   - value: The string value to store.
+    ///   - service: The Keychain service identifier (e.g. `"com.ajung.RULYX.session"`).
+    ///   - account: The account identifier associated with this value.
+    /// - Throws: `KeychainError.unexpectedStatus` if the save operation fails.
     func save(_ value: String, service: String, account: String) throws
+
+    /// Reads a string value from the Keychain.
+    /// - Parameters:
+    ///   - service: The Keychain service identifier.
+    ///   - account: The account identifier associated with the value.
+    /// - Returns: The stored string if found, or `nil` if no entry exists.
+    /// - Throws: `KeychainError.unexpectedStatus` or `KeychainError.invalidData` if reading fails or data is corrupt.
     func read(service: String, account: String) throws -> String?
+
+    /// Deletes an entry from the Keychain.
+    /// - Parameters:
+    ///   - service: The Keychain service identifier.
+    ///   - account: The account identifier associated with the value.
+    /// - Throws: `KeychainError.unexpectedStatus` if deletion fails for a reason other than "not found".
     func delete(service: String, account: String) throws
 }
 

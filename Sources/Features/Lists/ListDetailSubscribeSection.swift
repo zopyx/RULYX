@@ -1,6 +1,10 @@
 import SwiftUI
 
 extension ListDetailView {
+    // MARK: - ListDetailSubscribeSection
+
+    /// Section for subscribing/unsubscribing to a moderation list, with
+    /// error display and a prominent toggle button.
     struct ListDetailSubscribeSection: View {
         let currentList: BlueskyList
         @Binding var isSubscribed: Bool
@@ -11,6 +15,8 @@ extension ListDetailView {
 
         @EnvironmentObject var blueskyClient: LiveBlueskyClient
         @EnvironmentObject private var localizationManager: LocalizationManager
+
+        // MARK: - Body
 
         var body: some View {
             Section {

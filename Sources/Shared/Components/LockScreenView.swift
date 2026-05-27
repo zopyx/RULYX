@@ -1,8 +1,15 @@
 import SwiftUI
 
+// MARK: - LockScreenView
+
+/// A full-screen lock view displayed when the app is locked via `AppLockManager`.
+/// Shows a biometric icon (Face ID / Touch ID / lock shield), descriptive text,
+/// and an unlock button. Adapts messaging based on available biometrics.
 struct LockScreenView: View {
     @EnvironmentObject private var appLockManager: AppLockManager
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 24) {
@@ -38,6 +45,8 @@ struct LockScreenView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
     }
+
+    // MARK: - Private Helpers
 
     private var icon: String {
         switch appLockManager.biometricType {

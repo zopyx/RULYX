@@ -1,6 +1,10 @@
 import SwiftUI
 
 extension ListDetailView {
+    // MARK: - ListSearchSection
+
+    /// Section for searching Bluesky actors and adding them to the list,
+    /// with bulk-select and import/export tooling.
     struct ListSearchSection: View {
         @ObservedObject var viewModel: ListDetailViewModel
         @ObservedObject var batchState: ListBatchProgressState
@@ -19,12 +23,15 @@ extension ListDetailView {
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
         @EnvironmentObject private var localizationManager: LocalizationManager
 
+        // MARK: - Body
+
         var body: some View {
             searchSection
         }
 
         @FocusState private var searchFieldFocused: Bool
 
+        /// The main search UI with results, bulk-add toolbar, and workflow tools.
         private var searchSection: some View {
             Section {
                 HStack(spacing: 8) {
@@ -121,6 +128,7 @@ extension ListDetailView {
             }
         }
 
+        /// Select all / clear selection and bulk-add controls.
         private var bulkAddToolbar: some View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -161,6 +169,7 @@ extension ListDetailView {
             }
         }
 
+        /// Import from paste, file, or export as CSV.
         private var workflowToolsSection: some View {
             DisclosureGroup("list.search.tools") {
                 Button {

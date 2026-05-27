@@ -1,15 +1,23 @@
 import Foundation
 
+// MARK: - BlueskyListService
+
+/// The production implementation of `BlueskyListServicing` that performs CRUD
+/// operations on Bluesky moderation/curation lists via the AT Protocol.
 @MainActor
 final class BlueskyListService: ObservableObject, BlueskyListServicing {
+    /// Executes raw HTTP requests against the Bluesky API.
     private let requestExecutor: BlueskyRequestExecuting
+    /// Manages authentication sessions for request signing.
     private let sessionService: BlueskySessionServicing
 
+    /// Creates the service with its required dependencies.
     init(requestExecutor: BlueskyRequestExecuting, sessionService: BlueskySessionServicing) {
         self.requestExecutor = requestExecutor
         self.sessionService = sessionService
     }
 
+    /// Fetches all lists owned by the given account.
     func fetchLists(for account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
         let response: GetListsResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -39,6 +47,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         }
     }
 
+    /// Fetches a single list by its AT URI.
     func fetchList(
         uri: String,
         account: AppAccount,
@@ -48,6 +57,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         return lists.first { $0.id == uri }
     }
 
+    /// Fetches all members of a list, automatically paginating through all pages.
     func fetchListMembers(
         list: BlueskyList,
         account: AppAccount,
@@ -70,6 +80,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         return allMembers
     }
 
+    /// Fetches a single page of list members.
     func fetchListMembersPage(
         list: BlueskyList,
         cursor: String?,
@@ -114,6 +125,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         )
     }
 
+    /// Adds an actor (by DID) to the specified list.
+    /// - Returns: The AT URI of the created list item record.
     func addActor(
         did actorDID: String,
         to list: BlueskyList,
@@ -148,6 +161,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         return response.uri
     }
 
+    /// Removes a member from a list by deleting the list item record.
     func removeMember(
         recordURI: String,
         account: AppAccount,
@@ -175,6 +189,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         }
     }
 
+    /// Creates a new moderation or curation list.
     func createList(
         name: String,
         description: String,
@@ -217,6 +232,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         )
     }
 
+    /// Deletes an entire list and its associated record.
     func deleteList(
         list: BlueskyList,
         account: AppAccount,
@@ -243,6 +259,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         }
     }
 
+    /// Updates the name and description of an existing list.
     func updateListMetadata(
         list: BlueskyList,
         title: String,
@@ -289,6 +306,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         )
     }
 
+    /// Reports a list to the Bluesky moderation service with a free-form reason.
     func reportList(
         _ list: BlueskyList,
         reason: String?,
@@ -304,6 +322,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
         )
     }
 
+    /// Reports a list to the Bluesky moderation service with a specific reason type.
     func reportList(
         _ list: BlueskyList,
         selectedReason: ModerationReportReasonType?,

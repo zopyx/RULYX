@@ -1,25 +1,55 @@
 import SwiftUI
 
+// MARK: - Info View
+
+/// The Info tab providing an overview of the app, feature descriptions, and legal information.
+///
+/// ## Tabs
+/// - **Overview**: hero card with logo, claims grid (free, open-source, no tracking, no ads),
+///   GitHub link, security note, and version/build info.
+/// - **Features**: detailed breakdown of moderation, export, and list management features.
+/// - **Legal**: author info, links to website/imprint/privacy, license, third-party services
+///   (Clearsky), and data classification details.
+///
+/// ## Easter Eggs
+/// - **Triple-tap** the logo → replays the splash screen animation.
+/// - **Quadruple-tap** the logo → opens a hidden diagnostics view showing device info,
+///   orientation, accessibility settings, and app version.
 struct InfoView: View {
+    // MARK: - Properties
+
     @EnvironmentObject private var localizationManager: LocalizationManager
     @Environment(\.colorScheme) private var colorScheme
+
+    /// The currently selected info tab (overview / features / legal).
     @State private var selectedTab: InfoTab = .overview
+
+    /// Controls the splash screen replay overlay (triggered by triple-tapping the logo).
     @State private var showSplashReplay = false
+
+    /// Controls the hidden debug diagnostics sheet (triggered by quadruple-tapping the logo).
     @State private var showDebugInfo = false
 
+    /// The three segmented-picker tabs within the Info view.
     enum InfoTab: String, CaseIterable {
         case overview = "Overview"
         case features = "Features"
         case legal = "Legal"
     }
 
+    // MARK: - Body
+
     var body: some View {
         ZStack {
+            // MARK: Background Gradient
+
             background
                 .ignoresSafeArea()
 
             NavigationStack {
                 VStack(spacing: 0) {
+                    // MARK: Segmented Tab Picker
+
                     Picker(selection: $selectedTab) {
                         ForEach(InfoTab.allCases, id: \.self) { tab in
                             Text(verbatim: localizationManager.localized("info.\(tab.rawValue.lowercased())")).tag(tab)
@@ -34,6 +64,8 @@ struct InfoView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
 
+                    // MARK: Tab Content
+
                     ScrollView {
                         VStack(spacing: 16) {
                             switch selectedTab {
@@ -45,11 +77,17 @@ struct InfoView: View {
                         .padding(16)
                     }
                 }
+                // Suppresses the navigation bar title since the view provides its
+                // own visual identity via the logo and background gradient.
                 .navigationTitle("")
                 .toolbarTitleDisplayMode(.inline)
+                // Hides the navigation bar background so the gradient shows through.
                 .toolbarBackground(.hidden, for: .navigationBar)
             }
         }
+
+        // MARK: Splash Replay Overlay
+
         .overlay {
             if showSplashReplay {
                 SplashScreenView(isActive: $showSplashReplay)
@@ -57,6 +95,9 @@ struct InfoView: View {
                     .zIndex(100)
             }
         }
+
+        // MARK: Debug Info Sheet
+
         .sheet(isPresented: $showDebugInfo) {
             DebugInfoView()
                 .environmentObject(localizationManager)
@@ -71,6 +112,8 @@ struct InfoView: View {
             claimsGrid
             openSourceCard
             securityNote
+
+            // MARK: Version / Build Row
 
             HStack(spacing: 12) {
                 Image(systemName: "clock")
@@ -95,12 +138,15 @@ struct InfoView: View {
         }
     }
 
+    /// Reads `CFBundleShortVersionString` and `CFBundleVersion` from Info.plist.
     private var versionString: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
         return "v\(version) (\(build))"
     }
 
+    /// Reads the executable's modification date as a proxy for build date.
+    /// Formatted as UTC via `SharedDateFormatters.buildTimestampUTC`.
     private var buildDate: String {
         if let url = Bundle.main.executableURL,
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
@@ -111,6 +157,9 @@ struct InfoView: View {
         return "Unknown"
     }
 
+    /// The hero card with the RULYX logo.
+    /// - **Triple-tap** replays the splash screen.
+    /// - **Quadruple-tap** opens the hidden debug diagnostics sheet.
     private var heroCard: some View {
         VStack(spacing: 10) {
             Image("RulyxLogo")
@@ -118,6 +167,9 @@ struct InfoView: View {
                 .scaledToFit()
                 .frame(height: 128)
                 .onTapGesture(count: 3) { showSplashReplay = true }
+                // Hidden easter egg: quadruple-tap opens debug diagnostics.
+                // Uses `highPriorityGesture` to ensure it takes precedence over
+                // the triple-tap gesture.
                 .highPriorityGesture(TapGesture(count: 4).onEnded { showDebugInfo = true })
 
             Text(verbatim: localizationManager.localized("onboarding.title"))
@@ -138,6 +190,7 @@ struct InfoView: View {
         )
     }
 
+    /// 2×2 grid of claim tiles: free, open-source, no tracking, no ads.
     private var claimsGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             claimTile(icon: "dollarsign.circle.fill", text: localizationManager.localized("info.claim.free"), color: .skyPrimary)
@@ -147,6 +200,7 @@ struct InfoView: View {
         }
     }
 
+    /// Card linking to the GitHub repository.
     private var openSourceCard: some View {
         Link(destination: URL(string: "https://github.com/zopyx/RULYX")!) {
             HStack(spacing: 14) {
@@ -179,6 +233,7 @@ struct InfoView: View {
         .accessibilityHint(loc: "info.github.hint")
     }
 
+    /// Note explaining that credentials are stored in the Keychain, not UserDefaults.
     private var securityNote: some View {
         HStack(spacing: 12) {
             Image(systemName: "lock.shield")
@@ -204,6 +259,7 @@ struct InfoView: View {
 
     // MARK: - Features Tab
 
+    /// Feature cards describing moderation lists, data export, and block management.
     private var featuresTab: some View {
         VStack(spacing: 12) {
             featureCard(
@@ -244,6 +300,8 @@ struct InfoView: View {
 
     // MARK: - Legal Tab
 
+    /// Legal info: author, website, imprint, privacy, license, third-party
+    /// services (Clearsky), and data classification.
     private var legalTab: some View {
         VStack(spacing: 12) {
             legalRow(icon: "person.crop.square", title: localizationManager.localized("info.legal.author"), value: "Andreas Jung")
@@ -280,6 +338,8 @@ struct InfoView: View {
 
             legalDivider
 
+            // MARK: Third-Party Services
+
             VStack(alignment: .leading, spacing: 8) {
                 Text(verbatim: localizationManager.localized("info.third_party"))
                     .appFont(.subheading)
@@ -310,6 +370,8 @@ struct InfoView: View {
 
             legalDivider
 
+            // MARK: Data Classification
+
             VStack(alignment: .leading, spacing: 8) {
                 Text(verbatim: localizationManager.localized("info.data_classification"))
                     .appFont(.subheading)
@@ -327,6 +389,7 @@ struct InfoView: View {
 
     // MARK: - Reusable Components
 
+    /// A single tile in the 2×2 claims grid (free, open-source, no tracking, no ads).
     private func claimTile(icon: String, text: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
@@ -340,6 +403,7 @@ struct InfoView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
+    /// A feature card with a title and bullet-pointed list of capabilities.
     private func featureCard(icon: String, color: Color, title: String, items: [String]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
@@ -377,6 +441,7 @@ struct InfoView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
+    /// A row in the legal tab: icon, title, optional value, and optional external-link arrow.
     private func legalRow(icon: String, title: String, value: String? = nil, link: Bool = false) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
@@ -408,12 +473,14 @@ struct InfoView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
     }
 
+    /// A thin horizontal divider used to separate sections within the legal tab.
     private var legalDivider: some View {
         Color.appDivider.opacity(colorScheme == .dark ? 0.6 : 0.35)
             .frame(height: 1)
             .padding(.vertical, 4)
     }
 
+    /// A label + value row used in the data classification section.
     private func dataRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
@@ -426,6 +493,10 @@ struct InfoView: View {
         }
     }
 
+    // MARK: - Background
+
+    /// Full-screen background gradient with decorative blurred circles.
+    /// Uses different colors for light and dark mode.
     private var background: some View {
         ZStack {
             LinearGradient(
@@ -449,6 +520,7 @@ struct InfoView: View {
         .ignoresSafeArea()
     }
 
+    /// Gradient colors for the hero card, adapted for light/dark mode.
     private var heroGradientColors: [Color] {
         if colorScheme == .dark {
             return [
@@ -464,6 +536,7 @@ struct InfoView: View {
         ]
     }
 
+    /// Gradient colors for the full-screen background, adapted for light/dark mode.
     private var backgroundGradientColors: [Color] {
         if colorScheme == .dark {
             return [
@@ -481,11 +554,18 @@ struct InfoView: View {
     }
 }
 
-// MARK: - Debug Info
+// MARK: - Debug Info View
 
+/// Hidden diagnostics screen accessible by quadruple-tapping the RULYX logo
+/// on the Info tab's overview section.
+///
+/// Displays device model, iOS version, screen dimensions, orientation, low-power
+/// mode, thermal state, accessibility settings, and app version/build info.
 private struct DebugInfoView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @Environment(\.dismiss) private var dismiss
+
+    /// Collected diagnostics tuples (label, value) populated on appear.
     @State private var diagnostics: [(String, String)] = []
 
     var body: some View {
@@ -505,6 +585,7 @@ private struct DebugInfoView: View {
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
+                        // Copies all diagnostics as tab-separated text to the clipboard.
                         let text = diagnostics.map { "\($0.0): \($0.1)" }.joined(separator: "\n")
                         UIPasteboard.general.string = text
                     } label: {
@@ -512,10 +593,12 @@ private struct DebugInfoView: View {
                     }
                 }
             }
+            // Collects diagnostics on view appearance.
             .task { diagnostics = collectDiagnostics() }
         }
     }
 
+    /// Gathers device, OS, accessibility, and app version information for diagnostics.
     private func collectDiagnostics() -> [(String, String)] {
         let device = UIDevice.current
         let screen = UIScreen.main
@@ -554,6 +637,7 @@ private struct DebugInfoView: View {
         return result
     }
 
+    /// Reads the device model via `sysctlbyname("hw.machine")`.
     private var deviceModelName: String {
         var size = 0
         sysctlbyname("hw.machine", nil, &size, nil, 0)
@@ -563,6 +647,7 @@ private struct DebugInfoView: View {
         return String(data: data, encoding: .utf8)?.trimmingCharacters(in: .init(charactersIn: "\0")) ?? ""
     }
 
+    /// Returns a human-readable string for the current interface orientation.
     private var interfaceOrientation: String {
         let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
         switch scene?.interfaceOrientation {
@@ -574,6 +659,7 @@ private struct DebugInfoView: View {
         }
     }
 
+    /// Returns a human-readable string for the current thermal state.
     private var thermalState: String {
         switch ProcessInfo.processInfo.thermalState {
         case .nominal: return "Nominal"
@@ -584,6 +670,7 @@ private struct DebugInfoView: View {
         }
     }
 
+    /// Reads the executable's modification date as a proxy for build date (UTC).
     private var buildDate: String {
         if let url = Bundle.main.executableURL,
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
@@ -594,12 +681,15 @@ private struct DebugInfoView: View {
         return "Unknown"
     }
 
+    /// Formats a byte count as a human-readable memory string.
     private func byteCount(_ bytes: UInt64) -> String {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .memory
         return formatter.string(fromByteCount: Int64(bytes))
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     InfoView()

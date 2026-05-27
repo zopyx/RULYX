@@ -1,10 +1,21 @@
 import SwiftUI
 
+// MARK: - BlueskyActorRow
+
+/// A standard row displaying a Bluesky actor: avatar, title (display name), handle,
+/// optional description, and an `Extra` view for badges, labels, or trailing content.
+///
+/// Generic parameter `Extra` allows callers to inject additional content (e.g. a "Bot" badge).
+/// When no extra is needed, use the convenience initializer `init(actor:)`.
 struct BlueskyActorRow<Extra: View>: View {
+    /// The actor to display.
     let actor: BlueskyActor
+    /// Optional extra view injected by the caller.
     let extra: Extra
 
     @ScaledMetric(relativeTo: .body) private var avatarSize: CGFloat = 36
+
+    // MARK: - Init
 
     init(actor: BlueskyActor, @ViewBuilder extra: () -> Extra) {
         self.actor = actor
@@ -12,6 +23,9 @@ struct BlueskyActorRow<Extra: View>: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         HStack(spacing: 10) {
             avatarView
@@ -39,6 +53,8 @@ struct BlueskyActorRow<Extra: View>: View {
         .padding(.vertical, 2)
         .accessibilityLabel(String.localized("actor_row.label", replacements: ["title": actor.title, "handle": actor.handle]))
     }
+
+    // MARK: - Private Helpers
 
     @ViewBuilder
     private var avatarView: some View {
@@ -74,6 +90,7 @@ struct BlueskyActorRow<Extra: View>: View {
 }
 
 extension BlueskyActorRow where Extra == EmptyView {
+    /// Convenience initializer when no extra content is needed.
     init(actor: BlueskyActor) {
         self.actor = actor
         extra = EmptyView()

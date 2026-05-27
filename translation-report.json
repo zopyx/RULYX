@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1183,
+    "total_keys": 1207,
     "total_languages": 16,
-    "untranslated_total": 1637
+    "untranslated_total": 1997
   },
   "keys": {
     "account.active": {
@@ -55083,6 +55083,1518 @@
       "vi": {
         "text": "查找 (VI)",
         "untranslated": false
+      }
+    },
+    "profile.manage_posts.bulk_confirm": {
+      "en": "Delete {n} posts?",
+      "de": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete {n} posts?",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.bulk_confirm_msg": {
+      "en": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+      "de": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.custom_range": {
+      "en": "Custom Date Range",
+      "de": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Custom Date Range",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.delete_all": {
+      "en": "Delete All My Posts",
+      "de": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete All My Posts",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.delete_selected": {
+      "en": "Delete Selected ({n})",
+      "de": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete Selected ({n})",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.deleting": {
+      "en": "Deleting {n} of {total}…",
+      "de": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Deleting {n} of {total}…",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.deselect_all": {
+      "en": "Deselect All",
+      "de": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Deselect All",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Deselect All",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.empty_hint": {
+      "en": "Your posts will appear here.",
+      "de": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Your posts will appear here.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.confirm_1": {
+      "en": "Yes, delete everything",
+      "de": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Yes, delete everything",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.confirm_2": {
+      "en": "I am sure. Delete all posts.",
+      "de": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "I am sure. Delete all posts.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.confirm_3": {
+      "en": "I understand. Delete everything now.",
+      "de": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "I understand. Delete everything now.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.desc_1": {
+      "en": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+      "de": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.desc_2": {
+      "en": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+      "de": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.desc_3": {
+      "en": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+      "de": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.nuclear.title": {
+      "en": "Delete All Posts",
+      "de": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Delete All Posts",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.relative.allTime": {
+      "en": "All",
+      "de": {
+        "text": "All",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "All",
+        "untranslated": true
+      },
+      "it": {
+        "text": "All",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "All",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "All",
+        "untranslated": true
+      },
+      "es": {
+        "text": "All",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "All",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "All",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "All",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "All",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "All",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "All",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "All",
+        "untranslated": true
+      },
+      "th": {
+        "text": "All",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "All",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.relative.last30": {
+      "en": "30 days",
+      "de": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "it": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "es": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "th": {
+        "text": "30 days",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "30 days",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.relative.last7": {
+      "en": "7 days",
+      "de": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "it": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "es": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "th": {
+        "text": "7 days",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "7 days",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.relative.lastYear": {
+      "en": "Year",
+      "de": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Year",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Year",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.relative.today": {
+      "en": "Today",
+      "de": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Today",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Today",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.search": {
+      "en": "Search your posts…",
+      "de": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Search your posts…",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Search your posts…",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.select": {
+      "en": "Select",
+      "de": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.select_all": {
+      "en": "Select All",
+      "de": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select All",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select All",
+        "untranslated": true
+      }
+    },
+    "profile.manage_posts.title": {
+      "en": "Manage My Posts",
+      "de": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Manage My Posts",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Manage My Posts",
+        "untranslated": true
       }
     },
     "profile.media.download_complete": {

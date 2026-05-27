@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - Directional Symbol
+
 extension Image {
     /// Mark a directional SF Symbol so SwiftUI flips it under right-to-left layout.
     /// Use for disclosure chevrons, "forward" arrows, and other glyphs whose meaning is "in the reading direction".

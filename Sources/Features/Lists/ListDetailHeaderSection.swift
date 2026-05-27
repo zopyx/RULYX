@@ -1,11 +1,17 @@
 import SwiftUI
 
 extension ListDetailView {
+    // MARK: - ListDetailHeaderSection
+
+    /// Header section for a list detail — shows avatar, name, description,
+    /// and owner info (with navigation to owner profile).
     struct ListDetailHeaderSection: View {
         let currentList: BlueskyList
         let isOwnedList: Bool
         let ownerActor: BlueskyActor?
         @Binding var imagePreview: ImagePreviewCollection?
+
+        // MARK: - Body
 
         var body: some View {
             Section {
@@ -82,6 +88,7 @@ extension ListDetailView {
             }
         }
 
+        /// Placeholder shown while the list avatar is loading or missing.
         private var avatarPlaceholder: some View {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Color.skyPrimary.opacity(0.12))

@@ -1,22 +1,43 @@
 import Foundation
 
+/// Searches for posts mentioning a specific user by searching for their handle with the `mentions` parameter.
+///
+/// Uses `searchPosts(q: "@handle", mentions: did)` to find posts that mention the given user,
+/// supporting pagination via cursor and pull-to-refresh with cursor preservation.
 @MainActor
 final class MentionsSearchViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// Posts that mention the user, sorted newest-first.
     @Published private(set) var entries: [RichFeedEntry] = []
+    /// True while the initial load is in progress.
     @Published private(set) var isLoading = false
+    /// True while loading the next page.
     @Published private(set) var isLoadingMore = false
+    /// False when no more search pages are available.
     @Published private(set) var hasMore = true
+    /// User-facing error message.
     @Published var errorMessage: String?
 
+    // MARK: - Private Properties
+
+    /// Cursor for paginating through mention search results.
     private var cursor: String?
+    /// The DID of the user whose mentions are being searched.
     private let did: String
+    /// The handle of the user (used in the search query as `@handle`).
     private let handle: String
+
+    // MARK: - Init
 
     init(did: String, handle: String) {
         self.did = did
         self.handle = handle
     }
 
+    // MARK: - Public Methods
+
+    /// Resets all state to initial values.
     func reset() {
         entries = []
         cursor = nil
@@ -24,6 +45,7 @@ final class MentionsSearchViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    /// Performs the initial mention search.
     func load(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
@@ -52,6 +74,7 @@ final class MentionsSearchViewModel: ObservableObject {
         }
     }
 
+    /// Loads the next page of mention results.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoadingMore, let cursor else { return }
         isLoadingMore = true
@@ -77,6 +100,7 @@ final class MentionsSearchViewModel: ObservableObject {
         }
     }
 
+    /// Pull-to-refresh: reloads the first page, preserving the cursor on failure.
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true

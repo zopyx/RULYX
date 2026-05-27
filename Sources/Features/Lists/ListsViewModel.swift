@@ -1,16 +1,33 @@
 import Foundation
 
+/// Manages the moderation dashboard: lists grouped by kind, active profile info, and blocking counts.
+///
+/// Supports caching via `DashboardCache` so the dashboard loads instantly from disk
+/// while quietly refreshing data in the background.
 @MainActor
 final class ListsViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// All moderation lists grouped by their kind (moderation, reference, etc.).
     @Published private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
+    /// Profile of the currently active account.
     @Published private(set) var activeProfile: BlueskyProfile?
+    /// Number of accounts this user is blocking.
     @Published private(set) var blockingCount: Int?
+    /// Number of accounts blocking this user.
     @Published private(set) var blockedByCount: Int?
+    /// True while the initial load is in progress (no cache).
     @Published private(set) var isLoading = false
+    /// True while a manual refresh is in progress.
     @Published private(set) var isRefreshing = false
+    /// True when the displayed data was loaded from cache.
     @Published private(set) var isFromCache = false
+    /// User-facing error message.
     @Published var errorMessage: String?
 
+    // MARK: - Public Methods
+
+    /// Resets all state to initial values.
     func reset() {
         listsByKind = [:]
         activeProfile = nil
@@ -21,6 +38,13 @@ final class ListsViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    /// Loads the dashboard data — lists, profile, blocking counts.
+    ///
+    /// Behavior:
+    /// - If cached data exists, applies it immediately (`isFromCache = true`) then refreshes.
+    /// - Deferred cache hit: `isLoading` stays false; only `isRefreshing` is set for explicit refresh.
+    /// - If no cache, sets `isLoading = true` and shows a spinner.
+    /// - Persists updated cache after network fetch completes.
     func load(
         for account: AppAccount?,
         appPassword: String?,
@@ -50,6 +74,7 @@ final class ListsViewModel: ObservableObject {
         if isExplicitRefresh { isRefreshing = true }
         errorMessage = nil
 
+        // Fire all four fetches in parallel
         async let listsTask = client.fetchLists(for: account, appPassword: appPassword)
         async let profileTask = client.fetchProfile(
             did: account.did ?? account.handle,
@@ -78,6 +103,7 @@ final class ListsViewModel: ObservableObject {
         isRefreshing = false
     }
 
+    /// Applies a cached `DashboardCacheData` snapshot to all published properties.
     private func applyCached(_ cached: DashboardCacheData) {
         listsByKind = Dictionary(grouping: cached.lists, by: \.kind)
         activeProfile = cached.profile
@@ -85,6 +111,7 @@ final class ListsViewModel: ObservableObject {
         blockedByCount = cached.blockedByCount
     }
 
+    /// Persists the current state to `DashboardCache` for the given key.
     private func persistCache(forKey key: String) {
         let data = DashboardCacheData(
             lists: Array(listsByKind.values.flatMap(\.self)),
@@ -95,6 +122,7 @@ final class ListsViewModel: ObservableObject {
         DashboardCache.save(data, forKey: key)
     }
 
+    /// Adds a new list to the in-memory collection and updates the cache.
     func addList(_ list: BlueskyList) {
         var updated = listsByKind
         updated[list.kind, default: []].append(list)
@@ -103,6 +131,7 @@ final class ListsViewModel: ObservableObject {
         persistCache(forKey: didCacheKey ?? "")
     }
 
+    /// Replaces an existing list with an updated version, preserving sort order.
     func updateList(_ updatedList: BlueskyList) {
         var updated = listsByKind
         guard var lists = updated[updatedList.kind],
@@ -117,6 +146,9 @@ final class ListsViewModel: ObservableObject {
         persistCache(forKey: didCacheKey ?? "")
     }
 
+    // MARK: - Private Properties
+
+    /// Resolves the cache key from the current active profile.
     private var didCacheKey: String? {
         activeProfile?.did ?? activeProfile?.handle
     }

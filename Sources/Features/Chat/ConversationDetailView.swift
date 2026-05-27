@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - ConversationDetailView
+
+/// Full conversation view with scrollable message list, send bar,
+/// profile navigation, mute/leave actions, and scroll-to-bottom button.
 struct ConversationDetailView: View {
     @EnvironmentObject var chatStore: ChatStore
     @EnvironmentObject private var accountStore: AccountStore
@@ -14,14 +18,17 @@ struct ConversationDetailView: View {
 
     let conversation: ChatConversation
 
+    /// Messages for the current conversation.
     private var convoMessages: [ChatMessageKind] {
         chatStore.messages[conversation.id] ?? []
     }
 
+    /// The other participant in a 1:1 conversation.
     private var otherMember: ChatMemberProfile? {
         conversation.members.first { $0.did != chatStore.currentAccountDID }
     }
 
+    /// User-facing name: group name, other member's name, or fallback.
     private var displayName: String {
         if let groupInfo = conversation.groupInfo, !groupInfo.name.isEmpty {
             return groupInfo.name
@@ -31,6 +38,8 @@ struct ConversationDetailView: View {
         }
         return conversation.members.first?.handle ?? loc("chat.unknown")
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 0) {
@@ -184,6 +193,9 @@ struct ConversationDetailView: View {
         }
     }
 
+    // MARK: - Subviews
+
+    /// Scrollable message list with auto-scroll and load-more trigger.
     private var scrollView: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -259,6 +271,7 @@ struct ConversationDetailView: View {
         }
     }
 
+    /// Bottom input bar with text field and send button.
     private var sendBar: some View {
         HStack(spacing: 8) {
             TextField("chat.message.placeholder", text: $messageText)
@@ -288,6 +301,7 @@ struct ConversationDetailView: View {
         .background(.bar)
     }
 
+    /// Async avatar image with person.circle.fill fallback.
     @ViewBuilder
     private func avatarView(url: URL?, size: CGFloat) -> some View {
         if let url {
@@ -310,6 +324,7 @@ struct ConversationDetailView: View {
         }
     }
 
+    /// Renders a message bubble, deleted placeholder, or system message.
     @ViewBuilder
     private func messageView(for kind: ChatMessageKind) -> some View {
         switch kind {
@@ -324,6 +339,7 @@ struct ConversationDetailView: View {
         }
     }
 
+    /// Centered "message deleted" placeholder.
     private func deletedMessageView(_: ChatDeletedMessage) -> some View {
         HStack {
             Spacer()
@@ -335,6 +351,7 @@ struct ConversationDetailView: View {
         }
     }
 
+    /// Styled system event notification (join, leave, lock, etc.).
     private func systemMessageView(_ msg: ChatSystemMessage) -> some View {
         HStack {
             Spacer()
@@ -349,6 +366,7 @@ struct ConversationDetailView: View {
         .padding(.vertical, 4)
     }
 
+    /// Localized text for a system message type.
     private func systemText(_ data: ChatSystemMessageData) -> String {
         switch data {
         case .addMember: loc("chat.system.added")
@@ -363,10 +381,12 @@ struct ConversationDetailView: View {
         }
     }
 
+    /// ID of the most recent message for marking as read.
     private var lastMessageId: String? {
         convoMessages.last.map { idFor($0) }
     }
 
+    /// Extracts a stable ID regardless of message variant.
     private func idFor(_ kind: ChatMessageKind) -> String {
         switch kind {
         case let .message(m): m.id

@@ -1,11 +1,15 @@
 import Foundation
 
+// MARK: - SearchToken
+
 /// A simple token for guarding against stale search results.
-/// Create a new token before starting a search, and check `isCurrent`
-/// before applying the results.
+/// Create a new token before starting a search, and check `matches`
+/// before applying the results (discard if the token has been superseded).
 @MainActor
 final class SearchToken: Sendable {
     private nonisolated let id: UUID
+
+    // MARK: - Init
 
     init() {
         id = UUID()

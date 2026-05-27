@@ -1,10 +1,19 @@
 import SwiftUI
 
+// MARK: - ActorSearchResultRow
+
+/// A row in actor search results with a selection checkbox, actor info via `BlueskyActorRow`,
+/// and an add button. Used in list member management and batch operation target selection.
 struct ActorSearchResultRow: View {
+    /// The actor to display.
     let actor: BlueskyActor
+    /// Whether the actor is currently selected.
     let isSelected: Bool
+    /// Whether an add operation is in progress.
     let isAdding: Bool
+    /// Toggles the selection state.
     let toggleSelection: () -> Void
+    /// Performs the add action for this actor.
     let addAction: () -> Void
     @EnvironmentObject private var localizationManager: LocalizationManager
 

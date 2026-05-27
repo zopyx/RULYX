@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// PDS provider options for account creation.
 enum ProviderOption: String, CaseIterable, Identifiable {
     case bluesky = "Bluesky"
     case eurosky = "Eurosky"
@@ -18,6 +19,8 @@ enum ProviderOption: String, CaseIterable, Identifiable {
     }
 }
 
+/// Form view for adding a new Bluesky account — select PDS provider
+/// (Bluesky, Eurosky, or custom), enter handle and app password.
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore

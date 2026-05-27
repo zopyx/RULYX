@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Filter options for the HTTP request debug list.
 enum HTTPRequestDebugFilter: String, CaseIterable, Identifiable {
     case succeeded
     case failed
@@ -8,6 +9,7 @@ enum HTTPRequestDebugFilter: String, CaseIterable, Identifiable {
         rawValue
     }
 
+    /// Localization key for the filter's display title.
     var titleKey: String {
         switch self {
         case .succeeded: "debug.http.state.succeeded"
@@ -23,6 +25,8 @@ enum HTTPRequestDebugFilter: String, CaseIterable, Identifiable {
     }
 }
 
+/// A debug view that displays logged HTTP requests, their status codes,
+/// durations, and error response bodies. Supports filtering by succeeded/failed.
 struct HTTPRequestDebugView: View {
     @EnvironmentObject private var debugStore: HTTPRequestDebugStore
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -79,6 +83,8 @@ struct HTTPRequestDebugView: View {
     }
 }
 
+/// A single row displaying a logged HTTP request's URL, method, status,
+/// duration, source, and an optional "View Error" button.
 private struct HTTPRequestDebugRow: View {
     let entry: HTTPRequestDebugEntry
     let localizationManager: LocalizationManager

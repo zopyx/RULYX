@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// The Accounts tab — manage saved Bluesky accounts, switch active account,
+/// set preferred search account, edit account labels, and import/export
+/// accounts as JSON.
 struct AccountTabView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
@@ -15,6 +18,8 @@ struct AccountTabView: View {
     @State private var exportFileURL: URL?
     @State private var importError: String?
     @State private var importSuccess: String?
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -262,6 +267,8 @@ struct AccountTabView: View {
         }
     }
 
+    // MARK: - Import / Export
+
     private func exportAccounts() async {
         guard await AppLockManager.shared.authenticateSensitive() else { return }
         var entries: [[String: String]] = []
@@ -336,6 +343,8 @@ struct AccountTabView: View {
             importError = error.localizedDescription
         }
     }
+
+    // MARK: - Helpers
 
     @ViewBuilder
     private var preferredSearchRow: some View {

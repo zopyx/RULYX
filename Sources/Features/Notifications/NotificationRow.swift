@@ -1,10 +1,17 @@
 import SwiftUI
 
+// MARK: - NotificationRow
+
+/// A single notification row — shows the author avatar, reason text
+/// (liked/reposted/followed/etc.), relative timestamp, read/unread indicator,
+/// and an inline card for the related post (if available).
 struct NotificationRow: View {
     let notification: NotificationItem
     let relatedPost: RichPost?
     let onAuthorTap: () -> Void
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -43,6 +50,7 @@ struct NotificationRow: View {
         .opacity(notification.isRead ? 0.7 : 1)
     }
 
+    /// Author avatar with initials fallback and border overlay.
     private var avatarView: some View {
         AsyncImage(url: avatarURL) { image in
             image
@@ -65,15 +73,18 @@ struct NotificationRow: View {
         }
     }
 
+    /// Resolves the author's avatar URL string.
     private var avatarURL: URL? {
         URL(string: notification.author.avatar ?? "")
     }
 
+    /// Single-character initial from display name or handle.
     private var initials: String {
         let name = notification.author.displayName ?? notification.author.handle
         return String(name.prefix(1).uppercased())
     }
 
+    /// Localized reason text based on the notification reason string.
     private var reasonText: String {
         switch notification.reason {
         case "like": loc("notifications.reason.like")
@@ -87,11 +98,13 @@ struct NotificationRow: View {
         }
     }
 
+    /// Relative time string from the notification's indexedAt date.
     private var relativeTime: String {
         guard let date = SharedDateFormatters.parseISO8601(notification.indexedAt) else { return "" }
         return relativeTimeString(from: date)
     }
 
+    /// Inline preview card for the post associated with this notification.
     private func relatedPostCard(_ post: RichPost) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -169,6 +182,7 @@ struct NotificationRow: View {
         }
     }
 
+    /// Small avatar thumbnail for the post author in the related post card.
     private func smallAvatar(for author: RichAuthor) -> some View {
         Group {
             if let avatarURL = author.avatar.flatMap(URL.init) {
@@ -190,6 +204,7 @@ struct NotificationRow: View {
         .clipShape(Circle())
     }
 
+    /// Extracts the first image thumb or fullsize URL from the embed.
     private func previewImageURL(for post: RichPost) -> URL? {
         if let thumb = post.embed?.images?.first?.thumb.flatMap(URL.init) {
             return thumb

@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Scans the user's recent posts for direct replies (replies from other
+/// accounts to the user's posts), surfacing them in a chronological list
+/// for moderation review.
 struct DirectRepliesView: View {
     let did: String
     let handle: String
@@ -34,6 +37,9 @@ struct DirectRepliesView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         List {
             searchAccountSection
@@ -235,7 +241,8 @@ struct DirectRepliesView: View {
             if !hasAppeared {
                 hasAppeared = true
                 if let prefID = accountStore.preferredSearchAccountID,
-                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+                {
                     searchAccount = prefAccount
                 } else {
                     searchAccount = accountStore.activeAccount
@@ -254,6 +261,8 @@ struct DirectRepliesView: View {
         }
         .postLikerActions(manager: likerActions)
     }
+
+    // MARK: - Section builders
 
     private var searchAccountSection: some View {
         Group {
@@ -312,6 +321,8 @@ struct DirectRepliesView: View {
                     .foregroundStyle(.white)
             }
     }
+
+    // MARK: - Actions
 
     private func handleBlockAllLikers(postURI: String) {
         Task {
@@ -404,6 +415,8 @@ struct DirectRepliesView: View {
         pendingLikerTargets = []
         showBlockLikersConfirmation = false
     }
+
+    // MARK: - Data loading
 
     private func loadAvailableTargetLists() async {
         guard let account = accountStore.activeAccount,

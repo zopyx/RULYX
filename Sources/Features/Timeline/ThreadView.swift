@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Displays a single post thread with ancestors (reversed), the root post,
+/// and threaded replies with depth-based indentation and connection lines.
 struct ThreadView: View {
     let postURI: String
 
@@ -11,6 +13,8 @@ struct ThreadView: View {
     @State private var showLikesForURI: String?
     @State private var composeContext: ComposeContext?
     @StateObject private var likerActions = PostLikerActionsManager()
+
+    // MARK: - Computed properties
 
     private var mentionURLHandler: OpenURLAction {
         OpenURLAction { url in
@@ -24,6 +28,8 @@ struct ThreadView: View {
 
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -601,17 +607,29 @@ struct ThreadView: View {
     }
 }
 
+/// Manages loading and state for a single post thread view.
+///
+/// Fetches the full thread via `fetchPostThread` and exposes `thread`, `isLoading`, and `errorMessage`.
 @MainActor
 final class ThreadViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// The loaded thread node containing the post and its replies.
     @Published private(set) var thread: ThreadNode?
+    /// True while the thread is loading. Starts as `true`.
     @Published private(set) var isLoading = true
+    /// User-facing error message.
     @Published var errorMessage: String?
 
+    // MARK: - Public Methods
+
+    /// Handles the case where credentials are missing, showing a localized error.
     func handleMissingCredentials() {
         errorMessage = loc("list.detail.missing_creds")
         isLoading = false
     }
 
+    /// Loads the post thread for the given URI.
     func loadThread(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         isLoading = true
         errorMessage = nil

@@ -1,22 +1,42 @@
 import Foundation
 
+/// ViewModel that scans the user's recent feed posts and their threads to
+/// collect direct replies from other accounts.
 @MainActor
 final class DirectRepliesViewModel: ObservableObject {
+    // MARK: - Properties
+
+    /// All discovered replies to the user's posts, deduplicated and sorted newest-first.
     @Published private(set) var entries: [RichFeedEntry] = []
+    /// True while the initial load is in progress.
     @Published private(set) var isLoading = false
+    /// True while loading more replies.
     @Published private(set) var isLoadingMore = false
+    /// False when no more user posts are available to scan.
     @Published private(set) var hasMore = true
+    /// User-facing error message.
     @Published var errorMessage: String?
+    /// Localized progress label shown during scanning.
     @Published private(set) var progressLabel: String?
 
+    // MARK: - Private Properties
+
+    /// Cursor for paginating through the user's author feed.
     private var feedCursor: String?
+    /// The DID of the user whose direct replies are being found.
     private let did: String
+    /// Maximum number of user posts to scan for replies.
     private let maxPosts = 100
+
+    // MARK: - Init
 
     init(did: String) {
         self.did = did
     }
 
+    // MARK: - Public Methods
+
+    /// Resets all state back to initial values.
     func reset() {
         entries = []
         feedCursor = nil
@@ -24,6 +44,7 @@ final class DirectRepliesViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    /// Loads replies: phase 1 (collect my posts) → phase 2 (fetch threads, extract replies).
     func load(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
@@ -51,6 +72,7 @@ final class DirectRepliesViewModel: ObservableObject {
         }
     }
 
+    /// Loads the next batch of replies from additional user posts.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoadingMore, let feedCursor else { return }
         isLoadingMore = true
@@ -74,6 +96,7 @@ final class DirectRepliesViewModel: ObservableObject {
         }
     }
 
+    /// Pull-to-refresh: reloads all replies from scratch, preserving cursor on failure.
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
@@ -101,6 +124,9 @@ final class DirectRepliesViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Private Helpers
+
+    /// Removes duplicate URIs and sorts newest-first by post creation date.
     private func deduplicateAndSort(_ entries: [RichFeedEntry]) -> [RichFeedEntry] {
         var seen = Set<String>()
         let deduped = entries.filter { seen.insert($0.post.uri).inserted }
@@ -111,8 +137,7 @@ final class DirectRepliesViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Phase 1: Collect my posts
-
+    /// Phase 1: Collect up to `maxPosts` authored by the user (max 5 pages).
     private func fetchMyPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async throws -> [RichFeedEntry] {
         var allPosts: [RichFeedEntry] = []
         var pagesChecked = 0
@@ -142,8 +167,8 @@ final class DirectRepliesViewModel: ObservableObject {
         return Array(allPosts.prefix(maxPosts))
     }
 
-    // MARK: - Phase 2: Fetch threads and extract replies
-
+    /// Phase 2: For each user post, fetch the thread (depth 3) and collect replies by other accounts.
+    /// Processes posts in batches of 5 using a task group for parallelism.
     private func fetchReplies(for myPosts: [RichFeedEntry], account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async throws -> [RichFeedEntry] {
         let uris = myPosts.map(\.post.uri)
         var allReplies: [RichFeedEntry] = []
@@ -179,6 +204,7 @@ final class DirectRepliesViewModel: ObservableObject {
         return allReplies
     }
 
+    /// Fetches a single post thread (depth 3) and extracts replies not authored by the user.
     private func fetchRepliesForPost(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async throws -> [RichFeedEntry] {
         let response: GetPostThreadResponse
         do {
@@ -193,6 +219,7 @@ final class DirectRepliesViewModel: ObservableObject {
         return results
     }
 
+    /// Recursively collects reply posts whose author is different from the user.
     private func collectReplies(from node: ThreadNode, myDID: String, into results: inout [RichFeedEntry]) {
         guard let replies = node.replies else { return }
         for replyNode in replies {

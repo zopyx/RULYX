@@ -3,6 +3,12 @@ import Foundation
 import UIKit
 import UserNotifications
 
+// MARK: - PushNotificationCoordinator
+
+/// Coordinates push notification registration and handling across multiple
+/// Bluesky accounts. Listens for APNs device tokens, registers/unregisters
+/// each account with the Bluesky push service, and routes incoming push
+/// payloads to the appropriate stores (chat, navigation, etc.).
 @MainActor
 final class PushNotificationCoordinator: ObservableObject {
     private let pushService: BlueskyPushNotificationServicing

@@ -1,11 +1,22 @@
 import SwiftUI
 import WebKit
 
+// MARK: - InlineAnimatedMediaView
+
+/// Renders animated media (GIF, video) inline using a `WKWebView` with transparent background.
+/// Supports image formats (gif, jpg, png, webp) and video formats (mp4, webm, mov, m4v).
+/// When `allowsInteraction` is true, the web view is user-interactable (e.g. for pause/play).
 struct InlineAnimatedMediaView: View {
+    /// The URL of the media file to display.
     let url: URL
+    /// Whether the web view should allow user interaction.
     var allowsInteraction: Bool = false
+    /// The height of the media area.
     var height: CGFloat = 200
+    /// Corner radius applied to the media area.
     var cornerRadius: CGFloat = 8
+
+    // MARK: - Body
 
     var body: some View {
         InlineAnimatedMediaWebView(url: url, allowsInteraction: allowsInteraction)
@@ -16,9 +27,14 @@ struct InlineAnimatedMediaView: View {
     }
 }
 
+// MARK: - InlineAnimatedMediaWebView
+
+/// `UIViewRepresentable` wrapping a `WKWebView` configured for inline media playback.
 private struct InlineAnimatedMediaWebView: UIViewRepresentable {
     let url: URL
     let allowsInteraction: Bool
+
+    // MARK: - UIViewRepresentable
 
     func makeUIView(context _: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -42,6 +58,9 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
         loadContent(in: webView)
     }
 
+    // MARK: - Private Helpers
+
+    /// Construct an HTML page embedding the media file with transparent background and cover sizing.
     private func loadContent(in webView: WKWebView) {
         let ext = url.pathExtension.lowercased()
         if ["gif", "jpg", "jpeg", "png", "webp"].contains(ext) {

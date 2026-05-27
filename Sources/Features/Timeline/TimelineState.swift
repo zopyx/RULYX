@@ -1,5 +1,8 @@
 import Foundation
 
+// MARK: - TimelineState
+
+/// Represents the loading/empty/error state of the timeline feed.
 enum TimelineState: Equatable {
     case initialLoading
     case loaded
@@ -10,6 +13,7 @@ enum TimelineState: Equatable {
     case failed(String)
     case exhausted
 
+    /// Extracts the error message from failed or loadMoreFailed states.
     var errorMessage: String? {
         switch self {
         case let .loadMoreFailed(msg), let .failed(msg): msg
@@ -17,6 +21,7 @@ enum TimelineState: Equatable {
         }
     }
 
+    /// Whether the timeline is currently fetching data.
     var isLoading: Bool {
         switch self {
         case .initialLoading, .refreshing, .loadingMore: true
@@ -24,6 +29,7 @@ enum TimelineState: Equatable {
         }
     }
 
+    /// Whether more pages can be loaded.
     var hasMore: Bool {
         switch self {
         case .exhausted, .failed: false
@@ -31,6 +37,7 @@ enum TimelineState: Equatable {
         }
     }
 
+    /// Whether the timeline has no content.
     var isEmpty: Bool {
         self == .empty
     }

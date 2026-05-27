@@ -1,7 +1,13 @@
 import SwiftUI
 
+// MARK: - ListRowView
+
+/// A single row showing a list name, description, and member count.
 struct ListRowView: View {
+    /// The list to display.
     let list: BlueskyList
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 12) {

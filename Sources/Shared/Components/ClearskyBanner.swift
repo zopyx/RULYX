@@ -1,7 +1,13 @@
 import SwiftUI
 
+// MARK: - ClearskyBanner
+
+/// A red banner shown when ClearSky data is unavailable.
+/// Displays a cloud-slash icon with a localized message.
 struct ClearskyBanner: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 8) {

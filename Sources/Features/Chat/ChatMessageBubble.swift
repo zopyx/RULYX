@@ -1,10 +1,15 @@
 import SwiftUI
 
+// MARK: - ChatMessageBubble
+
+/// A single chat message bubble with mention link detection, reactions,
+/// and a tail shape that flips for outgoing vs. incoming messages.
 struct ChatMessageBubble: View {
     let message: ChatMessage
     let isOutgoing: Bool
     var onOpenProfile: ((String) -> Void)?
 
+    /// Shared time-only formatter for timestamps.
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateStyle = .none
@@ -13,9 +18,12 @@ struct ChatMessageBubble: View {
         return f
     }()
 
+    /// Formatted time string for the message timestamp.
     private var timeString: String {
         Self.timeFormatter.string(from: message.sentAt)
     }
+
+    // MARK: - Body
 
     var body: some View {
         HStack {
@@ -59,6 +67,7 @@ struct ChatMessageBubble: View {
         .padding(.vertical, 2)
     }
 
+    /// Converts @mentions in the text to tappable links with a custom mention:// scheme.
     private func mentionAttributedString(from text: String, isOutgoing: Bool) -> AttributedString {
         var attributed = AttributedString(text)
         guard let regex = try? NSRegularExpression(pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?")
@@ -76,6 +85,10 @@ struct ChatMessageBubble: View {
     }
 }
 
+// MARK: - BubbleShape
+
+/// Chat bubble shape with a tail on the bottom corner — tail position
+/// flips based on whether the message is outgoing (right) or incoming (left).
 struct BubbleShape: Shape {
     let isOutgoing: Bool
 

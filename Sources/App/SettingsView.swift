@@ -1,21 +1,52 @@
 import SwiftUI
 
+// MARK: - Settings View
+
+/// The Settings tab providing user-configurable preferences.
+///
+/// Sections:
+/// - **Preferences**: appearance mode (light/dark/system) and language picker
+/// - **Security**: biometric lock toggle and auto-lock timeout (only shown when
+///   biometrics are available on the device)
+/// - **AI**: navigation to AI model management
+/// - **Internal**: beta features toggle, debug mode toggle, clear cache, and
+///   a hidden HTTP request debug view (revealed by double-tapping the section header)
 struct SettingsView: View {
+    // MARK: - Properties
+
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var appLockManager: AppLockManager
     @EnvironmentObject private var httpRequestDebugStore: HTTPRequestDebugStore
     @EnvironmentObject private var aiService: LiveAIService
+
+    /// UserDefaults key `"debugMode"`: enables debug tools (HTTP request debug view, etc.).
     @AppStorage("debugMode") private var debugMode = false
+
+    /// UserDefaults key `"showBetaFeatures"`: gates access to Timeline, Notifications,
+    /// and Chat tabs in `RootView`.
     @AppStorage("showBetaFeatures") private var showBetaFeatures = false
+
+    /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
+    /// Values: `"light"`, `"dark"`, or `"system"`.
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
+
+    /// Controls the clear cache confirmation dialog.
     @State private var isShowingClearCacheConfirmation = false
+
+    /// Controls the HTTP request debug view sheet.
     @State private var isShowingHTTPRequestDebugView = false
+
+    /// Transient status message shown after clearing the cache (e.g. "Cache cleared").
     @State private var cacheStatusMessage: String?
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
             List {
+                // MARK: Preferences Section
+
                 Section {
                     Picker(
                         selection: Binding(
@@ -60,6 +91,8 @@ struct SettingsView: View {
                     Text(localizationManager.localized("settings.preferences"))
                 }
 
+                // MARK: Security Section (Biometrics)
+
                 if appLockManager.isBiometricsAvailable {
                     Section {
                         Toggle(isOn: $appLockManager.isEnabled) {
@@ -88,6 +121,8 @@ struct SettingsView: View {
                     }
                 }
 
+                // MARK: AI Section
+
                 Section {
                     NavigationLink {
                         AIModelManagementView()
@@ -103,6 +138,8 @@ struct SettingsView: View {
                 } header: {
                     Text(localizationManager.localized("settings.ai"))
                 }
+
+                // MARK: Internal Section
 
                 Section {
                     Toggle(isOn: $showBetaFeatures) {
@@ -139,6 +176,8 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
 
+                    // MARK: HTTP Debug View (debug mode only)
+
                     if debugMode {
                         Button {
                             isShowingHTTPRequestDebugView = true
@@ -156,12 +195,17 @@ struct SettingsView: View {
                         Spacer()
                     }
                     .contentShape(Rectangle())
+                    // Hidden gesture: double-tapping the "Internal" section header
+                    // opens the HTTP request debug view regardless of `debugMode`.
                     .onTapGesture(count: 2) {
                         isShowingHTTPRequestDebugView = true
                     }
                 }
             }
             .navigationTitle(localizationManager.localized("settings.title"))
+
+            // MARK: Sheet — HTTP Request Debug View
+
             .sheet(isPresented: $isShowingHTTPRequestDebugView) {
                 NavigationStack {
                     HTTPRequestDebugView()
@@ -169,6 +213,9 @@ struct SettingsView: View {
                         .environmentObject(localizationManager)
                 }
             }
+
+            // MARK: Confirmation — Clear Cache
+
             .confirmationDialog(
                 localizationManager.localized("settings.clear_cache.confirm"),
                 isPresented: $isShowingClearCacheConfirmation,
@@ -185,6 +232,12 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Private Helpers
+
+    /// Returns the SF Symbol name for the device's biometric type.
+    /// - `.faceID` → `"faceid"`
+    /// - `.touchID` → `"touchid"`
+    /// - default → `"lock.shield"`
     private var biometricIcon: String {
         switch appLockManager.biometricType {
         case .faceID: "faceid"
@@ -193,6 +246,8 @@ struct SettingsView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     SettingsView()

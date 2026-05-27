@@ -1,11 +1,22 @@
 import Foundation
 
+/// Represents a Bluesky moderation or curation list fetched from the AT Protocol.
+/// Lists can group actors for bulk moderation or organizational purposes.
 struct BlueskyList: Identifiable, Hashable, Codable {
+    // MARK: - Enums
+
+    /// Categorizes the list type based on its Bluesky purpose identifier.
     enum Kind: String, CaseIterable, Hashable, Codable {
+        /// A moderation list (`app.bsky.graph.defs#modlist`) — used for blocking/muting members in bulk.
         case moderation
+        /// A curation list (`app.bsky.graph.defs#curatelist`) — used for internal organization.
         case `internal`
+        /// A regular curation list — used for general grouping purposes.
         case regular
 
+        // MARK: - Computed Properties
+
+        /// Numeric sort order: moderation (0), internal (1), regular (2).
         var sortOrder: Int {
             switch self {
             case .moderation: 0
@@ -14,6 +25,7 @@ struct BlueskyList: Identifiable, Hashable, Codable {
             }
         }
 
+        /// Localized display title for this list kind.
         @MainActor
         var title: String {
             switch self {
@@ -26,6 +38,7 @@ struct BlueskyList: Identifiable, Hashable, Codable {
             }
         }
 
+        /// SF Symbol name used to visually represent this list kind.
         var symbolName: String {
             switch self {
             case .moderation:
@@ -37,6 +50,7 @@ struct BlueskyList: Identifiable, Hashable, Codable {
             }
         }
 
+        /// The AT Protocol lexicon purpose identifier for this list kind.
         var purposeIdentifier: String {
             switch self {
             case .moderation:
@@ -49,13 +63,24 @@ struct BlueskyList: Identifiable, Hashable, Codable {
         }
     }
 
+    // MARK: - Properties
+
+    /// The AT URI of this list (e.g., `at://did:plc:.../app.bsky.graph.list/...`).
     let id: String
+    /// The display name of this list.
     var name: String
+    /// The description of this list.
     var description: String
+    /// The number of members in this list, if available.
     let memberCount: Int?
+    /// The classification of this list (moderation, internal, regular).
     let kind: Kind
+    /// The URL to the list's avatar image.
     var avatarURL: URL? = nil
+    /// The content hash (CID) for this list record, if available.
     let cid: String?
+
+    // MARK: - Init
 
     init(
         id: String,
@@ -74,6 +99,8 @@ struct BlueskyList: Identifiable, Hashable, Codable {
         self.avatarURL = avatarURL
         self.cid = cid
     }
+
+    // MARK: - Codable
 
     enum CodingKeys: String, CodingKey {
         case id, name, description, memberCount, kind, avatarURL, cid

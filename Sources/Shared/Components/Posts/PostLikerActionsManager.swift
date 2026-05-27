@@ -1,5 +1,11 @@
 import SwiftUI
 
+/// Manages the lifecycle of bulk liker actions: fetching all likers of a post,
+/// confirming block-all-likers, adding likers to moderation/internal/regular lists,
+/// classifying a post, and submitting reports.
+///
+/// This is an `ObservableObject` meant to be owned at the timeline/feed level
+/// and shared across all post rows via `PostLikerActionsViewModifier`.
 @MainActor
 class PostLikerActionsManager: ObservableObject {
     @Published var availableTargetLists: [BlueskyList] = []
@@ -14,6 +20,7 @@ class PostLikerActionsManager: ObservableObject {
     @Published var reportEvidence = ""
     @Published var isSubmittingReport = false
 
+    /// Fetch the user's moderation, internal, and regular lists as potential targets for "add likers".
     func loadAvailableTargetLists(using blueskyClient: LiveBlueskyClient, internalListStore: InternalListStore? = nil, account: AppAccount, appPassword: String) async {
         var lists: [BlueskyList] = []
         do {
@@ -42,6 +49,8 @@ class PostLikerActionsManager: ObservableObject {
         }
     }
 
+    /// Begin the "block all likers" flow: fetch likers, build pending targets,
+    /// then set `showBlockLikersConfirmation` to present the confirmation alert.
     func handleBlockAllLikers(postURI: String, using blueskyClient: LiveBlueskyClient, fetchAccount: AppAccount, fetchPassword: String) {
         Task {
             guard let targets = await fetchLikerTargets(for: postURI, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword) else { return }
@@ -50,6 +59,8 @@ class PostLikerActionsManager: ObservableObject {
         }
     }
 
+    /// Begin the "add all likers to list" flow: fetch likers, then either add to internal list
+    /// directly or set `batchOperationConfig` for external list addition.
     func handleAddAllLikersToList(postURI: String, list: BlueskyList, using blueskyClient: LiveBlueskyClient, fetchAccount: AppAccount, fetchPassword: String, activeAccount: AppAccount, activePassword: String, internalListStore: InternalListStore? = nil) {
         if list.kind == .internal, let internalListStore {
             Task {
@@ -70,6 +81,7 @@ class PostLikerActionsManager: ObservableObject {
         }
     }
 
+    /// Called from the confirmation alert — commits the pending block operation.
     func confirmBlockLikers(activeAccount: AppAccount, activePassword: String) {
         guard !pendingLikerTargets.isEmpty else { return }
         let targets = pendingLikerTargets
@@ -80,11 +92,13 @@ class PostLikerActionsManager: ObservableObject {
         )
     }
 
+    /// Clear the pending liker targets and dismiss the confirmation alert.
     func resetPendingLikerTargets() {
         pendingLikerTargets = []
         showBlockLikersConfirmation = false
     }
 
+    /// Build a `SupportEmailDraft` for reporting the given post via email.
     func makeReportDraft(for entry: RichFeedEntry) -> SupportEmailDraft {
         let author = entry.post.author
         let handle = author?.handle ?? "unknown"
@@ -107,6 +121,7 @@ class PostLikerActionsManager: ObservableObject {
         )
     }
 
+    /// Submit a post report via the Bluesky API.
     func submitPostReport(using blueskyClient: LiveBlueskyClient, account: AppAccount, appPassword: String) async {
         guard let entry = postToReport, let cid = entry.post.cid else { return }
         isSubmittingReport = true
@@ -128,11 +143,15 @@ class PostLikerActionsManager: ObservableObject {
         isSubmittingReport = false
     }
 
+    // MARK: - Private Helpers
+
+    /// Strip `"internal:"` prefix from composite ID to get a bare UUID.
     private func internalListID(from compositeID: String) -> UUID {
         let stripped = compositeID.replacingOccurrences(of: "internal:", with: "")
         return UUID(uuidString: stripped) ?? UUID()
     }
 
+    /// Fetch all likers for a post (paginated) and return deduplicated `PendingLikerTarget` objects.
     private func fetchLikerTargets(for postURI: String, using blueskyClient: LiveBlueskyClient, fetchAccount: AppAccount, fetchPassword: String) async -> [PendingLikerTarget]? {
         isFetchingLikers = true
         resetPendingLikerTargets()
@@ -158,6 +177,7 @@ class PostLikerActionsManager: ObservableObject {
         }
     }
 
+    /// Deduplicate likers by DID.
     private func collectPendingLikerTargets(from likes: [LikeItem]) -> [PendingLikerTarget] {
         var seenDIDs = Set<String>()
         return likes.compactMap { like in

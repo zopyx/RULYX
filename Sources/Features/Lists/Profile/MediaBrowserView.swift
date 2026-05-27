@@ -1,6 +1,9 @@
 import AVKit
 import SwiftUI
 
+/// Browser for all media (images and videos) posted by a given user.
+/// Supports scanning, filtering by image/video, multi-select, and batch
+/// download to a user-chosen folder.
 struct MediaBrowserView: View {
     let did: String
     let handle: String
@@ -9,9 +12,9 @@ struct MediaBrowserView: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @Environment(\.dismiss) private var dismiss
-    @State private var isShowingFolderPicker = false
+    @State private var isShowingFolderPicker = false // Folder picker for download destination
     @State private var selectedDownloadFolder: URL?
-    @State private var previewItem: MediaItem?
+    @State private var previewItem: MediaItem? // Full-screen preview item
     @State private var initialLoadTask: Task<Void, Never>?
     @State private var searchAccount: AppAccount?
     @State private var loadMoreTask: Task<Void, Never>?
@@ -24,6 +27,9 @@ struct MediaBrowserView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -218,6 +224,8 @@ struct MediaBrowserView: View {
         }
     }
 
+    // MARK: - Toolbar
+
     private var toolbar: some View {
         HStack(spacing: 12) {
             if !viewModel.items.isEmpty {
@@ -257,6 +265,8 @@ struct MediaBrowserView: View {
         .padding(.vertical, 8)
         .background(.ultraThinMaterial)
     }
+
+    // MARK: - Thumbnails
 
     @ViewBuilder
     private func mediaThumbnail(_ item: MediaItem) -> some View {
@@ -321,6 +331,8 @@ struct MediaBrowserView: View {
         }
     }
 
+    // MARK: - Helpers
+
     private func filterLabel(_ f: MediaFilter, count: Int) -> String {
         "\(f.label) (\(count))"
     }
@@ -328,6 +340,8 @@ struct MediaBrowserView: View {
     private func ageText(for item: MediaItem) -> String? {
         item.ageText
     }
+
+    // MARK: - Data loading
 
     private func resolveSearchAccount() {
         if let prefID = accountStore.preferredSearchAccountID,

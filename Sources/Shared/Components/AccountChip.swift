@@ -1,9 +1,19 @@
 import SwiftUI
 
+// MARK: - AccountChip
+
+/// A compact, tappable chip showing the active account's avatar and display name
+/// with a chevron-down indicator. Used in toolbar/header areas to indicate the
+/// currently active account and to trigger account switching.
+/// Adapts to iOS 26 glass effect when available, falls back to thin material.
 struct AccountChip: View {
+    /// The account to display.
     let account: AppAccount
+    /// Optional URL for the account's avatar image.
     let avatarURL: URL?
     @ScaledMetric(relativeTo: .caption) private var avatarSize = 22.0
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 8) {
@@ -28,6 +38,8 @@ struct AccountChip: View {
             }
         }
     }
+
+    // MARK: - Private Helpers
 
     @ViewBuilder
     private var avatarView: some View {

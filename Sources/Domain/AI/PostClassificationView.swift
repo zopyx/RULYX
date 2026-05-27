@@ -1,17 +1,28 @@
 import SwiftUI
 
+/// A sheet view that lets the user run AI classification or generation on a
+/// specific feed post using any downloaded on-device model.
 struct PostClassificationView: View {
+    /// The feed entry whose post will be analyzed.
     let entry: RichFeedEntry
     @EnvironmentObject private var aiService: LiveAIService
     @EnvironmentObject private var localizationManager: LocalizationManager
+    /// The list of available models from the service catalog.
     @State private var catalogModels: [ModelBundle] = []
+    /// The set of model IDs the user has selected for classification.
     @State private var selectedModelIDs: Set<String> = []
+    /// Results keyed by model ID.
     @State private var results: [String: AIResult] = [:]
+    /// Whether classification is currently running.
     @State private var isRunning = false
 
+    /// Represents the result of running a model on the post.
     enum AIResult {
+        /// Classification scores from a text classifier model.
         case classification([String: Double])
+        /// Generated text from a text generator model.
         case generation(String)
+        /// Error message from a failed run.
         case failed(String)
     }
 
@@ -109,20 +120,25 @@ struct PostClassificationView: View {
         }
     }
 
+    /// The display name or handle of the post author.
     private var authorDisplay: String {
         let author = entry.post.author
         return author?.displayName ?? author?.handle ?? "—"
     }
 
+    /// The text content of the post being classified.
     private var postText: String {
         entry.post.safeRecord.text ?? ""
     }
 
+    /// Loads the model catalog from the AI service.
     private func loadModels() async {
         try? await aiService.refreshCatalog()
         catalogModels = await aiService.catalog
     }
 
+    /// Toggles selection of a model for classification. Only ready models
+    /// can be selected.
     private func toggleSelection(_ id: String) {
         let state = aiService.downloadStates[id] ?? .notDownloaded
         guard state == .ready else { return }
@@ -133,6 +149,8 @@ struct PostClassificationView: View {
         }
     }
 
+    /// Runs classification or generation on the post using all selected
+    /// models sequentially, collecting results.
     private func runClassification() {
         isRunning = true
         results = [:]
@@ -160,12 +178,18 @@ struct PostClassificationView: View {
     }
 }
 
-// MARK: - Model Selection Row
+// MARK: - ModelSelectionRow
 
+/// A row displaying a model's name, role, download state, and a selection
+/// checkbox. Only models in the ``.ready`` state are interactive.
 private struct ModelSelectionRow: View {
+    /// The model bundle to display.
     let model: ModelBundle
+    /// The current download state of the model.
     let state: ModelDownloadState
+    /// Whether the model is currently selected for classification.
     let isSelected: Bool
+    /// Closure invoked when the row is tapped.
     let onTap: () -> Void
 
     var body: some View {
@@ -207,6 +231,7 @@ private struct ModelSelectionRow: View {
         .disabled(state != .ready)
     }
 
+    /// Localized label for the model's role.
     private var roleLabel: String {
         switch model.role {
         case .textClassifier: loc("ai.models.role.classifier")
@@ -214,6 +239,7 @@ private struct ModelSelectionRow: View {
         }
     }
 
+    /// Localized label for the model's download state.
     private var stateLabel: String {
         switch state {
         case .notDownloaded: loc("ai.models.not_downloaded_label")
@@ -224,8 +250,10 @@ private struct ModelSelectionRow: View {
     }
 }
 
-// MARK: - Result Card
+// MARK: - ResultCard
 
+/// Displays the output of a single AI model run, showing classification
+/// scores as progress bars, generated text, or an error message.
 private struct ResultCard: View {
     let modelName: String
     let result: PostClassificationView.AIResult

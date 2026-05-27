@@ -1,10 +1,14 @@
 import Charts
 import SwiftUI
 
+/// Dashboard view showing moderation activity stats — operations by type,
+/// recent operation log, and top moderated accounts.
 struct DashboardView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         List {
@@ -67,11 +71,15 @@ struct DashboardView: View {
         .navigationTitle("dashboard.title")
     }
 
+    // MARK: - Computed properties
+
+    /// Aggregated operation counts keyed by title, sorted descending.
     private var operationCounts: [(String, Int)] {
         let grouped = Dictionary(grouping: workspaceStore.operationLog, by: \.title)
         return grouped.map { ($0.key, $0.value.count) }.sorted { $0.1 > $1.1 }
     }
 
+    /// Returns the most-frequently moderated handles, sorted by count descending.
     private func topModeratedAccounts() -> [(String, Int)] {
         var counts: [String: Int] = [:]
         for entry in workspaceStore.operationLog {

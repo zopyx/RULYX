@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// A sheet view that displays available AI models, their download states,
+/// and allows the user to download or delete models.
 struct AIModelManagementView: View {
     @EnvironmentObject private var aiService: LiveAIService
     @EnvironmentObject private var localizationManager: LocalizationManager

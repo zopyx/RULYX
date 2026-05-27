@@ -3,6 +3,7 @@ import Foundation
 // MARK: - Search, add/remove single actor, and membership filtering
 
 extension ListDetailViewModel {
+    /// Summary string describing the current search results count.
     var searchResultSummary: String {
         if hasMoreSearchResults {
             return "Showing \(searchResults.count) matches so far."
@@ -11,6 +12,9 @@ extension ListDetailViewModel {
         return "\(searchResults.count) matching account\(searchResults.count == 1 ? "" : "s")."
     }
 
+    /// Searches for actors to add to the list. Minimum 2-character query.
+    /// Filters out actors already in the member list.
+    /// - Stale-query guard: if `lastSearchQuery` changes during the request, the result is discarded.
     func search(
         query: String,
         account: AppAccount,
@@ -59,6 +63,7 @@ extension ListDetailViewModel {
         isSearching = false
     }
 
+    /// Loads the next page of search results.
     func loadMoreSearchResults(
         account: AppAccount,
         appPassword: String,
@@ -97,6 +102,7 @@ extension ListDetailViewModel {
         }
     }
 
+    /// Adds a single actor to the list and updates local state.
     func add(
         actor: BlueskyActor,
         to list: BlueskyList,
@@ -124,6 +130,7 @@ extension ListDetailViewModel {
         }
     }
 
+    /// Removes a single member from the list and updates local state.
     func remove(
         member: BlueskyListMember,
         account: AppAccount,
@@ -147,14 +154,17 @@ extension ListDetailViewModel {
         }
     }
 
+    /// True if a given actor is currently being added (optimistic state).
     func isAdding(_ actor: BlueskyActor) -> Bool {
         batchProgressState.isAdding(actor)
     }
 
+    /// True if a given member is currently being removed (optimistic state).
     func isRemoving(_ member: BlueskyListMember) -> Bool {
         batchProgressState.isRemoving(member)
     }
 
+    /// Filters out actors who are already members of the list, and deduplicates by DID.
     func filteredSearchResults(_ actors: [BlueskyActor]) -> [BlueskyActor] {
         let existing = Set(members.map(\.actor.did))
         var deduplicated: [BlueskyActor] = []
@@ -169,6 +179,7 @@ extension ListDetailViewModel {
         return deduplicated
     }
 
+    /// Re-filters the current search results after members change.
     func refreshSearchMembershipFilter() {
         searchResults = filteredSearchResults(searchResults)
         selectedSearchActorIDs = selectedSearchActorIDs.intersection(Set(searchResults.map(\.id)))

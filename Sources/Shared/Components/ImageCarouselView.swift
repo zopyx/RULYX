@@ -1,19 +1,36 @@
 import SwiftUI
 
+// MARK: - ImagePreviewCollection
+
+/// Identifiable wrapper for presenting a full-screen image carousel with a specific starting index.
 struct ImagePreviewCollection: Identifiable {
     let id = UUID()
+    /// URLs of images to display.
     let urls: [URL]
+    /// The index to start from.
     let initialIndex: Int
 }
 
+// MARK: - ImageCarouselView
+
+/// Full-screen image carousel with pinch-to-zoom, swipe-to-dismiss, and page indicators.
+/// Uses a `TabView` with page style for horizontal swiping between images.
+/// Each image is wrapped in `ZoomableImageView` for pinch-zoom and double-tap-to-zoom.
+///
+/// Drag down to dismiss with a parallax shrink effect.
 struct ImageCarouselView: View {
+    /// URLs of images to display.
     let urls: [URL]
+    /// The initial image index.
     let initialIndex: Int
+    /// Closure called when the carousel should be dismissed.
     let onDismiss: () -> Void
 
     @State private var currentIndex: Int
     @State private var dragOffset: CGSize = .zero
     @State private var isDragging = false
+
+    // MARK: - Init
 
     init(urls: [URL], initialIndex: Int, onDismiss: @escaping () -> Void) {
         self.urls = urls
@@ -22,12 +39,14 @@ struct ImageCarouselView: View {
         _currentIndex = State(initialValue: initialIndex)
     }
 
+    /// Progress of the dismiss drag gesture (0…1), used for opacity and scale.
     private var dragProgress: CGFloat {
         min(1, abs(dragOffset.height) / 200)
     }
 
     var body: some View {
         ZStack {
+            // Dimming background that lightens as user drags down
             Color.black.opacity(1 - dragProgress * 0.4)
                 .ignoresSafeArea()
 
@@ -41,6 +60,7 @@ struct ImageCarouselView: View {
             .offset(y: dragOffset.height)
             .scaleEffect(max(0.85, 1 - dragProgress * 0.15), anchor: .center)
 
+            // Top bar: page counter (if >1) + close button
             VStack {
                 HStack {
                     if urls.count > 1 {
@@ -70,6 +90,7 @@ struct ImageCarouselView: View {
         .gesture(
             DragGesture()
                 .onChanged { value in
+                    // Only respond to vertical drags (width < 50% of height)
                     if abs(value.translation.width) < abs(value.translation.height) * 0.5 {
                         isDragging = true
                         dragOffset = value.translation
@@ -78,6 +99,7 @@ struct ImageCarouselView: View {
                 .onEnded { value in
                     guard isDragging else { return }
                     isDragging = false
+                    // Dismiss if dragged far enough or flick velocity is high
                     if abs(value.translation.height) > 120 || abs(value.predictedEndTranslation.height - value.translation.height) > 400 {
                         withAnimation(.easeOut(duration: 0.2)) {
                             dragOffset = CGSize(width: 0, height: value.translation.height > 0 ? 600 : -600)
@@ -91,7 +113,11 @@ struct ImageCarouselView: View {
     }
 }
 
+// MARK: - ZoomableImageView
+
+/// A zoomable image view with pinch-to-zoom, double-tap-to-toggle, and pan when zoomed.
 struct ZoomableImageView: View {
+    /// The URL of the image to display.
     let url: URL
 
     @State private var scale: CGFloat = 1
@@ -99,6 +125,9 @@ struct ZoomableImageView: View {
     @State private var lastScale: CGFloat = 1
     @State private var lastOffset: CGSize = .zero
 
+    // MARK: - Pan Gesture (active only when zoomed in)
+
+    /// Drag gesture that pans the image when zoomed beyond 1x.
     private var panGesture: some Gesture {
         DragGesture()
             .onChanged { value in
@@ -111,6 +140,8 @@ struct ZoomableImageView: View {
                 lastOffset = offset
             }
     }
+
+    // MARK: - Body
 
     var body: some View {
         AsyncImage(url: url) { image in
@@ -142,6 +173,7 @@ struct ZoomableImageView: View {
                     }
                 }
                 .overlay {
+                    // Enable pan gesture only when zoomed in
                     if scale > 1 {
                         Color.clear
                             .contentShape(Rectangle())

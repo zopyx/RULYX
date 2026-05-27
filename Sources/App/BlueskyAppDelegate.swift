@@ -1,6 +1,12 @@
 import UIKit
 import UserNotifications
 
+// MARK: - BlueskyAppDelegate
+
+/// The UIKit application delegate responsible for push notification
+/// registration and routing. Posts system notifications to a shared
+/// `NotificationCenter` so that `PushNotificationCoordinator` can
+/// respond to token updates and incoming payloads.
 final class BlueskyAppDelegate: NSObject, UIApplicationDelegate, @preconcurrency UNUserNotificationCenterDelegate {
     func application(
         _: UIApplication,

@@ -2,12 +2,14 @@ import Foundation
 
 // MARK: - Protocol Seams
 
+/// Protocol for dependency injection of account-related services.
 @MainActor
 protocol AccountServicing: AnyObject {
     var accountStore: AccountStore { get }
     var localizationManager: LocalizationManager { get }
 }
 
+/// Protocol for dependency injection of moderation-related services.
 @MainActor
 protocol ModerationServicing: AnyObject {
     var blueskyClient: LiveBlueskyClient { get }
@@ -16,11 +18,13 @@ protocol ModerationServicing: AnyObject {
     var analyticsStore: AnalyticsStore { get }
 }
 
+/// Protocol for dependency injection of AI-related services.
 @MainActor
 protocol AIServicing: AnyObject {
     var aiService: LiveAIService { get }
 }
 
+/// Protocol for dependency injection of chat and push notification services.
 @MainActor
 protocol ChatServicesProtocol: AnyObject {
     var chatStore: ChatStore { get }
@@ -29,6 +33,13 @@ protocol ChatServicesProtocol: AnyObject {
 
 // MARK: - Wiring
 
+/// Root dependency container. Creates and holds all singleton services and stores
+/// used throughout the app. Injected into the SwiftUI environment via `@EnvironmentObject`.
+///
+/// Initialization branches on launch arguments:
+/// - `--uitesting`: Skips onboarding and sets English language for UI tests.
+/// - `--test-account`: Uses `LiveBlueskyClient` + real `AccountStore` for screenshot tests.
+/// - Default (no flags): Normal app launch with live services.
 @MainActor
 final class AppDependencies: ObservableObject {
     let accountStore: AccountStore
@@ -43,6 +54,8 @@ final class AppDependencies: ObservableObject {
     let clearskyHeartbeat: ClearskyHeartbeatService
     let internalListStore: InternalListStore
     let aiService: LiveAIService
+
+    // MARK: - Init
 
     init() {
         let isUITesting = CommandLine.arguments.contains("--uitesting")

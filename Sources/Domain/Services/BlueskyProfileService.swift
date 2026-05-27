@@ -1,17 +1,27 @@
 import Foundation
 
+// MARK: - BlueskyProfileService
+
+/// The production implementation of `BlueskyProfileInspecting` that provides
+/// profile search, inspection, follower/following management, and social
+/// actions (block, mute, follow, report) via the AT Protocol.
 @MainActor
 final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
+    /// Executes raw HTTP requests against the Bluesky API.
     private let requestExecutor: BlueskyRequestExecuting
+    /// Manages authentication sessions for request signing.
     private let sessionService: BlueskySessionServicing
+    /// HTTP client used for direct requests (e.g., moderation reports).
     private let httpClient: HTTPClient
 
+    /// Creates the service with its required dependencies.
     init(requestExecutor: BlueskyRequestExecuting, sessionService: BlueskySessionServicing, httpClient: HTTPClient = HTTPClient()) {
         self.requestExecutor = requestExecutor
         self.sessionService = sessionService
         self.httpClient = httpClient
     }
 
+    /// Searches for actors by handle or display name (single page only).
     func searchActors(
         query: String,
         account: AppAccount,
@@ -26,6 +36,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         return page.actors
     }
 
+    /// Searches for actors with pagination support.
     func searchActorsPage(
         query: String,
         cursor: String?,
@@ -71,6 +82,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         )
     }
 
+    /// Fetches all followers of a given actor (auto-paginated, up to 50 pages).
     func fetchFollowers(
         actor actorDID: String,
         account: AppAccount,
@@ -90,6 +102,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         return all
     }
 
+    /// Fetches a single page of followers.
     func fetchFollowersPage(
         actor actorDID: String,
         cursor: String?,
@@ -129,6 +142,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         )
     }
 
+    /// Fetches the full profile (including viewer state) for a given actor DID.
     func fetchProfile(
         did actorDID: String,
         account: AppAccount,
@@ -170,6 +184,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         )
     }
 
+    /// Performs a full profile inspection including profile data, list
+    /// memberships, and starter pack memberships in a single request batch.
     func inspectProfile(
         query: String,
         account: AppAccount,
@@ -259,6 +275,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         )
     }
 
+    /// Fetches all accounts that a given actor follows (auto-paginated, up to 50 pages).
     func fetchFollowing(
         actor actorDID: String,
         account: AppAccount,
@@ -278,6 +295,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         return all
     }
 
+    /// Fetches a single page of accounts followed by the given actor.
     func fetchFollowingPage(
         actor actorDID: String,
         cursor: String?,
@@ -311,6 +329,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         )
     }
 
+    /// Blocks the specified actor using the current active account.
     func blockActor(
         did actorDID: String,
         account: AppAccount,
@@ -339,6 +358,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// Unblocks an actor by deleting the block record.
     func unblockActor(
         recordURI: String,
         account: AppAccount,
@@ -366,6 +386,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// Follows the specified actor.
     func followActor(
         did actorDID: String,
         account: AppAccount,
@@ -394,6 +415,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// Unfollows an actor by deleting the follow record.
     func unfollowActor(
         recordURI: String,
         account: AppAccount,
@@ -421,6 +443,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// Mutes the specified actor so their posts are hidden from feeds.
     func muteActor(
         did actorDID: String,
         account: AppAccount,
@@ -442,6 +465,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// Unmutes the specified actor.
     func unmuteActor(
         did actorDID: String,
         account: AppAccount,
@@ -463,8 +487,11 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// DID of the Bluesky labeler service used for moderation reporting.
     private static let bskyLabelerDID = "did:plc:ar7c4by46qjdydhdevvrndac"
 
+    /// Reports an account to the Bluesky moderation service with a specific
+    /// reason type string, using the AT Protocol proxy header for labeler routing.
     func reportAccount(did targetDID: String, reasonType: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
         let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -498,6 +525,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    /// Reports an account to the Bluesky moderation service with a free-form reason.
     func reportAccount(did targetDID: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
         try await reportAccount(
             did: targetDID,
@@ -508,6 +536,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         )
     }
 
+    /// Reports an account with a specific `ModerationReportReasonType`.
     func reportAccount(
         did targetDID: String,
         selectedReason: ModerationReportReasonType?,

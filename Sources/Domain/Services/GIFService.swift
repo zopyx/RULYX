@@ -1,11 +1,18 @@
 import Foundation
 
+/// A single GIF search result with direct media URLs and dimensions.
 struct GIFResult: Identifiable, Hashable {
+    /// Unique identifier for the GIF.
     let id: String
+    /// URL of the MP4 video version.
     let mp4URL: String
+    /// URL of the static preview image.
     let previewURL: String
+    /// Width in pixels.
     let width: Int
+    /// Height in pixels.
     let height: Int
+    /// Title or alt text.
     let title: String
 
     func hash(into hasher: inout Hasher) {
@@ -17,6 +24,7 @@ struct GIFResult: Identifiable, Hashable {
     }
 }
 
+/// Errors related to GIF loading via the Klipy API.
 enum GIFError: LocalizedError {
     case missingAPIKey
     case networkError(String)
@@ -31,23 +39,36 @@ enum GIFError: LocalizedError {
     }
 }
 
+/// Singleton service for searching and downloading GIFs via the Klipy API.
+/// Manages API key storage in the Keychain with automatic migration from
+/// deprecated UserDefaults storage.
 final class GIFService: Sendable {
+    /// Shared singleton instance.
     static let shared = GIFService()
 
+    /// HTTP client for API requests.
     private let httpClient = HTTPClient()
+    /// Base URL of the Klipy API.
     private let baseURL = "https://api.klipy.com/api/v1"
+    /// Number of results per page.
     private let perPage = 24
+    /// Keychain service for API key storage.
     private let keychain: KeychainServicing
 
+    /// Keychain service name for the Klipy API key.
     private let keychainService = "com.ajung.RULYX.klipy"
+    /// Keychain account name for the Klipy API key.
     private let keychainAccount = "apiKey"
 
+    /// Creates the service, seeds the API key if needed, and migrates from
+    /// UserDefaults if a legacy key exists.
     init(keychain: KeychainServicing = KeychainService()) {
         self.keychain = keychain
         seedKeyIfNeeded()
         migrateFromUserDefaults()
     }
 
+    /// Seeds the default API key into the Keychain if none exists yet.
     private func seedKeyIfNeeded() {
         guard (try? keychain.read(service: keychainService, account: keychainAccount)) == nil else { return }
         try? keychain.save("W3FgVTePIgmlS4FEj8oF2xbMzXgwx3QGPX3pYEmrQZIvH4eRB0sin6PKqzun4f6R", service: keychainService, account: keychainAccount)
@@ -65,6 +86,7 @@ final class GIFService: Sendable {
         }
     }
 
+    /// Searches for GIFs matching the given query.
     func search(query: String) async throws -> [GIFResult] {
         guard let apiKey else { throw GIFError.missingAPIKey }
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
@@ -74,6 +96,7 @@ final class GIFService: Sendable {
         return decoded.data.data.map { $0.toGIFResult() }
     }
 
+    /// Fetches currently trending GIFs.
     func trending() async throws -> [GIFResult] {
         guard let apiKey else { throw GIFError.missingAPIKey }
         let url = URL(string: "\(baseURL)/\(apiKey)/gifs/trending?per_page=\(perPage)&format_filter=mp4,gif")!
@@ -82,6 +105,7 @@ final class GIFService: Sendable {
         return decoded.data.data.map { $0.toGIFResult() }
     }
 
+    /// Downloads a GIF's raw data from its URL.
     func downloadGIF(url: String) async throws -> Data {
         guard let url = URL(string: url) else { throw GIFError.networkError("Invalid URL") }
         let (data, _) = try await httpClient.data(from: url, source: "GIF Download")

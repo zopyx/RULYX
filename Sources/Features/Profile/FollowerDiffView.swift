@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - FollowerDiffView
+
 struct FollowerDiffView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
@@ -8,6 +10,8 @@ struct FollowerDiffView: View {
     @State private var previousFollowers: [BlueskyActor] = []
     @State private var isLoading = false
     @State private var statusMessage: String?
+
+    // MARK: - Computed properties
 
     private var newFollowers: [BlueskyActor] {
         let prev = Set(previousFollowers.map(\.did))
@@ -18,6 +22,8 @@ struct FollowerDiffView: View {
         let curr = Set(followers.map(\.did))
         return previousFollowers.filter { !curr.contains($0.did) }
     }
+
+    // MARK: - Body
 
     var body: some View {
         List {
@@ -69,6 +75,7 @@ struct FollowerDiffView: View {
         .task { await load() }
     }
 
+    /// Fetches followers, saves as new baseline, and computes diff from cached data.
     private func load() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }

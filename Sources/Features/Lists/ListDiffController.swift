@@ -1,7 +1,12 @@
 import Foundation
 
+// MARK: - ListDiffController
+
+/// Computes differences (overlap, only-in-current, only-in-other) between
+/// two lists and provides selection/export helpers.
 @MainActor
 final class ListDiffController {
+    /// Fetches the other list's members and produces a three-way comparison.
     func compare(
         currentMembers: [BlueskyListMember],
         otherList: BlueskyList,
@@ -40,6 +45,7 @@ final class ListDiffController {
         )
     }
 
+    /// Returns the members in a given comparison bucket.
     nonisolated func comparisonMembers(for bucket: ComparisonBucket, in report: ListComparisonReport) -> [BlueskyListMember] {
         switch bucket {
         case .overlap:
@@ -51,6 +57,7 @@ final class ListDiffController {
         }
     }
 
+    /// Filters comparison members to only those whose DID is in the selected set.
     nonisolated func selectedComparisonMembers(
         selectedDIDs: Set<String>,
         in report: ListComparisonReport
@@ -63,10 +70,12 @@ final class ListDiffController {
         }
     }
 
+    /// Returns all DIDs that belong to the given comparison bucket.
     nonisolated func selectComparisonBucket(_ bucket: ComparisonBucket, in report: ListComparisonReport) -> Set<String> {
         Set(comparisonMembers(for: bucket, in: report).map(\.actor.did))
     }
 
+    /// Generates CSV rows with bucket, handle, DID, and display name for the diff report.
     nonisolated func exportDiffRows(from report: ListComparisonReport) -> [String] {
         let sections: [(ComparisonBucket, [BlueskyListMember])] = [
             (.overlap, report.overlap),

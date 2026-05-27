@@ -2,9 +2,16 @@ import MessageUI
 import PhotosUI
 import SwiftUI
 
+// MARK: - LoadingPanel
+
+/// A full-width loading indicator with a message and progress spinner.
+/// Used to fill content areas while data is being fetched.
 struct LoadingPanel: View {
+    /// The localized message shown alongside the spinner.
     let message: String
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 12) {
@@ -20,14 +27,24 @@ struct LoadingPanel: View {
     }
 }
 
+// MARK: - EmptyStatePanel
+
+/// A centered empty-state placeholder with a tray icon, title, and optional message.
+/// Used when a list or section has no content.
 struct EmptyStatePanel: View {
+    /// The primary title text.
     let title: String
+    /// An optional descriptive message shown below the title.
     let message: String
+
+    // MARK: - Init
 
     init(title: String, message: String = "") {
         self.title = title
         self.message = message
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 8) {
@@ -49,9 +66,17 @@ struct EmptyStatePanel: View {
     }
 }
 
+// MARK: - ErrorRetryBanner
+
+/// A card-style banner showing an error message with a retry button.
+/// Uses warning icon and orange accent color.
 struct ErrorRetryBanner: View {
+    /// The error message to display.
     let message: String
+    /// Closure invoked when the retry button is tapped.
     let retry: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 12) {
@@ -78,12 +103,23 @@ struct ErrorRetryBanner: View {
     }
 }
 
+// MARK: - BatchProgressCard
+
+/// A progress card for batch operations (add, block, mute) showing completion ratio,
+/// current handle being processed, and an optional cancel button.
 struct BatchProgressCard: View {
+    /// Title of the batch operation.
     let title: String
+    /// Number of items processed so far.
     let completedCount: Int
+    /// Total number of items to process.
     let totalCount: Int
+    /// Handle of the item currently being processed, if any.
     let currentHandle: String?
+    /// Optional cancel button action. When nil, the cancel button is hidden.
     let onCancel: (() -> Void)?
+
+    // MARK: - Init
 
     init(
         title: String,
@@ -98,6 +134,8 @@ struct BatchProgressCard: View {
         self.currentHandle = currentHandle
         self.onCancel = onCancel
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -130,13 +168,32 @@ struct BatchProgressCard: View {
     }
 }
 
+// MARK: - StatusChip
+
+/// A small capsule-shaped badge indicating a status.
+/// Supports neutral, positive, warning, destructive, and info styles.
+/// Uses iOS 26 glass effect when available, falling back to solid background.
 struct StatusChip: View {
+    /// Visual style options for the chip.
     enum Style {
-        case neutral, positive, warning, destructive, info
+        /// Default gray appearance.
+        case neutral
+        /// Green for success states.
+        case positive
+        /// Orange for warning states.
+        case warning
+        /// Red for destructive/error states.
+        case destructive
+        /// Blue for informational states.
+        case info
     }
 
+    /// The text displayed inside the chip.
     let text: String
+    /// The visual style determining color.
     let style: Style
+
+    // MARK: - Body
 
     var body: some View {
         Text(text)
@@ -152,6 +209,8 @@ struct StatusChip: View {
                 }
             }
     }
+
+    // MARK: - Private Helpers
 
     private var foregroundColor: Color {
         switch style {
@@ -184,11 +243,20 @@ struct StatusChip: View {
     }
 }
 
+// MARK: - OnboardingRow
+
+/// A row with icon, title, and description, used in onboarding or feature-intro screens.
 struct OnboardingRow: View {
+    /// SF Symbol name for the icon.
     let icon: String
+    /// Tint color for the icon.
     let color: Color
+    /// The row's title text.
     let title: String
+    /// Descriptive text below the title.
     let description: String
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 14) {
@@ -208,9 +276,17 @@ struct OnboardingRow: View {
     }
 }
 
+// MARK: - HelpInfoButton
+
+/// A plain info-circle button that triggers the given action.
+/// Placed next to section headers to show explanatory content.
 struct HelpInfoButton: View {
+    /// Action to perform when tapped.
     let action: () -> Void
+    /// Accessibility label for the button.
     let accessibilityLabel: String
+
+    // MARK: - Body
 
     var body: some View {
         Button(action: action) {
@@ -224,13 +300,22 @@ struct HelpInfoButton: View {
     }
 }
 
+// MARK: - ToolbarCloseButton
+
+/// Standard dismiss/close button using `xmark.circle.fill`.
+/// Uses `@Environment(\.dismiss)` by default or a custom action when provided.
 struct ToolbarCloseButton: View {
     @Environment(\.dismiss) private var dismiss
+    /// Optional custom action. When nil, uses the environment dismiss.
     let action: (() -> Void)?
+
+    // MARK: - Init
 
     init(action: (() -> Void)? = nil) {
         self.action = action
     }
+
+    // MARK: - Body
 
     var body: some View {
         Button {
@@ -245,13 +330,24 @@ struct ToolbarCloseButton: View {
     }
 }
 
+// MARK: - SimplifiedReportSheet
+
+/// A two-tab report sheet: "Submit" (report via API) and "Contact" (email support with attachments).
+/// Allows selecting a reason, writing evidence text, and attaching up to 5 photos.
 struct SimplifiedReportSheet: View {
+    /// Navigation title for the sheet.
     let title: String
+    /// The selected report reason.
     @Binding var selectedReason: ModerationReportReasonType
+    /// Free-form evidence text.
     @Binding var evidenceText: String
+    /// Whether a submit is in progress.
     let isSubmitting: Bool
+    /// Closure that creates the support email draft.
     let makeSupportDraft: () -> SupportEmailDraft
+    /// Dismisses the sheet without action.
     let onCancel: () -> Void
+    /// Submits the report via the API.
     let onSubmit: () -> Void
 
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
@@ -262,8 +358,11 @@ struct SimplifiedReportSheet: View {
     @State private var showContactHelp = false
     @State private var reportTab = ReportTab.submit
 
+    /// Tabs for choosing report submission method.
     private enum ReportTab: String, CaseIterable {
+        /// Submit report via the Bluesky API.
         case submit
+        /// Contact support via email.
         case contact
     }
 
@@ -338,7 +437,6 @@ struct SimplifiedReportSheet: View {
                                         .scaledToFill()
                                         .frame(width: 80, height: 80)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
-
                                         .overlay(alignment: .topTrailing) {
                                             Button {
                                                 supportImages.remove(at: index)
@@ -427,6 +525,7 @@ struct SimplifiedReportSheet: View {
         }
     }
 
+    /// Builds a help sheet with a navigation stack and close button.
     private func helpSheet(title: String, text: String) -> some View {
         NavigationStack {
             List {
@@ -447,14 +546,20 @@ struct SimplifiedReportSheet: View {
     }
 }
 
+// MARK: - SupportEmailDraft
+
+/// An identifiable wrapper for the subject, body, and optional attachments of a support email.
 struct SupportEmailDraft: Identifiable {
+    /// Email subject line.
     let subject: String
+    /// HTML email body.
     let body: String
 
     var id: String {
         subject + body
     }
 
+    /// Generate an HTML email body with an intro paragraph, a labeled field table, and optional footer.
     static func htmlBody(intro: String, fields: [(String, String)], footer: String = "") -> String {
         let fieldRows = fields.map { label, value in
             let safeValue = value
@@ -500,11 +605,18 @@ struct SupportEmailDraft: Identifiable {
     }
 }
 
+// MARK: - SupportMailComposeView
+
+/// Wraps `MFMailComposeViewController` to send support email with optional JPEG attachments.
 private struct SupportMailComposeView: UIViewControllerRepresentable {
+    /// The email draft containing subject and body.
     let draft: SupportEmailDraft
+    /// Optional images to attach as JPEGs.
     let attachmentImages: [UIImage]
 
     @Environment(\.dismiss) private var dismiss
+
+    // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
         Coordinator(dismiss: dismiss)
@@ -532,6 +644,7 @@ private struct SupportMailComposeView: UIViewControllerRepresentable {
 
     func updateUIViewController(_: MFMailComposeViewController, context _: Context) {}
 
+    /// Coordinator handling mail compose delegate callbacks.
     final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         private let dismiss: DismissAction
 
@@ -549,7 +662,10 @@ private struct SupportMailComposeView: UIViewControllerRepresentable {
     }
 }
 
+// MARK: - String Helpers
+
 extension String {
+    /// Returns `nil` if the string is empty or whitespace-only.
     var nilIfBlank: String? {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : trimmed
@@ -558,6 +674,7 @@ extension String {
 
 @MainActor
 extension ModerationReportReasonType {
+    /// Localized title for each report reason.
     var localizedTitle: String {
         switch self {
         case .harassmentTargeted:

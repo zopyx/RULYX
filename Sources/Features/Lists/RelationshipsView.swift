@@ -1,11 +1,15 @@
 import SwiftUI
 
+// MARK: - RelationshipMode
+
+/// The type of relationship list to display.
 enum RelationshipMode: String, CaseIterable {
     case followers
     case following
     case blocking
     case blockedBy
 
+    /// User-facing title for this relationship mode.
     var title: String {
         switch self {
         case .followers: "My followers"
@@ -15,11 +19,16 @@ enum RelationshipMode: String, CaseIterable {
         }
     }
 
+    /// Returns the title with a count suffix.
     func titled(_ count: Int) -> String {
         "\(title) (\(count))"
     }
 }
 
+// MARK: - RelationshipsView
+
+/// Displays a list of actors for a given relationship (followers, following,
+/// blocking, blocked by) with search, export, block, and add-to-list actions.
 struct RelationshipsView: View {
     let mode: RelationshipMode
     let initialCount: Int?
@@ -45,6 +54,7 @@ struct RelationshipsView: View {
     @State private var exportProgressFraction: Double?
     @State private var clearskyTotal: Int?
 
+    /// Filters actors by handle or display name matching the search query.
     private var filteredActors: [BlueskyActor] {
         let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !trimmed.isEmpty else { return actors }
@@ -54,6 +64,7 @@ struct RelationshipsView: View {
         }
     }
 
+    /// Localized title for the current mode, optionally including a profile handle.
     private var modeLocalized: String {
         if let handle = profileHandle {
             switch mode {
@@ -70,6 +81,8 @@ struct RelationshipsView: View {
         case .blockedBy: return String(localized: "rel.mode.blocked_by")
         }
     }
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -234,7 +247,6 @@ struct RelationshipsView: View {
                         }
                         .disabled(isExporting)
                     }
-
                 }
             }
         }
@@ -289,6 +301,9 @@ struct RelationshipsView: View {
         }
     }
 
+    // MARK: - Helpers
+
+    /// Formats a blocked date as relative (< 30 days) or abbreviated.
     private func blockedDateDisplay(_ date: Date) -> String {
         let days = Calendar.current.dateComponents([.day], from: date, to: .now).day ?? 0
         if days < 30 {
@@ -297,6 +312,7 @@ struct RelationshipsView: View {
         return date.formatted(date: .abbreviated, time: .omitted)
     }
 
+    /// Exports all actors in the requested format with profile stats.
     private func exportAll(format: ExportFormat) async {
         let sanitizedName = mode.rawValue
 
@@ -360,6 +376,7 @@ struct RelationshipsView: View {
         shareFileURL = url
     }
 
+    /// Generates CSV string with handle, DID, display name, dates, and stats.
     private func generateCSV(from actors: [BlueskyActor], stats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]) -> String {
         let header = "handle,did,display_name,created_at,followers,following,posts,description"
         let rows = actors.map { actor in
@@ -378,6 +395,7 @@ struct RelationshipsView: View {
         return ([header] + rows).joined(separator: "\n")
     }
 
+    /// Generates JSON data with handle, DID, display name, dates, and stats.
     private func generateJSON(from actors: [BlueskyActor], stats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]) -> Data {
         let objects = actors.map { actor in
             let s = stats[actor.did]
@@ -395,12 +413,14 @@ struct RelationshipsView: View {
         return (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys])) ?? Data()
     }
 
+    /// Computes a cache key from the mode and subject DID.
     private var cacheKey: String? {
         guard let accountDID = accountStore.activeAccount?.did else { return nil }
         let subject = profileDID ?? accountDID
         return "\(mode.rawValue)_\(subject)"
     }
 
+    /// Loads cached data first, then fetches fresh data from the API.
     private func load() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
@@ -428,6 +448,7 @@ struct RelationshipsView: View {
         await fetchFromAPI(account: account, appPassword: appPassword)
     }
 
+    /// Pull-to-refresh that bypasses cache.
     private func refresh() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
@@ -436,6 +457,7 @@ struct RelationshipsView: View {
         isRefreshing = false
     }
 
+    /// Fetches actors from the Bluesky/CloudSky API based on mode, then caches the result.
     private func fetchFromAPI(account: AppAccount, appPassword: String) async {
         do {
             let did = profileDID ?? account.did ?? account.handle
@@ -474,9 +496,13 @@ struct RelationshipsView: View {
     }
 }
 
+// MARK: - ExportFormat
+
 private enum ExportFormat: String, CaseIterable {
     case csv, json, xlsx, ods
 }
+
+// MARK: - ShareSheet
 
 private struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
@@ -488,6 +514,9 @@ private struct ShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_: UIActivityViewController, context _: Context) {}
 }
 
+// MARK: - ListPickerSheet
+
+/// Sheet for picking a list to add an actor to.
 struct ListPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     let actor: BlueskyActor

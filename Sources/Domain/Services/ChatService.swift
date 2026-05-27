@@ -1,12 +1,21 @@
 import Foundation
 
+/// The AT Protocol proxy header value used to route chat requests through
+/// the Bluesky Chat service endpoint.
 private let chatProxyHeader = "did:web:api.bsky.chat#bsky_chat"
 
+// MARK: - ChatService
+
+/// The production implementation of `ChatServicing` that communicates with
+/// the Bluesky Chat API (``chat.bsky.convo.*``) via AT Protocol proxy headers.
 @MainActor
 final class ChatService: ChatServicing {
+    /// Manages authentication sessions for request signing.
     private let sessionService: BlueskySessionServicing
+    /// HTTP client for performing requests.
     private let httpClient: HTTPClient
 
+    /// Creates the chat service with its required dependencies.
     init(requestExecutor _: BlueskyRequestExecuting, sessionService: BlueskySessionServicing, httpClient: HTTPClient = HTTPClient()) {
         self.sessionService = sessionService
         self.httpClient = httpClient
@@ -14,6 +23,7 @@ final class ChatService: ChatServicing {
 
     // MARK: - Conversations
 
+    /// Lists conversations with optional status and cursor pagination.
     func listConvos(account: AppAccount, appPassword: String?, status: String? = nil, cursor: String? = nil) async throws -> PagedConvos {
         var queryItems = [URLQueryItem(name: "limit", value: "50")]
         if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
@@ -33,6 +43,7 @@ final class ChatService: ChatServicing {
         )
     }
 
+    /// Gets a single conversation by its ID.
     func getConvo(convoId: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation {
         let response: GetConvoResponse = try await chatRequest(
             path: "chat.bsky.convo.getConvo",
@@ -44,6 +55,7 @@ final class ChatService: ChatServicing {
         return response.convo.toDomain()
     }
 
+    /// Gets or creates a conversation for the specified member DIDs.
     func getConvoForMembers(members: [String], account: AppAccount, appPassword: String?) async throws -> ChatConversation {
         let response: GetConvoResponse = try await chatRequest(
             path: "chat.bsky.convo.getConvoForMembers",
@@ -57,6 +69,7 @@ final class ChatService: ChatServicing {
 
     // MARK: - Messages
 
+    /// Gets messages in a conversation with cursor pagination.
     func getMessages(convoId: String, cursor: String? = nil, limit: Int = 50, account: AppAccount, appPassword: String?) async throws -> PagedMessages {
         var queryItems = [
             URLQueryItem(name: "convoId", value: convoId),
@@ -78,6 +91,7 @@ final class ChatService: ChatServicing {
         )
     }
 
+    /// Sends a text message to a conversation.
     func sendMessage(convoId: String, text: String, account: AppAccount, appPassword: String?) async throws -> ChatMessageSendResult {
         let body = SendMessageRequest(convoId: convoId, message: MessageInputDTO(text: text))
         let response: SendMessageResponse = try await chatRequest(
@@ -100,6 +114,7 @@ final class ChatService: ChatServicing {
 
     // MARK: - Actions
 
+    /// Marks a conversation as read up to the specified message.
     func updateRead(convoId: String, messageId: String?, account: AppAccount, appPassword: String?) async throws {
         let body = UpdateReadRequest(convoId: convoId, messageId: messageId)
         let _: UpdateReadResponse = try await chatRequest(
@@ -112,6 +127,7 @@ final class ChatService: ChatServicing {
         )
     }
 
+    /// Leaves a conversation.
     func leaveConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
         let body = LeaveConvoRequest(convoId: convoId)
         let _: LeaveConvoResponse = try await chatRequest(
@@ -124,6 +140,7 @@ final class ChatService: ChatServicing {
         )
     }
 
+    /// Mutes a conversation so push notifications are suppressed.
     func muteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
         let body = MuteConvoRequest(convoId: convoId)
         let _: MuteConvoResponse = try await chatRequest(
@@ -136,6 +153,7 @@ final class ChatService: ChatServicing {
         )
     }
 
+    /// Unmutes a previously muted conversation.
     func unmuteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
         let body = MuteConvoRequest(convoId: convoId)
         let _: MuteConvoResponse = try await chatRequest(
@@ -150,6 +168,7 @@ final class ChatService: ChatServicing {
 
     // MARK: - Log
 
+    /// Gets the chat event log (conversation creation, messages, reactions, etc.).
     func getLog(cursor: String?, account: AppAccount, appPassword: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {
         var queryItems: [URLQueryItem] = []
         if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }

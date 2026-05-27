@@ -2,19 +2,31 @@ import Foundation
 
 // MARK: - List Convos
 
+/// Response from `chat.bsky.convo.listConvos`.
 struct ListConvosResponse: Decodable {
+    /// Pagination cursor.
     let cursor: String?
+    /// Array of conversation views.
     let convos: [ConvoViewDTO]
 }
 
+/// A conversation view returned by the Bluesky chat API.
 struct ConvoViewDTO: Decodable {
+    /// Conversation identifier.
     let id: String
+    /// Revision token for optimistic concurrency.
     let rev: String
+    /// Participants in the conversation.
     let members: [ChatMemberProfileDTO]
+    /// The most recent message, if any.
     let lastMessage: LastMessageUnion?
+    /// Whether the conversation is muted.
     let muted: Bool
+    /// Conversation status string.
     let status: String?
+    /// Number of unread messages.
     let unreadCount: Int
+    /// Optional kind (direct vs. group).
     let kind: ConvoKindUnion?
 
     enum CodingKeys: String, CodingKey {
@@ -34,6 +46,7 @@ struct ConvoViewDTO: Decodable {
     }
 }
 
+/// Discriminated union for direct vs. group conversation kinds.
 struct ConvoKindUnion: Decodable {
     let direct: DirectConvoDTO?
     let group: GroupConvoDTO?
@@ -53,22 +66,35 @@ struct ConvoKindUnion: Decodable {
     }
 }
 
+/// A direct (1:1) conversation kind marker.
 struct DirectConvoDTO: Decodable {}
 
+/// A group conversation with name, member count, and lock status.
 struct GroupConvoDTO: Decodable {
+    /// Group display name.
     let name: String?
+    /// Number of members in the group.
     let memberCount: Int?
+    /// ISO 8601 creation date string.
     let createdAt: String?
+    /// Lock status string (e.g. "unlocked").
     let lockStatus: String?
 }
 
+/// Profile information for a chat participant.
 struct ChatMemberProfileDTO: Decodable {
+    /// The member's DID.
     let did: String
+    /// The member's handle (optional for deleted accounts).
     let handle: String?
+    /// Display name if set.
     let displayName: String?
+    /// Avatar URL string.
     let avatar: String?
 }
 
+/// Discriminated union for the last message in a conversation, which may be
+/// a regular message, a deleted message, or a system message.
 struct LastMessageUnion: Decodable {
     let message: MessageViewDTO?
     let deleted: DeletedMessageViewDTO?
@@ -98,6 +124,7 @@ struct LastMessageUnion: Decodable {
 
 // MARK: - Get Messages
 
+/// Response from `chat.bsky.convo.getMessages`.
 struct GetMessagesResponse: Decodable {
     let cursor: String?
     let messages: [MessageUnionDTO]
@@ -105,8 +132,11 @@ struct GetMessagesResponse: Decodable {
 }
 
 struct MessageUnionDTO: Decodable {
+    /// A regular message view, if present.
     let messageView: MessageViewDTO?
+    /// A deleted message view, if present.
     let deletedMessageView: DeletedMessageViewDTO?
+    /// A system message view, if present.
     let systemMessageView: SystemMessageViewDTO?
 
     init(from decoder: Decoder) throws {
@@ -131,6 +161,7 @@ struct MessageUnionDTO: Decodable {
     }
 }
 
+/// A regular chat message view.
 struct MessageViewDTO: Decodable {
     let id: String?
     let rev: String?
@@ -140,6 +171,7 @@ struct MessageViewDTO: Decodable {
     let reactions: [ReactionViewDTO]?
 }
 
+/// A deleted chat message view.
 struct DeletedMessageViewDTO: Decodable {
     let id: String?
     let rev: String?
@@ -147,6 +179,7 @@ struct DeletedMessageViewDTO: Decodable {
     let sentAt: String?
 }
 
+/// A system-generated message view (member join/leave, group rename, etc.).
 struct SystemMessageViewDTO: Decodable {
     let id: String?
     let rev: String?
@@ -154,6 +187,7 @@ struct SystemMessageViewDTO: Decodable {
     let data: SystemMessageDataUnion?
 }
 
+/// System message payload containing member references, name changes, and type.
 struct SystemMessageDataUnion: Decodable {
     let member: ReferredUserDTO?
     let addedBy: ReferredUserDTO?
@@ -197,6 +231,7 @@ struct ReactionViewSenderDTO: Decodable {
 
 // MARK: - Send Message
 
+/// Request body for `chat.bsky.convo.sendMessage`.
 struct SendMessageRequest: Encodable {
     let convoId: String
     let message: MessageInputDTO
@@ -216,6 +251,7 @@ struct SendMessageResponse: Decodable {
 
 // MARK: - Update Read
 
+/// Request body for `chat.bsky.convo.updateRead`.
 struct UpdateReadRequest: Encodable {
     let convoId: String
     let messageId: String?
@@ -227,6 +263,7 @@ struct UpdateReadResponse: Decodable {
 
 // MARK: - Leave Convo
 
+/// Request body for `chat.bsky.convo.leaveConvo`.
 struct LeaveConvoRequest: Encodable {
     let convoId: String
 }
@@ -238,6 +275,7 @@ struct LeaveConvoResponse: Decodable {
 
 // MARK: - Mute/Unmute
 
+/// Request body for `chat.bsky.convo.muteConvo` / `unmuteConvo`.
 struct MuteConvoRequest: Encodable {
     let convoId: String
 }
@@ -248,6 +286,7 @@ struct MuteConvoResponse: Decodable {
 
 // MARK: - Get Log
 
+/// Response from `chat.bsky.convo.getLog`.
 struct GetLogResponse: Decodable {
     let cursor: String?
     let logs: [LogEventUnionDTO]
@@ -494,6 +533,7 @@ struct LogRemoveMemberDTO: Decodable {
 
 // MARK: - Get Convo For Members
 
+/// Request body for `chat.bsky.convo.getConvoForMembers`.
 struct GetConvoForMembersRequest: Encodable {
     let members: [String]
 }

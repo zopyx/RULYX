@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// A single account row showing avatar, display name, handle, optional
+/// label/entryway badge, active indicator, and deactivated warning.
 struct AccountRowView: View {
     let account: AppAccount
     let isActive: Bool
@@ -13,6 +15,7 @@ struct AccountRowView: View {
 
     @ScaledMetric(relativeTo: .body) private var avatarSize = 40.0
 
+    /// Returns a label for non-bsky.social PDS entryways (e.g. "eurosky.social").
     private var entrywayLabel: String? {
         guard let entryway = account.entrywayURL else { return nil }
         let host = entryway.host ?? ""

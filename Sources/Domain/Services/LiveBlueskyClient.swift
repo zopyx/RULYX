@@ -1,19 +1,31 @@
 import Foundation
 
+/// Result from fetching actors via ClearSky (blocklist or single-blocklist endpoint).
 struct ClearskyBlocklistResult {
     let actors: [BlueskyActor]
     let totalCount: Int
 }
 
+/// Primary API client for Bluesky network operations. Provides authenticated access to
+/// all major AT Protocol lexicons used by the app: lists, profiles, feeds, posts,
+/// notifications, chat, moderation reports, and ClearSky integration.
+///
+/// Conforms to `BlueskyAuthenticating`, `BlueskyListServicing`, and `BlueskyProfileInspecting`.
+///
+/// This class is marked `@MainActor` and all state mutations happen on the main actor.
 @MainActor
 class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting {
+    /// The AT Protocol service DID for the Bluesky App View proxy.
     private static let bskyAppViewServiceDID = "did:web:api.bsky.app#bsky_appview"
+    /// The default base URL for the Bluesky PDS.
     private let baseURL: URL
     private let httpClient: HTTPClient
     private let session: URLSession
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
     private let clearskyHeartbeat: ClearskyHeartbeatService
+
+    // MARK: - Init
 
     init(
         baseURL: URL = .bskySocial,
@@ -37,6 +49,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    // MARK: - Cache
+
+    /// Clears all in-memory and on-disk URL cache responses plus the session cache.
     func clearCache() {
         session.configuration.urlCache?.removeAllCachedResponses()
         URLCache.shared.removeAllCachedResponses()
@@ -45,24 +60,29 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Authentication & Session
 
+    /// Authenticates against the Bluesky PDS using a handle and app password.
     func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil) async throws -> BlueskySession {
         try await sessionService.authenticate(handle: handle, appPassword: appPassword, entrywayURL: entrywayURL)
     }
 
+    /// Persists the session token for an account to the Keychain.
     func persistSession(_ authSession: BlueskySession, for account: AppAccount) async throws {
         try await sessionService.persistSession(authSession, for: account)
     }
 
+    /// Removes a persisted session from the Keychain.
     func deletePersistedSession(for account: AppAccount) throws {
         try sessionService.deletePersistedSession(for: account)
     }
 
+    /// Restores sessions for all saved accounts from the Keychain.
     func restoreSessions(for accounts: [AppAccount]) async {
         await sessionService.restoreSessions(for: accounts)
     }
 
     // MARK: - List Operations
 
+    /// Fetches all lists owned by the authenticated account.
     func fetchLists(for account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
         let response: GetListsResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -93,6 +113,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches all lists owned by a specific actor (by DID or handle).
     func fetchActorLists(actor: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
         let response: GetListsResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -123,11 +144,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches a single list by URI via the owning account's list fetch.
+    /// Returns `nil` if the list is not found among the account's lists.
     func fetchList(uri: String, account: AppAccount, appPassword: String?) async throws -> BlueskyList? {
         let lists = try await fetchLists(for: account, appPassword: appPassword)
         return lists.first { $0.id == uri }
     }
 
+    /// Fetches all members of a list with automatic pagination.
     func fetchListMembers(list: BlueskyList, account: AppAccount, appPassword: String?) async throws -> [BlueskyListMember] {
         var allMembers: [BlueskyListMember] = []
         var cursor: String?
@@ -141,6 +165,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return allMembers
     }
 
+    /// Fetches a single page of list members.
+    /// - Parameters:
+    ///   - list: The list to fetch members from.
+    ///   - cursor: Pagination cursor. `nil` for the first page.
+    /// - Returns: A page of members and the next cursor.
     func fetchListMembersPage(list: BlueskyList, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedListMembers {
         let response: GetListResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -171,6 +200,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Fetches the metadata and creator for a list (without fetching all members).
+    /// Returns the list object and the creator's actor information.
+    /// - Throws: `BlueskyAPIError.server("List not found")` if the list does not exist.
     func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor) {
         let response: GetListResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -212,6 +244,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return (blueskyList, creator)
     }
 
+    /// Fetches all moderation lists the account has subscribed to (muted).
+    /// Returns them sorted by subscription date descending, then alphabetically.
     func fetchSubscribedModerationLists(account: AppAccount, appPassword: String?) async throws -> [SubscribedListInfo] {
         var cursor: String?
         var allLists: [SubscribedListInfo] = []
@@ -241,17 +275,18 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return allLists.sorted { lhs, rhs in
             switch (lhs.subscribedAt, rhs.subscribedAt) {
             case let (left?, right?):
-                return left > right
+                left > right
             case (.some, .none):
-                return true
+                true
             case (.none, .some):
-                return false
+                false
             case (.none, .none):
-                return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+                lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
             }
         }
     }
 
+    /// Checks whether the account is subscribed to (muted) a specific moderation list.
     func isSubscribedToModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws -> Bool {
         let response: GetListResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -272,6 +307,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return response.list?.viewer?.muted ?? false
     }
 
+    /// Subscribes to (mutes) a moderation list.
     func subscribeToModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -288,6 +324,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Unsubscribes from (unmutes) a moderation list.
     func unsubscribeFromModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -304,11 +341,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Actor Search
+
+    /// Searches for actors using the typeahead endpoint (returns first page only).
     func searchActors(query: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
         let page = try await searchActorsPage(query: query, cursor: nil, account: account, appPassword: appPassword)
         return page.actors
     }
 
+    /// Searches for actors using the full search endpoint (non-typeahead).
     func searchActorsFull(query: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuery.isEmpty else { return [] }
@@ -346,6 +387,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Searches for actors with pagination support (typeahead endpoint).
+    /// Returns `PagedActorSearch` with actors and cursor for the next page.
     func searchActorsPage(query: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedActorSearch {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuery.isEmpty else {
@@ -379,6 +422,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    // MARK: - List Membership Mutations
+
+    /// Adds an actor (by DID) to a list. Returns the record URI of the new list item.
     func addActor(did actorDID: String, to list: BlueskyList, account: AppAccount, appPassword: String?) async throws -> String {
         let response: CreateRecordResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -402,6 +448,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return response.uri
     }
 
+    /// Removes a member from a list by their list item record URI.
     func removeMember(recordURI: String, account: AppAccount, appPassword: String?) async throws {
         let record = try parseATURI(recordURI)
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
@@ -420,6 +467,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Creates a new list (curation or moderation). Returns the created `BlueskyList`.
     func createList(name: String, description: String, kind: BlueskyList.Kind, account: AppAccount, appPassword: String?) async throws -> BlueskyList {
         let response: CreateRecordResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -449,6 +497,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return BlueskyList(id: response.uri, name: name, description: description, memberCount: 0, kind: kind, cid: response.cid)
     }
 
+    /// Deletes a list and all its members.
     func deleteList(list: BlueskyList, account: AppAccount, appPassword: String?) async throws {
         let record = try parseATURI(list.id)
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
@@ -467,6 +516,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Updates a list's name and description via `com.atproto.repo.putRecord`.
     func updateListMetadata(list: BlueskyList, title: String, description: String, account: AppAccount, appPassword: String?) async throws -> BlueskyList {
         let record = try parseATURI(list.id)
         let _: CreateRecordResponse = try await sessionService.performAuthenticatedRequest(
@@ -499,6 +549,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return BlueskyList(id: list.id, name: title, description: description, memberCount: list.memberCount, kind: list.kind, avatarURL: list.avatarURL, cid: list.cid)
     }
 
+    // MARK: - Social Graph (Block / Mute / Follow)
+
+    /// Blocks an actor by DID. Creates a `app.bsky.graph.block` record.
     func blockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -523,10 +576,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Unblocks an actor by their block record URI. Delegates to `removeMember`.
     func unblockActor(recordURI: String, account: AppAccount, appPassword: String?) async throws {
         try await removeMember(recordURI: recordURI, account: account, appPassword: appPassword)
     }
 
+    /// Follows an actor by DID. Creates a `app.bsky.graph.follow` record.
     func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -551,10 +606,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Unfollows an actor by their follow record URI. Delegates to `removeMember`.
     func unfollowActor(recordURI: String, account: AppAccount, appPassword: String?) async throws {
         try await removeMember(recordURI: recordURI, account: account, appPassword: appPassword)
     }
 
+    /// Mutes an actor by DID.
     func muteActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -572,6 +629,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Unmutes an actor by DID.
     func unmuteActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -589,6 +647,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Private Helpers (List)
+
+    /// Maps an API `ListView` into the app's `SubscribedListInfo` domain model.
     private func mapSubscribedListInfo(from item: ListView) -> SubscribedListInfo {
         SubscribedListInfo(
             id: item.uri,
@@ -604,6 +665,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Sends a request proxied through the Bluesky App View. Used for endpoints that
+    /// require the `atproto-proxy` header to route through `bsky_appview`.
     private func sendAppViewRequest<Response: Decodable>(
         path: String,
         method: String,
@@ -615,17 +678,19 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             path: path,
             method: method,
             queryItems: queryItems,
-            body: Optional<String>.none,
+            body: String?.none,
             accessToken: accessToken,
             pdsURL: pdsURL
         )
     }
 
-    private func sendAppViewRequest<Response: Decodable, Body: Encodable>(
+    /// Sends a request proxied through the Bluesky App View, with optional request body.
+    /// Sets the `atproto-proxy` header to route the request through the AppView service.
+    private func sendAppViewRequest<Response: Decodable>(
         path: String,
         method: String,
         queryItems: [URLQueryItem],
-        body: Body?,
+        body: (some Encodable)?,
         accessToken: String,
         pdsURL: URL
     ) async throws -> Response {
@@ -676,8 +741,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Moderation Reports
+
+    /// The DID of the Ozone labeler used for moderation report proxy.
     private static let bskyLabelerDID = "did:plc:ar7c4by46qjdydhdevvrndac"
 
+    /// Submits a moderation report against an account (by DID) with a specific reason type.
     func reportAccount(did targetDID: String, reasonType: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
         let _: CreateModerationReportResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -711,6 +780,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Submits a moderation report against an account using the default reason type.
     func reportAccount(did targetDID: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
         try await reportAccount(
             did: targetDID,
@@ -721,6 +791,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Submits a moderation report against an account with a selectable reason type.
     func reportAccount(
         did targetDID: String,
         selectedReason: ModerationReportReasonType?,
@@ -737,6 +808,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Submits a moderation report against a list using the default reason type.
     func reportList(_ list: BlueskyList, reason: String?, account: AppAccount, appPassword: String?) async throws {
         try await reportList(
             list,
@@ -747,6 +819,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Submits a moderation report against a list with a selectable reason type.
+    /// Proxied through the Ozone labeler service.
     func reportList(
         _ list: BlueskyList,
         selectedReason: ModerationReportReasonType?,
@@ -786,6 +860,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Submits a moderation report against a specific record (post) by URI and CID.
     func reportRecord(
         uri: String,
         cid: String,
@@ -826,6 +901,10 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Profile
+
+    /// Fetches a full profile by DID or handle for a given account context.
+    /// Returns a `BlueskyProfile` with viewer state, labels, and associated counts.
     func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> BlueskyProfile {
         let response: ProfileViewDetailed = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -854,37 +933,46 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Clearsky Integration
 
+    /// Checks that ClearSky service is available; throws if the heartbeat has failed.
     private func guardClearskyAvailable() throws {
         guard clearskyHeartbeat.isClearskyAvailable else {
             throw BlueskyAPIError.server("ClearSky is temporarily unavailable")
         }
     }
 
+    /// Fetches the list of actors blocked by the account (the "my blocklist" view).
     func fetchBlockedActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
         try await fetchClearskyActors(account: account, endpoint: "blocklist")
     }
 
+    /// Fetches the list of actors that have blocked the account (the "blocked by" view).
     func fetchBlockedByActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
         try await fetchClearskyActors(account: account, endpoint: "single-blocklist")
     }
 
+    /// Returns the total count of actors the account has blocked.
     func fetchBlockingCount(for account: AppAccount) async throws -> Int {
         try await fetchClearskyActors(account: account, endpoint: "blocklist").totalCount
     }
 
+    /// Returns the total count of actors that have blocked the account.
     func fetchBlockedByCount(for account: AppAccount) async throws -> Int {
         try await fetchClearskyActors(account: account, endpoint: "single-blocklist").totalCount
     }
 
+    /// Returns the count of actors that block the account but are not blocked back.
     func fetchUnblockedBlockersCount(for account: AppAccount) async throws -> Int {
         try await fetchUnblockedBlockerActors(account: account, appPassword: nil).count
     }
 
+    /// Fetches the set of DIDs from a ClearSky endpoint (no profile resolution).
     private func fetchClearskyDIDs(actorDID: String, endpoint: String) async throws -> Set<String> {
         let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint)
         return Set(entries.map(\.did))
     }
 
+    /// Paginates through all pages of a ClearSky endpoint.
+    /// Stops early if a page returns fewer than 100 entries (last page).
     private func fetchClearskyEntries(actorDID: String, endpoint: String) async throws -> [ClearskyBlocklistEntry] {
         var allEntries: [ClearskyBlocklistEntry] = []
         var page = 1
@@ -905,20 +993,25 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             }
             let entries = decoded.data.blocklist
             allEntries.append(contentsOf: entries)
+            // If fewer than 100 entries, this was the last page.
             if entries.count < 100 { break }
             page += 1
         } while true
         return allEntries
     }
 
+    /// Fetches actors that block the account but are not blocked back.
+    /// Resolves profiles in parallel batches and sorts by block date descending.
     func fetchUnblockedBlockerActors(account: AppAccount, appPassword _: String?) async throws -> [BlueskyActor] {
         try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
+        // Fetch blocked (actors we block) and blocked-by (actors that block us) in parallel.
         async let blockedDIDsTask = fetchClearskyDIDs(actorDID: actorDID, endpoint: "blocklist")
         async let blockedByEntriesTask = fetchClearskyEntries(actorDID: actorDID, endpoint: "single-blocklist")
         let (blockedDIDs, blockedByEntries) = try await (blockedDIDsTask, blockedByEntriesTask)
 
+        // Filter to only those that block us but aren't on our blocklist.
         let candidateEntries = blockedByEntries.filter { !blockedDIDs.contains($0.did) }
         guard !candidateEntries.isEmpty else { return [] }
 
@@ -937,6 +1030,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
     }
 
+    /// Resolves profiles for a list of DIDs in parallel batches of 25.
+    /// Silently ignores individual batch failures (best-effort resolution).
     private func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
         let uniqueDIDs = Array(Set(dids)).sorted()
         return await withTaskGroup(of: [BlueskyActor].self) { group in
@@ -962,11 +1057,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Resolves the DID for an account. If the account already has a DID, returns it;
+    /// otherwise resolves the handle to a DID via ClearSky.
     private func resolveAccountDID(_ account: AppAccount) async throws -> String {
         if let did = account.did { return did }
         return try await resolveHandleToDID(handle: account.handle)
     }
 
+    /// Fetches ClearSky blocklist entries and resolves all actor profiles.
     private func fetchClearskyActors(account: AppAccount, endpoint: String) async throws -> ClearskyBlocklistResult {
         try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
@@ -983,6 +1081,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             return ClearskyBlocklistResult(actors: [], totalCount: 0)
         }
 
+        // If profile resolution fails entirely, still return a partial result with the total count.
         guard let actors = try? await resolveProfiles(dids: Array(allDIDs).sorted()) else {
             return ClearskyBlocklistResult(actors: [], totalCount: allDIDs.count)
         }
@@ -995,6 +1094,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return ClearskyBlocklistResult(actors: result, totalCount: allDIDs.count)
     }
 
+    /// Fetches all ClearSky moderation lists for a given handle with pagination.
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
         try guardClearskyAvailable()
         var allLists: [ClearskyListEntry] = []
@@ -1028,6 +1128,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - DID Resolution & PLC Audit
 
+    /// Resolves profiles for an array of DIDs in parallel batches of 25.
+    /// Throws on the first batch failure.
     private func resolveProfiles(dids: [String]) async throws -> [BlueskyActor] {
         try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
             var offset = 0
@@ -1046,10 +1148,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches profiles for an array of identifiers via the instance method (will be used by other parts of the app).
     func fetchProfileBatch(identifiers: [String]) async throws -> [BlueskyActor] {
         try await Self.fetchProfileBatch(identifiers: identifiers, httpClient: httpClient)
     }
 
+    /// Static batch profile lookup via `app.bsky.actor.getProfiles`. Bypasses authentication
+    /// using the public API endpoint. Used by ClearSky resolution paths.
     static func fetchProfileBatch(identifiers: [String], httpClient: HTTPClient) async throws -> [BlueskyActor] {
         let actorsParam = identifiers.map { URLQueryItem(name: "actors", value: $0) }
         guard let profilesURL = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles") else {
@@ -1071,6 +1176,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches stats (followers, following, posts, description) for an array of DIDs in batches.
+    /// Reports progress via the optional callback. Non-isolated so it can be called from background contexts.
     nonisolated static func fetchProfileStats(dids: [String], onProgress: (@Sendable (Int, Int) -> Void)? = nil) async throws -> [String: (followers: Int, following: Int, posts: Int, description: String)] {
         var result: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]
         let httpClient = HTTPClient()
@@ -1108,6 +1215,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return result
     }
 
+    /// Resolves a handle to a DID via the ClearSky `get-did` endpoint.
     private func resolveHandleToDID(handle: String) async throws -> String {
         try guardClearskyAvailable()
         guard let url = URL(string: "https://public.api.clearsky.services/api/v1/anon/get-did/\(handle)") else {
@@ -1131,6 +1239,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return decoded.data.didIdentifier
     }
 
+    // MARK: - Author Feed
+
+    /// Fetches an author's feed (used for image/media downloads).
     func fetchAuthorFeed(did: String, cursor: String? = nil, account: AppAccount, appPassword: String?) async throws -> GetAuthorFeedResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1150,6 +1261,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches an author's feed with rich post content (used in the post browser).
     func fetchRichFeed(did: String, cursor: String? = nil, account: AppAccount, appPassword: String?) async throws -> RichFeedResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1169,6 +1281,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Posts & Threads
+
+    /// Fetches a post thread by URI, with optional reply depth limit.
     func fetchPostThread(uri: String, depth: Int? = nil, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1188,6 +1303,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Timeline & Feeds
+
+    /// Fetches the home timeline for the authenticated account.
     func fetchTimeline(cursor: String? = nil, limit: Int = 50, account: AppAccount, appPassword: String?) async throws -> RichFeedResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1207,6 +1325,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches a custom feed by AT URI (feed generator).
     func fetchFeed(feedURI: String, cursor: String? = nil, limit: Int = 50, account: AppAccount, appPassword: String?) async throws -> RichFeedResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1229,6 +1348,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - PLC Audit
+
+    /// Fetches the PLC directory audit log for a DID. Used for handle change history.
     func fetchPLCAuditLog(did: String) async throws -> [PLCAuditLogEntry] {
         guard let url = URL(string: "https://plc.directory/\(did)/log/audit") else {
             throw BlueskyAPIError.invalidURL
@@ -1243,6 +1365,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Followers / Following
 
+    /// Fetches all followers for an actor with automatic pagination (up to 50 pages / ~5000 entries).
     func fetchFollowers(actor actorDID: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
         var all: [BlueskyActor] = []
         var cursor: String?
@@ -1259,6 +1382,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 lastError = nil
             } catch {
                 lastError = error
+                // If we have a cursor, we can continue from the error; if no cursor, rethrow.
                 if cursor == nil { throw error }
                 break
             }
@@ -1269,6 +1393,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return all
     }
 
+    /// Fetches a single page of followers.
     func fetchFollowersPage(actor actorDID: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedActorSearch {
         let response: GetFollowersResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1295,6 +1420,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Fetches all accounts the given actor is following, with automatic pagination (up to 50 pages).
     func fetchFollowing(actor actorDID: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
         var all: [BlueskyActor] = []
         var cursor: String?
@@ -1321,6 +1447,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return all
     }
 
+    /// Fetches a single page of accounts the given actor follows.
     func fetchFollowingPage(actor actorDID: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedActorSearch {
         let response: GetFollowsResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -1349,12 +1476,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Profile Inspection
 
+    /// Performs a comprehensive profile inspection: fetches the profile, list memberships,
+    /// and starter pack memberships in parallel.
     func inspectProfile(query: String, account: AppAccount, appPassword: String?) async throws -> ProfileInspection {
         let actor = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !actor.isEmpty else {
             throw BlueskyAPIError.server("Enter a Bluesky handle or DID.")
         }
 
+        // Fire off profile, list membership, and starter pack requests in parallel.
         let (profile, _, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
             try await sessionService.performAuthenticatedRequest(
                 account: account,
@@ -1390,6 +1520,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             viewerState: mapViewerState(profile.viewer)
         )
 
+        // Fetch list memberships separately (paginated through the account's own lists).
         let listMemberships = await fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
 
         return ProfileInspection(
@@ -1401,6 +1532,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
     }
 
+    /// Checks which of the account's lists contain a given target DID.
+    /// Pages through up to 5 pages of each list to find the member.
     func fetchListMemberships(
         for targetDID: String,
         account: AppAccount,
@@ -1410,6 +1543,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             return []
         }
 
+        // For each list owned by the account, check if the target DID is a member.
         return await withTaskGroup(of: ProfileListMembership?.self) { group in
             for list in lists {
                 group.addTask {
@@ -1417,6 +1551,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     var foundItem: BlueskyListMember?
                     var pagesChecked = 0
 
+                    // Search up to 5 pages of members per list.
                     while foundItem == nil, pagesChecked < 5 {
                         guard let page = try? await self.fetchListMembersPage(
                             list: list, cursor: cursor,
@@ -1447,6 +1582,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Blob Upload
+
+    /// Uploads binary data (image/video) to the PDS via `com.atproto.repo.uploadBlob`.
     func uploadBlob(data: Data, mimeType: String, account: AppAccount, appPassword: String?) async throws -> UploadBlobResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             let url = authSession.pdsURL.appendingPathComponent("xrpc/com.atproto.repo.uploadBlob")
@@ -1460,6 +1598,23 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Post Creation
+
+    /// Creates a new post with optional images, video, reply context, quote, thread gate, and quote-gate.
+    ///
+    /// - Parameters:
+    ///   - text: The post text content.
+    ///   - images: Optional image attachments (must be pre-uploaded).
+    ///   - video: Optional video attachment (must be pre-uploaded). Mutually exclusive with images.
+    ///   - replyTo: Reply context (parent and root URIs/CIDs).
+    ///   - quote: Post to quote (URI and CID).
+    ///   - threadGate: Optional thread gate rule (who can reply).
+    ///   - allowQuoting: Whether other users can quote this post. Set `false` to disable.
+    /// - Returns: The `CreateRecordResponse` with the new post's URI and CID.
+    ///
+    /// Post-creation steps (when applicable):
+    /// 1. Creates a `app.bsky.feed.threadgate` record if `threadGate` is set.
+    /// 2. Creates a `app.bsky.feed.postgate` record with `disableRule` if `allowQuoting` is `false`.
     func createPost(
         text: String,
         images: [PostImageAttachment]? = nil,
@@ -1481,11 +1636,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             appPassword: appPassword
         )
         if let threadGate {
-            let rules: [ThreadGateRule]
-            if threadGate == .noReply {
-                rules = []
+            let rules: [ThreadGateRule] = if threadGate == .noReply {
+                // An empty allow array means no one can reply.
+                []
             } else {
-                rules = [threadGate]
+                [threadGate]
             }
             try await createThreadGate(
                 postURI: response.uri,
@@ -1504,6 +1659,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return response
     }
 
+    /// Creates the underlying `app.bsky.feed.post` record with text, embeds, and reply context.
     private func createPostRecord(
         text: String,
         images: [PostImageAttachment]?,
@@ -1559,6 +1715,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Creates a `app.bsky.feed.threadgate` record to control who can reply.
     func createThreadGate(
         postURI: String,
         rules: [ThreadGateRule],
@@ -1588,6 +1745,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Creates a `app.bsky.feed.postgate` record to disable quote-embedding.
     func createPostGate(
         postURI: String,
         account: AppAccount,
@@ -1616,6 +1774,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Likes & Reposts
+
+    /// Creates a like on a post.
     func createLike(uri: String, cid: String, account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             let body = CreateGenericRecordRequest(
@@ -1637,6 +1798,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Creates a repost of a post.
     func createRepost(uri: String, cid: String, account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             let body = CreateGenericRecordRequest(
@@ -1658,6 +1820,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches the list of likes on a post.
     func fetchLikes(uri: String, cursor: String? = nil, account: AppAccount, appPassword: String?) async throws -> GetLikesResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             var queryItems = [URLQueryItem(name: "uri", value: uri), URLQueryItem(name: "limit", value: "100")]
@@ -1674,6 +1837,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Batch-fetches posts by their URIs using the public API (no auth required).
+    /// Automatically chunks URIs into groups of 25 and runs them in parallel.
     func fetchPosts(uris: [String]) async throws -> [RichPost] {
         guard let url = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts") else {
             throw BlueskyAPIError.invalidURL
@@ -1704,6 +1869,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Record Deletion
+
+    /// Deletes any AT Protocol record by its AT URI.
     func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             let components = try parseATURI(recordURI)
@@ -1721,12 +1889,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Search Posts
 
+    /// Internal response type for the `app.bsky.feed.searchPosts` endpoint.
     struct SearchPostsResponse: Decodable {
         let cursor: String?
         let hitsTotal: Int?
         let posts: [RichPost]
     }
 
+    /// Searches posts using the `app.bsky.feed.searchPosts` endpoint.
     func searchPosts(q: String, mentions: String? = nil, sort: String? = nil, cursor: String? = nil, limit: Int = 25, account: AppAccount, appPassword: String?) async throws -> SearchPostsResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             var queryItems = [
@@ -1754,6 +1924,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Notifications
 
+    /// Fetches the account's notifications.
     func fetchNotifications(cursor: String? = nil, limit: Int = 50, account: AppAccount, appPassword: String?) async throws -> ListNotificationsResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             var queryItems = [URLQueryItem(name: "limit", value: "\(limit)")]
@@ -1770,6 +1941,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches the count of unread notifications.
     func getUnreadCount(account: AppAccount, appPassword: String?) async throws -> Int {
         let response: UnreadCountResponse = try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             try await requestExecutor.send(
@@ -1783,6 +1955,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return response.count
     }
 
+    /// Marks the notification timestamp as seen.
     func updateSeen(at date: Date, account: AppAccount, appPassword: String?) async throws {
         let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             let body = UpdateSeenRequest(seenAt: ISO8601DateFormatter().string(from: date))
@@ -1798,11 +1971,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 }
 
+// MARK: - Supporting Types
+
+/// An image attachment for post creation (pre-uploaded blob + alt text).
 struct PostImageAttachment {
     let blob: UploadedBlob
     let alt: String
 }
 
+/// A video attachment for post creation (pre-uploaded blob + alt text + optional aspect ratio).
 struct PostVideoAttachment {
     let blob: UploadedBlob
     let alt: String
@@ -1810,6 +1987,7 @@ struct PostVideoAttachment {
 }
 
 private extension Array {
+    /// Splits the array into chunks of the given maximum length.
     func chunked(maxLength: Int) -> [[Element]] {
         stride(from: 0, to: count, by: maxLength).map {
             Array(self[$0 ..< Swift.min($0 + maxLength, count)])

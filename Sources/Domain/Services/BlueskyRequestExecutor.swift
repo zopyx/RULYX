@@ -1,7 +1,20 @@
 import CryptoKit
 import Foundation
 
+/// Executes HTTP requests to the Bluesky AT Protocol XRPC endpoints.
+/// Implementations handle URL construction, JSON encoding/decoding, authentication headers,
+/// HTTP status code validation, and error mapping to `BlueskyAPIError`.
 protocol BlueskyRequestExecuting: Sendable {
+    /// Sends a request with an optional JSON-encoded body to an XRPC endpoint.
+    /// - Parameters:
+    ///   - path: The XRPC method path (e.g. `"com.atproto.server.createSession"`).
+    ///   - method: The HTTP method (e.g. `"GET"`, `"POST"`).
+    ///   - queryItems: URL query parameters for the request.
+    ///   - body: An optional `Encodable` value to serialize as the JSON request body.
+    ///   - accessToken: An optional Bearer token for authenticated endpoints.
+    ///   - hostURL: The base URL for the request; if `nil`, uses the default PDS URL.
+    /// - Returns: The decoded response of type `Response`.
+    /// - Throws: `BlueskyAPIError` for HTTP errors, decoding failures, or network errors.
     func send<Response: Decodable>(
         path: String,
         method: String,
@@ -11,6 +24,15 @@ protocol BlueskyRequestExecuting: Sendable {
         hostURL: URL?
     ) async throws -> Response
 
+    /// Sends a request without a body to an XRPC endpoint.
+    /// - Parameters:
+    ///   - path: The XRPC method path.
+    ///   - method: The HTTP method.
+    ///   - queryItems: URL query parameters for the request.
+    ///   - accessToken: An optional Bearer token for authenticated endpoints.
+    ///   - hostURL: The base URL for the request; if `nil`, uses the default PDS URL.
+    /// - Returns: The decoded response of type `Response`.
+    /// - Throws: `BlueskyAPIError` for HTTP errors, decoding failures, or network errors.
     func send<Response: Decodable>(
         path: String,
         method: String,

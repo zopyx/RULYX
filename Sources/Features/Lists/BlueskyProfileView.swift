@@ -1,5 +1,11 @@
 import SwiftUI
 
+/// Full profile detail/inspection view for a Bluesky actor.
+///
+/// Displays profile metadata, follower/following/posts/media stats,
+/// moderation controls (block/mute/follow/list membership), block-back
+/// functionality (beta), subscribed moderation lists, owned lists,
+/// ClearSky lists, handle history, and reporting.
 struct BlueskyProfileView: View {
     let member: BlueskyListMember
     let list: BlueskyList?
@@ -13,15 +19,18 @@ struct BlueskyProfileView: View {
     @EnvironmentObject var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = BlueskyProfileViewModel()
+
+    // MARK: - Properties
+
     @AppStorage("showBetaFeatures") private var showBetaFeatures = false
-    @State private var isShowingAvatarPreview = false
-    @State private var showPostBrowser = false
-    @State private var showMediaBrowser = false
+    @State private var isShowingAvatarPreview = false // Full-screen avatar overlay
+    @State private var showPostBrowser = false // Posts browser sheet
+    @State private var showMediaBrowser = false // Media browser sheet
     @State private var shareFileURL: URL?
     @State private var loadTask: Task<Void, Never>?
     @State private var moderationTask: Task<Void, Never>?
     @State private var exportTask: Task<Void, Never>?
-    @State private var blockedAccessType: BlockedAccessType?
+    @State private var blockedAccessType: BlockedAccessType? // Blocked-access info sheet
     @State private var blockingCount: Int?
     @State private var blockedByCount: Int?
     @State private var isFetchingBlockCounts = false
@@ -56,6 +65,9 @@ struct BlueskyProfileView: View {
     @State private var newInternalListColor = InternalListColor.blue
     @State private var showBlockingListsPanel = false
 
+    // MARK: - Computed properties
+
+    /// Returns the preferred search account or falls back to the active account.
     private var preferredSearchAccount: AppAccount? {
         if let prefID = accountStore.preferredSearchAccountID,
            let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
@@ -66,6 +78,8 @@ struct BlueskyProfileView: View {
         }
     }
 
+    /// Identifies whether the user tried to access posts or media that are
+    /// blocked by the target account.
     enum BlockedAccessType: String, Identifiable {
         case posts
         case media
@@ -73,6 +87,8 @@ struct BlueskyProfileView: View {
             rawValue
         }
     }
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -434,10 +450,14 @@ struct BlueskyProfileView: View {
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
+    // MARK: - Content
+
+    /// The account used for data-fetching (preferred search or active).
     private var dataAccount: AppAccount? {
         preferredSearchAccount ?? accountStore.activeAccount
     }
 
+    /// The app password for `dataAccount`.
     private var dataAppPassword: String? {
         dataAccount.flatMap { accountStore.appPassword(for: $0) }
     }
@@ -1007,11 +1027,13 @@ struct BlueskyProfileView: View {
                                         .progressViewStyle(.linear)
                                         .tint(Color.skyPrimary)
                                     HStack {
-                                        Text(loc("profile.block_back.progress")
-                                            .replacingOccurrences(of: "{completed}", with: "\(blockBackCompleted)")
-                                            .replacingOccurrences(of: "{total}", with: "\(blockBackTotal)"))
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                        Text(
+                                            loc("profile.block_back.progress")
+                                                .replacingOccurrences(of: "{completed}", with: "\(blockBackCompleted)")
+                                                .replacingOccurrences(of: "{total}", with: "\(blockBackTotal)")
+                                        )
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                         Spacer()
                                     }
                                 }
@@ -1238,7 +1260,8 @@ struct BlueskyProfileView: View {
         }
     }
 
-    @ViewBuilder
+    // MARK: - Block back
+
     private var blockBackPreviewSheet: some View {
         NavigationStack {
             blockBackPreviewContent
@@ -1288,8 +1311,10 @@ struct BlueskyProfileView: View {
                     blockBackPreviewRow(actor: actor)
                 }
             } header: {
-                Text(loc("profile.block_back.preview.count")
-                    .replacingOccurrences(of: "{count}", with: "\(blockPreviewActors.count)"))
+                Text(
+                    loc("profile.block_back.preview.count")
+                        .replacingOccurrences(of: "{count}", with: "\(blockPreviewActors.count)")
+                )
             }
         }
         .listStyle(.insetGrouped)
@@ -1348,6 +1373,8 @@ struct BlueskyProfileView: View {
             }
         }
     }
+
+    // MARK: - Helpers
 
     private func makeProfileSupportDraft(for profile: BlueskyProfile?) -> SupportEmailDraft {
         let reason = viewModel.selectedReportReason.localizedTitle

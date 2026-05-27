@@ -1,23 +1,45 @@
 import Foundation
 
+// MARK: - AppErrorCategory
+
+/// Broad category for an error, used for user-facing messaging and analytics.
 enum AppErrorCategory: String, Equatable {
+    /// Authentication failures (invalid credentials, unauthorized).
     case authentication
+    /// Network connectivity errors.
     case network
+    /// Response parsing or data decoding errors.
     case decoding
+    /// Input validation errors.
     case validation
+    /// Server-side errors.
     case server
+    /// Request was cancelled.
     case cancellation
+    /// Uncategorized errors.
     case unknown
 }
 
+// MARK: - AppError
+
+/// Normalized error type used throughout the app.
+/// Converts various error types (`URLError`, `BlueskyAPIError`, `DecodingError`, etc.)
+/// into a consistent `category` + `message` format via `AppError.from(_:)`.
 struct AppError: LocalizedError, Equatable {
+    /// The broad category of the error.
     let category: AppErrorCategory
+    /// User-facing error message.
     let message: String
 
     var errorDescription: String? {
         message
     }
 
+    // MARK: - Public
+
+    // MARK: - Public
+
+    /// Convert any `Error` to an `AppError`, categorizing it appropriately.
     static func from(_ error: Error) -> AppError {
         if let appError = error as? AppError {
             return appError
@@ -73,10 +95,12 @@ struct AppError: LocalizedError, Equatable {
         return AppError(category: .unknown, message: error.localizedDescription)
     }
 
+    /// Extract a user-facing message string from any error.
     static func userMessage(from error: Error) -> String {
         from(error).message
     }
 
+    /// Check whether an error represents a cancellation (Swift `CancellationError` or `URLError.cancelled`).
     static func isCancellation(_ error: Error) -> Bool {
         if error is CancellationError {
             return true

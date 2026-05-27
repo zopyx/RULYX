@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - FeedPickerView
+
+/// Sheet for switching between the default "Following" feed and custom
+/// Bluesky feed URIs, with a list of recently used feeds.
 struct FeedPickerView: View {
     @ObservedObject var feedStore: FeedStore
     @Environment(\.dismiss) private var dismiss

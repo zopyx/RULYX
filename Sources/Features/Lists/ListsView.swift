@@ -1,5 +1,11 @@
 import SwiftUI
 
+/// Main moderation lists view — the primary screen of the Moderation tab.
+///
+/// Displays the active account summary, follower/following/blocking/blocked-by
+/// relationship counts, the user's Bluesky moderation + regular lists, internal
+/// (local-only) lists, and advanced search tools (mentions, custom search,
+/// direct replies).
 struct ListsView: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
@@ -7,6 +13,9 @@ struct ListsView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject var internalListStore: InternalListStore
     @StateObject var viewModel = ListsViewModel()
+
+    // MARK: - Properties
+
     @State private var presentationState = PresentationState()
     @State private var isShowingUserSearch = false
     @State var exportFormat: ListsExportFormat?
@@ -22,6 +31,8 @@ struct ListsView: View {
     @State private var showInternalListsHelp = false
     @State private var internalListName = ""
     @State private var internalListColor = InternalListColor.blue
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -94,7 +105,6 @@ struct ListsView: View {
                                     )
                                 }
                                 .buttonStyle(.plain)
-
                             }
                         }
                         .listRowInsets(EdgeInsets())
@@ -507,6 +517,8 @@ struct ListsView: View {
             showShareSheet = false
         }
     }
+
+    // MARK: - Helpers
 
     private func helpSheet(title: String, text: String) -> some View {
         NavigationStack {

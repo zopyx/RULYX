@@ -1,6 +1,9 @@
 import SwiftUI
 import UIKit
 
+/// Full-text search for posts and users across the Bluesky network.
+/// Supports searching by keyword with tabs for Top / Newest / Users results,
+/// with post interaction actions (like, reply, repost, block likers, etc.).
 struct CustomSearchView: View {
     @StateObject private var viewModel = CustomSearchViewModel()
     @EnvironmentObject var accountStore: AccountStore
@@ -20,6 +23,8 @@ struct CustomSearchView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @StateObject private var likerActions = PostLikerActionsManager()
+
+    // MARK: - Body
 
     var body: some View {
         listContent
@@ -61,6 +66,8 @@ struct CustomSearchView: View {
             }
             .postLikerActions(manager: likerActions)
     }
+
+    // MARK: - Section builders
 
     private var listContent: some View {
         List {

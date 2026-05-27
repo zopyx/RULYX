@@ -1,6 +1,9 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// Detail view for a single Bluesky list — shows members, allows searching,
+/// importing, exporting, bulk operations (add/remove/block/mute/transfer),
+/// comparison with other lists, and snapshots.
 struct ListDetailView: View {
     let onListUpdated: ((BlueskyList) -> Void)?
 
@@ -33,12 +36,16 @@ struct ListDetailView: View {
     @State private var isSearching = false
     @Environment(\.dismiss) private var dismiss
 
+    // MARK: - Computed properties
+
+    /// Extracts the list owner's DID from the list AT URI.
     private var ownerDID: String? {
         let parts = currentList.id.split(separator: "/")
         guard parts.count >= 2, parts[0].description == "at:" else { return nil }
         return parts[1].description
     }
 
+    /// Whether the current account owns this list and can edit/delete it.
     var isOwnedList: Bool {
         guard let activeDID = accountStore.activeAccount?.did else { return false }
         return currentList.id.hasPrefix("at://\(activeDID)")
@@ -50,6 +57,9 @@ struct ListDetailView: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
     var body: some View {
         rootContent
             .navigationTitle("")
@@ -206,6 +216,8 @@ struct ListDetailView: View {
             }
     }
 
+    // MARK: - Root content
+
     private var rootContent: some View {
         Group {
             if let account = accountStore.activeAccount,
@@ -250,6 +262,8 @@ struct ListDetailView: View {
             }
         }
     }
+
+    // MARK: - Toolbar
 
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
@@ -340,6 +354,8 @@ struct ListDetailView: View {
         }
     }
 
+    // MARK: - Sheets
+
     private func importSheetContent() -> some View {
         ImportHandlesSheet { rawInput in
             if let account = accountStore.activeAccount,
@@ -382,6 +398,8 @@ struct ListDetailView: View {
             }
         }
     }
+
+    // MARK: - Content
 
     private func content(account: AppAccount, appPassword: String) -> some View {
         List {
@@ -487,6 +505,8 @@ struct ListDetailView: View {
         }
     }
 
+    // MARK: - Bindings
+
     private var bulkResultPresentedBinding: Binding<Bool> {
         Binding(
             get: { viewModel.bulkActionResult != nil },
@@ -508,6 +528,8 @@ struct ListDetailView: View {
             }
         )
     }
+
+    // MARK: - Export
 
     private func exportList(format: ExportFormat) async {
         guard let account = accountStore.activeAccount,
@@ -633,6 +655,8 @@ struct ListDetailView: View {
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
+    // MARK: - Helpers
+
     private func generateCSV(from members: [BlueskyListMember], stats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]) -> String {
         let header = "handle,did,display_name,followers,following,posts,description"
         let rows = members.map { member in
@@ -713,6 +737,8 @@ struct ListDetailView: View {
     }
 }
 
+// MARK: - Export format
+
 extension ListDetailView {
     enum ExportFormat: String, CaseIterable {
         case csv, json, xlsx, ods
@@ -721,26 +747,28 @@ extension ListDetailView {
 
 // MARK: - State structs (consolidated from ListDetailView+State.swift)
 
+// MARK: - State structs
+
 extension ListDetailView {
     /// Groups export-related state into a single struct.
     struct ExportState {
-        var cachedExportFileURL: URL?
-        var cachedDiffExportFileURL: URL?
+        var cachedExportFileURL: URL? // Cached URL for full member CSV export
+        var cachedDiffExportFileURL: URL? // Cached URL for diff/compare CSV export
     }
 
     /// Groups list-comparison and snapshot-related state into a single struct.
     struct ComparisonState {
-        var selectedComparisonListID = ""
-        var snapshotSummary: ListMembershipSnapshotSummary?
-        var selectedNewerSnapshotID: UUID?
-        var selectedOlderSnapshotID: UUID?
+        var selectedComparisonListID = "" // The list being compared against
+        var snapshotSummary: ListMembershipSnapshotSummary? // Latest snapshot summary
+        var selectedNewerSnapshotID: UUID? // Newer snapshot in comparison
+        var selectedOlderSnapshotID: UUID? // Older snapshot in comparison
     }
 
     /// Groups sheet-presentation state for import/edit operations into a single struct.
     struct ImportState {
-        var isShowingEditSheet = false
-        var isShowingImportSheet = false
-        var isShowingImportFilePicker = false
+        var isShowingEditSheet = false // Edit list metadata sheet
+        var isShowingImportSheet = false // Import handles sheet
+        var isShowingImportFilePicker = false // File picker for import
     }
 }
 

@@ -1,10 +1,12 @@
 import SwiftUI
 
+/// Scans the active account's followers for "trend" signals (new accounts,
+/// suspicious patterns) and lists them for review.
 struct TrendDetectionView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @State private var flaggedAccounts: [(BlueskyActor, String)] = []
+    @State private var flaggedAccounts: [(BlueskyActor, String)] = [] // (actor, reason)
     @State private var isLoading = false
 
     var body: some View {

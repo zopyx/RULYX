@@ -1,5 +1,9 @@
 import SwiftUI
 
+// MARK: - SearchSheetsModifier
+
+/// View modifier that presents sheets for post thread, image carousel,
+/// video player, likes list, and profile navigation from search results.
 struct SearchSheetsModifier: ViewModifier {
     @Binding var selectedPostURI: String?
     @Binding var imagePreview: ImagePreviewCollection?

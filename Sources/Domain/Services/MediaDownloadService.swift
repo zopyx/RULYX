@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 
+/// Errors that can occur during media download and processing.
 private enum MediaDownloadFailure: LocalizedError {
     case nonHTTPResponse
     case invalidStatusCode(Int)
@@ -24,23 +25,37 @@ private enum MediaDownloadFailure: LocalizedError {
     }
 }
 
+/// Describes a single media asset to be downloaded (image or HLS video).
 struct MediaAssetDownload {
+    /// Index used for ordering results.
     let index: Int
+    /// Base filename stem (without extension) for the saved file.
     let filenameStem: String
+    /// The source type (image URL or video playlist URL).
     let source: MediaAssetSource
 }
 
+/// The source type of a media asset for download.
 enum MediaAssetSource {
+    /// A static image to download directly.
     case image(url: URL, preferredExtension: String?)
+    /// An HLS video playlist URL to be fetched and remuxed.
     case videoPlaylist(URL)
 }
 
+/// The result of downloading a single media asset.
 struct MediaAssetDownloadOutcome {
+    /// The asset index for ordering.
     let index: Int
+    /// The filename of the saved file, or `nil` on failure.
     let savedFilename: String?
+    /// Error message if the download failed.
     let error: String?
 }
 
+/// Actor-based service for downloading media assets (images and HLS videos)
+/// with configurable concurrency limits. Handles HLS playlist resolution,
+/// segment downloading, TS concatenation, and AVFoundation remuxing to MP4.
 actor MediaDownloadService {
     static let shared = MediaDownloadService()
 

@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// A predefined list template that users can create with one tap.
 struct ListTemplate: Identifiable {
     let id: String
     let name: String
@@ -17,6 +18,8 @@ private let templates: [ListTemplate] = [
     ListTemplate(id: "emergency-block", name: "Emergency Block", description: "Urgent accounts requiring immediate blocking", kind: .moderation, presetDescription: "Quick-action block list"),
 ]
 
+/// Picker view showing predefined list templates (Spam Watch, Reply Guys,
+/// Trusted Sources, etc.) that create a new list with one tap.
 struct ListTemplatesView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient

@@ -1,7 +1,13 @@
 import Foundation
 
+// MARK: - PreviewBlueskyClient
+
+/// A preview/mock Bluesky client that overrides `LiveBlueskyClient` with
+/// deterministic, in-memory behavior and simulated network latency. Used
+/// for SwiftUI previews, testing, and the screenshot test suite.
 @MainActor
 final class PreviewBlueskyClient: LiveBlueskyClient {
+    /// Hardcoded set of preview actors used across all mock responses.
     private let previewActors = [
         BlueskyActor(did: "did:plc:1", handle: "alice.bsky.social", displayName: "Alice Chen"),
         BlueskyActor(did: "did:plc:2", handle: "moderator.bsky.social", displayName: "Moderator Desk"),
@@ -390,8 +396,8 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
 
     override func fetchListMemberships(
         for targetDID: String,
-        account: AppAccount,
-        appPassword: String?
+        account _: AppAccount,
+        appPassword _: String?
     ) async -> [ProfileListMembership] {
         try? await Task.sleep(for: .milliseconds(80))
         return [

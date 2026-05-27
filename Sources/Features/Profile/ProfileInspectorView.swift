@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - ProfileInspectorView
+
 struct ProfileInspectorView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
@@ -12,6 +14,8 @@ struct ProfileInspectorView: View {
     @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault
     @State private var isShowingReportSheet = false
     @State private var isSubmittingReport = false
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -418,6 +422,7 @@ struct ProfileInspectorView: View {
         }
     }
 
+    /// Whether the inspected profile matches the active account.
     private var isOwnProfile: Bool {
         guard let account = accountStore.activeAccount,
               let inspection = viewModel.inspection else { return false }
@@ -425,10 +430,12 @@ struct ProfileInspectorView: View {
         return account.handle.lowercased() == inspection.profile.handle.lowercased()
     }
 
+    /// Convenience accessor for the active account's app password.
     private var activePassword: String? {
         accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
     }
 
+    /// Formats a count: shows the number or "-" if nil.
     private func countText(_ value: Int?) -> String {
         if let value {
             return "\(value)"
@@ -436,6 +443,7 @@ struct ProfileInspectorView: View {
         return "-"
     }
 
+    /// Closes the quick switcher and opens the full account management sheet.
     private func openAccountManagement() {
         isShowingQuickAccountSwitcher = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -443,6 +451,7 @@ struct ProfileInspectorView: View {
         }
     }
 
+    /// Builds a pre-filled support email draft for reporting the profile.
     private func makeProfileSupportDraft(from profile: BlueskyProfile) -> SupportEmailDraft {
         let profileURL = profile.profileURL?.absoluteString ?? "https://bsky.app/profile/\(profile.handle)"
         return SupportEmailDraft(
@@ -462,6 +471,7 @@ struct ProfileInspectorView: View {
         )
     }
 
+    /// Submits a simplified moderation report via the Bluesky API.
     private func submitSimplifiedReport(did: String, account: AppAccount, appPassword: String) async {
         isSubmittingReport = true
         defer { isSubmittingReport = false }
