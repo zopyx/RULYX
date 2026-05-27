@@ -34,6 +34,7 @@ struct BlueskyProfileView: View {
     @State private var showBlockBackResult = false
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
+    @State private var showManagePosts = false
     @State private var showExportSheet = false
     @State private var downloadFormat: ExportFileFormat = .csv
     @State private var isExportActive = false
@@ -128,6 +129,11 @@ struct BlueskyProfileView: View {
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             }
+        }
+        .sheet(isPresented: $showManagePosts) {
+            ManagePostsView(did: member.actor.did)
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
         }
         .sheet(item: $shareFileURL) { url in
             ShareSheet(activityItems: [url])
@@ -1117,6 +1123,18 @@ struct BlueskyProfileView: View {
                         }
                     } header: {
                         Text(loc("profile.subscribed_lists"))
+                    }
+
+                    Section {
+                        Button {
+                            showManagePosts = true
+                        } label: {
+                            Label {
+                                Text(loc("profile.manage_posts.title"))
+                            } icon: {
+                                Image(systemName: "pencil.and.list.clipboard")
+                            }
+                        }
                     }
                 }
             } else if viewModel.isLoading {
