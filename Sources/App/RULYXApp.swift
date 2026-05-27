@@ -60,6 +60,8 @@ struct RULYXApp: App {
 
     // MARK: - Scene
 
+    // MARK: - Scene
+
     var body: some Scene {
         WindowGroup {
             ZStack {
@@ -219,5 +221,184 @@ struct RULYXApp: App {
                 }
             }
         }
+        // Support handoff / Universal Control via matching external events
+        .handlesExternalEvents(matching: ["*"])
+        // Commands builder for iPad keyboard shortcuts
+        .commands {
+            // File menu
+            CommandGroup(replacing: .newItem) {
+                Button(loc("sidebar.all_lists")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.allLists)
+                }
+                .keyboardShortcut("1", modifiers: .command)
+                Button(loc("sidebar.dashboard")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.dashboard)
+                }
+                .keyboardShortcut("2", modifiers: .command)
+            }
+
+            // Moderation commands
+            CommandMenu(loc("shortcut.menu.moderation")) {
+                Button(loc("sidebar.all_lists")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.allLists)
+                }
+                .keyboardShortcut("l", modifiers: .command)
+
+                Button(loc("sidebar.dashboard")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.dashboard)
+                }
+                .keyboardShortcut("d", modifiers: .command)
+
+                Button(loc("sidebar.custom_search")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.customSearch)
+                }
+                .keyboardShortcut("f", modifiers: .command)
+
+                Divider()
+
+                Button(loc("sidebar.relationships")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.relationships)
+                }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
+            }
+
+            // Navigate menu
+            CommandMenu(loc("shortcut.menu.navigate")) {
+                Button(loc("sidebar.timeline")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.timeline)
+                }
+                .keyboardShortcut("t", modifiers: .command)
+
+                Button(loc("sidebar.notifications")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.notifications)
+                }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+
+                Button(loc("sidebar.chat")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.chat)
+                }
+                .keyboardShortcut("m", modifiers: .command)
+
+                Divider()
+
+                Button(loc("sidebar.settings")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.settings)
+                }
+                .keyboardShortcut(",", modifiers: .command)
+
+                Button(loc("sidebar.accounts")) {
+                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.accounts)
+                }
+                .keyboardShortcut("a", modifiers: [.command, .shift])
+            }
+        }
+
+        // Standalone profile window — opened via context menu "Open in New Window"
+        WindowGroup("Profile", for: String.self) { $did in
+            if let did {
+                ProfileWindowView(did: did)
+                    .environmentObject(deps.accountStore)
+                    .environmentObject(deps.blueskyClient)
+                    .environmentObject(deps.localizationManager)
+                    .environmentObject(deps.workspaceStore)
+                    .environmentObject(deps.mutedWordsStore)
+                    .environmentObject(deps.analyticsStore)
+                    .environmentObject(deps.chatStore)
+                    .environmentObject(deps.httpRequestDebugStore)
+                    .environmentObject(deps.clearskyHeartbeat)
+                    .environmentObject(deps.internalListStore)
+                    .environmentObject(deps.aiService)
+                    .environmentObject(appLockManager)
+                    .environmentObject(iCloudAccountSync.shared)
+            }
+        }
+        .commandsRemoved()
+        .handlesExternalEvents(matching: ["profile"])
+    }
+}
+
+// MARK: - Notification names
+
+extension Notification.Name {
+    static let iPadNavigateTo = Notification.Name("com.ajung.rulyx.ipad.navigateTo")
+}
+
+// MARK: - Profile Window (placeholder)
+
+/// Standalone profile window displayed when opening a profile in a new window.
+/// Fetches the profile by DID and displays it using the existing inspection logic.
+struct ProfileWindowView: View {
+    let did: String
+
+    @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
+
+    var body: some View {
+        NavigationStack {
+            ProfileWindowContentView(did: did)
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+                .environmentObject(localizationManager)
+        }
+    }
+}
+
+private struct ProfileWindowContentView: View {
+    let did: String
+
+    @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
+    @State private var actor: BlueskyActor?
+    @State private var isLoading = true
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ContentUnavailableView(
+                    "Loading Profile…",
+                    systemImage: "person.crop.circle",
+                    description: Text("Profile loading for DID: \(did)")
+                )
+            } else if let actor {
+                let member = BlueskyListMember(
+                    recordURI: "at://\(did)/app.bsky.graph.listmember/self",
+                    actor: actor
+                )
+                BlueskyProfileView(member: member, list: nil)
+            } else {
+                ContentUnavailableView(
+                    "Profile Not Found",
+                    systemImage: "person.slash",
+                    description: Text("Could not load profile for DID: \(did)")
+                )
+            }
+        }
+        .task {
+            await loadProfile()
+        }
+    }
+
+    private func loadProfile() async {
+        guard let active = accountStore.activeAccount else {
+            isLoading = false
+            return
+        }
+        let password = accountStore.appPassword(for: active)
+        do {
+            let profile = try await blueskyClient.fetchProfile(did: did, account: active, appPassword: password)
+            actor = BlueskyActor(
+                did: profile.did,
+                handle: profile.handle,
+                displayName: profile.displayName,
+                avatarURL: profile.avatarURL,
+                description: profile.description
+            )
+        } catch {
+            // Use basic DID-based actor as fallback
+            actor = BlueskyActor(did: did, handle: did.replacingOccurrences(of: "did:", with: ""))
+        }
+        isLoading = false
     }
 }

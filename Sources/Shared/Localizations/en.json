@@ -1205,5 +1205,49 @@
   "ai.error.not_loaded": "Model not loaded.",
   "ai.error.unsupported_role": "Unsupported model role.",
   "ai.error.download_failed": "Download failed.",
-  "ai.error.runtime_not_available": "AI runtime not yet available."
+  "ai.error.runtime_not_available": "AI runtime not yet available.",
+
+  "sidebar.section.moderation": "Moderation",
+  "sidebar.section.search_profiles": "Search & Profiles",
+  "sidebar.section.social": "Social",
+  "sidebar.all_lists": "All Lists",
+  "sidebar.templates": "Templates",
+  "sidebar.rules": "Rules",
+  "sidebar.dashboard": "Dashboard",
+  "sidebar.relationships": "Relationships",
+  "sidebar.custom_search": "Custom Search",
+  "sidebar.mentions_search": "Mentions Search",
+  "sidebar.bulk_lookup": "Bulk Lookup",
+  "sidebar.network_graph": "Network Graph",
+  "sidebar.timeline": "Timeline",
+  "sidebar.notifications": "Notifications",
+  "sidebar.chat": "Chat",
+  "sidebar.settings": "Settings",
+  "sidebar.accounts": "Accounts",
+  "sidebar.info": "Info",
+  "sidebar.edit": "Edit",
+
+  "shortcut.menu.moderation": "Moderation",
+  "shortcut.menu.navigate": "Navigate",
+  "shortcut.new_list": "New List",
+  "shortcut.search": "Search",
+  "shortcut.dashboard": "Dashboard",
+
+  "context.open_in_new_window": "Open in New Window",
+  "context.add_to_list": "Add to List",
+  "context.copy_handle": "Copy Handle",
+  "context.block_actor": "Block Actor",
+  "context.mute_actor": "Mute Actor",
+
+  "empty.select_item": "Select an item to inspect",
+  "empty.no_selection": "No Selection",
+  "empty.select_profile": "Select a profile to view details",
+  "empty.select_list": "Select a list to view its members",
+
+  "command_palette.placeholder": "Type a command...",
+  "command_palette.no_results": "No matching commands",
+
+  "drag.add_to_list": "Drop to add to list",
+  "drag.drop_list_here": "Drop list here",
+  "drag.import_file": "Drop a file to import"
 }

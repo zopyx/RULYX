@@ -1,3 +1,5 @@
+import SwiftUI
+import UniformTypeIdentifiers
 import Foundation
 
 /// Represents a minimal Bluesky actor with core profile information.

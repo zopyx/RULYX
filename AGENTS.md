@@ -3,7 +3,7 @@
 > Report issues: https://github.com/anomalyco/opencode/issues
 
 ## Project Overview
-iOS-only SwiftUI app for Bluesky moderation (lists, bulk operations, profile inspection, followers/following management, timeline). Targets iOS 17+, runs on iPhone only (no iPad, no macOS). Uses xcodegen for project generation.
+iOS SwiftUI app for Bluesky moderation (lists, bulk operations, profile inspection, followers/following management, timeline). Targets iOS 17+, runs on iPhone and iPad (adaptive layout via `horizontalSizeClass`). No macOS. Uses xcodegen for project generation.
 
 ## Build & Test
 ```bash
@@ -99,17 +99,57 @@ iOS tab bars show at most 5 tabs before placing extras in a "More" list, so the 
 - Suppress title (`.navigationTitle("")`) only when the view provides its own visual title via a section header or `.principal` toolbar item
 
 ## Platform Constraints
-- **iPhone only** — TARGETED_DEVICE_FAMILY = "1" (runs in iPhone compatibility mode on iPad)
+- **iPhone + iPad** — TARGETED_DEVICE_FAMILY = "1,2" (runs natively on both, adaptive via `horizontalSizeClass`)
 - **No macOS** — no Mac target, no Mac Catalyst
-- **No iPad code paths** — do not use `horizontalSizeClass`, `NavigationSplitView`, or any iPad-adaptive layout branching; always use iPhone layout
+- **iPad navigation** — uses `NavigationSplitView` (sidebar + content column) in regular width; falls back to iPhone TabView in compact (Slide Over / 1/3 split)
+- **iPad views** live in `Sources/App/iPad/` and `Sources/Features/*/iPad/` directories
+- **iPhone views** remain untouched — all iPad views are new files; branching happens at `RootView` level via `horizontalSizeClass`
 - Do not add `#if os(macOS)` code paths
+
+## iPad Architecture
+
+### Navigation
+- `RootView` checks `horizontalSizeClass`: regular → `iPadRootView()`, compact → existing `TabView`
+- `iPadRootView` uses `NavigationSplitView` with `iPadSidebar` (list) and content column
+- Sidebar sections: Moderation, Search & Profiles, Social (beta-gated), System
+- All 7 original tabs are accessible as sidebar items; content column renders the corresponding view
+- `iPadDashboardView` uses a responsive `LazyVGrid` layout
+
+### Keyboard Shortcuts
+- Defined via `.commands` builder in `RULYXApp.swift` (Mac-style menu bar for iPadOS)
+- Shortcuts: Cmd+L (Lists), Cmd+D (Dashboard), Cmd+F (Search), Cmd+T (Timeline), etc.
+- Navigation via `NotificationCenter.default.post(name: .iPadNavigateTo, object:)`
+
+### Multi-Window
+- `WindowGroup("Profile", for: String.self)` opens standalone profile windows
+- `ProfileWindowView` fetches actor by DID and renders `BlueskyProfileView`
+
+### Files
+| File | Role |
+|------|------|
+| `Sources/App/iPad/iPadRootView.swift` | Root split view, sidebar + content dispatch |
+| `Sources/App/iPad/iPadSidebar.swift` | Sidebar with sectioned lists, beta gating |
+| `Sources/App/iPad/iPadNavigationState.swift` | Selection state for sidebar/columns |
+| `Sources/App/iPad/iPadDashboardView.swift` | Grid dashboard with charts |
+| `Sources/App/iPad/iPadEmptyDetailPlaceholder.swift` | Empty state when no detail selected |
+| `Sources/App/iPad/iPadMentionsSearchWrapper.swift` | Placeholder for mentions search (profile-required) |
+| `Sources/App/iPad/iPadCommandPalette.swift` | Cmd+K quick action palette with fuzzy search |
+| `Sources/App/iPad/iPadDragDrop.swift` | TransferableActor/List + drag source modifier |
+| `Sources/App/iPad/iPadKeyboardShortcuts.swift` | Centralized shortcut registry |
+| `Sources/App/iPad/iPadListsView.swift` | Two-column list browser (content column) |
+| `Sources/App/iPad/iPadListDetailView.swift` | Detail column list member viewer + actions |
+| `Sources/App/iPad/iPadProfileInspector.swift` | Detail column profile card with tabs |
+| `Sources/App/iPad/iPadTimelineView.swift` | Timeline wrapper for iPad content column |
+| `Sources/App/iPad/iPadNotificationsView.swift` | Notifications wrapper for iPad content column |
+| `Sources/App/iPad/iPadChatView.swift` | Chat wrapper for iPad content column |
 
 ## Key Architecture
 - **Services**: `BlueskyRequestExecutor`, `BlueskySessionService`, `BlueskyListService`, `BlueskyProfileService`, `LiveBlueskyClient`
 - **Stores**: `ModerationWorkspaceStore`, `WorkspacePreferencesStore`, `ModerationAuditStore`, `ActionQueueStore`, `AccountStore`, `FeedStore`, `MutedWordsStore`, `AnalyticsStore`
 - **Timeline**: `FeedTimelineViewModel`, `FeedTimelineView`, `FeedPickerView`, `TimelineTab`, `TimelineState`
 - **Views**: SwiftUI with `@EnvironmentObject` injection via `AppDependencies`
-- **Navigation**: `TabView` (5 tabs: Moderation, Info, Timeline, Settings, Accounts) with `NavigationStack` and `.navigationDestination`
+- **Navigation (iPhone)**: `TabView` (7 tabs: Moderation, Timeline, Notifications, Chat, Info, Settings, Accounts) with `NavigationStack` and `.navigationDestination`
+- **Navigation (iPad)**: `NavigationSplitView` with sidebar (all 7 sections as sidebar items) — accessible via root `horizontalSizeClass` branching
 - **DI**: All dependencies created in `AppDependencies` and injected as environment objects
 
 ## Task Documentation Requirement

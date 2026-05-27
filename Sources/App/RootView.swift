@@ -38,6 +38,8 @@ struct RootView: View {
     @EnvironmentObject private var chatStore: ChatStore
     @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     /// UserDefaults key `"hasSeenOnboarding"`: whether the first-launch onboarding
     /// has been shown. Suppresses the onboarding sheet on subsequent launches.
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
@@ -63,6 +65,22 @@ struct RootView: View {
     // MARK: - Body
 
     var body: some View {
+        if horizontalSizeClass == .regular {
+            iPadRootView()
+                .environmentObject(accountStore)
+                .environmentObject(blueskyClient)
+                .environmentObject(workspaceStore)
+                .environmentObject(localizationManager)
+                .environmentObject(mutedWordsStore)
+                .environmentObject(analyticsStore)
+                .environmentObject(chatStore)
+                .environmentObject(clearskyHeartbeat)
+        } else {
+            compactBody
+        }
+    }
+
+    private var compactBody: some View {
         VStack(spacing: 0) {
             // MARK: Clearsky Outage Banner
 
