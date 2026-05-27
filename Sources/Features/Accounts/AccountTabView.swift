@@ -39,6 +39,17 @@ struct AccountTabView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
+                        Button {
+                            Task {
+                                guard await AppLockManager.shared.authenticateSensitive() else { return }
+                                showImportPicker = true
+                            }
+                        } label: {
+                            Label(loc("account.import"), systemImage: "square.and.arrow.down")
+                                .frame(maxWidth: 200)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.large)
                     }
                     .listRowBackground(Color.clear)
                     .frame(maxWidth: .infinity)
