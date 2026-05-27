@@ -35,8 +35,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ajung.RULYX
-        MARKETING_VERSION: "1.0.3"
-        CURRENT_PROJECT_VERSION: "57"
+        MARKETING_VERSION: "1.0.4"
+        CURRENT_PROJECT_VERSION: "58"
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     scheme:
