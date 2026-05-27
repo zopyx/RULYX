@@ -20,7 +20,7 @@
     ],
     "total_keys": 1207,
     "total_languages": 16,
-    "untranslated_total": 1997
+    "untranslated_total": 1852
   },
   "keys": {
     "account.active": {
@@ -1034,8 +1034,8 @@
     "account.deactivated": {
       "en": "Deactivated",
       "de": {
-        "text": "Deactivated",
-        "untranslated": true
+        "text": "Deaktiviert",
+        "untranslated": false
       },
       "fr": {
         "text": "Deactivated",
@@ -1570,23 +1570,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "e.g. Work, Personal (RU)",
+        "text": "например: Работа, Личное",
         "untranslated": false
       },
       "ar": {
-        "text": "e.g. Work, Personal (AR)",
+        "text": "مثال: العمل، الشخصي",
         "untranslated": false
       },
       "nl": {
-        "text": "z.B. Arbeit, Privat (NL)",
+        "text": "bijv. Werk, Persoonlijk",
         "untranslated": false
       },
       "pl": {
-        "text": "e.g. Work, Personal (PL)",
+        "text": "np. Praca, Osobiste",
         "untranslated": false
       },
       "tr": {
-        "text": "e.g. Work, Personal (TR)",
+        "text": "örn. İş, Kişisel",
         "untranslated": false
       },
       "th": {
@@ -2294,31 +2294,31 @@
     "account.export": {
       "en": "Export Accounts",
       "de": {
-        "text": "Export Accounts (DE)",
+        "text": "Accounts exportieren",
         "untranslated": false
       },
       "fr": {
-        "text": "Export Accounts (FR)",
+        "text": "Exporter les comptes",
         "untranslated": false
       },
       "it": {
-        "text": "Export Accounts (IT)",
+        "text": "Esporta account",
         "untranslated": false
       },
       "ja": {
-        "text": "Export Accounts (JA)",
+        "text": "アカウントをエクスポート",
         "untranslated": false
       },
       "zh": {
-        "text": "Export Accounts (ZH)",
+        "text": "导出账户",
         "untranslated": false
       },
       "es": {
-        "text": "Export Accounts (ES)",
+        "text": "Exportar cuentas",
         "untranslated": false
       },
       "pt": {
-        "text": "Export Accounts (PT)",
+        "text": "Exportar contas",
         "untranslated": false
       },
       "ko": {
@@ -2357,31 +2357,31 @@
     "account.import": {
       "en": "Import Accounts",
       "de": {
-        "text": "Import Accounts (DE)",
+        "text": "Accounts importieren",
         "untranslated": false
       },
       "fr": {
-        "text": "Import Accounts (FR)",
+        "text": "Importer des comptes",
         "untranslated": false
       },
       "it": {
-        "text": "Import Accounts (IT)",
+        "text": "Importa account",
         "untranslated": false
       },
       "ja": {
-        "text": "Import Accounts (JA)",
+        "text": "アカウントをインポート",
         "untranslated": false
       },
       "zh": {
-        "text": "Import Accounts (ZH)",
+        "text": "导入账户",
         "untranslated": false
       },
       "es": {
-        "text": "Import Accounts (ES)",
+        "text": "Importar cuentas",
         "untranslated": false
       },
       "pt": {
-        "text": "Import Accounts (PT)",
+        "text": "Importar contas",
         "untranslated": false
       },
       "ko": {
@@ -2420,31 +2420,31 @@
     "account.import.access_error": {
       "en": "Could not access the selected file.",
       "de": {
-        "text": "Could not access the selected file. (DE)",
+        "text": "Auf die ausgewählte Datei konnte nicht zugegriffen werden.",
         "untranslated": false
       },
       "fr": {
-        "text": "Could not access the selected file. (FR)",
+        "text": "Impossible d’accéder au fichier sélectionné.",
         "untranslated": false
       },
       "it": {
-        "text": "Could not access the selected file. (IT)",
+        "text": "Impossibile accedere al file selezionato.",
         "untranslated": false
       },
       "ja": {
-        "text": "Could not access the selected file. (JA)",
+        "text": "選択したファイルにアクセスできませんでした。",
         "untranslated": false
       },
       "zh": {
-        "text": "Could not access the selected file. (ZH)",
+        "text": "无法访问所选文件。",
         "untranslated": false
       },
       "es": {
-        "text": "Could not access the selected file. (ES)",
+        "text": "No se pudo acceder al archivo seleccionado.",
         "untranslated": false
       },
       "pt": {
-        "text": "Could not access the selected file. (PT)",
+        "text": "Não foi possível acessar o arquivo selecionado.",
         "untranslated": false
       },
       "ko": {
@@ -2472,42 +2472,42 @@
         "untranslated": false
       },
       "th": {
-        "text": "Could not access the selected file. (TH)",
+        "text": "ไม่สามารถเข้าถึงไฟล์ที่เลือกได้",
         "untranslated": false
       },
       "vi": {
-        "text": "Could not access the selected file. (VI)",
+        "text": "Không thể truy cập tệp đã chọn.",
         "untranslated": false
       }
     },
     "account.import.count": {
       "en": "{n} account(s) imported successfully.",
       "de": {
-        "text": "{n} account(s) imported successfully. (DE)",
+        "text": "{n} Account(s) erfolgreich importiert.",
         "untranslated": false
       },
       "fr": {
-        "text": "{n} account(s) imported successfully. (FR)",
+        "text": "{n} compte(s) importé(s) avec succès.",
         "untranslated": false
       },
       "it": {
-        "text": "{n} account(s) imported successfully. (IT)",
+        "text": "{n} account importati correttamente.",
         "untranslated": false
       },
       "ja": {
-        "text": "{n} account(s) imported successfully. (JA)",
+        "text": "{n}件のアカウントをインポートしました。",
         "untranslated": false
       },
       "zh": {
-        "text": "{n} account(s) imported successfully. (ZH)",
+        "text": "已成功导入 {n} 个账户。",
         "untranslated": false
       },
       "es": {
-        "text": "{n} account(s) imported successfully. (ES)",
+        "text": "{n} cuenta(s) importada(s) correctamente.",
         "untranslated": false
       },
       "pt": {
-        "text": "{n} account(s) imported successfully. (PT)",
+        "text": "{n} conta(s) importada(s) com sucesso.",
         "untranslated": false
       },
       "ko": {
@@ -2535,42 +2535,42 @@
         "untranslated": false
       },
       "th": {
-        "text": "{n} account(s) imported successfully. (TH)",
+        "text": "นำเข้า {n} บัญชีสำเร็จ",
         "untranslated": false
       },
       "vi": {
-        "text": "{n} account(s) imported successfully. (VI)",
+        "text": "Đã nhập thành công {n} tài khoản.",
         "untranslated": false
       }
     },
     "account.import.error": {
       "en": "Import Error",
       "de": {
-        "text": "Import Error (DE)",
+        "text": "Importfehler",
         "untranslated": false
       },
       "fr": {
-        "text": "Import Error (FR)",
+        "text": "Erreur d’importation",
         "untranslated": false
       },
       "it": {
-        "text": "Import Error (IT)",
+        "text": "Errore di importazione",
         "untranslated": false
       },
       "ja": {
-        "text": "Import Error (JA)",
+        "text": "インポートエラー",
         "untranslated": false
       },
       "zh": {
-        "text": "Import Error (ZH)",
+        "text": "导入错误",
         "untranslated": false
       },
       "es": {
-        "text": "Import Error (ES)",
+        "text": "Error de importación",
         "untranslated": false
       },
       "pt": {
-        "text": "Import Error (PT)",
+        "text": "Erro de importação",
         "untranslated": false
       },
       "ko": {
@@ -2598,42 +2598,42 @@
         "untranslated": false
       },
       "th": {
-        "text": "Import Error (TH)",
+        "text": "ข้อผิดพลาดในการนำเข้า",
         "untranslated": false
       },
       "vi": {
-        "text": "Import Error (VI)",
+        "text": "Lỗi nhập",
         "untranslated": false
       }
     },
     "account.import.invalid_format": {
       "en": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields.",
       "de": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (DE)",
+        "text": "Ungültiges Dateiformat. Erwartet wird ein JSON-Array mit den Feldern 'handle' und 'appPassword'.",
         "untranslated": false
       },
       "fr": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (FR)",
+        "text": "Format de fichier invalide. Un tableau JSON avec les champs 'handle' et 'appPassword' est attendu.",
         "untranslated": false
       },
       "it": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (IT)",
+        "text": "Formato file non valido. È previsto un array JSON con i campi 'handle' e 'appPassword'.",
         "untranslated": false
       },
       "ja": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (JA)",
+        "text": "無効なファイル形式です。'handle' と 'appPassword' フィールドを含むJSON配列が必要です。",
         "untranslated": false
       },
       "zh": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (ZH)",
+        "text": "文件格式无效。应为包含 'handle' 和 'appPassword' 字段的 JSON 数组。",
         "untranslated": false
       },
       "es": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (ES)",
+        "text": "Formato de archivo no válido. Se esperaba un array JSON con los campos 'handle' y 'appPassword'.",
         "untranslated": false
       },
       "pt": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (PT)",
+        "text": "Formato de arquivo inválido. Esperava-se um array JSON com os campos 'handle' e 'appPassword'.",
         "untranslated": false
       },
       "ko": {
@@ -2661,42 +2661,42 @@
         "untranslated": false
       },
       "th": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (TH)",
+        "text": "รูปแบบไฟล์ไม่ถูกต้อง ต้องเป็นอาร์เรย์ JSON ที่มีฟิลด์ 'handle' และ 'appPassword'",
         "untranslated": false
       },
       "vi": {
-        "text": "Invalid file format. Expected JSON array with 'handle' and 'appPassword' fields. (VI)",
+        "text": "Định dạng tệp không hợp lệ. Cần mảng JSON có các trường 'handle' và 'appPassword'.",
         "untranslated": false
       }
     },
     "account.import.skipped": {
       "en": "{n} account(s) were skipped due to missing or duplicate data.",
       "de": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (DE)",
+        "text": "{n} Account(s) wurden wegen fehlender oder doppelter Daten übersprungen.",
         "untranslated": false
       },
       "fr": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (FR)",
+        "text": "{n} compte(s) ignoré(s) en raison de données manquantes ou dupliquées.",
         "untranslated": false
       },
       "it": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (IT)",
+        "text": "{n} account ignorati per dati mancanti o duplicati.",
         "untranslated": false
       },
       "ja": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (JA)",
+        "text": "{n}件のアカウントは、データ不足または重複のためスキップされました。",
         "untranslated": false
       },
       "zh": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (ZH)",
+        "text": "由于数据缺失或重复，已跳过 {n} 个账户。",
         "untranslated": false
       },
       "es": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (ES)",
+        "text": "Se omitieron {n} cuenta(s) por datos faltantes o duplicados.",
         "untranslated": false
       },
       "pt": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (PT)",
+        "text": "{n} conta(s) foram ignoradas devido a dados ausentes ou duplicados.",
         "untranslated": false
       },
       "ko": {
@@ -2724,42 +2724,42 @@
         "untranslated": false
       },
       "th": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (TH)",
+        "text": "ข้าม {n} บัญชีเนื่องจากข้อมูลขาดหายหรือซ้ำกัน",
         "untranslated": false
       },
       "vi": {
-        "text": "{n} account(s) were skipped due to missing or duplicate data. (VI)",
+        "text": "Đã bỏ qua {n} tài khoản do thiếu dữ liệu hoặc dữ liệu trùng lặp.",
         "untranslated": false
       }
     },
     "account.import.success": {
       "en": "Import Successful",
       "de": {
-        "text": "Import Successful (DE)",
+        "text": "Import erfolgreich",
         "untranslated": false
       },
       "fr": {
-        "text": "Import Successful (FR)",
+        "text": "Importation réussie",
         "untranslated": false
       },
       "it": {
-        "text": "Import Successful (IT)",
+        "text": "Importazione riuscita",
         "untranslated": false
       },
       "ja": {
-        "text": "Import Successful (JA)",
+        "text": "インポートに成功しました",
         "untranslated": false
       },
       "zh": {
-        "text": "Import Successful (ZH)",
+        "text": "导入成功",
         "untranslated": false
       },
       "es": {
-        "text": "Import Successful (ES)",
+        "text": "Importación correcta",
         "untranslated": false
       },
       "pt": {
-        "text": "Import Successful (PT)",
+        "text": "Importação bem-sucedida",
         "untranslated": false
       },
       "ko": {
@@ -2787,11 +2787,11 @@
         "untranslated": false
       },
       "th": {
-        "text": "Import Successful (TH)",
+        "text": "นำเข้าสำเร็จ",
         "untranslated": false
       },
       "vi": {
-        "text": "Import Successful (VI)",
+        "text": "Nhập thành công",
         "untranslated": false
       }
     },
@@ -3302,31 +3302,31 @@
     "account.manage.more": {
       "en": "More",
       "de": {
-        "text": "More (DE)",
+        "text": "Mehr",
         "untranslated": false
       },
       "fr": {
-        "text": "More (FR)",
+        "text": "Plus",
         "untranslated": false
       },
       "it": {
-        "text": "More (IT)",
+        "text": "Altro",
         "untranslated": false
       },
       "ja": {
-        "text": "More (JA)",
+        "text": "その他",
         "untranslated": false
       },
       "zh": {
-        "text": "More (ZH)",
+        "text": "更多",
         "untranslated": false
       },
       "es": {
-        "text": "More (ES)",
+        "text": "Más",
         "untranslated": false
       },
       "pt": {
-        "text": "More (PT)",
+        "text": "Mais",
         "untranslated": false
       },
       "ko": {
@@ -3617,31 +3617,31 @@
     "account.preferred_search": {
       "en": "Default search account",
       "de": {
-        "text": "Standardsuchkonto (DE)",
+        "text": "Standardsuch-Account",
         "untranslated": false
       },
       "fr": {
-        "text": "Compte de recherche par défaut (FR)",
+        "text": "Compte de recherche par défaut",
         "untranslated": false
       },
       "it": {
-        "text": "Account di ricerca predefinito (IT)",
+        "text": "Account di ricerca predefinito",
         "untranslated": false
       },
       "ja": {
-        "text": "デフォルトの検索アカウント (JA)",
+        "text": "デフォルトの検索アカウント",
         "untranslated": false
       },
       "zh": {
-        "text": "默认搜索账户 (ZH)",
+        "text": "默认搜索账户",
         "untranslated": false
       },
       "es": {
-        "text": "Cuenta de búsqueda predeterminada (ES)",
+        "text": "Cuenta de búsqueda predeterminada",
         "untranslated": false
       },
       "pt": {
-        "text": "Conta de pesquisa padrão (PT)",
+        "text": "Conta de pesquisa padrão",
         "untranslated": false
       },
       "ko": {
@@ -3673,38 +3673,38 @@
         "untranslated": false
       },
       "vi": {
-        "text": "Default search account (VI)",
+        "text": "Tài khoản tìm kiếm mặc định",
         "untranslated": false
       }
     },
     "account.preferred_search.hint": {
       "en": "Choose an account with little or no blockings for unrestricted searches.",
       "de": {
-        "text": "Wähle ein Konto mit wenigen oder keinen Sperrungen für uneingeschränkte Suchen. (DE)",
+        "text": "Wählen Sie einen Account mit wenigen oder keinen Blockierungen für möglichst uneingeschränkte Suchen.",
         "untranslated": false
       },
       "fr": {
-        "text": "Choisissez un compte avec peu ou pas de blocages pour des recherches sans restriction. (FR)",
+        "text": "Choisissez un compte avec peu ou pas de blocages pour des recherches sans restriction.",
         "untranslated": false
       },
       "it": {
-        "text": "Scegli un account con pochi o nessun blocco per ricerche senza restrizioni. (IT)",
+        "text": "Scegli un account con pochi o nessun blocco per ricerche senza restrizioni.",
         "untranslated": false
       },
       "ja": {
-        "text": "ブロックが少ないか全くないアカウントを選択して、制限のない検索を行います。 (JA)",
+        "text": "ブロックが少ない、またはまったくないアカウントを選ぶと、より制限の少ない検索ができます。",
         "untranslated": false
       },
       "zh": {
-        "text": "选择一个没有或很少屏蔽的账户，进行无限制搜索。 (ZH)",
+        "text": "请选择屏蔽较少或没有屏蔽的账户，以便不受限制地搜索。",
         "untranslated": false
       },
       "es": {
-        "text": "Elija una cuenta con pocos o ningún bloqueo para búsquedas sin restricciones. (ES)",
+        "text": "Elija una cuenta con pocos o ningún bloqueo para búsquedas sin restricciones.",
         "untranslated": false
       },
       "pt": {
-        "text": "Escolha uma conta com poucos ou nenhum bloqueio para pesquisas sem restrições. (PT)",
+        "text": "Escolha uma conta com poucos ou nenhum bloqueio para pesquisas sem restrições.",
         "untranslated": false
       },
       "ko": {
@@ -3736,7 +3736,7 @@
         "untranslated": false
       },
       "vi": {
-        "text": "Choose an account with little or no blockings for unrestricted searches. (VI)",
+        "text": "Chọn tài khoản có ít hoặc không có lượt chặn để tìm kiếm không bị hạn chế.",
         "untranslated": false
       }
     },
@@ -4058,31 +4058,31 @@
     "account.preferred_search.section": {
       "en": "Preferred Account for Searching",
       "de": {
-        "text": "Bevorzugtes Konto für die Suche (DE)",
+        "text": "Bevorzugter Account für die Suche",
         "untranslated": false
       },
       "fr": {
-        "text": "Compte préféré pour la recherche (FR)",
+        "text": "Compte préféré pour la recherche",
         "untranslated": false
       },
       "it": {
-        "text": "Account preferito per la ricerca (IT)",
+        "text": "Account preferito per la ricerca",
         "untranslated": false
       },
       "ja": {
-        "text": "検索に使用する優先アカウント (JA)",
+        "text": "検索に使用する優先アカウント",
         "untranslated": false
       },
       "zh": {
-        "text": "首选搜索账户 (ZH)",
+        "text": "搜索首选账户",
         "untranslated": false
       },
       "es": {
-        "text": "Cuenta preferida para buscar (ES)",
+        "text": "Cuenta preferida para buscar",
         "untranslated": false
       },
       "pt": {
-        "text": "Conta Preferida para Pesquisar (PT)",
+        "text": "Conta preferida para pesquisa",
         "untranslated": false
       },
       "ko": {
@@ -4114,7 +4114,7 @@
         "untranslated": false
       },
       "vi": {
-        "text": "Preferred Account for Searching (VI)",
+        "text": "Tài khoản ưu tiên để tìm kiếm",
         "untranslated": false
       }
     },
@@ -4373,7 +4373,7 @@
     "account.switch_tab.hint": {
       "en": "Switches the active account to {handle}",
       "de": {
-        "text": "Schaltet das aktive Konto auf{handle}um",
+        "text": "Schaltet den aktiven Account auf {handle} um",
         "untranslated": false
       },
       "fr": {
@@ -4499,7 +4499,7 @@
     "account.switcher.hint": {
       "en": "Opens account switcher to change or manage accounts",
       "de": {
-        "text": "Öffnet die Account-Umschaltung",
+        "text": "Öffnet die Account-Auswahl zum Wechseln oder Verwalten von Accounts",
         "untranslated": false
       },
       "fr": {
@@ -7208,7 +7208,7 @@
     "actor_search.add_to_list.hint": {
       "en": "Adds this actor to the list",
       "de": {
-        "text": "Fügt diesen Schauspieler zur Liste hinzu",
+        "text": "Fügt diesen Account zur Liste hinzu",
         "untranslated": false
       },
       "fr": {
@@ -7271,7 +7271,7 @@
     "actor_search.toggle.hint": {
       "en": "Toggles the selection of this actor",
       "de": {
-        "text": "Schaltet die Auswahl dieses Schauspielers um",
+        "text": "Schaltet die Auswahl dieses Accounts um",
         "untranslated": false
       },
       "fr": {
@@ -7334,8 +7334,8 @@
     "ai.classify.no_models": {
       "en": "No Models Available",
       "de": {
-        "text": "No Models Available",
-        "untranslated": true
+        "text": "Keine Modelle verfügbar",
+        "untranslated": false
       },
       "fr": {
         "text": "No Models Available",
@@ -7397,8 +7397,8 @@
     "ai.classify.no_models_desc": {
       "en": "Download an AI model in Settings to classify posts.",
       "de": {
-        "text": "Download an AI model in Settings to classify posts.",
-        "untranslated": true
+        "text": "Laden Sie in den Einstellungen ein KI-Modell herunter, um Beiträge zu klassifizieren.",
+        "untranslated": false
       },
       "fr": {
         "text": "Download an AI model in Settings to classify posts.",
@@ -7460,8 +7460,8 @@
     "ai.classify.results": {
       "en": "Results",
       "de": {
-        "text": "Results",
-        "untranslated": true
+        "text": "Ergebnisse",
+        "untranslated": false
       },
       "fr": {
         "text": "Results",
@@ -7523,8 +7523,8 @@
     "ai.classify.run": {
       "en": "Run Classification",
       "de": {
-        "text": "Run Classification",
-        "untranslated": true
+        "text": "Klassifizierung ausführen",
+        "untranslated": false
       },
       "fr": {
         "text": "Run Classification",
@@ -7586,8 +7586,8 @@
     "ai.classify.select_models": {
       "en": "Select Models",
       "de": {
-        "text": "Select Models",
-        "untranslated": true
+        "text": "Modelle auswählen",
+        "untranslated": false
       },
       "fr": {
         "text": "Select Models",
@@ -7649,8 +7649,8 @@
     "ai.error.download_failed": {
       "en": "Download failed.",
       "de": {
-        "text": "Download failed.",
-        "untranslated": true
+        "text": "Download fehlgeschlagen.",
+        "untranslated": false
       },
       "fr": {
         "text": "Download failed.",
@@ -7712,8 +7712,8 @@
     "ai.error.not_downloaded": {
       "en": "Model not downloaded.",
       "de": {
-        "text": "Model not downloaded.",
-        "untranslated": true
+        "text": "Modell nicht heruntergeladen.",
+        "untranslated": false
       },
       "fr": {
         "text": "Model not downloaded.",
@@ -7775,8 +7775,8 @@
     "ai.error.not_loaded": {
       "en": "Model not loaded.",
       "de": {
-        "text": "Model not loaded.",
-        "untranslated": true
+        "text": "Modell nicht geladen.",
+        "untranslated": false
       },
       "fr": {
         "text": "Model not loaded.",
@@ -7838,8 +7838,8 @@
     "ai.error.runtime_not_available": {
       "en": "AI runtime not yet available.",
       "de": {
-        "text": "AI runtime not yet available.",
-        "untranslated": true
+        "text": "KI-Laufzeitumgebung ist noch nicht verfügbar.",
+        "untranslated": false
       },
       "fr": {
         "text": "AI runtime not yet available.",
@@ -7901,8 +7901,8 @@
     "ai.error.unsupported_role": {
       "en": "Unsupported model role.",
       "de": {
-        "text": "Unsupported model role.",
-        "untranslated": true
+        "text": "Nicht unterstützte Modellrolle.",
+        "untranslated": false
       },
       "fr": {
         "text": "Unsupported model role.",
@@ -7964,8 +7964,8 @@
     "ai.models.delete": {
       "en": "Delete",
       "de": {
-        "text": "Delete",
-        "untranslated": true
+        "text": "Löschen",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete",
@@ -8027,8 +8027,8 @@
     "ai.models.download": {
       "en": "Download",
       "de": {
-        "text": "Download",
-        "untranslated": true
+        "text": "Herunterladen",
+        "untranslated": false
       },
       "fr": {
         "text": "Download",
@@ -8090,8 +8090,8 @@
     "ai.models.downloading_label": {
       "en": "Downloading...",
       "de": {
-        "text": "Downloading...",
-        "untranslated": true
+        "text": "Wird heruntergeladen...",
+        "untranslated": false
       },
       "fr": {
         "text": "Downloading...",
@@ -8122,24 +8122,24 @@
         "untranslated": true
       },
       "ru": {
-        "text": "Downloading...",
-        "untranslated": true
+        "text": "Загрузка...",
+        "untranslated": false
       },
       "ar": {
-        "text": "Downloading...",
-        "untranslated": true
+        "text": "جارٍ التنزيل...",
+        "untranslated": false
       },
       "nl": {
-        "text": "Downloading...",
-        "untranslated": true
+        "text": "Downloaden...",
+        "untranslated": false
       },
       "pl": {
-        "text": "Downloading...",
-        "untranslated": true
+        "text": "Pobieranie...",
+        "untranslated": false
       },
       "tr": {
-        "text": "Downloading...",
-        "untranslated": true
+        "text": "İndiriliyor...",
+        "untranslated": false
       },
       "th": {
         "text": "Downloading...",
@@ -8153,8 +8153,8 @@
     "ai.models.empty": {
       "en": "No Models Available",
       "de": {
-        "text": "No Models Available",
-        "untranslated": true
+        "text": "Keine KI-Modelle verfügbar",
+        "untranslated": false
       },
       "fr": {
         "text": "No Models Available",
@@ -8216,8 +8216,8 @@
     "ai.models.empty_desc": {
       "en": "No AI model catalog found. A future update will add downloadable on-device AI models.",
       "de": {
-        "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
-        "untranslated": true
+        "text": "Kein KI-Modellkatalog gefunden. Ein zukünftiges Update wird herunterladbare On-Device-KI-Modelle hinzufügen.",
+        "untranslated": false
       },
       "fr": {
         "text": "No AI model catalog found. A future update will add downloadable on-device AI models.",
@@ -8279,8 +8279,8 @@
     "ai.models.failed_label": {
       "en": "Failed",
       "de": {
-        "text": "Failed",
-        "untranslated": true
+        "text": "Fehlgeschlagen",
+        "untranslated": false
       },
       "fr": {
         "text": "Failed",
@@ -8342,8 +8342,8 @@
     "ai.models.not_downloaded_label": {
       "en": "Not downloaded",
       "de": {
-        "text": "Not downloaded",
-        "untranslated": true
+        "text": "Nicht heruntergeladen",
+        "untranslated": false
       },
       "fr": {
         "text": "Not downloaded",
@@ -8405,8 +8405,8 @@
     "ai.models.refresh": {
       "en": "Refresh",
       "de": {
-        "text": "Refresh",
-        "untranslated": true
+        "text": "Aktualisieren",
+        "untranslated": false
       },
       "fr": {
         "text": "Refresh",
@@ -8468,8 +8468,8 @@
     "ai.models.retry": {
       "en": "Retry",
       "de": {
-        "text": "Retry",
-        "untranslated": true
+        "text": "Wiederholen",
+        "untranslated": false
       },
       "fr": {
         "text": "Retry",
@@ -8531,8 +8531,8 @@
     "ai.models.role.classifier": {
       "en": "Classifier",
       "de": {
-        "text": "Classifier",
-        "untranslated": true
+        "text": "Klassifizierer",
+        "untranslated": false
       },
       "fr": {
         "text": "Classifier",
@@ -8657,8 +8657,8 @@
     "ai.models.section": {
       "en": "Available Models",
       "de": {
-        "text": "Available Models",
-        "untranslated": true
+        "text": "Verfügbare Modelle",
+        "untranslated": false
       },
       "fr": {
         "text": "Available Models",
@@ -8720,8 +8720,8 @@
     "ai.models.title": {
       "en": "AI Models",
       "de": {
-        "text": "AI Models",
-        "untranslated": true
+        "text": "KI-Modelle",
+        "untranslated": false
       },
       "fr": {
         "text": "AI Models",
@@ -11240,7 +11240,7 @@
     "common.progress.hint": {
       "en": "{title}: {completedCount} of {totalCount} complete",
       "de": {
-        "text": "{title}: {completedCount} oder {totalCount} abgeschlossen",
+        "text": "{title}: {completedCount} von {totalCount} abgeschlossen",
         "untranslated": false
       },
       "fr": {
@@ -11555,8 +11555,8 @@
     "compose.allow_quoting": {
       "en": "Allow quoting",
       "de": {
-        "text": "Allow quoting",
-        "untranslated": true
+        "text": "Zitieren erlauben",
+        "untranslated": false
       },
       "fr": {
         "text": "Allow quoting",
@@ -11933,8 +11933,8 @@
     "compose.image_resize_message": {
       "en": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
       "de": {
-        "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
-        "untranslated": true
+        "text": "Einige Bilder überschreiten das Limit von 4000×4000 px oder 2 MB. Herunterskalieren?",
+        "untranslated": false
       },
       "fr": {
         "text": "Some images exceed the 4000×4000px or 2MB limit. Scale them down?",
@@ -11996,8 +11996,8 @@
     "compose.image_resize_scale": {
       "en": "Scale Down",
       "de": {
-        "text": "Scale Down",
-        "untranslated": true
+        "text": "Herunterskalieren",
+        "untranslated": false
       },
       "fr": {
         "text": "Scale Down",
@@ -12059,8 +12059,8 @@
     "compose.image_resize_title": {
       "en": "Image Size Alert",
       "de": {
-        "text": "Image Size Alert",
-        "untranslated": true
+        "text": "Bildgröße prüfen",
+        "untranslated": false
       },
       "fr": {
         "text": "Image Size Alert",
@@ -12122,8 +12122,8 @@
     "compose.image_scaling": {
       "en": "Scaling images...",
       "de": {
-        "text": "Scaling images...",
-        "untranslated": true
+        "text": "Bilder werden skaliert...",
+        "untranslated": false
       },
       "fr": {
         "text": "Scaling images...",
@@ -12154,24 +12154,24 @@
         "untranslated": true
       },
       "ru": {
-        "text": "Scaling images...",
-        "untranslated": true
+        "text": "Масштабирование изображений...",
+        "untranslated": false
       },
       "ar": {
-        "text": "Scaling images...",
-        "untranslated": true
+        "text": "جارٍ تصغير الصور...",
+        "untranslated": false
       },
       "nl": {
-        "text": "Scaling images...",
-        "untranslated": true
+        "text": "Afbeeldingen schalen...",
+        "untranslated": false
       },
       "pl": {
-        "text": "Scaling images...",
-        "untranslated": true
+        "text": "Skalowanie obrazów...",
+        "untranslated": false
       },
       "tr": {
-        "text": "Scaling images...",
-        "untranslated": true
+        "text": "Görseller ölçekleniyor...",
+        "untranslated": false
       },
       "th": {
         "text": "Scaling images...",
@@ -12626,8 +12626,8 @@
     "compose.reply_controls": {
       "en": "Who can reply",
       "de": {
-        "text": "Who can reply",
-        "untranslated": true
+        "text": "Wer antworten darf",
+        "untranslated": false
       },
       "fr": {
         "text": "Who can reply",
@@ -12689,8 +12689,8 @@
     "compose.reply_everyone": {
       "en": "Everyone",
       "de": {
-        "text": "Everyone",
-        "untranslated": true
+        "text": "Alle",
+        "untranslated": false
       },
       "fr": {
         "text": "Everyone",
@@ -12752,8 +12752,8 @@
     "compose.reply_following": {
       "en": "People you follow",
       "de": {
-        "text": "People you follow",
-        "untranslated": true
+        "text": "Personen, denen Sie folgen",
+        "untranslated": false
       },
       "fr": {
         "text": "People you follow",
@@ -12815,8 +12815,8 @@
     "compose.reply_list": {
       "en": "Custom list",
       "de": {
-        "text": "Custom list",
-        "untranslated": true
+        "text": "Benutzerdefinierte Liste",
+        "untranslated": false
       },
       "fr": {
         "text": "Custom list",
@@ -12878,8 +12878,8 @@
     "compose.reply_list_count": {
       "en": "{n} members",
       "de": {
-        "text": "{n} members",
-        "untranslated": true
+        "text": "{n} Mitglieder",
+        "untranslated": false
       },
       "fr": {
         "text": "{n} members",
@@ -12941,8 +12941,8 @@
     "compose.reply_list_pick": {
       "en": "Choose a list",
       "de": {
-        "text": "Choose a list",
-        "untranslated": true
+        "text": "Liste auswählen",
+        "untranslated": false
       },
       "fr": {
         "text": "Choose a list",
@@ -13004,8 +13004,8 @@
     "compose.reply_mention": {
       "en": "Mentioned users only",
       "de": {
-        "text": "Mentioned users only",
-        "untranslated": true
+        "text": "Nur erwähnte Nutzer",
+        "untranslated": false
       },
       "fr": {
         "text": "Mentioned users only",
@@ -13067,8 +13067,8 @@
     "compose.reply_nobody": {
       "en": "Nobody",
       "de": {
-        "text": "Nobody",
-        "untranslated": true
+        "text": "Niemand",
+        "untranslated": false
       },
       "fr": {
         "text": "Nobody",
@@ -13804,7 +13804,7 @@
         "untranslated": false
       },
       "pl": {
-        "text": "Badawczy...",
+        "text": "Wyszukiwanie...",
         "untranslated": false
       },
       "tr": {
@@ -14768,8 +14768,8 @@
     "dashboard.title": {
       "en": "Dashboard",
       "de": {
-        "text": "Armaturenbrett",
-        "untranslated": false
+        "text": "Dashboard",
+        "untranslated": true
       },
       "fr": {
         "text": "Tableau de bord",
@@ -15461,8 +15461,8 @@
     "directreplies.empty": {
       "en": "No direct replies",
       "de": {
-        "text": "No direct replies",
-        "untranslated": true
+        "text": "Keine direkten Antworten",
+        "untranslated": false
       },
       "fr": {
         "text": "No direct replies",
@@ -15524,8 +15524,8 @@
     "directreplies.empty_desc": {
       "en": "No one has replied to your posts yet",
       "de": {
-        "text": "No one has replied to your posts yet",
-        "untranslated": true
+        "text": "Noch niemand hat auf Ihre Beiträge geantwortet",
+        "untranslated": false
       },
       "fr": {
         "text": "No one has replied to your posts yet",
@@ -15587,8 +15587,8 @@
     "directreplies.end": {
       "en": "No more replies",
       "de": {
-        "text": "No more replies",
-        "untranslated": true
+        "text": "Keine weiteren Antworten",
+        "untranslated": false
       },
       "fr": {
         "text": "No more replies",
@@ -15650,8 +15650,8 @@
     "directreplies.fetching_page": {
       "en": "Fetching page {n}...",
       "de": {
-        "text": "Fetching page {n}...",
-        "untranslated": true
+        "text": "Seite {n} wird geladen...",
+        "untranslated": false
       },
       "fr": {
         "text": "Fetching page {n}...",
@@ -15682,24 +15682,24 @@
         "untranslated": true
       },
       "ru": {
-        "text": "Fetching page {n}...",
-        "untranslated": true
+        "text": "Загрузка страницы {n}...",
+        "untranslated": false
       },
       "ar": {
-        "text": "Fetching page {n}...",
-        "untranslated": true
+        "text": "جارٍ تحميل الصفحة {n}...",
+        "untranslated": false
       },
       "nl": {
-        "text": "Fetching page {n}...",
-        "untranslated": true
+        "text": "Pagina {n} ophalen...",
+        "untranslated": false
       },
       "pl": {
-        "text": "Fetching page {n}...",
-        "untranslated": true
+        "text": "Pobieranie strony {n}...",
+        "untranslated": false
       },
       "tr": {
-        "text": "Fetching page {n}...",
-        "untranslated": true
+        "text": "Sayfa {n} alınıyor...",
+        "untranslated": false
       },
       "th": {
         "text": "Fetching page {n}...",
@@ -15713,7 +15713,7 @@
     "directreplies.loading": {
       "en": "Scanning your posts...",
       "de": {
-        "text": "Loading replies...",
+        "text": "Antworten werden geladen...",
         "untranslated": false
       },
       "fr": {
@@ -15745,23 +15745,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Loading replies...",
+        "text": "Загрузка ответов...",
         "untranslated": false
       },
       "ar": {
-        "text": "Loading replies...",
+        "text": "جارٍ تحميل الردود...",
         "untranslated": false
       },
       "nl": {
-        "text": "Loading replies...",
+        "text": "Antwoorden laden...",
         "untranslated": false
       },
       "pl": {
-        "text": "Loading replies...",
+        "text": "Ładowanie odpowiedzi...",
         "untranslated": false
       },
       "tr": {
-        "text": "Loading replies...",
+        "text": "Yanıtlar yükleniyor...",
         "untranslated": false
       },
       "th": {
@@ -15776,8 +15776,8 @@
     "directreplies.scanning_posts": {
       "en": "Fetching your posts...",
       "de": {
-        "text": "Fetching your posts...",
-        "untranslated": true
+        "text": "Ihre Beiträge werden geladen...",
+        "untranslated": false
       },
       "fr": {
         "text": "Fetching your posts...",
@@ -15808,24 +15808,24 @@
         "untranslated": true
       },
       "ru": {
-        "text": "Fetching your posts...",
-        "untranslated": true
+        "text": "Загрузка ваших постов...",
+        "untranslated": false
       },
       "ar": {
-        "text": "Fetching your posts...",
-        "untranslated": true
+        "text": "جارٍ تحميل منشوراتك...",
+        "untranslated": false
       },
       "nl": {
-        "text": "Fetching your posts...",
-        "untranslated": true
+        "text": "Je berichten ophalen...",
+        "untranslated": false
       },
       "pl": {
-        "text": "Fetching your posts...",
-        "untranslated": true
+        "text": "Pobieranie Twoich postów...",
+        "untranslated": false
       },
       "tr": {
-        "text": "Fetching your posts...",
-        "untranslated": true
+        "text": "Gönderileriniz alınıyor...",
+        "untranslated": false
       },
       "th": {
         "text": "Fetching your posts...",
@@ -15839,8 +15839,8 @@
     "directreplies.scanning_progress": {
       "en": "Scanning post {n} of {total}...",
       "de": {
-        "text": "Scanning post {n} of {total}...",
-        "untranslated": true
+        "text": "Beitrag {n} von {total} wird geprüft...",
+        "untranslated": false
       },
       "fr": {
         "text": "Scanning post {n} of {total}...",
@@ -15902,8 +15902,8 @@
     "directreplies.searching_as": {
       "en": "Searching as",
       "de": {
-        "text": "Searching as",
-        "untranslated": true
+        "text": "Suchen als",
+        "untranslated": false
       },
       "fr": {
         "text": "Searching as",
@@ -15965,8 +15965,8 @@
     "directreplies.title": {
       "en": "Direct replies",
       "de": {
-        "text": "Direct replies",
-        "untranslated": true
+        "text": "Direkte Antworten",
+        "untranslated": false
       },
       "fr": {
         "text": "Direct replies",
@@ -16123,23 +16123,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Loading followers... (RU)",
+        "text": "Загрузка подписчиков...",
         "untranslated": false
       },
       "ar": {
-        "text": "Loading followers... (AR)",
+        "text": "جارٍ تحميل المتابعين...",
         "untranslated": false
       },
       "nl": {
-        "text": "Follower werden geladen... (NL)",
+        "text": "Volgers laden...",
         "untranslated": false
       },
       "pl": {
-        "text": "Loading followers... (PL)",
+        "text": "Ładowanie obserwujących...",
         "untranslated": false
       },
       "tr": {
-        "text": "Loading followers... (TR)",
+        "text": "Takipçiler yükleniyor...",
         "untranslated": false
       },
       "th": {
@@ -16784,7 +16784,7 @@
     "gif.no_results_desc": {
       "en": "No GIFs match your search. Try a different term.",
       "de": {
-        "text": "Keine GIFs entsprechen Ihrer Suche.Versuchen Sie es mit einem anderen Begriff.",
+        "text": "Keine GIFs entsprechen Ihrer Suche. Versuchen Sie es mit einem anderen Begriff.",
         "untranslated": false
       },
       "fr": {
@@ -17344,7 +17344,7 @@
         "untranslated": false
       },
       "vi": {
-        "text": "屏蔽和被屏蔽数据由 ClearSky 提供。ClearSky 从 Bluesky 数据流索引屏蔽记录，并通过公共 API 提供。 (VI)",
+        "text": "Dữ liệu chặn và bị chặn được cung cấp bởi ClearSky. ClearSky lập chỉ mục bản ghi chặn từ luồng dữ liệu Bluesky và cung cấp qua API công khai.",
         "untranslated": false
       }
     },
@@ -17741,12 +17741,12 @@
         "untranslated": false
       },
       "ja": {
-        "text": "[ja] Bluesky-API",
-        "untranslated": false
+        "text": "Bluesky API",
+        "untranslated": true
       },
       "zh": {
-        "text": "[zh] Bluesky-API",
-        "untranslated": false
+        "text": "Bluesky API",
+        "untranslated": true
       },
       "es": {
         "text": "[es] Bluesky-API",
@@ -17804,7 +17804,7 @@
         "untranslated": false
       },
       "ja": {
-        "text": "[ja] Live Lesen/Schreiben",
+        "text": "ライブ読み取り/書き込み",
         "untranslated": false
       },
       "zh": {
@@ -19178,8 +19178,8 @@
     "info.feature.moderation": {
       "en": "Moderation",
       "de": {
-        "text": "Mäßigung",
-        "untranslated": false
+        "text": "Moderation",
+        "untranslated": true
       },
       "fr": {
         "text": "Modération",
@@ -19647,7 +19647,7 @@
         "untranslated": false
       },
       "ko": {
-        "text": "github.com/zopyx/RULYX (KO)",
+        "text": "github.com/zopyx/RULYX",
         "untranslated": false
       },
       "ru": {
@@ -19864,7 +19864,7 @@
         "untranslated": false
       },
       "vi": {
-        "text": "账户机密数据永远不会离开您的设备。所有 API 调用直接发送到您的 Bluesky PDS。 (VI)",
+        "text": "Thông tin bí mật của tài khoản không bao giờ rời khỏi thiết bị của bạn. Tất cả lệnh gọi API được gửi trực tiếp đến Bluesky PDS của bạn.",
         "untranslated": false
       }
     },
@@ -21068,8 +21068,8 @@
     "internal.list.delete": {
       "en": "Delete List",
       "de": {
-        "text": "Delete List",
-        "untranslated": true
+        "text": "Liste löschen",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete List",
@@ -21131,8 +21131,8 @@
     "internal.list.delete_confirm": {
       "en": "Delete this internal list?",
       "de": {
-        "text": "Delete this internal list?",
-        "untranslated": true
+        "text": "Diese interne Liste löschen?",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete this internal list?",
@@ -21194,8 +21194,8 @@
     "internal.list.delete_message": {
       "en": "This cannot be undone.",
       "de": {
-        "text": "This cannot be undone.",
-        "untranslated": true
+        "text": "Dies kann nicht rückgängig gemacht werden.",
+        "untranslated": false
       },
       "fr": {
         "text": "This cannot be undone.",
@@ -21257,8 +21257,8 @@
     "internal.list.empty": {
       "en": "No internal lists yet",
       "de": {
-        "text": "No internal lists yet",
-        "untranslated": true
+        "text": "Noch keine internen Listen",
+        "untranslated": false
       },
       "fr": {
         "text": "No internal lists yet",
@@ -21320,8 +21320,8 @@
     "internal.list.member_count": {
       "en": "{n} members",
       "de": {
-        "text": "{n} members",
-        "untranslated": true
+        "text": "{n} Mitglieder",
+        "untranslated": false
       },
       "fr": {
         "text": "{n} members",
@@ -21383,8 +21383,8 @@
     "internal.list.no_members": {
       "en": "No members",
       "de": {
-        "text": "No members",
-        "untranslated": true
+        "text": "Keine Mitglieder",
+        "untranslated": false
       },
       "fr": {
         "text": "No members",
@@ -21446,8 +21446,8 @@
     "internal.lists.color": {
       "en": "Color",
       "de": {
-        "text": "Color",
-        "untranslated": true
+        "text": "Farbe",
+        "untranslated": false
       },
       "fr": {
         "text": "Color",
@@ -21509,8 +21509,8 @@
     "internal.lists.create": {
       "en": "New List",
       "de": {
-        "text": "New List",
-        "untranslated": true
+        "text": "Neue Liste",
+        "untranslated": false
       },
       "fr": {
         "text": "New List",
@@ -21635,8 +21635,8 @@
     "internal.lists.section": {
       "en": "My Internal Lists",
       "de": {
-        "text": "My Internal Lists",
-        "untranslated": true
+        "text": "Meine internen Listen",
+        "untranslated": false
       },
       "fr": {
         "text": "My Internal Lists",
@@ -21698,8 +21698,8 @@
     "internal.profile.add_to": {
       "en": "Add to {list}",
       "de": {
-        "text": "Add to {list}",
-        "untranslated": true
+        "text": "Zu {list} hinzufügen",
+        "untranslated": false
       },
       "fr": {
         "text": "Add to {list}",
@@ -21761,8 +21761,8 @@
     "internal.profile.remove_from": {
       "en": "Remove from {list}",
       "de": {
-        "text": "Remove from {list}",
-        "untranslated": true
+        "text": "Aus {list} entfernen",
+        "untranslated": false
       },
       "fr": {
         "text": "Remove from {list}",
@@ -21824,8 +21824,8 @@
     "internal.profile.section": {
       "en": "My Internal Tags",
       "de": {
-        "text": "My Internal Tags",
-        "untranslated": true
+        "text": "Meine internen Tags",
+        "untranslated": false
       },
       "fr": {
         "text": "My Internal Tags",
@@ -21887,8 +21887,8 @@
     "label.!hide": {
       "en": "Hidden",
       "de": {
-        "text": "Hidden",
-        "untranslated": true
+        "text": "Ausgeblendet",
+        "untranslated": false
       },
       "fr": {
         "text": "Hidden",
@@ -21950,8 +21950,8 @@
     "label.!no-unauthenticated": {
       "en": "No Unauthenticated Access",
       "de": {
-        "text": "No Unauthenticated Access",
-        "untranslated": true
+        "text": "Kein nicht authentifizierter Zugriff",
+        "untranslated": false
       },
       "fr": {
         "text": "No Unauthenticated Access",
@@ -22013,8 +22013,8 @@
     "label.!warn": {
       "en": "Warning",
       "de": {
-        "text": "Warning",
-        "untranslated": true
+        "text": "Warnung",
+        "untranslated": false
       },
       "fr": {
         "text": "Warning",
@@ -22139,8 +22139,8 @@
     "label.graphic-media": {
       "en": "Graphic Media",
       "de": {
-        "text": "Graphic Media",
-        "untranslated": true
+        "text": "Grafische Medien",
+        "untranslated": false
       },
       "fr": {
         "text": "Graphic Media",
@@ -22202,8 +22202,8 @@
     "label.impersonation": {
       "en": "Impersonation",
       "de": {
-        "text": "Impersonation",
-        "untranslated": true
+        "text": "Identitätsmissbrauch",
+        "untranslated": false
       },
       "fr": {
         "text": "Impersonation",
@@ -22265,8 +22265,8 @@
     "label.nudity": {
       "en": "Nudity",
       "de": {
-        "text": "Nudity",
-        "untranslated": true
+        "text": "Nacktheit",
+        "untranslated": false
       },
       "fr": {
         "text": "Nudity",
@@ -22328,8 +22328,8 @@
     "label.porn": {
       "en": "Pornographic",
       "de": {
-        "text": "Pornographic",
-        "untranslated": true
+        "text": "Pornografisch",
+        "untranslated": false
       },
       "fr": {
         "text": "Pornographic",
@@ -22391,8 +22391,8 @@
     "label.sexual": {
       "en": "Sexual",
       "de": {
-        "text": "Sexual",
-        "untranslated": true
+        "text": "Sexuell",
+        "untranslated": false
       },
       "fr": {
         "text": "Sexual",
@@ -24344,7 +24344,7 @@
     "list.compare.help_tooltip": {
       "en": "Compare this list against another list. View overlapping and unique members, then copy or move members between lists.",
       "de": {
-        "text": "Vergleichen Sie diese Liste mit einer anderen Liste.Zeigen Sie überlappende und eindeutige Mitglieder an und kopieren oder verschieben Sie dann Mitglieder zwischen Listen.",
+        "text": "Vergleichen Sie diese Liste mit einer anderen Liste. Zeigen Sie überschneidende und eindeutige Mitglieder an und kopieren oder verschieben Sie anschließend Mitglieder zwischen Listen.",
         "untranslated": false
       },
       "fr": {
@@ -25730,7 +25730,7 @@
     "list.create.discard.hint": {
       "en": "Discards and dismisses the create list sheet",
       "de": {
-        "text": "Verwirft und verwirft das Erstellungslistenblatt",
+        "text": "Verwirft Änderungen und schließt das Formular zum Erstellen der Liste",
         "untranslated": false
       },
       "fr": {
@@ -28691,7 +28691,7 @@
     "list.detail.subscribe.success": {
       "en": "Subscribed successfully",
       "de": {
-        "text": "Abonniert erfolgreich",
+        "text": "Erfolgreich abonniert",
         "untranslated": false
       },
       "fr": {
@@ -28817,7 +28817,7 @@
     "list.detail.subscribed": {
       "en": "Subscribed",
       "de": {
-        "text": "Gezeichnet",
+        "text": "Abonniert",
         "untranslated": false
       },
       "fr": {
@@ -31400,7 +31400,7 @@
     "list.import_preview.help_write": {
       "en": "Importing writes to the live Bluesky list immediately.",
       "de": {
-        "text": "Der Import schreibt sofort in die live Bluesky-Liste.",
+        "text": "Der Import schreibt sofort in die Live-Liste auf Bluesky.",
         "untranslated": false
       },
       "fr": {
@@ -31967,8 +31967,8 @@
     "list.kind.internal": {
       "en": "Internal Lists",
       "de": {
-        "text": "Internal Lists",
-        "untranslated": true
+        "text": "Interne Listen",
+        "untranslated": false
       },
       "fr": {
         "text": "Internal Lists",
@@ -32156,7 +32156,7 @@
     "list.members.block_selected": {
       "en": "Block Selected",
       "de": {
-        "text": "Block ausgewählt",
+        "text": "Ausgewählte blockieren",
         "untranslated": false
       },
       "fr": {
@@ -32219,7 +32219,7 @@
     "list.members.bulk_action_title": {
       "en": "Confirm Bulk Action",
       "de": {
-        "text": "Bestätigen Sie die Massenaktion",
+        "text": "Massenaktion bestätigen",
         "untranslated": false
       },
       "fr": {
@@ -32286,7 +32286,7 @@
         "untranslated": false
       },
       "fr": {
-        "text": "Bloquer {count} les membres sélectionnés ?",
+        "text": "Bloquer {count} membres sélectionnés ?",
         "untranslated": false
       },
       "it": {
@@ -32306,7 +32306,7 @@
         "untranslated": false
       },
       "pt": {
-        "text": "Bloquear membros selecionados {count}?",
+        "text": "Bloquear {count} membros selecionados?",
         "untranslated": false
       },
       "ko": {
@@ -32349,11 +32349,11 @@
         "untranslated": false
       },
       "fr": {
-        "text": "Muet {count} des membres sélectionnés ?",
+        "text": "Mettre en sourdine {count} membres sélectionnés ?",
         "untranslated": false
       },
       "it": {
-        "text": "Disattivare i membri selezionati {count}?",
+        "text": "Silenziare {count} membri selezionati?",
         "untranslated": false
       },
       "ja": {
@@ -32365,11 +32365,11 @@
         "untranslated": false
       },
       "es": {
-        "text": "¿Silenciar a los miembros seleccionados {count}?",
+        "text": "¿Silenciar {count} miembros seleccionados?",
         "untranslated": false
       },
       "pt": {
-        "text": "Silenciar membros selecionados {count}?",
+        "text": "Silenciar {count} membros selecionados?",
         "untranslated": false
       },
       "ko": {
@@ -32412,11 +32412,11 @@
         "untranslated": false
       },
       "fr": {
-        "text": "Débloquer {count} les membres sélectionnés ?",
+        "text": "Débloquer {count} membres sélectionnés ?",
         "untranslated": false
       },
       "it": {
-        "text": "Sbloccare i membri selezionati {count}?",
+        "text": "Sbloccare {count} membri selezionati?",
         "untranslated": false
       },
       "ja": {
@@ -32428,11 +32428,11 @@
         "untranslated": false
       },
       "es": {
-        "text": "¿Desbloquear miembros seleccionados de {count}?",
+        "text": "¿Desbloquear {count} miembros seleccionados?",
         "untranslated": false
       },
       "pt": {
-        "text": "Desbloquear membros selecionados {count}?",
+        "text": "Desbloquear {count} membros selecionados?",
         "untranslated": false
       },
       "ko": {
@@ -32471,15 +32471,15 @@
     "list.members.bulk_unmute_message": {
       "en": "Unmute {count} selected members?",
       "de": {
-        "text": "Stummschaltung aufheben{count}ausgewählte Mitglieder?",
+        "text": "Stummschaltung für {count} ausgewählte Mitglieder aufheben?",
         "untranslated": false
       },
       "fr": {
-        "text": "Activer le son des membres {count} sélectionnés ?",
+        "text": "Réactiver {count} membres sélectionnés ?",
         "untranslated": false
       },
       "it": {
-        "text": "Riattivare l'audio dei membri selezionati {count}?",
+        "text": "Riattivare {count} membri selezionati?",
         "untranslated": false
       },
       "ja": {
@@ -32491,11 +32491,11 @@
         "untranslated": false
       },
       "es": {
-        "text": "¿Quieres activar el silencio de los miembros seleccionados de {count}?",
+        "text": "¿Dejar de silenciar {count} miembros seleccionados?",
         "untranslated": false
       },
       "pt": {
-        "text": "Ativar som {count} membros selecionados?",
+        "text": "Reativar o som de {count} membros selecionados?",
         "untranslated": false
       },
       "ko": {
@@ -33479,7 +33479,7 @@
     "list.members.mute_selected": {
       "en": "Mute Selected",
       "de": {
-        "text": "Stummschaltung ausgewählt",
+        "text": "Ausgewählte stummschalten",
         "untranslated": false
       },
       "fr": {
@@ -34298,7 +34298,7 @@
     "list.row.label": {
       "en": "{name}, {count} members",
       "de": {
-        "text": "{name}-, {count}-Mitglieder",
+        "text": "{name}, {count} Mitglieder",
         "untranslated": false
       },
       "fr": {
@@ -36629,7 +36629,7 @@
     "list.snapshot.current": {
       "en": "Current snapshot: {date}",
       "de": {
-        "text": "Aktueller Snapshot: {date}",
+        "text": "Aktueller Schnappschuss: {date}",
         "untranslated": false
       },
       "fr": {
@@ -37322,7 +37322,7 @@
     "list.snapshot.help_tooltip": {
       "en": "Snapshots capture the full membership of a list at a point in time. Compare two snapshots to see what changed.",
       "de": {
-        "text": "Snapshots erfassen die vollständige Mitgliedschaft einer Liste zu einem bestimmten Zeitpunkt.Vergleichen Sie zwei Schnappschüsse, um zu sehen, was sich geändert hat.",
+        "text": "Schnappschüsse erfassen die vollständige Mitgliedschaft einer Liste zu einem bestimmten Zeitpunkt. Vergleichen Sie zwei Schnappschüsse, um zu sehen, was sich geändert hat.",
         "untranslated": false
       },
       "fr": {
@@ -38740,23 +38740,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Paste the AT URI of a list (e.g. at://did:plc:.../app.bsky.graph.list/rkey) or a bsky.app profile URL. (RU)",
+        "text": "Вставьте AT URI списка (например, at://did:plc:.../app.bsky.graph.list/rkey) или URL профиля bsky.app.",
         "untranslated": false
       },
       "ar": {
-        "text": "Paste the AT URI of a list (e.g. at://did:plc:.../app.bsky.graph.list/rkey) or a bsky.app profile URL. (AR)",
+        "text": "الصق AT URI لقائمة (مثل at://did:plc:.../app.bsky.graph.list/rkey) أو رابط ملف شخصي على bsky.app.",
         "untranslated": false
       },
       "nl": {
-        "text": "Fügen Sie die AT-URI einer Liste oder eine bsky.app-Profil-URL ein. (NL)",
+        "text": "Plak de AT-URI van een lijst (bijv. at://did:plc:.../app.bsky.graph.list/rkey) of een bsky.app-profiel-URL.",
         "untranslated": false
       },
       "pl": {
-        "text": "Paste the AT URI of a list (e.g. at://did:plc:.../app.bsky.graph.list/rkey) or a bsky.app profile URL. (PL)",
+        "text": "Wklej AT URI listy (np. at://did:plc:.../app.bsky.graph.list/rkey) lub URL profilu bsky.app.",
         "untranslated": false
       },
       "tr": {
-        "text": "Paste the AT URI of a list (e.g. at://did:plc:.../app.bsky.graph.list/rkey) or a bsky.app profile URL. (TR)",
+        "text": "Bir listenin AT URI'sini (örn. at://did:plc:.../app.bsky.graph.list/rkey) veya bsky.app profil URL'sini yapıştırın.",
         "untranslated": false
       },
       "th": {
@@ -39338,8 +39338,8 @@
     "lists.advanced.directreplies_button": {
       "en": "Replies to my posts/replies",
       "de": {
-        "text": "Replies to my posts/replies",
-        "untranslated": true
+        "text": "Antworten auf meine Beiträge/Antworten",
+        "untranslated": false
       },
       "fr": {
         "text": "Replies to my posts/replies",
@@ -40220,7 +40220,7 @@
     "lists.lists.help": {
       "en": "Regular lists organize accounts for reference without moderation actions.",
       "de": {
-        "text": "Regelmäßige Listen organisieren Konten als Referenz ohne Moderationsmaßnahmen.",
+        "text": "Normale Listen organisieren Accounts zur Orientierung, ohne Moderationsaktionen auszulösen.",
         "untranslated": false
       },
       "fr": {
@@ -40535,7 +40535,7 @@
     "lists.moderation_lists.help": {
       "en": "Moderation lists let you bulk-mute or bulk-block accounts together. Tap + to create one.",
       "de": {
-        "text": "Mit Moderationslisten können Sie Konten gemeinsam stummschalten oder sperren.Tippen Sie auf +, um eines zu erstellen.",
+        "text": "Mit Moderationslisten können Sie Accounts gemeinsam stummschalten oder blockieren. Tippen Sie auf +, um eine Liste zu erstellen.",
         "untranslated": false
       },
       "fr": {
@@ -40598,7 +40598,7 @@
     "lists.no_account.desc": {
       "en": "Add a Bluesky account in the Accounts tab to load lists.",
       "de": {
-        "text": "Fügen Sie einen Bluesky-Account hinzu, um Listen zu laden.",
+        "text": "Fügen Sie im Accounts-Tab einen Bluesky-Account hinzu, um Listen zu laden.",
         "untranslated": false
       },
       "fr": {
@@ -40610,7 +40610,7 @@
         "untranslated": false
       },
       "ja": {
-        "text": "[ja] Fügen Sie einen Bluesky-Account hinzu, um Listen zu laden.",
+        "text": "「アカウント」タブでBlueskyアカウントを追加すると、リストを読み込めます。",
         "untranslated": false
       },
       "zh": {
@@ -40724,8 +40724,8 @@
     "lists.not_blocked_back": {
       "en": "Accounts not yet blocked",
       "de": {
-        "text": "Accounts not yet blocked",
-        "untranslated": true
+        "text": "Noch nicht zurückblockierte Accounts",
+        "untranslated": false
       },
       "fr": {
         "text": "Accounts not yet blocked",
@@ -41165,7 +41165,7 @@
     "lists.relationships.help": {
       "en": "View your followers, who you follow, accounts you block, and accounts that block you.",
       "de": {
-        "text": "Sehen Sie sich Ihre Follower an, wem Sie folgen, Konten, die Sie blockieren, und Konten, die Sie blockieren.",
+        "text": "Ihre Follower, gefolgten Accounts, blockierten Accounts und Accounts anzeigen, die Sie blockieren.",
         "untranslated": false
       },
       "fr": {
@@ -43339,23 +43339,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Loading relationships... (RU)",
+        "text": "Загрузка связей...",
         "untranslated": false
       },
       "ar": {
-        "text": "Loading relationships... (AR)",
+        "text": "جارٍ تحميل العلاقات...",
         "untranslated": false
       },
       "nl": {
-        "text": "Beziehungen werden geladen... (NL)",
+        "text": "Relaties laden...",
         "untranslated": false
       },
       "pl": {
-        "text": "Loading relationships... (PL)",
+        "text": "Ładowanie relacji...",
         "untranslated": false
       },
       "tr": {
-        "text": "Loading relationships... (TR)",
+        "text": "İlişkiler yükleniyor...",
         "untranslated": false
       },
       "th": {
@@ -45071,7 +45071,7 @@
     "onboarding.accounts.desc": {
       "en": "Switch between saved accounts, add new accounts, and manage account labels.",
       "de": {
-        "text": "Wechseln Sie zwischen gespeicherten Konten, fügen Sie neue Konten hinzu und verwalten Sie Kontobezeichnungen.",
+        "text": "Zwischen gespeicherten Accounts wechseln, neue Accounts hinzufügen und Account-Labels verwalten.",
         "untranslated": false
       },
       "fr": {
@@ -45249,7 +45249,7 @@
         "untranslated": false
       },
       "th": {
-        "text": "Close (TH)",
+        "text": "ปิด",
         "untranslated": false
       },
       "vi": {
@@ -45260,7 +45260,7 @@
     "onboarding.close.label": {
       "en": "Close onboarding",
       "de": {
-        "text": "Enges Onboarding",
+        "text": "Onboarding schließen",
         "untranslated": false
       },
       "fr": {
@@ -45375,7 +45375,7 @@
         "untranslated": false
       },
       "th": {
-        "text": "Get Started (TH)",
+        "text": "เริ่มต้นใช้งาน",
         "untranslated": false
       },
       "vi": {
@@ -45575,8 +45575,8 @@
     "onboarding.moderation.title": {
       "en": "Moderation",
       "de": {
-        "text": "Mäßigung",
-        "untranslated": false
+        "text": "Moderation",
+        "untranslated": true
       },
       "fr": {
         "text": "Modération",
@@ -45922,23 +45922,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Free  ·  Open source  ·  No ads  ·  No tracking (RU)",
+        "text": "Бесплатно · Открытый исходный код · Без рекламы · Без отслеживания",
         "untranslated": false
       },
       "ar": {
-        "text": "Free  ·  Open source  ·  No ads  ·  No tracking (AR)",
+        "text": "مجاني · مفتوح المصدر · بلا إعلانات · بلا تتبع",
         "untranslated": false
       },
       "nl": {
-        "text": "Kostenlos · Open Source · Kein Tracking · Keine Werbung (NL)",
+        "text": "Gratis · Open source · Geen advertenties · Geen tracking",
         "untranslated": false
       },
       "pl": {
-        "text": "Free  ·  Open source  ·  No ads  ·  No tracking (PL)",
+        "text": "Bezpłatne · Open source · Bez reklam · Bez śledzenia",
         "untranslated": false
       },
       "tr": {
-        "text": "Free  ·  Open source  ·  No ads  ·  No tracking (TR)",
+        "text": "Ücretsiz · Açık kaynak · Reklamsız · Takipsiz",
         "untranslated": false
       },
       "th": {
@@ -48599,8 +48599,8 @@
     "post.block_user": {
       "en": "Block %@",
       "de": {
-        "text": "Block %@",
-        "untranslated": true
+        "text": "%@ blockieren",
+        "untranslated": false
       },
       "fr": {
         "text": "Block %@",
@@ -48725,8 +48725,8 @@
     "post.classify.content": {
       "en": "Post Content",
       "de": {
-        "text": "Post Content",
-        "untranslated": true
+        "text": "Beitragsinhalt",
+        "untranslated": false
       },
       "fr": {
         "text": "Post Content",
@@ -49103,8 +49103,8 @@
     "post.gear_menu": {
       "en": "Post actions",
       "de": {
-        "text": "Post actions",
-        "untranslated": true
+        "text": "Beitragsaktionen",
+        "untranslated": false
       },
       "fr": {
         "text": "Post actions",
@@ -49166,8 +49166,8 @@
     "post.mute_user": {
       "en": "Mute %@",
       "de": {
-        "text": "Mute %@",
-        "untranslated": true
+        "text": "%@ stummschalten",
+        "untranslated": false
       },
       "fr": {
         "text": "Mute %@",
@@ -49292,8 +49292,8 @@
     "post.share": {
       "en": "Share post",
       "de": {
-        "text": "Share post",
-        "untranslated": true
+        "text": "Beitrag teilen",
+        "untranslated": false
       },
       "fr": {
         "text": "Share post",
@@ -50678,8 +50678,8 @@
     "profile.badge.blocking_by_list": {
       "en": "Blocked by {list}",
       "de": {
-        "text": "Blocked by {list}",
-        "untranslated": true
+        "text": "Blockiert durch {list}",
+        "untranslated": false
       },
       "fr": {
         "text": "Blocked by {list}",
@@ -50741,8 +50741,8 @@
     "profile.badge.blocking_by_list_more": {
       "en": "Blocked by {list} …and {n} more",
       "de": {
-        "text": "Blocked by {list} …and {n} more",
-        "untranslated": true
+        "text": "Blockiert durch {list} …und {n} weitere",
+        "untranslated": false
       },
       "fr": {
         "text": "Blocked by {list} …and {n} more",
@@ -50804,16 +50804,16 @@
     "profile.badge.blocking_by_my_lists": {
       "en": "Block my moderation lists ({n})",
       "de": {
-        "text": "Block my moderation lists ({n})",
-        "untranslated": true
+        "text": "Durch meine Moderationslisten blockiert ({n})",
+        "untranslated": false
       },
       "fr": {
-        "text": "Block my moderation lists ({n})",
-        "untranslated": true
+        "text": "Bloqué par mes listes de modération ({n})",
+        "untranslated": false
       },
       "it": {
-        "text": "Block my moderation lists ({n})",
-        "untranslated": true
+        "text": "Bloccato dalle mie liste di moderazione ({n})",
+        "untranslated": false
       },
       "ja": {
         "text": "Block my moderation lists ({n})",
@@ -50824,12 +50824,12 @@
         "untranslated": true
       },
       "es": {
-        "text": "Block my moderation lists ({n})",
-        "untranslated": true
+        "text": "Bloqueado por mis listas de moderación ({n})",
+        "untranslated": false
       },
       "pt": {
-        "text": "Block my moderation lists ({n})",
-        "untranslated": true
+        "text": "Bloqueado pelas minhas listas de moderação ({n})",
+        "untranslated": false
       },
       "ko": {
         "text": "Block my moderation lists ({n})",
@@ -51182,16 +51182,16 @@
     "profile.block.by_list_more": {
       "en": "Blocked via {list} …and {n} more — manage from the list instead",
       "de": {
-        "text": "Blocked via {list} …and {n} more — manage from the list instead",
-        "untranslated": true
+        "text": "Über {list} blockiert …und {n} weitere — stattdessen über die Liste verwalten",
+        "untranslated": false
       },
       "fr": {
-        "text": "Blocked via {list} …and {n} more — manage from the list instead",
-        "untranslated": true
+        "text": "Bloqué via {list} …et {n} autres — à gérer depuis la liste",
+        "untranslated": false
       },
       "it": {
-        "text": "Blocked via {list} …and {n} more — manage from the list instead",
-        "untranslated": true
+        "text": "Bloccato tramite {list} …e altri {n} — gestiscilo dalla lista",
+        "untranslated": false
       },
       "ja": {
         "text": "Blocked via {list} …and {n} more — manage from the list instead",
@@ -51202,12 +51202,12 @@
         "untranslated": true
       },
       "es": {
-        "text": "Blocked via {list} …and {n} more — manage from the list instead",
-        "untranslated": true
+        "text": "Bloqueado mediante {list} …y {n} más — gestiónalo desde la lista",
+        "untranslated": false
       },
       "pt": {
-        "text": "Blocked via {list} …and {n} more — manage from the list instead",
-        "untranslated": true
+        "text": "Bloqueado via {list} …e mais {n} — gerencie pela lista",
+        "untranslated": false
       },
       "ko": {
         "text": "Blocked via {list} …and {n} more — manage from the list instead",
@@ -51245,16 +51245,16 @@
     "profile.block.by_list_notice": {
       "en": "Blocked via \"{list}\" — manage from the list instead",
       "de": {
-        "text": "Blocked via \"{list}\" — manage from the list instead",
-        "untranslated": true
+        "text": "Über \"{list}\" blockiert — stattdessen über die Liste verwalten",
+        "untranslated": false
       },
       "fr": {
-        "text": "Blocked via \"{list}\" — manage from the list instead",
-        "untranslated": true
+        "text": "Bloqué via \"{list}\" — à gérer depuis la liste",
+        "untranslated": false
       },
       "it": {
-        "text": "Blocked via \"{list}\" — manage from the list instead",
-        "untranslated": true
+        "text": "Bloccato tramite \"{list}\" — gestiscilo dalla lista",
+        "untranslated": false
       },
       "ja": {
         "text": "Blocked via \"{list}\" — manage from the list instead",
@@ -51265,12 +51265,12 @@
         "untranslated": true
       },
       "es": {
-        "text": "Blocked via \"{list}\" — manage from the list instead",
-        "untranslated": true
+        "text": "Bloqueado mediante \"{list}\" — gestiónalo desde la lista",
+        "untranslated": false
       },
       "pt": {
-        "text": "Blocked via \"{list}\" — manage from the list instead",
-        "untranslated": true
+        "text": "Bloqueado via \"{list}\" — gerencie pela lista",
+        "untranslated": false
       },
       "ko": {
         "text": "Blocked via \"{list}\" — manage from the list instead",
@@ -51497,11 +51497,11 @@
     "profile.block_all_warning": {
       "en": "Warning: This will block every follower of this account. Use with caution.",
       "de": {
-        "text": "Warnung: Dadurch wird jeder Follower dieses Kontos blockiert.Mit Vorsicht verwenden.",
+        "text": "Warnung: Dadurch wird jeder Follower dieses Accounts blockiert. Mit Vorsicht verwenden.",
         "untranslated": false
       },
       "fr": {
-        "text": "Attention : cela bloquera tous les abonnés de ce compte. A utiliser avec prudence.",
+        "text": "Attention : cela bloquera tous les abonnés de ce compte. À utiliser avec prudence.",
         "untranslated": false
       },
       "it": {
@@ -52190,8 +52190,8 @@
     "profile.block_back.preview.blocks_me": {
       "en": "Blocks me",
       "de": {
-        "text": "Blocks me",
-        "untranslated": true
+        "text": "Blockiert mich",
+        "untranslated": false
       },
       "fr": {
         "text": "Blocks me",
@@ -52253,8 +52253,8 @@
     "profile.block_back.preview.count": {
       "en": "{count} account(s) that block you but are not blocked back",
       "de": {
-        "text": "{count} account(s) that block you but are not blocked back",
-        "untranslated": true
+        "text": "{count} Account(s), die Sie blockieren, aber noch nicht zurückblockiert wurden",
+        "untranslated": false
       },
       "fr": {
         "text": "{count} account(s) that block you but are not blocked back",
@@ -52316,8 +52316,8 @@
     "profile.block_back.preview.empty": {
       "en": "No accounts to block back",
       "de": {
-        "text": "No accounts to block back",
-        "untranslated": true
+        "text": "Keine Accounts zum Zurückblockieren",
+        "untranslated": false
       },
       "fr": {
         "text": "No accounts to block back",
@@ -52379,8 +52379,8 @@
     "profile.block_back.preview.not_blocked": {
       "en": "Not blocked back",
       "de": {
-        "text": "Not blocked back",
-        "untranslated": true
+        "text": "Nicht zurückblockiert",
+        "untranslated": false
       },
       "fr": {
         "text": "Not blocked back",
@@ -52442,8 +52442,8 @@
     "profile.block_back.preview.title": {
       "en": "Accounts to Block Back",
       "de": {
-        "text": "Accounts to Block Back",
-        "untranslated": true
+        "text": "Accounts zum Zurückblockieren",
+        "untranslated": false
       },
       "fr": {
         "text": "Accounts to Block Back",
@@ -53009,8 +53009,8 @@
     "profile.blocking_lists.panel_title": {
       "en": "Moderation Lists",
       "de": {
-        "text": "Moderation Lists",
-        "untranslated": true
+        "text": "Moderationslisten",
+        "untranslated": false
       },
       "fr": {
         "text": "Moderation Lists",
@@ -53072,8 +53072,8 @@
     "profile.blocking_lists.section_header": {
       "en": "Lists blocking this profile",
       "de": {
-        "text": "Lists blocking this profile",
-        "untranslated": true
+        "text": "Listen, die dieses Profil blockieren",
+        "untranslated": false
       },
       "fr": {
         "text": "Lists blocking this profile",
@@ -53135,8 +53135,8 @@
     "profile.create_list_confirm.create": {
       "en": "Create List",
       "de": {
-        "text": "Create List",
-        "untranslated": true
+        "text": "Liste erstellen",
+        "untranslated": false
       },
       "fr": {
         "text": "Create List",
@@ -53198,8 +53198,8 @@
     "profile.create_list_confirm.title": {
       "en": "Create a new list and add this account?",
       "de": {
-        "text": "Create a new list and add this account?",
-        "untranslated": true
+        "text": "Neue Liste erstellen und diesen Account hinzufügen?",
+        "untranslated": false
       },
       "fr": {
         "text": "Create a new list and add this account?",
@@ -53450,8 +53450,8 @@
     "profile.did": {
       "en": "DID",
       "de": {
-        "text": "TAT",
-        "untranslated": false
+        "text": "DID",
+        "untranslated": true
       },
       "fr": {
         "text": "A FAIT",
@@ -53576,8 +53576,8 @@
     "profile.dm_blocked_notice": {
       "en": "Messaging is not available — you are blocking this account.",
       "de": {
-        "text": "Messaging is not available — you are blocking this account.",
-        "untranslated": true
+        "text": "Nachrichten sind nicht verfügbar — Sie blockieren diesen Account.",
+        "untranslated": false
       },
       "fr": {
         "text": "Messaging is not available — you are blocking this account.",
@@ -53702,8 +53702,8 @@
     "profile.export.complete": {
       "en": "Export complete",
       "de": {
-        "text": "Export complete",
-        "untranslated": true
+        "text": "Export abgeschlossen",
+        "untranslated": false
       },
       "fr": {
         "text": "Export complete",
@@ -53828,8 +53828,8 @@
     "profile.export.download_posts": {
       "en": "Download Posts",
       "de": {
-        "text": "Download Posts",
-        "untranslated": true
+        "text": "Beiträge herunterladen",
+        "untranslated": false
       },
       "fr": {
         "text": "Download Posts",
@@ -53954,8 +53954,8 @@
     "profile.export.loading": {
       "en": "Page {n} · {posts} posts...",
       "de": {
-        "text": "Page {n} · {posts} posts...",
-        "untranslated": true
+        "text": "Seite {n} · {posts} Beiträge...",
+        "untranslated": false
       },
       "fr": {
         "text": "Page {n} · {posts} posts...",
@@ -54017,8 +54017,8 @@
     "profile.export.writing": {
       "en": "Writing file...",
       "de": {
-        "text": "Writing file...",
-        "untranslated": true
+        "text": "Datei wird geschrieben...",
+        "untranslated": false
       },
       "fr": {
         "text": "Writing file...",
@@ -54206,8 +54206,8 @@
     "profile.handle": {
       "en": "Handle",
       "de": {
-        "text": "Handhaben",
-        "untranslated": false
+        "text": "Handle",
+        "untranslated": true
       },
       "fr": {
         "text": "Poignée",
@@ -54836,8 +54836,8 @@
     "profile.labels": {
       "en": "Labels",
       "de": {
-        "text": "Etiketten",
-        "untranslated": false
+        "text": "Labels",
+        "untranslated": true
       },
       "fr": {
         "text": "Étiquettes",
@@ -54899,8 +54899,8 @@
     "profile.labels_section": {
       "en": "Labels",
       "de": {
-        "text": "Etiketten",
-        "untranslated": false
+        "text": "Labels",
+        "untranslated": true
       },
       "fr": {
         "text": "Étiquettes",
@@ -55088,8 +55088,8 @@
     "profile.manage_posts.bulk_confirm": {
       "en": "Delete {n} posts?",
       "de": {
-        "text": "Delete {n} posts?",
-        "untranslated": true
+        "text": "{n} Beiträge löschen?",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete {n} posts?",
@@ -55151,8 +55151,8 @@
     "profile.manage_posts.bulk_confirm_msg": {
       "en": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
       "de": {
-        "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
-        "untranslated": true
+        "text": "Dadurch werden die ausgewählten Beiträge dauerhaft aus Bluesky entfernt. Dies kann nicht rückgängig gemacht werden.",
+        "untranslated": false
       },
       "fr": {
         "text": "This will permanently remove the selected posts from Bluesky. This cannot be undone.",
@@ -55214,8 +55214,8 @@
     "profile.manage_posts.custom_range": {
       "en": "Custom Date Range",
       "de": {
-        "text": "Custom Date Range",
-        "untranslated": true
+        "text": "Benutzerdefinierter Zeitraum",
+        "untranslated": false
       },
       "fr": {
         "text": "Custom Date Range",
@@ -55277,8 +55277,8 @@
     "profile.manage_posts.delete_all": {
       "en": "Delete All My Posts",
       "de": {
-        "text": "Delete All My Posts",
-        "untranslated": true
+        "text": "Alle meine Beiträge löschen",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete All My Posts",
@@ -55340,8 +55340,8 @@
     "profile.manage_posts.delete_selected": {
       "en": "Delete Selected ({n})",
       "de": {
-        "text": "Delete Selected ({n})",
-        "untranslated": true
+        "text": "Ausgewählte löschen ({n})",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete Selected ({n})",
@@ -55403,8 +55403,8 @@
     "profile.manage_posts.deleting": {
       "en": "Deleting {n} of {total}…",
       "de": {
-        "text": "Deleting {n} of {total}…",
-        "untranslated": true
+        "text": "{n} von {total} werden gelöscht…",
+        "untranslated": false
       },
       "fr": {
         "text": "Deleting {n} of {total}…",
@@ -55466,8 +55466,8 @@
     "profile.manage_posts.deselect_all": {
       "en": "Deselect All",
       "de": {
-        "text": "Deselect All",
-        "untranslated": true
+        "text": "Alle abwählen",
+        "untranslated": false
       },
       "fr": {
         "text": "Deselect All",
@@ -55529,8 +55529,8 @@
     "profile.manage_posts.empty_hint": {
       "en": "Your posts will appear here.",
       "de": {
-        "text": "Your posts will appear here.",
-        "untranslated": true
+        "text": "Ihre Beiträge werden hier angezeigt.",
+        "untranslated": false
       },
       "fr": {
         "text": "Your posts will appear here.",
@@ -55592,8 +55592,8 @@
     "profile.manage_posts.nuclear.confirm_1": {
       "en": "Yes, delete everything",
       "de": {
-        "text": "Yes, delete everything",
-        "untranslated": true
+        "text": "Ja, alles löschen",
+        "untranslated": false
       },
       "fr": {
         "text": "Yes, delete everything",
@@ -55655,8 +55655,8 @@
     "profile.manage_posts.nuclear.confirm_2": {
       "en": "I am sure. Delete all posts.",
       "de": {
-        "text": "I am sure. Delete all posts.",
-        "untranslated": true
+        "text": "Ich bin sicher. Alle Beiträge löschen.",
+        "untranslated": false
       },
       "fr": {
         "text": "I am sure. Delete all posts.",
@@ -55718,8 +55718,8 @@
     "profile.manage_posts.nuclear.confirm_3": {
       "en": "I understand. Delete everything now.",
       "de": {
-        "text": "I understand. Delete everything now.",
-        "untranslated": true
+        "text": "Ich verstehe. Jetzt alles löschen.",
+        "untranslated": false
       },
       "fr": {
         "text": "I understand. Delete everything now.",
@@ -55781,8 +55781,8 @@
     "profile.manage_posts.nuclear.desc_1": {
       "en": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
       "de": {
-        "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
-        "untranslated": true
+        "text": "Dadurch wird JEDER Beitrag in Ihrem Account gelöscht. Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden.",
+        "untranslated": false
       },
       "fr": {
         "text": "This will delete EVERY post in your account. This action is permanent and cannot be undone.",
@@ -55844,8 +55844,8 @@
     "profile.manage_posts.nuclear.desc_2": {
       "en": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
       "de": {
-        "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
-        "untranslated": true
+        "text": "Sind Sie absolut sicher? Dies ist Ihre letzte Möglichkeit abzubrechen. Alle Ihre Beiträge werden dauerhaft verschwinden.",
+        "untranslated": false
       },
       "fr": {
         "text": "Are you absolutely sure? This is your final chance to cancel. All your posts will be gone forever.",
@@ -55907,8 +55907,8 @@
     "profile.manage_posts.nuclear.desc_3": {
       "en": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
       "de": {
-        "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
-        "untranslated": true
+        "text": "Letzte Warnung. Es gibt kein Zurück. Alle Ihre Beiträge werden dauerhaft aus Bluesky gelöscht.",
+        "untranslated": false
       },
       "fr": {
         "text": "Final warning. There is no undo. All your posts will be permanently deleted from Bluesky.",
@@ -55970,8 +55970,8 @@
     "profile.manage_posts.nuclear.title": {
       "en": "Delete All Posts",
       "de": {
-        "text": "Delete All Posts",
-        "untranslated": true
+        "text": "Alle Beiträge löschen",
+        "untranslated": false
       },
       "fr": {
         "text": "Delete All Posts",
@@ -56033,8 +56033,8 @@
     "profile.manage_posts.relative.allTime": {
       "en": "All",
       "de": {
-        "text": "All",
-        "untranslated": true
+        "text": "Alle",
+        "untranslated": false
       },
       "fr": {
         "text": "All",
@@ -56096,8 +56096,8 @@
     "profile.manage_posts.relative.last30": {
       "en": "30 days",
       "de": {
-        "text": "30 days",
-        "untranslated": true
+        "text": "30 Tage",
+        "untranslated": false
       },
       "fr": {
         "text": "30 days",
@@ -56159,8 +56159,8 @@
     "profile.manage_posts.relative.last7": {
       "en": "7 days",
       "de": {
-        "text": "7 days",
-        "untranslated": true
+        "text": "7 Tage",
+        "untranslated": false
       },
       "fr": {
         "text": "7 days",
@@ -56222,8 +56222,8 @@
     "profile.manage_posts.relative.lastYear": {
       "en": "Year",
       "de": {
-        "text": "Year",
-        "untranslated": true
+        "text": "Jahr",
+        "untranslated": false
       },
       "fr": {
         "text": "Year",
@@ -56285,8 +56285,8 @@
     "profile.manage_posts.relative.today": {
       "en": "Today",
       "de": {
-        "text": "Today",
-        "untranslated": true
+        "text": "Heute",
+        "untranslated": false
       },
       "fr": {
         "text": "Today",
@@ -56348,8 +56348,8 @@
     "profile.manage_posts.search": {
       "en": "Search your posts…",
       "de": {
-        "text": "Search your posts…",
-        "untranslated": true
+        "text": "Ihre Beiträge suchen…",
+        "untranslated": false
       },
       "fr": {
         "text": "Search your posts…",
@@ -56411,8 +56411,8 @@
     "profile.manage_posts.select": {
       "en": "Select",
       "de": {
-        "text": "Select",
-        "untranslated": true
+        "text": "Auswählen",
+        "untranslated": false
       },
       "fr": {
         "text": "Select",
@@ -56474,8 +56474,8 @@
     "profile.manage_posts.select_all": {
       "en": "Select All",
       "de": {
-        "text": "Select All",
-        "untranslated": true
+        "text": "Alle auswählen",
+        "untranslated": false
       },
       "fr": {
         "text": "Select All",
@@ -56537,8 +56537,8 @@
     "profile.manage_posts.title": {
       "en": "Manage My Posts",
       "de": {
-        "text": "Manage My Posts",
-        "untranslated": true
+        "text": "Meine Beiträge verwalten",
+        "untranslated": false
       },
       "fr": {
         "text": "Manage My Posts",
@@ -57860,8 +57860,8 @@
     "profile.moderation_section": {
       "en": "Moderation",
       "de": {
-        "text": "Mäßigung",
-        "untranslated": false
+        "text": "Moderation",
+        "untranslated": true
       },
       "fr": {
         "text": "Modération",
@@ -58490,8 +58490,8 @@
     "profile.on_my_lists.help": {
       "en": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
       "de": {
-        "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
-        "untranslated": true
+        "text": "Normale Listen helfen dabei, Accounts nach Themen oder Interessen zu organisieren. Schalten Sie die Mitgliedschaft um, um diesen Account hinzuzufügen oder zu entfernen.",
+        "untranslated": false
       },
       "fr": {
         "text": "Regular lists help you organize accounts by topic or interest. Toggle membership to add or remove this account from your lists.",
@@ -58616,8 +58616,8 @@
     "profile.on_my_moderation_lists.help": {
       "en": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
       "de": {
-        "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
-        "untranslated": true
+        "text": "Moderationslisten werden verwendet, um Accounts zu verfolgen und zu verwalten, die möglicherweise Moderationsaktionen benötigen. Schalten Sie die Mitgliedschaft um, um diesen Account hinzuzufügen oder zu entfernen.",
+        "untranslated": false
       },
       "fr": {
         "text": "Moderation lists are used to track and manage accounts that may need moderation action. Toggle membership to add or remove this account from your lists.",
@@ -59132,7 +59132,7 @@
         "untranslated": false
       },
       "ja": {
-        "text": "[ja] Öffnen",
+        "text": "開く",
         "untranslated": false
       },
       "zh": {
@@ -60191,7 +60191,7 @@
     "profile.recent_search.label": {
       "en": "Load recent search for {query}",
       "de": {
-        "text": "Letzte Suche nach{query}laden",
+        "text": "Letzte Suche nach {query} laden",
         "untranslated": false
       },
       "fr": {
@@ -61010,8 +61010,8 @@
     "profile.report.reason_explanation": {
       "en": "Select a reason for this report. This helps moderators prioritize and process your report.",
       "de": {
-        "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
-        "untranslated": true
+        "text": "Wählen Sie einen Grund für diese Meldung. Das hilft Moderatorinnen und Moderatoren, Ihre Meldung einzuordnen und zu bearbeiten.",
+        "untranslated": false
       },
       "fr": {
         "text": "Select a reason for this report. This helps moderators prioritize and process your report.",
@@ -61451,7 +61451,7 @@
     "profile.saved_search.label": {
       "en": "Load saved search for {query}",
       "de": {
-        "text": "Gespeicherte Suche nach{query}laden",
+        "text": "Gespeicherte Suche nach {query} laden",
         "untranslated": false
       },
       "fr": {
@@ -62018,8 +62018,8 @@
     "profile.stats.did": {
       "en": "DID",
       "de": {
-        "text": "TAT",
-        "untranslated": false
+        "text": "DID",
+        "untranslated": true
       },
       "fr": {
         "text": "A FAIT",
@@ -62270,8 +62270,8 @@
     "profile.stats.handle": {
       "en": "Handle",
       "de": {
-        "text": "Handhaben",
-        "untranslated": false
+        "text": "Handle",
+        "untranslated": true
       },
       "fr": {
         "text": "Poignée",
@@ -62396,8 +62396,8 @@
     "profile.stats.labels": {
       "en": "Labels",
       "de": {
-        "text": "Etiketten",
-        "untranslated": false
+        "text": "Labels",
+        "untranslated": true
       },
       "fr": {
         "text": "Étiquettes",
@@ -62585,35 +62585,35 @@
     "profile.stats.owned_lists": {
       "en": "Owner of lists",
       "de": {
-        "text": "Owner of lists (DE)",
+        "text": "Eigene Listen",
         "untranslated": false
       },
       "fr": {
-        "text": "Owner of lists (FR)",
+        "text": "Listes créées",
         "untranslated": false
       },
       "it": {
-        "text": "Owner of lists (IT)",
+        "text": "Liste create",
         "untranslated": false
       },
       "ja": {
-        "text": "Owner of lists (JA)",
+        "text": "リストの所有者",
         "untranslated": false
       },
       "zh": {
-        "text": "Owner of lists (ZH)",
+        "text": "拥有的列表",
         "untranslated": false
       },
       "es": {
-        "text": "Owner of lists (ES)",
+        "text": "Listas creadas",
         "untranslated": false
       },
       "pt": {
-        "text": "Owner of lists (PT)",
+        "text": "Listas criadas",
         "untranslated": false
       },
       "ko": {
-        "text": "Owner of lists (KO)",
+        "text": "소유한 리스트",
         "untranslated": false
       },
       "ru": {
@@ -62648,35 +62648,35 @@
     "profile.stats.owned_lists.empty": {
       "en": "No lists owned",
       "de": {
-        "text": "No lists owned (DE)",
+        "text": "Keine eigenen Listen",
         "untranslated": false
       },
       "fr": {
-        "text": "No lists owned (FR)",
+        "text": "Aucune liste créée",
         "untranslated": false
       },
       "it": {
-        "text": "No lists owned (IT)",
+        "text": "Nessuna lista creata",
         "untranslated": false
       },
       "ja": {
-        "text": "No lists owned (JA)",
+        "text": "所有しているリストはありません",
         "untranslated": false
       },
       "zh": {
-        "text": "No lists owned (ZH)",
+        "text": "没有拥有的列表",
         "untranslated": false
       },
       "es": {
-        "text": "No lists owned (ES)",
+        "text": "No hay listas creadas",
         "untranslated": false
       },
       "pt": {
-        "text": "No lists owned (PT)",
+        "text": "Nenhuma lista criada",
         "untranslated": false
       },
       "ko": {
-        "text": "No lists owned (KO)",
+        "text": "소유한 리스트 없음",
         "untranslated": false
       },
       "ru": {
@@ -62711,35 +62711,35 @@
     "profile.stats.owned_lists.empty_desc": {
       "en": "This account hasn't created any lists yet.",
       "de": {
-        "text": "This account hasn't created any lists yet. (DE)",
+        "text": "Dieser Account hat noch keine Listen erstellt.",
         "untranslated": false
       },
       "fr": {
-        "text": "This account hasn't created any lists yet. (FR)",
+        "text": "Ce compte n'a encore créé aucune liste.",
         "untranslated": false
       },
       "it": {
-        "text": "This account hasn't created any lists yet. (IT)",
+        "text": "Questo account non ha ancora creato liste.",
         "untranslated": false
       },
       "ja": {
-        "text": "This account hasn't created any lists yet. (JA)",
+        "text": "このアカウントはまだリストを作成していません。",
         "untranslated": false
       },
       "zh": {
-        "text": "This account hasn't created any lists yet. (ZH)",
+        "text": "此账户尚未创建任何列表。",
         "untranslated": false
       },
       "es": {
-        "text": "This account hasn't created any lists yet. (ES)",
+        "text": "Esta cuenta aún no ha creado ninguna lista.",
         "untranslated": false
       },
       "pt": {
-        "text": "This account hasn't created any lists yet. (PT)",
+        "text": "Esta conta ainda não criou nenhuma lista.",
         "untranslated": false
       },
       "ko": {
-        "text": "This account hasn't created any lists yet. (KO)",
+        "text": "이 계정은 아직 리스트를 만들지 않았습니다.",
         "untranslated": false
       },
       "ru": {
@@ -62774,35 +62774,35 @@
     "profile.stats.owned_lists.member_count": {
       "en": "{count} members",
       "de": {
-        "text": "{count} members (DE)",
+        "text": "{count} Mitglieder",
         "untranslated": false
       },
       "fr": {
-        "text": "{count} members (FR)",
+        "text": "{count} membres",
         "untranslated": false
       },
       "it": {
-        "text": "{count} members (IT)",
+        "text": "{count} membri",
         "untranslated": false
       },
       "ja": {
-        "text": "{count} members (JA)",
+        "text": "{count}人のメンバー",
         "untranslated": false
       },
       "zh": {
-        "text": "{count} members (ZH)",
+        "text": "{count} 位成员",
         "untranslated": false
       },
       "es": {
-        "text": "{count} members (ES)",
+        "text": "{count} miembros",
         "untranslated": false
       },
       "pt": {
-        "text": "{count} members (PT)",
+        "text": "{count} membros",
         "untranslated": false
       },
       "ko": {
-        "text": "{count} members (KO)",
+        "text": "멤버 {count}명",
         "untranslated": false
       },
       "ru": {
@@ -63026,8 +63026,8 @@
     "profile.subscribed_lists": {
       "en": "Subscribed Moderation Lists",
       "de": {
-        "text": "Subscribed Moderation Lists",
-        "untranslated": true
+        "text": "Abonnierte Moderationslisten",
+        "untranslated": false
       },
       "fr": {
         "text": "Subscribed Moderation Lists",
@@ -63089,8 +63089,8 @@
     "profile.subscribed_lists.empty": {
       "en": "No subscribed moderation lists",
       "de": {
-        "text": "No subscribed moderation lists",
-        "untranslated": true
+        "text": "Keine abonnierten Moderationslisten",
+        "untranslated": false
       },
       "fr": {
         "text": "No subscribed moderation lists",
@@ -63152,8 +63152,8 @@
     "profile.subscribed_lists.loading": {
       "en": "Loading subscribed lists…",
       "de": {
-        "text": "Loading subscribed lists…",
-        "untranslated": true
+        "text": "Abonnierte Listen werden geladen…",
+        "untranslated": false
       },
       "fr": {
         "text": "Loading subscribed lists…",
@@ -63215,8 +63215,8 @@
     "profile.subscribed_lists.member_count": {
       "en": "{count} members",
       "de": {
-        "text": "{count} members",
-        "untranslated": true
+        "text": "{count} Mitglieder",
+        "untranslated": false
       },
       "fr": {
         "text": "{count} members",
@@ -63656,7 +63656,7 @@
     "profile.your_lists_section": {
       "en": "Profile listed on lists...",
       "de": {
-        "text": "Profil ist auf Listen aufgeführt...",
+        "text": "Profil ist in Listen enthalten...",
         "untranslated": false
       },
       "fr": {
@@ -63719,7 +63719,7 @@
     "profile.your_starter_packs": {
       "en": "Your Starter Packs",
       "de": {
-        "text": "Ihre Starter Packs",
+        "text": "Ihre Starterpakete",
         "untranslated": false
       },
       "fr": {
@@ -63782,7 +63782,7 @@
     "profile.your_starter_packs_section": {
       "en": "Your Starter Packs",
       "de": {
-        "text": "Ihre Starter Packs",
+        "text": "Ihre Starterpakete",
         "untranslated": false
       },
       "fr": {
@@ -64633,23 +64633,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Loading {mode}... (RU)",
+        "text": "Загрузка: {mode}...",
         "untranslated": false
       },
       "ar": {
-        "text": "Loading {mode}... (AR)",
+        "text": "جارٍ تحميل {mode}...",
         "untranslated": false
       },
       "nl": {
-        "text": "{mode} werden geladen... (NL)",
+        "text": "{mode} laden...",
         "untranslated": false
       },
       "pl": {
-        "text": "Loading {mode}... (PL)",
+        "text": "Ładowanie: {mode}...",
         "untranslated": false
       },
       "tr": {
-        "text": "Loading {mode}... (TR)",
+        "text": "{mode} yükleniyor...",
         "untranslated": false
       },
       "th": {
@@ -64696,23 +64696,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Loading lists... (RU)",
+        "text": "Загрузка списков...",
         "untranslated": false
       },
       "ar": {
-        "text": "Loading lists... (AR)",
+        "text": "جارٍ تحميل القوائم...",
         "untranslated": false
       },
       "nl": {
-        "text": "Listen werden geladen... (NL)",
+        "text": "Lijsten laden...",
         "untranslated": false
       },
       "pl": {
-        "text": "Loading lists... (PL)",
+        "text": "Ładowanie list...",
         "untranslated": false
       },
       "tr": {
-        "text": "Loading lists... (TR)",
+        "text": "Listeler yükleniyor...",
         "untranslated": false
       },
       "th": {
@@ -64916,7 +64916,7 @@
     "rel.mode.followers_of": {
       "en": "Followers of {handle}",
       "de": {
-        "text": "Anhänger von {handle}",
+        "text": "Follower von {handle}",
         "untranslated": false
       },
       "fr": {
@@ -65042,7 +65042,7 @@
     "rel.mode.following_of": {
       "en": "Following of {handle}",
       "de": {
-        "text": "Im Anschluss an {handle}",
+        "text": "Accounts, denen {handle} folgt",
         "untranslated": false
       },
       "fr": {
@@ -65739,7 +65739,7 @@
         "untranslated": false
       },
       "fr": {
-        "text": "- Combles concernés : {count}",
+        "text": "- Comptes traités : {count}",
         "untranslated": false
       },
       "it": {
@@ -65798,7 +65798,7 @@
     "report.doc_activity_line": {
       "en": "- {title}: {summary} ({date})",
       "de": {
-        "text": "-{title}:{summary}({date})",
+        "text": "- {title}: {summary} ({date})",
         "untranslated": false
       },
       "fr": {
@@ -66743,8 +66743,8 @@
     "report.option_contact.help": {
       "en": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
       "de": {
-        "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
-        "untranslated": true
+        "text": "Eine E-Mail mit angehängten Screenshots an den Bluesky-Support senden, wenn eine ausführliche Meldung Anhänge benötigt.",
+        "untranslated": false
       },
       "fr": {
         "text": "Send an email with attached screenshots to Bluesky support for detailed reports that require attachments.",
@@ -66806,7 +66806,7 @@
     "report.option_contact.title": {
       "en": "Report by E-Mail",
       "de": {
-        "text": "Contact Support",
+        "text": "Support kontaktieren",
         "untranslated": false
       },
       "fr": {
@@ -66869,8 +66869,8 @@
     "report.option_submit.help": {
       "en": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
       "de": {
-        "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
-        "untranslated": true
+        "text": "Einen Moderationsbericht direkt an Bluesky-Moderatorinnen und -Moderatoren senden. Wählen Sie einen Grund und ergänzen Sie optional Belege.",
+        "untranslated": false
       },
       "fr": {
         "text": "Send a moderation report directly to Bluesky moderators. Select a reason and provide optional evidence text.",
@@ -66932,8 +66932,8 @@
     "report.option_submit.title": {
       "en": "Submit Report",
       "de": {
-        "text": "Submit Report",
-        "untranslated": true
+        "text": "Meldung einreichen",
+        "untranslated": false
       },
       "fr": {
         "text": "Submit Report",
@@ -67373,35 +67373,35 @@
     "report.support.attachment": {
       "en": "Attachment",
       "de": {
-        "text": "Attachment (DE)",
+        "text": "Anhang",
         "untranslated": false
       },
       "fr": {
-        "text": "Attachment (FR)",
+        "text": "Pièce jointe",
         "untranslated": false
       },
       "it": {
-        "text": "Attachment (IT)",
+        "text": "Allegato",
         "untranslated": false
       },
       "ja": {
-        "text": "Attachment (JA)",
+        "text": "添付ファイル",
         "untranslated": false
       },
       "zh": {
-        "text": "Attachment (ZH)",
+        "text": "附件",
         "untranslated": false
       },
       "es": {
-        "text": "Attachment (ES)",
+        "text": "Archivo adjunto",
         "untranslated": false
       },
       "pt": {
-        "text": "Attachment (PT)",
+        "text": "Anexo",
         "untranslated": false
       },
       "ko": {
-        "text": "Attachment (KO)",
+        "text": "첨부 파일",
         "untranslated": false
       },
       "ru": {
@@ -67436,35 +67436,35 @@
     "report.support.attachment.add": {
       "en": "Add Attachment",
       "de": {
-        "text": "Add Attachment (DE)",
+        "text": "Anhang hinzufügen",
         "untranslated": false
       },
       "fr": {
-        "text": "Add Attachment (FR)",
+        "text": "Ajouter une pièce jointe",
         "untranslated": false
       },
       "it": {
-        "text": "Add Attachment (IT)",
+        "text": "Aggiungi allegato",
         "untranslated": false
       },
       "ja": {
-        "text": "Add Attachment (JA)",
+        "text": "添付ファイルを追加",
         "untranslated": false
       },
       "zh": {
-        "text": "Add Attachment (ZH)",
+        "text": "添加附件",
         "untranslated": false
       },
       "es": {
-        "text": "Add Attachment (ES)",
+        "text": "Añadir archivo adjunto",
         "untranslated": false
       },
       "pt": {
-        "text": "Add Attachment (PT)",
+        "text": "Adicionar anexo",
         "untranslated": false
       },
       "ko": {
-        "text": "Add Attachment (KO)",
+        "text": "첨부 파일 추가",
         "untranslated": false
       },
       "ru": {
@@ -67499,35 +67499,35 @@
     "report.support.attachment.remove": {
       "en": "Remove Attachment",
       "de": {
-        "text": "Remove Attachment (DE)",
+        "text": "Anhang entfernen",
         "untranslated": false
       },
       "fr": {
-        "text": "Remove Attachment (FR)",
+        "text": "Supprimer la pièce jointe",
         "untranslated": false
       },
       "it": {
-        "text": "Remove Attachment (IT)",
+        "text": "Rimuovi allegato",
         "untranslated": false
       },
       "ja": {
-        "text": "Remove Attachment (JA)",
+        "text": "添付ファイルを削除",
         "untranslated": false
       },
       "zh": {
-        "text": "Remove Attachment (ZH)",
+        "text": "移除附件",
         "untranslated": false
       },
       "es": {
-        "text": "Remove Attachment (ES)",
+        "text": "Eliminar archivo adjunto",
         "untranslated": false
       },
       "pt": {
-        "text": "Remove Attachment (PT)",
+        "text": "Remover anexo",
         "untranslated": false
       },
       "ko": {
-        "text": "Remove Attachment (KO)",
+        "text": "첨부 파일 제거",
         "untranslated": false
       },
       "ru": {
@@ -67562,35 +67562,35 @@
     "report.support.email": {
       "en": "Send as Email",
       "de": {
-        "text": "Send as Email (DE)",
+        "text": "Als E-Mail senden",
         "untranslated": false
       },
       "fr": {
-        "text": "Send as Email (FR)",
+        "text": "Envoyer par e-mail",
         "untranslated": false
       },
       "it": {
-        "text": "Send as Email (IT)",
+        "text": "Invia come e-mail",
         "untranslated": false
       },
       "ja": {
-        "text": "Send as Email (JA)",
+        "text": "メールで送信",
         "untranslated": false
       },
       "zh": {
-        "text": "Send as Email (ZH)",
+        "text": "通过电子邮件发送",
         "untranslated": false
       },
       "es": {
-        "text": "Send as Email (ES)",
+        "text": "Enviar por correo electrónico",
         "untranslated": false
       },
       "pt": {
-        "text": "Send as Email (PT)",
+        "text": "Enviar por e-mail",
         "untranslated": false
       },
       "ko": {
-        "text": "Send as Email (KO)",
+        "text": "이메일로 보내기",
         "untranslated": false
       },
       "ru": {
@@ -67625,35 +67625,35 @@
     "report.support.mail_unavailable": {
       "en": "Mail is unavailable",
       "de": {
-        "text": "Mail is unavailable (DE)",
+        "text": "Mail ist nicht verfügbar",
         "untranslated": false
       },
       "fr": {
-        "text": "Mail is unavailable (FR)",
+        "text": "Mail n’est pas disponible",
         "untranslated": false
       },
       "it": {
-        "text": "Mail is unavailable (IT)",
+        "text": "Mail non è disponibile",
         "untranslated": false
       },
       "ja": {
-        "text": "Mail is unavailable (JA)",
+        "text": "メールを利用できません",
         "untranslated": false
       },
       "zh": {
-        "text": "Mail is unavailable (ZH)",
+        "text": "邮件不可用",
         "untranslated": false
       },
       "es": {
-        "text": "Mail is unavailable (ES)",
+        "text": "Mail no está disponible",
         "untranslated": false
       },
       "pt": {
-        "text": "Mail is unavailable (PT)",
+        "text": "Mail indisponível",
         "untranslated": false
       },
       "ko": {
-        "text": "Mail is unavailable (KO)",
+        "text": "메일을 사용할 수 없습니다",
         "untranslated": false
       },
       "ru": {
@@ -67688,35 +67688,35 @@
     "report.support.section": {
       "en": "Support",
       "de": {
-        "text": "Support (DE)",
-        "untranslated": false
+        "text": "Support",
+        "untranslated": true
       },
       "fr": {
-        "text": "Support (FR)",
-        "untranslated": false
+        "text": "Support",
+        "untranslated": true
       },
       "it": {
-        "text": "Support (IT)",
+        "text": "Supporto",
         "untranslated": false
       },
       "ja": {
-        "text": "Support (JA)",
+        "text": "サポート",
         "untranslated": false
       },
       "zh": {
-        "text": "Support (ZH)",
+        "text": "支持",
         "untranslated": false
       },
       "es": {
-        "text": "Support (ES)",
+        "text": "Soporte",
         "untranslated": false
       },
       "pt": {
-        "text": "Support (PT)",
+        "text": "Suporte",
         "untranslated": false
       },
       "ko": {
-        "text": "Support (KO)",
+        "text": "지원",
         "untranslated": false
       },
       "ru": {
@@ -67751,8 +67751,8 @@
     "report.tab_label": {
       "en": "Report Method",
       "de": {
-        "text": "Report Method",
-        "untranslated": true
+        "text": "Meldeweg",
+        "untranslated": false
       },
       "fr": {
         "text": "Report Method",
@@ -69263,7 +69263,7 @@
     "settings.ai": {
       "en": "AI / On-Device",
       "de": {
-        "text": "AI Models",
+        "text": "KI-Modelle",
         "untranslated": false
       },
       "fr": {
@@ -70775,7 +70775,7 @@
     "settings.icloud.enabled_footer": {
       "en": "Account handles and labels sync across your devices. App passwords stay on each device for security.",
       "de": {
-        "text": "Kontonamen und -bezeichnungen werden auf Ihren Geräten synchronisiert.App-Passwörter bleiben aus Sicherheitsgründen auf jedem Gerät.",
+        "text": "Account-Namen und Labels werden auf Ihren Geräten synchronisiert. App-Passwörter bleiben aus Sicherheitsgründen auf jedem Gerät.",
         "untranslated": false
       },
       "fr": {
@@ -71279,63 +71279,63 @@
     "settings.klipy_services": {
       "en": "KLIPY GIF Services",
       "de": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "KLIPY-GIF-Dienste",
         "untranslated": false
       },
       "fr": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "Services GIF KLIPY",
         "untranslated": false
       },
       "it": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "Servizi GIF KLIPY",
         "untranslated": false
       },
       "ja": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "KLIPY GIFサービス",
         "untranslated": false
       },
       "zh": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "KLIPY GIF 服务",
         "untranslated": false
       },
       "es": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "Servicios GIF de KLIPY",
         "untranslated": false
       },
       "pt": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "Serviços de GIF da KLIPY",
         "untranslated": false
       },
       "ko": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "KLIPY GIF 서비스",
         "untranslated": false
       },
       "ru": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "GIF-сервисы KLIPY",
         "untranslated": false
       },
       "ar": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "خدمات صور GIF من KLIPY",
         "untranslated": false
       },
       "nl": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "KLIPY GIF-diensten",
         "untranslated": false
       },
       "pl": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "Usługi GIF KLIPY",
         "untranslated": false
       },
       "tr": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "KLIPY GIF Hizmetleri",
         "untranslated": false
       },
       "th": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "บริการ GIF ของ KLIPY",
         "untranslated": false
       },
       "vi": {
-        "text": "KLIPY GIF Services (EN)",
+        "text": "Dịch vụ GIF KLIPY",
         "untranslated": false
       }
     },
@@ -71846,8 +71846,8 @@
     "splash.tagline_sub": {
       "en": "Easy to use, sharp as a knife",
       "de": {
-        "text": "Easy to use, sharp as a knife",
-        "untranslated": true
+        "text": "Einfach zu bedienen, präzise in der Wirkung",
+        "untranslated": false
       },
       "fr": {
         "text": "Easy to use, sharp as a knife",
@@ -72465,7 +72465,7 @@
         "untranslated": false
       },
       "th": {
-        "text": "Info (TH)",
+        "text": "ข้อมูล",
         "untranslated": false
       },
       "vi": {
@@ -72476,8 +72476,8 @@
     "tab.moderation": {
       "en": "Moderation",
       "de": {
-        "text": "Mäßigung",
-        "untranslated": false
+        "text": "Moderation",
+        "untranslated": true
       },
       "fr": {
         "text": "Modération",
@@ -72528,7 +72528,7 @@
         "untranslated": false
       },
       "th": {
-        "text": "Moderation (TH)",
+        "text": "การดูแล",
         "untranslated": false
       },
       "vi": {
@@ -72654,7 +72654,7 @@
         "untranslated": false
       },
       "th": {
-        "text": "Profile (TH)",
+        "text": "โปรไฟล์",
         "untranslated": false
       },
       "vi": {
@@ -72717,7 +72717,7 @@
         "untranslated": false
       },
       "th": {
-        "text": "Settings (TH)",
+        "text": "การตั้งค่า",
         "untranslated": false
       },
       "vi": {
@@ -74650,23 +74650,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Подача AT URI (по адресу: //...)",
+        "text": "AT URI ленты (at://...)",
         "untranslated": false
       },
       "ar": {
-        "text": "تغذية في URI (في: //...)",
+        "text": "معرّف AT URI للموجز (at://...)",
         "untranslated": false
       },
       "nl": {
-        "text": "Feed AT URI (op://...)",
+        "text": "Feed-AT-URI (at://...)",
         "untranslated": false
       },
       "pl": {
-        "text": "Kanał AT URI (at://...)",
+        "text": "AT URI kanału (at://...)",
         "untranslated": false
       },
       "tr": {
-        "text": "URI'de besleme yap (://...)",
+        "text": "Akış AT URI'si (at://...)",
         "untranslated": false
       },
       "th": {
@@ -75248,8 +75248,8 @@
     "timeline.show_replies": {
       "en": "Show {n} replies",
       "de": {
-        "text": "Show {n} replies",
-        "untranslated": true
+        "text": "{n} Antworten anzeigen",
+        "untranslated": false
       },
       "fr": {
         "text": "Show {n} replies",
@@ -75374,8 +75374,8 @@
     "timeline.view_all_replies": {
       "en": "View all replies",
       "de": {
-        "text": "View all replies",
-        "untranslated": true
+        "text": "Alle Antworten anzeigen",
+        "untranslated": false
       },
       "fr": {
         "text": "View all replies",
@@ -75469,23 +75469,23 @@
         "untranslated": false
       },
       "ru": {
-        "text": "Analyzing accounts... (RU)",
+        "text": "Анализ аккаунтов...",
         "untranslated": false
       },
       "ar": {
-        "text": "Analyzing accounts... (AR)",
+        "text": "جارٍ تحليل الحسابات...",
         "untranslated": false
       },
       "nl": {
-        "text": "Accounts werden analysiert... (NL)",
+        "text": "Accounts analyseren...",
         "untranslated": false
       },
       "pl": {
-        "text": "Analyzing accounts... (PL)",
+        "text": "Analizowanie kont...",
         "untranslated": false
       },
       "tr": {
-        "text": "Analyzing accounts... (TR)",
+        "text": "Hesaplar analiz ediliyor...",
         "untranslated": false
       },
       "th": {
