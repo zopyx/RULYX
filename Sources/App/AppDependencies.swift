@@ -57,11 +57,12 @@ final class AppDependencies: ObservableObject {
 
         httpRequestDebugStore = HTTPRequestDebugStore.shared
         clearskyHeartbeat = ClearskyHeartbeatService.shared
-        accountStore = isUITesting ? AccountStore(preview: true) : AccountStore(keychain: keychain)
+        let useRealAccount = isUITesting && CommandLine.arguments.contains("--test-account")
+        accountStore = useRealAccount ? AccountStore(keychain: keychain) : (isUITesting ? AccountStore(preview: true) : AccountStore(keychain: keychain))
         workspaceStore = ModerationWorkspaceStore()
-        blueskyClient = isUITesting
-            ? PreviewBlueskyClient()
-            : LiveBlueskyClient(requestExecutor: requestExecutor, sessionService: sessionService)
+        blueskyClient = useRealAccount
+            ? LiveBlueskyClient(requestExecutor: requestExecutor, sessionService: sessionService)
+            : (isUITesting ? PreviewBlueskyClient() : LiveBlueskyClient(requestExecutor: requestExecutor, sessionService: sessionService))
         localizationManager = LocalizationManager.shared
         mutedWordsStore = MutedWordsStore()
         analyticsStore = AnalyticsStore()

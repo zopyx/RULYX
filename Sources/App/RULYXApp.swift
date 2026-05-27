@@ -51,6 +51,14 @@ struct RULYXApp: App {
                         await deps.blueskyClient.restoreSessions(for: deps.accountStore.accounts)
                     }
                     .task {
+                        guard CommandLine.arguments.contains("--test-account"),
+                              let handle = ProcessInfo.processInfo.environment["TEST_HANDLE"],
+                              let password = ProcessInfo.processInfo.environment["TEST_PASSWORD"] else { return }
+                        guard !deps.accountStore.accounts.contains(where: { $0.handle == handle }) else { return }
+                        let pdsURL = ProcessInfo.processInfo.environment["TEST_PDS"].flatMap { URL(string: $0) }
+                        _ = await deps.accountStore.addAccount(handle: handle, appPassword: password, entrywayURL: pdsURL, client: deps.blueskyClient)
+                    }
+                    .task {
                         DispatchQueue.main.async {
                             deps.pushNotificationCoordinator.start()
                         }

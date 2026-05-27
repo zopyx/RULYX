@@ -15,6 +15,56 @@ swiftlint
 swiftformat Sources Tests
 ```
 
+## Screenshots (App Store)
+
+### Quick start
+```bash
+# 1. Create .env in project root with your Bluesky credentials:
+#    export TEST_HANDLE=yourhandle.bsky.social
+#    export TEST_PASSWORD=your-app-password
+#    export TEST_PDS=https://bsky.social     # optional, defaults to bsky.social
+
+# 2. Run (uses fastlane + snapshot)
+make screenshots
+
+# 3. Resize (run separately if fastlane's resize lane fails)
+bundle exec fastlane ios resize_screenshots  # or:
+# for f in screenshots/en-US/*.png; do b=n=${f%.*}; [[ "$b" != *_1260x2736 ]] && sips -z 2736 1260 "$f" --out "${b}_1260x2736.png"; done
+```
+
+### How it works
+
+**Test structure** (`UITests/ScreenshotTests.swift`):
+- `testCaptureCoreTabs` — launches without beta features, captures Moderation, Info, Settings, Accounts (4 always-visible tabs)
+- `testCaptureBetaTabs` — launches with `-showBetaFeatures 1`, captures Moderation, Timeline, Notifications, Chat (the 4 beta tabs)
+
+iOS tab bars show at most 5 tabs before placing extras in a "More" list, so the two tests split the 7 total tabs cleanly.
+
+**Credential sources** (priority order):
+1. Environment variables `TEST_HANDLE` / `TEST_PASSWORD` / `TEST_PDS`
+2. `.env` file in project root (supports `export KEY=VALUE` and `KEY=VALUE` formats, strips single/double quotes)
+3. If neither is set → falls back to `PreviewBlueskyClient` + preview accounts (mock data)
+
+**Launch flow** (when credentials are provided):
+1. `ScreenshotTests.setUp()` passes credentials via `app.launchEnvironment` and `--test-account` argument
+2. `AppDependencies.init()` switches from `PreviewBlueskyClient` to `LiveBlueskyClient` and from `AccountStore(preview:)` to `AccountStore(keychain:)`
+3. `RULYXApp.swift` runs a `.task` that calls `accountStore.addAccount()` with the credentials, authenticating against the live API
+4. `sleep(3)` in the test gives the auth call time to complete before screenshots begin
+
+**Key files:**
+| File | Role |
+|------|------|
+| `UITests/ScreenshotTests.swift` | XCTest test methods, credential loading, `.env` parser |
+| `UITests/SnapshotHelper.swift` | Fastlane's standard screenshot helper (writes to `~/Library/Caches/tools.fastlane/screenshots/`) |
+| `fastlane/Snapfile` | Device ("iPhone 16 Pro Max"), language ("en-US"), output dir |
+| `fastlane/Fastfile` | `screenshots` lane (capture + resize to 1260×2736) |
+| `Sources/App/AppDependencies.swift` | Detects `--test-account`, uses `LiveBlueskyClient` + real `AccountStore` |
+| `Sources/App/RULYXApp.swift` | `.task` that adds the test account on launch |
+
+**Known issues:**
+- `testAccountDetailNavigation` (`RULYXUITests.swift:149`) fails when `--test-account` is used because it expects preview account "team-alpha.bsky.social". Screenshot tests still pass and screenshots are collected because `stop_after_first_error: false` in the Fastfile.
+- `setup_simulator_env` in the Fastfile's `before_all` block is not defined, causing `resize_screenshots` lane to error when invoked independently. Run the manual `sips` resize command above.
+
 ## Navigation Design Guide
 
 ### Toolbar Button Rules

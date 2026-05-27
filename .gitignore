@@ -26,3 +26,8 @@ screenshots/
 # Fastlane
 fastlane/output/
 fastlane/test_output/
+fastlane/report.xml
+fastlane/README.md
+
+# Credentials
+accounts.txt
