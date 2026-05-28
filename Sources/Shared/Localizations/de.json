@@ -992,6 +992,7 @@
   "profile.direct_message": "Direktnachricht",
   "profile.dm_blocked_notice": "Nachrichten sind nicht verfügbar — Sie blockieren diesen Account.",
   "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
+  "profile.dm_blocked_by_notice": "Messaging is not available — this account is blocking you.",
   "chat.error.title": "Konversationen konnten nicht geladen werden",
   "lists.lists_on_profile": "Profil ist auf Listen aufgeführt...",
   "lists.advanced": "Erweitert",

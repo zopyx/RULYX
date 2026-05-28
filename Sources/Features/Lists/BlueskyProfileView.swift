@@ -950,8 +950,10 @@ struct BlueskyProfileView: View {
                         }
 
                         if showBetaFeatures {
-                            let isBlockedDM = profile.viewerState?.isBlocking == true || (profile.viewerState?.blockingByListName.isEmpty == false)
+                            let isBlockingThem = profile.viewerState?.isBlocking == true || (profile.viewerState?.blockingByListName.isEmpty == false)
+                            let isBlockedByThem = profile.viewerState?.blockedBy == true
                             let isMutualFollow = profile.viewerState?.isFollowing == true && profile.viewerState?.followsYou == true
+                            let shouldDisableDM = isBlockingThem || isBlockedByThem || isMutualFollow
                             Button {
                                 Task {
                                     chatStore.setAccount(account, appPassword: appPassword)
@@ -973,9 +975,13 @@ struct BlueskyProfileView: View {
                                         .background(Capsule().fill(.orange))
                                 }
                             }
-                            .disabled(isBlockedDM || isMutualFollow)
-                            if isBlockedDM {
+                            .disabled(shouldDisableDM)
+                            if isBlockingThem {
                                 Text(loc("profile.dm_blocked_notice"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else if isBlockedByThem {
+                                Text(loc("profile.dm_blocked_by_notice"))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             } else if isMutualFollow {

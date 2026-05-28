@@ -792,6 +792,7 @@
   "profile.direct_message": "Direct Message",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
 "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
+  "profile.dm_blocked_by_notice": "Messaging is not available — this account is blocking you.",
   "onboarding.close.label": "Close onboarding",
   "info.github.label": "View on GitHub",
   "info.github.hint": "Opens the project repository on GitHub in your browser",

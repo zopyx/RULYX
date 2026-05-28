@@ -987,6 +987,7 @@
   "profile.direct_message": "رسالة مباشرة",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
+  "profile.dm_blocked_by_notice": "Messaging is not available — this account is blocking you.",
   "chat.error.title": "فشل تحميل المحادثات",
   "lists.lists_on_profile": "الملف الشخصي مُدرج في القوائم...",
   "lists.advanced.mentions_button": "البحث عن المنشورات التي تذكرني",

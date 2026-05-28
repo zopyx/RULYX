@@ -988,6 +988,7 @@
   "profile.direct_message": "Tin nhắn trực tiếp",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
+  "profile.dm_blocked_by_notice": "Messaging is not available — this account is blocking you.",
   "chat.error.title": "Không thể tải cuộc trò chuyện",
   "lists.lists_on_profile": "Hồ sơ có trong các danh sách...",
   "lists.advanced.mentions_button": "Tìm bài viết nhắc đến tôi",

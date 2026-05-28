@@ -988,6 +988,7 @@
   "profile.direct_message": "Direct bericht",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
   "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
+  "profile.dm_blocked_by_notice": "Messaging is not available — this account is blocking you.",
   "chat.error.title": "Kan gesprekken niet laden",
   "lists.lists_on_profile": "Profiel staat op lijsten...",
   "lists.advanced.mentions_button": "Zoek berichten die mij vermelden",
