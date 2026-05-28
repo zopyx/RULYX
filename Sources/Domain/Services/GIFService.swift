@@ -1,18 +1,11 @@
 import Foundation
 
-/// A single GIF search result with direct media URLs and dimensions.
-struct GIFResult: Identifiable, Hashable {
-    /// Unique identifier for the GIF.
+struct GIFResult: Identifiable, Hashable, Sendable {
     let id: String
-    /// URL of the MP4 video version.
     let mp4URL: String
-    /// URL of the static preview image.
     let previewURL: String
-    /// Width in pixels.
     let width: Int
-    /// Height in pixels.
     let height: Int
-    /// Title or alt text.
     let title: String
 
     func hash(into hasher: inout Hasher) {
@@ -24,146 +17,252 @@ struct GIFResult: Identifiable, Hashable {
     }
 }
 
-/// Errors related to GIF loading via the Klipy API.
-enum GIFError: LocalizedError {
+enum GIFError: LocalizedError, Equatable {
     case missingAPIKey
     case networkError(String)
     case noResults
+    case invalidURL
+    case tooLarge
 
     var errorDescription: String? {
         switch self {
-        case .missingAPIKey: "KLIPY API key not configured. Add it in Settings."
-        case let .networkError(msg): msg
-        case .noResults: "No GIFs found"
+        case .missingAPIKey:
+            "KLIPY API key not configured. Add it in Settings."
+        case let .networkError(message):
+            message
+        case .noResults:
+            "No GIFs found"
+        case .invalidURL:
+            "GIF service URL is invalid."
+        case .tooLarge:
+            "GIF is too large to attach."
         }
     }
 }
 
-/// Singleton service for searching and downloading GIFs via the Klipy API.
-/// Manages API key storage in the Keychain with automatic migration from
-/// deprecated UserDefaults storage.
 final class GIFService: Sendable {
-    /// Shared singleton instance.
     static let shared = GIFService()
 
-    /// HTTP client for API requests.
-    private let httpClient = HTTPClient()
-    /// Base URL of the Klipy API.
-    private let baseURL = "https://api.klipy.com/api/v1"
-    /// Number of results per page.
-    private let perPage = 24
-    /// Keychain service for API key storage.
+    static let keychainService = "com.ajung.RULYX.klipy"
+    static let keychainAccount = "apiKey"
+
+    private static let bundledAPIKey = "W3FgVTePIgmlS4FEj8oF2xbMzXgwx3QGPX3pYEmrQZIvH4eRB0sin6PKqzun4f6R"
+
+    private let baseURL = URL(string: "https://api.klipy.com/api/v1")!
+    private let httpClient: HTTPClient
     private let keychain: KeychainServicing
+    private let maxAttachmentBytes: Int64
+    private let perPage: Int
 
-    /// Keychain service name for the Klipy API key.
-    private let keychainService = "com.ajung.RULYX.klipy"
-    /// Keychain account name for the Klipy API key.
-    private let keychainAccount = "apiKey"
-
-    /// Creates the service, seeds the API key if needed, and migrates from
-    /// UserDefaults if a legacy key exists.
-    init(keychain: KeychainServicing = KeychainService()) {
+    init(
+        httpClient: HTTPClient = HTTPClient(),
+        keychain: KeychainServicing = KeychainService(),
+        maxAttachmentBytes: Int64 = 20_000_000,
+        perPage: Int = 24
+    ) {
+        self.httpClient = httpClient
         self.keychain = keychain
-        seedKeyIfNeeded()
-        migrateFromUserDefaults()
+        self.maxAttachmentBytes = maxAttachmentBytes
+        self.perPage = perPage
+        migrateLegacyAPIKey()
+        Self.seedKeyIfNeeded(in: keychain)
     }
 
-    /// Seeds the default API key into the Keychain if none exists yet.
-    private func seedKeyIfNeeded() {
+    static func seedKeyIfNeeded(in keychain: KeychainServicing = KeychainService()) {
         guard (try? keychain.read(service: keychainService, account: keychainAccount)) == nil else { return }
-        try? keychain.save("W3FgVTePIgmlS4FEj8oF2xbMzXgwx3QGPX3pYEmrQZIvH4eRB0sin6PKqzun4f6R", service: keychainService, account: keychainAccount)
+        try? keychain.save(bundledAPIKey, service: keychainService, account: keychainAccount)
+    }
+
+    func search(query: String) async throws -> [GIFResult] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return try await trending() }
+
+        let url = try makeURL(
+            path: "gifs/search",
+            queryItems: [
+                URLQueryItem(name: "q", value: trimmed),
+                URLQueryItem(name: "per_page", value: "\(perPage)"),
+                URLQueryItem(name: "format_filter", value: "mp4,gif"),
+            ]
+        )
+        return try await loadResults(from: url, source: "GIF Search")
+    }
+
+    func trending() async throws -> [GIFResult] {
+        let url = try makeURL(
+            path: "gifs/trending",
+            queryItems: [
+                URLQueryItem(name: "per_page", value: "\(perPage)"),
+                URLQueryItem(name: "format_filter", value: "mp4,gif"),
+            ]
+        )
+        return try await loadResults(from: url, source: "GIF Trending")
+    }
+
+    func downloadGIF(url urlString: String) async throws -> Data {
+        guard let url = URL(string: urlString) else { throw GIFError.invalidURL }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 30
+        let (fileURL, response) = try await httpClient.download(for: request, source: "GIF Download")
+
+        guard (200 ..< 300).contains(response.statusCode) else {
+            throw GIFError.networkError("GIF download failed.")
+        }
+        if response.expectedContentLength > maxAttachmentBytes {
+            throw GIFError.tooLarge
+        }
+
+        let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
+        if let size = attributes[.size] as? NSNumber, size.int64Value > maxAttachmentBytes {
+            throw GIFError.tooLarge
+        }
+
+        return try Data(contentsOf: fileURL, options: .mappedIfSafe)
     }
 
     private var apiKey: String? {
-        guard let key = try? keychain.read(service: keychainService, account: keychainAccount) else { return nil }
-        return key.isEmpty ? nil : key
+        guard let value = try? keychain.read(service: Self.keychainService, account: Self.keychainAccount) else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 
-    private func migrateFromUserDefaults() {
-        if let oldKey = UserDefaults.standard.string(forKey: "klipyAPIKey"), !oldKey.isEmpty {
-            try? keychain.save(oldKey, service: keychainService, account: keychainAccount)
-            UserDefaults.standard.removeObject(forKey: "klipyAPIKey")
+    private func migrateLegacyAPIKey() {
+        guard let oldKey = UserDefaults.standard.string(forKey: "klipyAPIKey"), !oldKey.isEmpty else { return }
+        try? keychain.save(oldKey, service: Self.keychainService, account: Self.keychainAccount)
+        UserDefaults.standard.removeObject(forKey: "klipyAPIKey")
+    }
+
+    private func makeURL(path: String, queryItems: [URLQueryItem]) throws -> URL {
+        guard let apiKey else { throw GIFError.missingAPIKey }
+        let endpoint = baseURL
+            .appending(path: apiKey)
+            .appending(path: path)
+
+        guard var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {
+            throw GIFError.invalidURL
         }
+        components.queryItems = queryItems
+
+        guard let url = components.url else { throw GIFError.invalidURL }
+        return url
     }
 
-    /// Searches for GIFs matching the given query.
-    func search(query: String) async throws -> [GIFResult] {
-        guard let apiKey else { throw GIFError.missingAPIKey }
-        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-        let url = URL(string: "\(baseURL)/\(apiKey)/gifs/search?q=\(encoded)&per_page=\(perPage)&format_filter=mp4,gif")!
-        let (data, _) = try await httpClient.data(from: url, source: "GIF Search")
-        let decoded = try JSONDecoder().decode(KlipyResponse.self, from: data)
-        return decoded.data.data.map { $0.toGIFResult() }
-    }
+    private func loadResults(from url: URL, source: String) async throws -> [GIFResult] {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 12
+        let (data, response) = try await httpClient.data(for: request, source: source)
 
-    /// Fetches currently trending GIFs.
-    func trending() async throws -> [GIFResult] {
-        guard let apiKey else { throw GIFError.missingAPIKey }
-        let url = URL(string: "\(baseURL)/\(apiKey)/gifs/trending?per_page=\(perPage)&format_filter=mp4,gif")!
-        let (data, _) = try await httpClient.data(from: url, source: "GIF Trending")
-        let decoded = try JSONDecoder().decode(KlipyResponse.self, from: data)
-        return decoded.data.data.map { $0.toGIFResult() }
-    }
+        guard (200 ..< 300).contains(response.statusCode) else {
+            throw GIFError.networkError("GIF service returned HTTP \(response.statusCode).")
+        }
 
-    /// Downloads a GIF's raw data from its URL.
-    func downloadGIF(url: String) async throws -> Data {
-        guard let url = URL(string: url) else { throw GIFError.networkError("Invalid URL") }
-        let (data, _) = try await httpClient.data(from: url, source: "GIF Download")
-        return data
+        do {
+            let response = try JSONDecoder().decode(KlipyResponse.self, from: data)
+            let results = response.results.compactMap(\.gifResult)
+            guard !results.isEmpty else { throw GIFError.noResults }
+            return results
+        } catch let error as GIFError {
+            throw error
+        } catch {
+            throw GIFError.networkError("GIF service response could not be read.")
+        }
     }
 }
 
-// MARK: - Keychain Helper
-
 enum KlipyKeychainHelper {
-    private static let service = "com.ajung.RULYX.klipy"
-    private static let account = "apiKey"
     private static let keychain: KeychainServicing = KeychainService()
 
     static func read() -> String {
-        (try? keychain.read(service: service, account: account)) ?? ""
+        GIFService.seedKeyIfNeeded(in: keychain)
+        return (try? keychain.read(service: GIFService.keychainService, account: GIFService.keychainAccount)) ?? ""
     }
 
     static func save(_ value: String) {
-        if value.isEmpty {
-            try? keychain.delete(service: service, account: account)
+        if value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            try? keychain.delete(service: GIFService.keychainService, account: GIFService.keychainAccount)
         } else {
-            try? keychain.save(value, service: service, account: account)
+            try? keychain.save(value, service: GIFService.keychainService, account: GIFService.keychainAccount)
         }
     }
 
     static func exists() -> Bool {
-        guard let key = try? keychain.read(service: service, account: account) else { return false }
-        return !key.isEmpty
+        GIFService.seedKeyIfNeeded(in: keychain)
+        guard let key = try? keychain.read(service: GIFService.keychainService, account: GIFService.keychainAccount) else { return false }
+        return !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 
-// MARK: - KLIPY Response Models
-
 private struct KlipyResponse: Decodable {
-    let result: Bool
-    let data: KlipyData
+    let result: Bool?
+    let payload: KlipyPayload
+
+    var results: [KlipyGIF] {
+        guard result != false else { return [] }
+        return payload.items
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case result
+        case data
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(Bool.self, forKey: .result)
+        payload = try container.decode(KlipyPayload.self, forKey: .data)
+    }
 }
 
-private struct KlipyData: Decodable {
-    let data: [KlipyGIF]
+private struct KlipyPayload: Decodable {
+    let items: [KlipyGIF]
+
+    private enum CodingKeys: String, CodingKey {
+        case data
+        case results
+    }
+
+    init(from decoder: Decoder) throws {
+        if let direct = try? [KlipyGIF](from: decoder) {
+            items = direct
+            return
+        }
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = (try? container.decode([KlipyGIF].self, forKey: .data))
+            ?? (try? container.decode([KlipyGIF].self, forKey: .results))
+            ?? []
+    }
 }
 
 private struct KlipyGIF: Decodable {
-    let id: Int
+    let id: String
     let title: String?
     let file: KlipyFile?
 
-    func toGIFResult() -> GIFResult {
-        let format = file?.hd ?? file?.md ?? file?.sm
+    var gifResult: GIFResult? {
+        guard let media = file?.preferredMedia, !media.mp4URL.isEmpty else { return nil }
         return GIFResult(
-            id: "\(id)",
-            mp4URL: format?.mp4?.url ?? "",
-            previewURL: format?.gif?.url ?? format?.mp4?.url ?? "",
-            width: format?.gif?.width ?? format?.mp4?.width ?? 0,
-            height: format?.gif?.height ?? format?.mp4?.height ?? 0,
+            id: id,
+            mp4URL: media.mp4URL,
+            previewURL: media.previewURL,
+            width: media.width,
+            height: media.height,
             title: title ?? ""
         )
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case file
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeStringOrInt(forKey: .id)
+        title = try container.decodeIfPresent(String.self, forKey: .title)
+        file = try container.decodeIfPresent(KlipyFile.self, forKey: .file)
     }
 }
 
@@ -171,15 +270,46 @@ private struct KlipyFile: Decodable {
     let hd: KlipyFormat?
     let md: KlipyFormat?
     let sm: KlipyFormat?
+
+    var preferredMedia: KlipySelectedMedia? {
+        [sm, md, hd].compactMap { $0?.selectedMedia }.first
+    }
 }
 
 private struct KlipyFormat: Decodable {
     let gif: KlipyMedia?
     let mp4: KlipyMedia?
+
+    var selectedMedia: KlipySelectedMedia? {
+        guard let mp4URL = mp4?.url, !mp4URL.isEmpty else { return nil }
+        let previewURL = gif?.url.flatMap { $0.isEmpty ? nil : $0 } ?? mp4URL
+        return KlipySelectedMedia(
+            mp4URL: mp4URL,
+            previewURL: previewURL,
+            width: mp4?.width ?? gif?.width ?? 0,
+            height: mp4?.height ?? gif?.height ?? 0
+        )
+    }
 }
 
 private struct KlipyMedia: Decodable {
     let url: String?
     let width: Int?
     let height: Int?
+}
+
+private struct KlipySelectedMedia {
+    let mp4URL: String
+    let previewURL: String
+    let width: Int
+    let height: Int
+}
+
+private extension KeyedDecodingContainer {
+    func decodeStringOrInt(forKey key: Key) throws -> String {
+        if let value = try? decode(String.self, forKey: key) {
+            return value
+        }
+        return String(try decode(Int.self, forKey: key))
+    }
 }

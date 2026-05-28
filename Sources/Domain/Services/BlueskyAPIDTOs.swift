@@ -1001,11 +1001,19 @@ struct FeedPostVideoAttachment {
     let aspectRatio: (width: Int, height: Int)?
 }
 
-/// Polymorphic embed type for feed posts: images, record embeds (quotes), or video.
+/// A lightweight external link attachment for post creation.
+struct FeedPostExternalAttachment {
+    let uri: String
+    let title: String
+    let description: String
+}
+
+/// Polymorphic embed type for feed posts: images, record embeds (quotes), video, or external links.
 enum FeedPostRecordEmbed: Encodable {
     case images([FeedPostImage])
     case record(uri: String, cid: String)
     case video(FeedPostVideoAttachment)
+    case external(FeedPostExternalAttachment)
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -1032,6 +1040,12 @@ enum FeedPostRecordEmbed: Encodable {
                 try ar.encode(ratio.width, forKey: .width)
                 try ar.encode(ratio.height, forKey: .height)
             }
+        case let .external(attachment):
+            try container.encode("app.bsky.embed.external", forKey: .type)
+            var external = container.nestedContainer(keyedBy: ExternalCodingKeys.self, forKey: .external)
+            try external.encode(attachment.uri, forKey: .uri)
+            try external.encode(attachment.title, forKey: .title)
+            try external.encode(attachment.description, forKey: .description)
         }
     }
 
@@ -1043,6 +1057,7 @@ enum FeedPostRecordEmbed: Encodable {
         case captions
         case alt
         case aspectRatio
+        case external
     }
 
     private enum RecordCodingKeys: String, CodingKey {
@@ -1055,6 +1070,12 @@ enum FeedPostRecordEmbed: Encodable {
         case ref
         case mimeType
         case size
+    }
+
+    private enum ExternalCodingKeys: String, CodingKey {
+        case uri
+        case title
+        case description
     }
 
     private enum AspectRatioCodingKeys: String, CodingKey {

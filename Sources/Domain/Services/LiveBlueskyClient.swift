@@ -1619,6 +1619,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         text: String,
         images: [PostImageAttachment]? = nil,
         video: PostVideoAttachment? = nil,
+        external: PostExternalAttachment? = nil,
         replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)? = nil,
         quote: (uri: String, cid: String)? = nil,
         threadGate: ThreadGateRule? = nil,
@@ -1630,6 +1631,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             text: text,
             images: images,
             video: video,
+            external: external,
             replyTo: replyTo,
             quote: quote,
             account: account,
@@ -1664,6 +1666,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         text: String,
         images: [PostImageAttachment]?,
         video: PostVideoAttachment?,
+        external: PostExternalAttachment?,
         replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
         quote: (uri: String, cid: String)?,
         account: AppAccount,
@@ -1676,6 +1679,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 }
                 if let video {
                     return .video(FeedPostVideoAttachment(blob: video.blob, alt: video.alt, aspectRatio: video.aspectRatio))
+                }
+                if let external {
+                    return .external(FeedPostExternalAttachment(
+                        uri: external.uri,
+                        title: external.title,
+                        description: external.description
+                    ))
                 }
                 if let images {
                     guard !images.isEmpty else { return nil }
@@ -1984,6 +1994,13 @@ struct PostVideoAttachment {
     let blob: UploadedBlob
     let alt: String
     let aspectRatio: (width: Int, height: Int)?
+}
+
+/// An external link attachment for post creation.
+struct PostExternalAttachment {
+    let uri: String
+    let title: String
+    let description: String
 }
 
 private extension Array {

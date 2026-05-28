@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1207,
+    "total_keys": 1247,
     "total_languages": 16,
-    "untranslated_total": 1852
+    "untranslated_total": 2393
   },
   "keys": {
     "account.active": {
@@ -11237,6 +11237,132 @@
         "untranslated": false
       }
     },
+    "command_palette.no_results": {
+      "en": "No matching commands",
+      "de": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No matching commands",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No matching commands",
+        "untranslated": true
+      }
+    },
+    "command_palette.placeholder": {
+      "en": "Type a command...",
+      "de": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Type a command...",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Type a command...",
+        "untranslated": true
+      }
+    },
     "common.progress.hint": {
       "en": "{title}: {completedCount} of {totalCount} complete",
       "de": {
@@ -13377,6 +13503,321 @@
       "vi": {
         "text": "Soạn bài đăng",
         "untranslated": false
+      }
+    },
+    "context.add_to_list": {
+      "en": "Add to List",
+      "de": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Add to List",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Add to List",
+        "untranslated": true
+      }
+    },
+    "context.block_actor": {
+      "en": "Block Actor",
+      "de": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Block Actor",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Block Actor",
+        "untranslated": true
+      }
+    },
+    "context.copy_handle": {
+      "en": "Copy Handle",
+      "de": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Copy Handle",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Copy Handle",
+        "untranslated": true
+      }
+    },
+    "context.mute_actor": {
+      "en": "Mute Actor",
+      "de": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Mute Actor",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Mute Actor",
+        "untranslated": true
+      }
+    },
+    "context.open_in_new_window": {
+      "en": "Open in New Window",
+      "de": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Open in New Window",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Open in New Window",
+        "untranslated": true
       }
     },
     "customsearch.clear_recent": {
@@ -16022,6 +16463,447 @@
       },
       "vi": {
         "text": "Direct replies",
+        "untranslated": true
+      }
+    },
+    "drag.add_to_list": {
+      "en": "Drop to add to list",
+      "de": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Drop to add to list",
+        "untranslated": true
+      }
+    },
+    "drag.drop_list_here": {
+      "en": "Drop list here",
+      "de": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Drop list here",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Drop list here",
+        "untranslated": true
+      }
+    },
+    "drag.import_file": {
+      "en": "Drop a file to import",
+      "de": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Drop a file to import",
+        "untranslated": true
+      }
+    },
+    "empty.no_selection": {
+      "en": "No Selection",
+      "de": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No Selection",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No Selection",
+        "untranslated": true
+      }
+    },
+    "empty.select_item": {
+      "en": "Select an item to inspect",
+      "de": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select an item to inspect",
+        "untranslated": true
+      }
+    },
+    "empty.select_list": {
+      "en": "Select a list to view its members",
+      "de": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select a list to view its members",
+        "untranslated": true
+      }
+    },
+    "empty.select_profile": {
+      "en": "Select a profile to view details",
+      "de": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select a profile to view details",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select a profile to view details",
         "untranslated": true
       }
     },
@@ -21822,66 +22704,66 @@
       }
     },
     "internal.profile.section": {
-      "en": "My Internal Tags",
+      "en": "On my internal lists",
       "de": {
         "text": "Meine internen Tags",
         "untranslated": false
       },
       "fr": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "it": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "ja": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "zh": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "es": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "pt": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "ko": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "ru": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "ar": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "nl": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "pl": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "tr": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "th": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       },
       "vi": {
         "text": "My Internal Tags",
-        "untranslated": true
+        "untranslated": false
       }
     },
     "label.!hide": {
@@ -53573,6 +54455,69 @@
         "untranslated": false
       }
     },
+    "profile.dm_blocked_by_notice": {
+      "en": "Messaging is not available — this account is blocking you.",
+      "de": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Messaging is not available — this account is blocking you.",
+        "untranslated": true
+      }
+    },
     "profile.dm_blocked_notice": {
       "en": "Messaging is not available — you are blocking this account.",
       "de": {
@@ -53633,6 +54578,69 @@
       },
       "vi": {
         "text": "Messaging is not available — you are blocking this account.",
+        "untranslated": true
+      }
+    },
+    "profile.dm_mutual_notice": {
+      "en": "Messaging is not available — you both follow each other.",
+      "de": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Messaging is not available — you both follow each other.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Messaging is not available — you both follow each other.",
         "untranslated": true
       }
     },
@@ -71652,6 +72660,1518 @@
       "vi": {
         "text": "设置 (VI)",
         "untranslated": false
+      }
+    },
+    "shortcut.dashboard": {
+      "en": "Dashboard",
+      "de": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Dashboard",
+        "untranslated": true
+      }
+    },
+    "shortcut.menu.moderation": {
+      "en": "Moderation",
+      "de": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Moderation",
+        "untranslated": true
+      }
+    },
+    "shortcut.menu.navigate": {
+      "en": "Navigate",
+      "de": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Navigate",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Navigate",
+        "untranslated": true
+      }
+    },
+    "shortcut.new_list": {
+      "en": "New List",
+      "de": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "it": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "es": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "th": {
+        "text": "New List",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "New List",
+        "untranslated": true
+      }
+    },
+    "shortcut.search": {
+      "en": "Search",
+      "de": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Search",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Search",
+        "untranslated": true
+      }
+    },
+    "sidebar.accounts": {
+      "en": "Accounts",
+      "de": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Accounts",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Accounts",
+        "untranslated": true
+      }
+    },
+    "sidebar.all_lists": {
+      "en": "All Lists",
+      "de": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "All Lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "All Lists",
+        "untranslated": true
+      }
+    },
+    "sidebar.bulk_lookup": {
+      "en": "Bulk Lookup",
+      "de": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Bulk Lookup",
+        "untranslated": true
+      }
+    },
+    "sidebar.chat": {
+      "en": "Chat",
+      "de": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Chat",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Chat",
+        "untranslated": false
+      }
+    },
+    "sidebar.custom_search": {
+      "en": "Custom Search",
+      "de": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Custom Search",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Custom Search",
+        "untranslated": true
+      }
+    },
+    "sidebar.dashboard": {
+      "en": "Dashboard",
+      "de": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Dashboard",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Dashboard",
+        "untranslated": true
+      }
+    },
+    "sidebar.edit": {
+      "en": "Edit",
+      "de": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Edit",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Edit",
+        "untranslated": true
+      }
+    },
+    "sidebar.info": {
+      "en": "Info",
+      "de": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Info",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Info",
+        "untranslated": false
+      }
+    },
+    "sidebar.mentions_search": {
+      "en": "Mentions Search",
+      "de": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Mentions Search",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Mentions Search",
+        "untranslated": true
+      }
+    },
+    "sidebar.network_graph": {
+      "en": "Network Graph",
+      "de": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Network Graph",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Network Graph",
+        "untranslated": true
+      }
+    },
+    "sidebar.notifications": {
+      "en": "Notifications",
+      "de": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Notifications",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Notifications",
+        "untranslated": false
+      }
+    },
+    "sidebar.relationships": {
+      "en": "Relationships",
+      "de": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Relationships",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Relationships",
+        "untranslated": true
+      }
+    },
+    "sidebar.rules": {
+      "en": "Rules",
+      "de": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Rules",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Rules",
+        "untranslated": true
+      }
+    },
+    "sidebar.section.moderation": {
+      "en": "Moderation",
+      "de": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Moderation",
+        "untranslated": true
+      }
+    },
+    "sidebar.section.search_profiles": {
+      "en": "Search & Profiles",
+      "de": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Search & Profiles",
+        "untranslated": true
+      }
+    },
+    "sidebar.section.social": {
+      "en": "Social",
+      "de": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Social",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Social",
+        "untranslated": true
+      }
+    },
+    "sidebar.settings": {
+      "en": "Settings",
+      "de": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Settings",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Settings",
+        "untranslated": true
+      }
+    },
+    "sidebar.templates": {
+      "en": "Templates",
+      "de": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Templates",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Templates",
+        "untranslated": true
+      }
+    },
+    "sidebar.timeline": {
+      "en": "Timeline",
+      "de": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Timeline",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Timeline",
+        "untranslated": true
       }
     },
     "splash.footer": {

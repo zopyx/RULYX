@@ -16,11 +16,42 @@ final class GIFServiceModelTests: XCTestCase {
         XCTAssertEqual(GIFError.missingAPIKey.errorDescription, "KLIPY API key not configured. Add it in Settings.")
         XCTAssertEqual(GIFError.networkError("Timed out").errorDescription, "Timed out")
         XCTAssertEqual(GIFError.noResults.errorDescription, "No GIFs found")
+        XCTAssertEqual(GIFError.invalidURL.errorDescription, "GIF service URL is invalid.")
+        XCTAssertEqual(GIFError.tooLarge.errorDescription, "GIF is too large to attach.")
     }
 
     func testGIFServiceSharedSingleton() {
         let a = GIFService.shared
         let b = GIFService.shared
         XCTAssertTrue(a === b)
+    }
+
+    func testSeedKeyIfNeededStoresBundledKey() throws {
+        let keychain = MockKeychain()
+
+        GIFService.seedKeyIfNeeded(in: keychain)
+
+        let value = try keychain.read(
+            service: GIFService.keychainService,
+            account: GIFService.keychainAccount
+        )
+        XCTAssertFalse(value?.isEmpty ?? true)
+    }
+
+    func testSeedKeyIfNeededDoesNotOverwriteExistingKey() throws {
+        let keychain = MockKeychain()
+        try keychain.save(
+            "existing-key",
+            service: GIFService.keychainService,
+            account: GIFService.keychainAccount
+        )
+
+        GIFService.seedKeyIfNeeded(in: keychain)
+
+        let value = try keychain.read(
+            service: GIFService.keychainService,
+            account: GIFService.keychainAccount
+        )
+        XCTAssertEqual(value, "existing-key")
     }
 }
