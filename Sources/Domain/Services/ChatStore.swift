@@ -400,6 +400,7 @@ final class ChatStore: ObservableObject {
 
     /// Applies an incoming message to the local cache and updates the conversation's last message.
     /// Increments the unread count if the message is from someone else and the conversation is not visible.
+    /// Posts a local notification when a new message arrives from another user.
     private func applyIncomingMessage(_ message: ChatMessage, to convoId: String) {
         let incomingKind = ChatMessageKind.message(message)
 
@@ -428,6 +429,33 @@ final class ChatStore: ObservableObject {
         )
         conversations[index] = updated
         conversations.sort { $0.lastMessageAt > $1.lastMessageAt }
+
+        if shouldIncrementUnread, !existing.muted {
+            postLocalNotification(for: message, in: existing)
+        }
+    }
+
+    /// Posts a local notification for an incoming chat message from another user.
+    private func postLocalNotification(for message: ChatMessage, in conversation: ChatConversation) {
+        let senderName = conversation.members
+            .first { $0.did == message.senderDID }
+            .flatMap { $0.displayName ?? $0.handle } ?? message.senderDID
+
+        let content = UNMutableNotificationContent()
+        content.title = senderName
+        content.body = message.text
+        content.sound = .default
+        content.threadIdentifier = conversation.id
+
+        let request = UNNotificationRequest(
+            identifier: "chat_\(message.id)",
+            content: content,
+            trigger: nil
+        )
+
+        Task {
+            try? await UNUserNotificationCenter.current().add(request)
+        }
     }
 
     /// Inserts or replaces a conversation in the local list, then re-sorts by `lastMessageAt`.
