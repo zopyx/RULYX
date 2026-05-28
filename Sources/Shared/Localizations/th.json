@@ -987,6 +987,7 @@
   "chat.select_all": "เลือกทั้งหมด",
   "profile.direct_message": "ข้อความโดยตรง",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "chat.error.title": "โหลดการสนทนาไม่สำเร็จ",
   "lists.lists_on_profile": "โปรไฟล์นี้อยู่ในรายการ...",
   "lists.advanced.mentions_button": "ค้นหาโพสต์ที่กล่าวถึงฉัน",

@@ -987,6 +987,7 @@
   "chat.select_all": "Выбрать все",
   "profile.direct_message": "Прямое сообщение",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "chat.error.title": "Не удалось загрузить беседы",
   "lists.lists_on_profile": "Профиль добавлен в списки...",
   "lists.advanced.mentions_button": "Искать посты с упоминанием меня",

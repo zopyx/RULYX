@@ -987,6 +987,7 @@
   "chat.select_all": "选择全部",
   "profile.direct_message": "私信",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "chat.error.title": "无法加载对话",
   "lists.lists_on_profile": "个人资料被收录的列表...",
   "lists.advanced.mentions_button": "搜索提及我的帖子",

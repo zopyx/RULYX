@@ -987,6 +987,7 @@
   "chat.select_all": "Tümünü Seç",
   "profile.direct_message": "Doğrudan Mesaj",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "chat.error.title": "Konuşmalar Yüklenemedi",
   "lists.lists_on_profile": "Profilin yer aldığı listeler...",
   "lists.advanced.mentions_button": "Beni bahseden gönderileri ara",

@@ -987,6 +987,7 @@
   "chat.select_all": "Sélectionner tout",
   "profile.direct_message": "Message direct",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "chat.error.title": "Échec du chargement des conversations",
   "lists.lists_on_profile": "Profil présent sur des listes...",
   "lists.advanced.mentions_button": "Rechercher les posts qui me mentionnent",

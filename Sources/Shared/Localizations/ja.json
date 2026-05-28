@@ -987,6 +987,7 @@
   "chat.select_all": "すべて選択",
   "profile.direct_message": "ダイレクトメッセージ",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "chat.error.title": "会話の読み込みに失敗しました",
   "lists.lists_on_profile": "このプロフィールが掲載されているリスト...",
   "lists.advanced.mentions_button": "自分に言及している投稿を検索",
