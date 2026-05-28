@@ -65,8 +65,8 @@ struct NetworkGraphView: View {
 
             if let a = accountA, let b = accountB {
                 Section {
-                    LabeledContent("network.mutual_followers", value: "\(mutualFollowers.count)")
-                    LabeledContent("network.mutual_following", value: "\(mutualFollowing.count)")
+                    LabeledContent(loc("network.mutual_followers"), value: "\(mutualFollowers.count)")
+                    LabeledContent(loc("network.mutual_following"), value: "\(mutualFollowing.count)")
                     LabeledContent(
                         String.localized("network.follows_relationship", replacements: ["handle1": a.handle, "handle2": b.handle]),
                         value: aFollowsB ? loc("network.yes") : loc("network.no")
@@ -94,7 +94,7 @@ struct NetworkGraphView: View {
             }
 
             Section {
-                Button("network.analyze") { Task { await analyze() } }
+                Button(loc("network.analyze")) { Task { await analyze() } }
                     .disabled(accountA == nil || accountB == nil || isLoading)
                     .foregroundStyle(Color.skyPrimary)
                     .accessibilityHint(loc("network.analyze.hint"))
@@ -113,7 +113,7 @@ struct NetworkGraphView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("network.title"))
+        .pageTitle(loc("network.title"))
     }
 
     private func analyze() async {
@@ -148,7 +148,7 @@ private struct SearchField: View {
     let blueskyClient: LiveBlueskyClient
 
     var body: some View {
-        TextField("network.search_placeholder", text: $query)
+        TextField(loc("network.search_placeholder"), text: $query)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .task(id: query) {

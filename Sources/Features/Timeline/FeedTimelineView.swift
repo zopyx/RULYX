@@ -49,8 +49,7 @@ struct FeedTimelineView: View {
                 listContent
             }
         }
-        .navigationTitle(loc("timeline.title"))
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(loc("timeline.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showNewPostComposer = true } label: {
@@ -242,7 +241,7 @@ struct FeedTimelineView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Button("actions.retry") {
+                    Button(loc("actions.retry")) {
                         Task { await loadMore() }
                     }
                     .buttonStyle(.bordered)

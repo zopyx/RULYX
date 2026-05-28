@@ -16,7 +16,7 @@ struct BulkProfileLookupView: View {
     var body: some View {
         List {
             Section {
-                TextField("bulk.input_placeholder", text: $viewModel.rawInput)
+                TextField(loc("bulk.input_placeholder"), text: $viewModel.rawInput)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .lineLimit(5 ... 15)
@@ -71,7 +71,7 @@ struct BulkProfileLookupView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(Text(loc: "bulk.title"))
+        .pageTitle(Text(loc: "bulk.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.isLoading {
@@ -89,7 +89,7 @@ struct BulkProfileLookupView: View {
 
             ToolbarItem(placement: .topBarLeading) {
                 if !viewModel.results.isEmpty {
-                    Button("bulk.clear") { viewModel.clear() }
+                    Button(loc("bulk.clear")) { viewModel.clear() }
                         .accessibilityHint("Clears all lookup results")
                 }
             }

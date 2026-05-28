@@ -145,8 +145,7 @@ private struct HTTPRequestDebugErrorResponseView: View {
                 .padding()
                 .textSelection(.enabled)
         }
-        .navigationTitle(entry.url)
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(entry.url)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 ToolbarCloseButton()

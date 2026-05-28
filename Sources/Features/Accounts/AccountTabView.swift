@@ -172,7 +172,7 @@ struct AccountTabView: View {
                     }
                 }
             }
-            .navigationTitle(loc("account.manage.title"))
+            .pageTitle(loc("account.manage.title"))
             .navigationBarBackButtonHidden(true)
             .task {
                 await accountStore.refreshAccountProfiles(using: blueskyClient)
@@ -184,7 +184,7 @@ struct AccountTabView: View {
                     .environmentObject(blueskyClient)
             }
             .alert(Text(loc: "account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
-                Button("actions.ok") {
+                Button(loc("actions.ok")) {
                     accountStore.errorMessage = nil
                 }
             }, message: {
@@ -203,8 +203,7 @@ struct AccountTabView: View {
                         }
                     }
                     .listStyle(.insetGrouped)
-                    .navigationTitle(Text(loc: "account.preferred_search.info.title"))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(Text(loc: "account.preferred_search.info.title"))
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton(action: { showPreferredSearchInfo = false })
@@ -215,21 +214,21 @@ struct AccountTabView: View {
             .sheet(item: $editingLabelAccount) { account in
                 NavigationStack {
                     List {
-                        Section("account.edit_label.section") {
-                            TextField("account.edit_label.placeholder", text: $editLabelText)
+                        Section(loc("account.edit_label.section")) {
+                            TextField(loc("account.edit_label.placeholder"), text: $editLabelText)
                                 .textInputAutocapitalization(.never)
                             Button(loc("account.edit_label.clear"), role: .destructive) {
                                 accountStore.setLabel(for: account, label: nil)
                                 editingLabelAccount = nil
                             }
                         }
-                        Section("account.edit_label.suggestions") {
+                        Section(loc("account.edit_label.suggestions")) {
                             ForEach(["Work", "Personal", "Community", "Testing"], id: \.self) { option in
                                 Button {
                                     editLabelText = option
                                 } label: {
                                     HStack {
-                                        Text("account.edit_label.\(option.lowercased())").foregroundStyle(.primary)
+                                        Text(loc: "account.edit_label.\(option.lowercased())").foregroundStyle(.primary)
                                         if editLabelText == option { Spacer()
                                             Image(systemName: "checkmark")
                                         }
@@ -238,17 +237,16 @@ struct AccountTabView: View {
                             }
                         }
                     }
-                    .navigationTitle(loc("account.edit_label.title"))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(loc("account.edit_label.title"))
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("account.edit_label.save") {
+                            Button(loc("account.edit_label.save")) {
                                 accountStore.setLabel(for: account, label: editLabelText)
                                 editingLabelAccount = nil
                             }
                         }
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("account.edit_label.cancel") { editingLabelAccount = nil }
+                            Button(loc("account.edit_label.cancel")) { editingLabelAccount = nil }
                         }
                     }
                 }
@@ -266,12 +264,12 @@ struct AccountTabView: View {
                 }
             }
             .alert(loc("account.import.error"), isPresented: .constant(importError != nil)) {
-                Button("actions.ok") { importError = nil }
+                Button(loc("actions.ok")) { importError = nil }
             } message: {
                 Text(importError ?? "")
             }
             .alert(loc("account.import.success"), isPresented: .constant(importSuccess != nil)) {
-                Button("actions.ok") { importSuccess = nil }
+                Button(loc("actions.ok")) { importSuccess = nil }
             } message: {
                 Text(importSuccess ?? "")
             }

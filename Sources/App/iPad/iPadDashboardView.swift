@@ -26,8 +26,7 @@ struct iPadDashboardView: View {
             }
             .padding()
         }
-        .navigationTitle(loc("dashboard.title"))
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(loc("dashboard.title"))
     }
 
     private var accountsCard: some View {

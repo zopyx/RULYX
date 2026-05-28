@@ -31,7 +31,7 @@ extension ListDetailView {
         /// Text field for filtering members and a matching count display.
         private var findMembersSection: some View {
             Section {
-                TextField("list.members.filter_placeholder", text: $memberSearchQuery)
+                TextField(loc("list.members.filter_placeholder"), text: $memberSearchQuery)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .accessibilityLabel(loc("list.members.filter.label"))
@@ -112,7 +112,7 @@ extension ListDetailView {
                                 .foregroundStyle(.secondary)
                         }
                     } else if viewModel.hasMoreMembers {
-                        Button("list.members.load_more_button") {
+                        Button(loc("list.members.load_more_button")) {
                             Task {
                                 await viewModel.loadMoreMembersIfNeeded(
                                     currentMember: viewModel.filteredMembers.last,

@@ -52,7 +52,7 @@ struct AddAccountView: View {
                     .accessibilityHint(loc("account.select_pds.hint"))
 
                     if selectedProvider == .other {
-                        TextField("account.add.placeholder.url", text: $customPDS)
+                        TextField(loc("account.add.placeholder.url"), text: $customPDS)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.URL)
@@ -62,11 +62,11 @@ struct AddAccountView: View {
                 }
 
                 Section {
-                    TextField("account.add.placeholder.handle", text: $handle)
+                    TextField(loc("account.add.placeholder.handle"), text: $handle)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
 
-                    SecureField("account.add.placeholder.password", text: $appPassword)
+                    SecureField(loc("account.add.placeholder.password"), text: $appPassword)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 } header: {
@@ -80,18 +80,17 @@ struct AddAccountView: View {
                     Text(loc: "account.add.why_password")
                 }
             }
-            .navigationTitle(Text(loc: "account.add.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(Text(loc: "account.add.title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("account.add.cancel") {
+                    Button(loc("account.add.cancel")) {
                         dismiss()
                     }
                     .accessibilityHint(loc("account.discard_add.hint"))
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("account.add.save") {
+                    Button(loc("account.add.save")) {
                         Task {
                             let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                 URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -122,7 +121,7 @@ struct AddAccountView: View {
                 if accountStore.isAddingAccount {
                     ZStack {
                         Color.black.opacity(0.08).ignoresSafeArea()
-                        ProgressView("account.add.validating")
+                        ProgressView(loc("account.add.validating"))
                             .padding(20)
                             .background {
                                 if #available(iOS 26, *) {

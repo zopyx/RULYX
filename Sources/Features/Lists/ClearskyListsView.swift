@@ -39,8 +39,7 @@ struct ClearskyListsView: View {
                     }
                 }
             }
-            .navigationTitle(loc("lists.lists_on_profile"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("lists.lists_on_profile"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()

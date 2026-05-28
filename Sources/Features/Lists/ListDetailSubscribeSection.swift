@@ -72,7 +72,7 @@ extension ListDetailView {
                                 ProgressView()
                                     .tint(.white)
                             } else if isSubscribed {
-                                Label("list.detail.unsubscribe", systemImage: "bell.slash.fill")
+                                Label(loc("list.detail.unsubscribe"), systemImage: "bell.slash.fill")
                             } else {
                                 Text(loc: "list.detail.subscribe")
                                     .fontWeight(.semibold)

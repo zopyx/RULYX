@@ -115,8 +115,7 @@ struct InternalListDetailView: View {
             }
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: loc("list.search.placeholder"))
-        .navigationTitle(list.name)
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(list.name)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -153,7 +152,7 @@ struct InternalListDetailView: View {
                 internalListStore.deleteList(list)
                 dismiss()
             }
-            Button("actions.cancel", role: .cancel) {}
+            Button(loc("actions.cancel"), role: .cancel) {}
         } message: {
             Text(loc("internal.list.delete_message"))
         }
@@ -181,11 +180,10 @@ struct InternalListDetailView: View {
                         .pickerStyle(.navigationLink)
                     }
                 }
-                .navigationTitle(loc("internal.list.edit"))
-                .toolbarTitleDisplayMode(.inline)
+                .pageTitle(loc("internal.list.edit"))
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("actions.save") {
+                        Button(loc("actions.save")) {
                             if let current = internalListStore.lists.first(where: { $0.id == list.id }) {
                                 var updated = current
                                 updated.name = editName
@@ -197,7 +195,7 @@ struct InternalListDetailView: View {
                         .disabled(editName.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("actions.cancel") { showEditSheet = false }
+                        Button(loc("actions.cancel")) { showEditSheet = false }
                     }
                 }
             }

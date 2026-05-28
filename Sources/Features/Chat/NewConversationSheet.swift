@@ -23,7 +23,7 @@ struct NewConversationSheet: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(.secondary)
-                        TextField("chat.new.search_placeholder", text: $searchQuery)
+                        TextField(loc("chat.new.search_placeholder"), text: $searchQuery)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                             .onSubmit { Task { await search() } }
@@ -50,18 +50,17 @@ struct NewConversationSheet: View {
                     }
                 }
             }
-            .navigationTitle(loc("chat.new.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("chat.new.title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("actions.cancel") {
+                    Button(loc("actions.cancel")) {
                         dismiss()
                         onComplete(nil)
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if let selectedActor {
-                        Button("chat.new.start") {
+                        Button(loc("chat.new.start")) {
                             Task { await startConversation(actor: selectedActor) }
                         }
                         .disabled(isCreating)

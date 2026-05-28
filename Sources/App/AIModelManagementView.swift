@@ -46,8 +46,7 @@ struct AIModelManagementView: View {
                 )
             }
         }
-        .navigationTitle(loc("ai.models.title"))
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(loc("ai.models.title"))
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

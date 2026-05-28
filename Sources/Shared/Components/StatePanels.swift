@@ -90,7 +90,7 @@ struct ErrorRetryBanner: View {
             }
 
             Button(action: retry) {
-                Label("actions.retry", systemImage: "arrow.clockwise")
+                Label(loc("actions.retry"), systemImage: "arrow.clockwise")
             }
             .buttonStyle(.bordered)
             .glassBorderedButton()
@@ -152,7 +152,7 @@ struct BatchProgressCard: View {
                 HStack {
                     Spacer()
                     Button(role: .destructive, action: onCancel) {
-                        Label("actions.cancel", systemImage: "xmark.circle")
+                        Label(loc("actions.cancel"), systemImage: "xmark.circle")
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
@@ -426,7 +426,7 @@ struct SimplifiedReportSheet: View {
                 } else {
                     Section {
                         PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 5, matching: .images) {
-                            Label("report.support.attachment.add", systemImage: "paperclip")
+                            Label(loc("report.support.attachment.add"), systemImage: "paperclip")
                         }
 
                         if !supportImages.isEmpty {
@@ -466,7 +466,7 @@ struct SimplifiedReportSheet: View {
                         } label: {
                             HStack {
                                 Spacer()
-                                Label("report.support.email", systemImage: "envelope")
+                                Label(loc("report.support.email"), systemImage: "envelope")
                                     .fontWeight(.semibold)
                                 Spacer()
                             }
@@ -477,8 +477,7 @@ struct SimplifiedReportSheet: View {
                     }
                 }
             }
-            .navigationTitle(title)
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(title)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(loc("actions.cancel"), action: onCancel)
@@ -507,8 +506,8 @@ struct SimplifiedReportSheet: View {
                     attachmentImages: supportImages
                 )
             }
-            .alert("report.support.mail_unavailable", isPresented: $isShowingMailUnavailableAlert) {
-                Button("actions.ok") {}
+            .alert(loc("report.support.mail_unavailable"), isPresented: $isShowingMailUnavailableAlert) {
+                Button(loc("actions.ok")) {}
             }
             .sheet(isPresented: $showSubmitHelp) {
                 helpSheet(
@@ -535,8 +534,7 @@ struct SimplifiedReportSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle(title)
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(title)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()

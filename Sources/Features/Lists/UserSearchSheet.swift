@@ -20,7 +20,7 @@ struct UserSearchSheet: View {
         NavigationStack {
             List {
                 Section {
-                    TextField("usersearch.placeholder", text: $searchQuery)
+                    TextField(loc("usersearch.placeholder"), text: $searchQuery)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .focused($searchFocused)
@@ -56,8 +56,7 @@ struct UserSearchSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle(loc("usersearch.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("usersearch.title"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()

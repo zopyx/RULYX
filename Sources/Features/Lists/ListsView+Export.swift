@@ -81,11 +81,10 @@ extension ListsView {
                     .padding(.vertical, 8)
                 }
             }
-            .navigationTitle(loc("lists.export.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("lists.export.title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("actions.cancel") { isShowingListPicker = false }
+                    Button(loc("actions.cancel")) { isShowingListPicker = false }
                         .disabled(isExporting)
                 }
             }

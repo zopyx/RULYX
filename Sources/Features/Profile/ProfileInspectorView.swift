@@ -21,7 +21,7 @@ struct ProfileInspectorView: View {
         NavigationStack {
             List {
                 Section {
-                    TextField("profile.search.placeholder", text: $viewModel.query)
+                    TextField(loc("profile.search.placeholder"), text: $viewModel.query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .accessibilityLabel(loc("profile.search.label"))
@@ -135,7 +135,7 @@ struct ProfileInspectorView: View {
                                 Button(role: .destructive) {
                                     workspaceStore.deleteSavedSearch(search)
                                 } label: {
-                                    Label("actions.delete", systemImage: "trash")
+                                    Label(loc("actions.delete"), systemImage: "trash")
                                 }
                             }
                         }
@@ -209,12 +209,12 @@ struct ProfileInspectorView: View {
                                 }
                             }
                         } else {
-                            LabeledContent("profile.stats.followers", value: countText(inspection.profile.followersCount))
-                            LabeledContent("profile.stats.following", value: countText(inspection.profile.followsCount))
+                            LabeledContent(loc("profile.stats.followers"), value: countText(inspection.profile.followersCount))
+                            LabeledContent(loc("profile.stats.following"), value: countText(inspection.profile.followsCount))
                         }
-                        LabeledContent("profile.stats.posts", value: countText(inspection.profile.postsCount))
-                        LabeledContent("profile.stats.lists", value: countText(inspection.profile.listsCount))
-                        LabeledContent("profile.stats.starter_packs", value: countText(inspection.profile.starterPacksCount))
+                        LabeledContent(loc("profile.stats.posts"), value: countText(inspection.profile.postsCount))
+                        LabeledContent(loc("profile.stats.lists"), value: countText(inspection.profile.listsCount))
+                        LabeledContent(loc("profile.stats.starter_packs"), value: countText(inspection.profile.starterPacksCount))
                     } header: {
                         Text(loc: "profile.stats")
                     }
@@ -342,7 +342,7 @@ struct ProfileInspectorView: View {
                     }
                 }
             }
-            .navigationTitle(loc("profile.title"))
+            .pageTitle(loc("profile.title"))
             .toolbar {
                 accountSwitcherToolbar(isPresented: $isShowingQuickAccountSwitcher, accountStore: accountStore, localizationManager: localizationManager)
             }

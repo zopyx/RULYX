@@ -62,8 +62,7 @@ struct ListDetailView: View {
 
     var body: some View {
         rootContent
-            .navigationTitle("")
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(currentList.name)
             .toolbar(content: toolbarContent)
             .sheet(isPresented: $importState.isShowingEditSheet) {
                 if let account = accountStore.activeAccount,
@@ -130,7 +129,7 @@ struct ListDetailView: View {
                 }
             }
             .alert(Text(loc: "list.detail.alert_title"), isPresented: .constant(viewModel.errorMessage != nil), actions: {
-                Button("actions.ok") {
+                Button(loc("actions.ok")) {
                     viewModel.errorMessage = nil
                 }
                 .accessibilityHint(loc("list.detail.dismiss_error.hint"))
@@ -142,7 +141,7 @@ struct ListDetailView: View {
                 viewModel.bulkActionResult?.operation.title ?? loc("list.detail.bulk_update"),
                 isPresented: bulkResultPresentedBinding
             ) {
-                Button("actions.ok") {
+                Button(loc("actions.ok")) {
                     viewModel.bulkActionResult = nil
                 }
                 .accessibilityHint(loc("list.detail.dismiss_bulk.hint"))
@@ -152,7 +151,7 @@ struct ListDetailView: View {
                    let result = viewModel.bulkActionResult,
                    !result.failures.isEmpty
                 {
-                    Button("list.detail.retry_failed") {
+                    Button(loc("list.detail.retry_failed")) {
                         Task {
                             await viewModel.retryFailures(
                                 from: result,
@@ -426,7 +425,7 @@ struct ListDetailView: View {
                         reportEvidenceText = ""
                         isShowingReportSheet = true
                     } label: {
-                        Label("actions.report", systemImage: "exclamationmark.shield")
+                        Label(loc("actions.report"), systemImage: "exclamationmark.shield")
                     }
                     .disabled(isReportingList)
                 }
@@ -437,7 +436,7 @@ struct ListDetailView: View {
                         reportEvidenceText = ""
                         isShowingReportSheet = true
                     } label: {
-                        Label("actions.report", systemImage: "exclamationmark.shield")
+                        Label(loc("actions.report"), systemImage: "exclamationmark.shield")
                     }
                     .disabled(isReportingList)
                 }

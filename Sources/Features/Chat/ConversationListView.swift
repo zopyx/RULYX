@@ -46,7 +46,7 @@ struct ConversationListView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
-                        Button("state.error.retry") {
+                        Button(loc("state.error.retry")) {
                             Task { await chatStore.loadConvos() }
                         }
                         .buttonStyle(.bordered)
@@ -76,21 +76,21 @@ struct ConversationListView: View {
                                     Button {
                                         Task { await chatStore.unmute(convoId: convo.id) }
                                     } label: {
-                                        Label("chat.unmute", systemImage: "bell")
+                                        Label(loc("chat.unmute"), systemImage: "bell")
                                     }
                                     .tint(.orange)
                                 } else {
                                     Button {
                                         Task { await chatStore.mute(convoId: convo.id) }
                                     } label: {
-                                        Label("chat.mute", systemImage: "bell.slash")
+                                        Label(loc("chat.mute"), systemImage: "bell.slash")
                                     }
                                     .tint(.orange)
                                 }
                                 Button(role: .destructive) {
                                     Task { await chatStore.leave(convoId: convo.id) }
                                 } label: {
-                                    Label("chat.delete", systemImage: "trash")
+                                    Label(loc("chat.delete"), systemImage: "trash")
                                 }
                             }
                         }
@@ -102,7 +102,7 @@ struct ConversationListView: View {
                         }
                     }
                     .listStyle(.plain)
-                    .searchable(text: $searchText, prompt: "chat.search.placeholder")
+                    .searchable(text: $searchText, prompt: loc("chat.search.placeholder"))
                     .environment(\.editMode, $editMode)
                 }
             }
@@ -111,7 +111,7 @@ struct ConversationListView: View {
                     .environmentObject(chatStore)
                     .environmentObject(accountStore)
             }
-            .navigationTitle(Text(loc: "tab.chat"))
+            .pageTitle(Text(loc: "tab.chat"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -129,7 +129,7 @@ struct ConversationListView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     if editMode.isEditing {
-                        Button("chat.select_all") {
+                        Button(loc("chat.select_all")) {
                             let allIDs = Set(filteredConvos.map(\.id))
                             if selectedConvos == allIDs {
                                 selectedConvos = []
@@ -171,7 +171,7 @@ struct ConversationListView: View {
                             }
                             withAnimation { selectedConvos = [] }
                         } label: {
-                            Label("chat.mute", systemImage: "bell.slash")
+                            Label(loc("chat.mute"), systemImage: "bell.slash")
                         }
                         .buttonStyle(.bordered)
 
@@ -182,7 +182,7 @@ struct ConversationListView: View {
                             }
                             withAnimation { selectedConvos = [] }
                         } label: {
-                            Label("chat.unmute", systemImage: "bell")
+                            Label(loc("chat.unmute"), systemImage: "bell")
                         }
                         .buttonStyle(.bordered)
 
@@ -194,7 +194,7 @@ struct ConversationListView: View {
                             }
                             withAnimation { selectedConvos = [] }
                         } label: {
-                            Label("chat.delete", systemImage: "trash")
+                            Label(loc("chat.delete"), systemImage: "trash")
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
@@ -215,7 +215,7 @@ struct ConversationListView: View {
                 .environmentObject(accountStore)
                 .environmentObject(chatStore)
             }
-            .alert("chat.error.title", isPresented: Binding(
+            .alert(loc("chat.error.title"), isPresented: Binding(
                 get: { chatStore.error != nil },
                 set: { isPresented in
                     if !isPresented {
@@ -223,7 +223,7 @@ struct ConversationListView: View {
                     }
                 }
             )) {
-                Button("actions.ok") {
+                Button(loc("actions.ok")) {
                     chatStore.error = nil
                 }
             } message: {

@@ -81,7 +81,6 @@ struct InfoView: View {
                 // own visual identity via the logo and background gradient.
                 .navigationTitle("")
                 .toolbarTitleDisplayMode(.inline)
-                // Hides the navigation bar background so the gradient shows through.
                 .toolbarBackground(.hidden, for: .navigationBar)
             }
         }
@@ -577,8 +576,7 @@ private struct DebugInfoView: View {
                         .font(.caption.monospaced())
                 }
             }
-            .navigationTitle(localizationManager.localized("debug.diagnostics"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(localizationManager.localized("debug.diagnostics"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()

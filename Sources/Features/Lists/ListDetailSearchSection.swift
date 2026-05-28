@@ -35,7 +35,7 @@ extension ListDetailView {
         private var searchSection: some View {
             Section {
                 HStack(spacing: 8) {
-                    TextField("list.search.placeholder", text: $searchQuery)
+                    TextField(loc("list.search.placeholder"), text: $searchQuery)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .accessibilityLabel(loc("list.search.field.label"))
@@ -92,7 +92,7 @@ extension ListDetailView {
                                 .foregroundStyle(.secondary)
                         }
                     } else if viewModel.hasMoreSearchResults {
-                        Button("list.search.load_more") {
+                        Button(loc("list.search.load_more")) {
                             Task {
                                 await viewModel.loadMoreSearchResults(
                                     account: account,
@@ -171,7 +171,7 @@ extension ListDetailView {
 
         /// Import from paste, file, or export as CSV.
         private var workflowToolsSection: some View {
-            DisclosureGroup("list.search.tools") {
+            DisclosureGroup(loc("list.search.tools")) {
                 Button {
                     isShowingImportSheet = true
                 } label: {

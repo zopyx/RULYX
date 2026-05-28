@@ -78,8 +78,7 @@ struct UserPostsView: View {
                     listContent
                 }
             }
-            .navigationTitle(loc("profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("profile.posts.title_by").replacingOccurrences(of: "{name}", with: displayName))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if !viewModel.posts.isEmpty {
@@ -242,7 +241,7 @@ struct UserPostsView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.tertiary)
                     .font(.subheadline)
-                TextField("profile.posts.search", text: $viewModel.searchText)
+                TextField(loc("profile.posts.search"), text: $viewModel.searchText)
                     .textFieldStyle(.plain)
                     .font(.subheadline)
                 if !viewModel.searchText.isEmpty {

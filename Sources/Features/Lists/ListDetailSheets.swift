@@ -26,18 +26,17 @@ struct ImportHandlesSheet: View {
                     }
                 }
             }
-            .navigationTitle(loc("list.import.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("list.import.title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("actions.cancel") {
+                    Button(loc("actions.cancel")) {
                         dismiss()
                     }
                     .accessibilityHint(loc("list.import.dismiss.hint"))
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("list.import.review") {
+                    Button(loc("list.import.review")) {
                         importAction(rawInput)
                         dismiss()
                     }
@@ -57,8 +56,7 @@ struct ImportHandlesSheet: View {
                         }
                     }
                     .listStyle(.insetGrouped)
-                    .navigationTitle(Text(loc("list.import.help_title")))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(Text(loc("list.import.help_title")))
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton()
@@ -115,8 +113,7 @@ struct ImportPreviewSheet: View {
                 previewSection(loc("list.import_preview.duplicate"), items: preview.duplicateItems)
                 previewSection(loc("list.import_preview.unresolved"), items: preview.unresolvedItems)
             }
-            .navigationTitle(loc("list.import_preview.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("list.import_preview.title"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton(action: { dismissAction()
@@ -145,8 +142,7 @@ struct ImportPreviewSheet: View {
                         }
                     }
                     .listStyle(.insetGrouped)
-                    .navigationTitle(Text(loc("list.import_preview.help_title")))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(Text(loc("list.import_preview.help_title")))
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton()
@@ -230,7 +226,7 @@ struct ListMetadataSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("list.edit.name_placeholder", text: $title)
+                    TextField(loc("list.edit.name_placeholder"), text: $title)
                         .onChange(of: title) { _, newValue in
                             if newValue.count > Self.maxTitleLength {
                                 title = String(newValue.prefix(Self.maxTitleLength))
@@ -243,7 +239,7 @@ struct ListMetadataSheet: View {
                 }
 
                 Section {
-                    TextField("list.edit.desc_placeholder", text: $description, axis: .vertical)
+                    TextField(loc("list.edit.desc_placeholder"), text: $description, axis: .vertical)
                         .lineLimit(3 ... 6)
                         .onChange(of: description) { _, newValue in
                             if newValue.count > Self.maxDescriptionLength {
@@ -265,7 +261,7 @@ struct ListMetadataSheet: View {
                 }
 
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("actions.cancel") {
+                    Button(loc("actions.cancel")) {
                         dismiss()
                     }
                     .disabled(isSaving)

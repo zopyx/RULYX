@@ -12,7 +12,7 @@ struct PendingActionsSheet: View {
         NavigationStack {
             List {
                 if workspaceStore.queuedActions.isEmpty {
-                    ContentUnavailableView("pending.empty.title", systemImage: "tray", description: Text(loc: "pending.empty.desc"))
+                    ContentUnavailableView(loc("pending.empty.title"), systemImage: "tray", description: Text(loc: "pending.empty.desc"))
                 } else {
                     ForEach(workspaceStore.queuedActions) { action in
                         VStack(alignment: .leading, spacing: 8) {
@@ -62,7 +62,7 @@ struct PendingActionsSheet: View {
                                 .accessibilityHint(loc("action_queue.cancel.hint"))
                             }
                             if case .completed = action.status {
-                                Button("pending.retry_button") {
+                                Button(loc("pending.retry_button")) {
                                     workspaceStore.actionQueue.retry(action.id)
                                 }
                                 .font(.caption)
@@ -78,11 +78,10 @@ struct PendingActionsSheet: View {
                     }
                 }
             }
-            .navigationTitle(Text(loc: "pending.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(Text(loc: "pending.title"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("pending.done_button") { isPresented = false }
+                    Button(loc("pending.done_button")) { isPresented = false }
                         .accessibilityHint(loc("action_queue.close.hint"))
                 }
             }

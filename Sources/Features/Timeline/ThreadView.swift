@@ -71,8 +71,7 @@ struct ThreadView: View {
                 .listStyle(.plain)
             }
         }
-        .navigationTitle(loc("profile.posts.thread"))
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(loc("profile.posts.thread"))
         .fullScreenCover(item: $imagePreview) { preview in
             ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {
                 imagePreview = nil

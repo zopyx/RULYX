@@ -78,8 +78,7 @@ struct iPadListsView: View {
             }
         }
         .listStyle(.sidebar)
-        .navigationTitle(loc("sidebar.all_lists"))
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(loc("sidebar.all_lists"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Menu {

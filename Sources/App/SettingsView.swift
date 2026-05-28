@@ -104,7 +104,7 @@ struct SettingsView: View {
                         }
 
                         if appLockManager.isEnabled {
-                            Picker("settings.auto_lock", selection: $appLockManager.timeoutMinutes) {
+                            Picker(loc("settings.auto_lock"), selection: $appLockManager.timeoutMinutes) {
                                 Text(loc: "settings.auto_lock.immediately").tag(0)
                                 Text(loc: "settings.auto_lock.1min").tag(1)
                                 Text(loc: "settings.auto_lock.5min").tag(5)
@@ -202,7 +202,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .navigationTitle(localizationManager.localized("settings.title"))
+            .pageTitle(localizationManager.localized("settings.title"))
 
             // MARK: Sheet — HTTP Request Debug View
 

@@ -58,13 +58,12 @@ struct AccountQuickSwitcherSheet: View {
                             onManageAccounts()
                         }
                     } label: {
-                        Label("account.switcher.manage", systemImage: "slider.horizontal.3")
+                        Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
                     }
                     .accessibilityHint("Opens the full account management screen")
                 }
             }
-            .navigationTitle(loc: "account.switcher.title")
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("account.switcher.title"))
         }
         .presentationDetents([.height(360), .medium])
         .presentationDragIndicator(.visible)

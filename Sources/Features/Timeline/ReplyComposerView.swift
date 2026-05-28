@@ -79,8 +79,7 @@ struct ReplyComposerView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
             }
-            .navigationTitle(loc("post.reply"))
-            .navigationBarTitleDisplayMode(.inline)
+            .pageTitle(loc("post.reply"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(loc("actions.cancel")) { dismiss() }

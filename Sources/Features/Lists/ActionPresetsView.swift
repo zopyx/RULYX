@@ -27,11 +27,11 @@ struct ActionPresetsView: View {
                 }
                 .padding(.vertical, 4)
                 .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) { store.delete(preset) } label: { Label("actions.delete", systemImage: "trash") }
+                    Button(role: .destructive) { store.delete(preset) } label: { Label(loc("actions.delete"), systemImage: "trash") }
                         .accessibilityHint(loc("action_preset.delete.hint"))
                 }
                 .swipeActions(edge: .leading) {
-                    Button { store.duplicate(preset) } label: { Label("presets.duplicate", systemImage: "doc.on.doc") }
+                    Button { store.duplicate(preset) } label: { Label(loc("presets.duplicate"), systemImage: "doc.on.doc") }
                         .accessibilityHint(loc("action_preset.duplicate.hint"))
                 }
             }
@@ -90,25 +90,24 @@ struct EditActionPresetView: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("presets.name_placeholder", text: $name)
-                Section("presets.actions_section") {
-                    Toggle("presets.block", isOn: $shouldBlock)
+                TextField(loc("presets.name_placeholder"), text: $name)
+                Section(loc("presets.actions_section")) {
+                    Toggle(loc("presets.block"), isOn: $shouldBlock)
                         .accessibilityHint(loc("action_preset.block.hint"))
-                    Toggle("presets.mute", isOn: $shouldMute)
+                    Toggle(loc("presets.mute"), isOn: $shouldMute)
                         .accessibilityHint(loc("action_preset.mute.hint"))
-                    Toggle("presets.report", isOn: $shouldReport)
+                    Toggle(loc("presets.report"), isOn: $shouldReport)
                         .accessibilityHint(loc("action_preset.report.hint"))
                 }
-                Section("presets.add_to_list") {
-                    TextField("presets.list_placeholder", text: $targetListName)
+                Section(loc("presets.add_to_list")) {
+                    TextField(loc("presets.list_placeholder"), text: $targetListName)
                 }
             }
-            .navigationTitle(loc("presets.new_title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("presets.new_title"))
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("actions.cancel") { dismiss() }.accessibilityHint(loc("action_preset.discard.hint")) }
+                ToolbarItem(placement: .cancellationAction) { Button(loc("actions.cancel")) { dismiss() }.accessibilityHint(loc("action_preset.discard.hint")) }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("actions.save") {
+                    Button(loc("actions.save")) {
                         store.save(ActionPreset(name: name, shouldBlock: shouldBlock, shouldMute: shouldMute, shouldReport: shouldReport, targetListName: targetListName.isEmpty ? nil : targetListName))
                         dismiss()
                     }

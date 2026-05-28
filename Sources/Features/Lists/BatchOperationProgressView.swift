@@ -157,8 +157,7 @@ struct BatchOperationProgressView: View {
                 }
             }
             .padding(.horizontal, 24)
-            .navigationTitle(navTitle)
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(navTitle)
             .animation(.default, value: isCheckComplete)
             .animation(.default, value: isExecuteComplete)
             .interactiveDismissDisabled(!isExecuteComplete)

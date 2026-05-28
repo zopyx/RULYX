@@ -76,8 +76,7 @@ struct iPadProfileInspector: View {
                 using: blueskyClient
             )
         }
-        .navigationTitle(profileVM.inspection?.profile.handle ?? "")
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(profileVM.inspection?.profile.handle ?? "")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {

@@ -22,6 +22,7 @@ struct ComposePostView: View {
     @State private var imageAlts: [String] = []
     @State private var videoAttachment: PostVideoAttachment?
     @State private var selectedGIFPreviewURL: String?
+    @State private var selectedGIFLinkURL: String?
     @State private var selectedGIFTitle: String = ""
     @State private var isPosting = false
     @State private var errorMessage: String?
@@ -111,9 +112,10 @@ struct ComposePostView: View {
                             Button(role: .destructive) {
                                 videoAttachment = nil
                                 selectedGIFPreviewURL = nil
+                                selectedGIFLinkURL = nil
                                 selectedGIFTitle = ""
                             } label: {
-                                Label("actions.remove", systemImage: "xmark.circle.fill")
+                                Label(loc("actions.remove"), systemImage: "xmark.circle.fill")
                                     .font(.caption)
                             }
                         }
@@ -127,21 +129,20 @@ struct ComposePostView: View {
                 replyControlsSection
                 addMediaSection
             }
-            .navigationTitle(navigationTitleString)
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(navigationTitleString)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("actions.cancel") { dismiss() }
+                    Button(loc("actions.cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("compose.post") {
+                    Button(loc("compose.post")) {
                         Task { await post() }
                     }
                     .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                 }
             }
             .alert(Text(loc: "compose.error"), isPresented: .constant(errorMessage != nil)) {
-                Button("actions.ok") { errorMessage = nil }
+                Button(loc("actions.ok")) { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
             }
@@ -159,7 +160,7 @@ struct ComposePostView: View {
                     showListPicker = true
                     Task { await loadUserLists() }
                 }
-                Button("actions.cancel", role: .cancel) {}
+                Button(loc("actions.cancel"), role: .cancel) {}
             }
             .sheet(isPresented: $showListPicker) {
                 NavigationStack {
@@ -173,11 +174,10 @@ struct ComposePostView: View {
                             listRowLabel(list)
                         }
                     }
-                    .navigationTitle(loc("compose.reply_list_pick"))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(loc("compose.reply_list_pick"))
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("actions.cancel") { showListPicker = false }
+                            Button(loc("actions.cancel")) { showListPicker = false }
                         }
                     }
                 }
@@ -205,7 +205,7 @@ struct ComposePostView: View {
                     pendingImageResize?()
                     showImageResizeAlert = false
                 }
-                Button("actions.cancel", role: .cancel) {
+                Button(loc("actions.cancel"), role: .cancel) {
                     showImageResizeAlert = false
                 }
             } message: { _ in
@@ -254,7 +254,7 @@ struct ComposePostView: View {
                                     .contentShape(Rectangle())
                                     .offset(x: 4, y: -4)
                                 }
-                                TextField("compose.alt_placeholder", text: altBinding)
+                                TextField(loc("compose.alt_placeholder"), text: altBinding)
                                     .font(.caption)
                                     .textFieldStyle(.plain)
                                     .frame(width: 100)
@@ -297,7 +297,7 @@ struct ComposePostView: View {
             PhotosPicker(selection: $selectedItems, maxSelectionCount: maxImages, matching: .images) {
                 Label { Text(loc: "compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
             }
-            .disabled(selectedImages.count >= maxImages || videoAttachment != nil)
+            .disabled(selectedImages.count >= maxImages || videoAttachment != nil || selectedGIFLinkURL != nil)
             .onChange(of: selectedItems) { _, items in
                 Task { await loadImages(from: items) }
             }
@@ -314,8 +314,8 @@ struct ComposePostView: View {
                     }
                 }
             }
-            .disabled(videoAttachment != nil || !selectedImages.isEmpty)
-            .foregroundStyle(videoAttachment != nil ? Color.skyPrimary : .primary)
+            .disabled(isDownloadingGIF || videoAttachment != nil || selectedGIFLinkURL != nil || !selectedImages.isEmpty)
+            .foregroundStyle(videoAttachment != nil || selectedGIFLinkURL != nil ? Color.skyPrimary : .primary)
         }
     }
 
@@ -546,28 +546,23 @@ struct ComposePostView: View {
 
     // MARK: - GIF handling
 
+    private var selectedGIFExternalAttachment: PostExternalAttachment? {
+        guard let selectedGIFLinkURL else { return nil }
+        return PostExternalAttachment(
+            uri: selectedGIFLinkURL,
+            title: selectedGIFTitle.isEmpty ? "GIF" : selectedGIFTitle,
+            description: "GIF"
+        )
+    }
+
+    @MainActor
     private func handleGIFSelection(_ gif: GIFResult) async {
+        guard !isDownloadingGIF else { return }
         guard !gif.mp4URL.isEmpty else { return }
-        isDownloadingGIF = true
+        videoAttachment = nil
         selectedGIFPreviewURL = gif.previewURL
+        selectedGIFLinkURL = gif.mp4URL
         selectedGIFTitle = gif.title
-        defer { isDownloadingGIF = false }
-        do {
-            let data = try await GIFService.shared.downloadGIF(url: gif.mp4URL)
-            let response = try await blueskyClient.uploadBlob(
-                data: data,
-                mimeType: "video/mp4",
-                account: account,
-                appPassword: appPassword
-            )
-            let ratio: (width: Int, height: Int)? = gif.width > 0 && gif.height > 0 ? (gif.width, gif.height) : nil
-            videoAttachment = PostVideoAttachment(blob: response.blob, alt: gif.title, aspectRatio: ratio)
-        } catch {
-            videoAttachment = nil
-            selectedGIFPreviewURL = nil
-            selectedGIFTitle = ""
-            errorMessage = error.localizedDescription
-        }
     }
 
     // MARK: - Posting
@@ -597,6 +592,7 @@ struct ComposePostView: View {
                 text: postText,
                 images: images,
                 video: videoAttachment,
+                external: selectedGIFExternalAttachment,
                 replyTo: editReplyTo ?? replyTo,
                 quote: quote,
                 threadGate: replyRule,

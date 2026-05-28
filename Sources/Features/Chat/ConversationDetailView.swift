@@ -52,7 +52,7 @@ struct ConversationDetailView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                    Button("state.error.retry") {
+                    Button(loc("state.error.retry")) {
                         Task { await chatStore.loadMessages(convoId: conversation.id) }
                     }
                     .buttonStyle(.bordered)
@@ -67,7 +67,7 @@ struct ConversationDetailView: View {
 
             sendBar
         }
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(displayName)
         .task {
             chatStore.setVisibleConversation(conversation.id)
             await chatStore.loadMessages(convoId: conversation.id)
@@ -104,25 +104,25 @@ struct ConversationDetailView: View {
                         Button {
                             Task { await chatStore.unmute(convoId: conversation.id) }
                         } label: {
-                            Label("chat.unmute", systemImage: "bell")
+                            Label(loc("chat.unmute"), systemImage: "bell")
                         }
                     } else {
                         Button {
                             Task { await chatStore.mute(convoId: conversation.id) }
                         } label: {
-                            Label("chat.mute", systemImage: "bell.slash")
+                            Label(loc("chat.mute"), systemImage: "bell.slash")
                         }
                     }
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         Task { await chatStore.loadMessages(convoId: conversation.id) }
                     } label: {
-                        Label("chat.reload", systemImage: "arrow.clockwise")
+                        Label(loc("chat.reload"), systemImage: "arrow.clockwise")
                     }
                     Button(role: .destructive) {
                         Task { await chatStore.leave(convoId: conversation.id) }
                     } label: {
-                        Label("chat.delete", systemImage: "trash")
+                        Label(loc("chat.delete"), systemImage: "trash")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -215,7 +215,7 @@ struct ConversationDetailView: View {
                             if chatStore.isLoadingMoreMessages {
                                 ProgressView()
                             } else {
-                                Button("chat.load_older") {
+                                Button(loc("chat.load_older")) {
                                     Task { await chatStore.loadMoreMessages(convoId: conversation.id) }
                                 }
                                 .font(.subheadline)
@@ -274,7 +274,7 @@ struct ConversationDetailView: View {
     /// Bottom input bar with text field and send button.
     private var sendBar: some View {
         HStack(spacing: 8) {
-            TextField("chat.message.placeholder", text: $messageText)
+            TextField(loc("chat.message.placeholder"), text: $messageText)
                 .textFieldStyle(.roundedBorder)
                 .focused($isFocused)
                 .disabled(chatStore.isSendingMessage)

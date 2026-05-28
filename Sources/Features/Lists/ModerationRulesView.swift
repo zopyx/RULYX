@@ -32,7 +32,7 @@ struct ModerationRulesView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("rules.title"))
+        .pageTitle(loc("rules.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { Button { isCreating = true } label: { Image(systemName: "plus") }.accessibilityLabel(loc("rules.new_title")).accessibilityHint(loc("moderation_rule.create.hint")) }
         }
@@ -77,20 +77,20 @@ private struct EditRuleView: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("rules.name_placeholder", text: $name)
-                Picker("rules.trigger", selection: $trigger) {
+                TextField(loc("rules.name_placeholder"), text: $name)
+                Picker(loc("rules.trigger"), selection: $trigger) {
                     ForEach(ModerationRule.Trigger.allCases) { t in Text(triggerLocalized(t)).tag(t) }
                 }
-                .accessibilityHint("moderation_rule.condition.hint")
+                .accessibilityHint(loc: "moderation_rule.condition.hint")
                 if trigger == .handleContains || trigger == .hasLabel {
-                    TextField("rules.value_placeholder", text: $triggerValue)
+                    TextField(loc("rules.value_placeholder"), text: $triggerValue)
                 }
-                Picker("rules.action", selection: $action) {
+                Picker(loc("rules.action"), selection: $action) {
                     ForEach(ModerationRule.Action.allCases) { a in Text(actionLocalized(a)).tag(a) }
                 }
-                .accessibilityHint("moderation_rule.action.hint")
+                .accessibilityHint(loc: "moderation_rule.action.hint")
             }
-            .navigationTitle(loc("rules.new_title"))
+            .pageTitle(loc("rules.new_title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(loc("actions.cancel")) { dismiss() }.accessibilityHint(loc("moderation_rule.discard.hint")) }
                 ToolbarItem(placement: .confirmationAction) {

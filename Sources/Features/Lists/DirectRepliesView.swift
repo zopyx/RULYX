@@ -47,7 +47,7 @@ struct DirectRepliesView: View {
             if isFetchingLikers {
                 HStack {
                     Spacer()
-                    ProgressView("post.block_likers.fetching")
+                    ProgressView(loc("post.block_likers.fetching"))
                     Spacer()
                 }
                 .listRowSeparator(.hidden)
@@ -169,8 +169,7 @@ struct DirectRepliesView: View {
         .refreshable {
             await refresh()
         }
-        .navigationTitle(Text(loc: "directreplies.title"))
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(Text(loc: "directreplies.title"))
         .sheet(item: $selectedPostURI) { uri in
             NavigationStack {
                 ThreadView(postURI: uri)
@@ -230,8 +229,8 @@ struct DirectRepliesView: View {
             let remainder = pendingLikerTargets.count > 5 ? "\n…and \(pendingLikerTargets.count - 5) more" : ""
             Text(verbatim: loc("post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
         }
-        .alert("list.detail.alert_title", isPresented: .init(get: { blockError != nil }, set: { if !$0 { blockError = nil } })) {
-            Button("actions.ok") { blockError = nil }
+        .alert(loc("list.detail.alert_title"), isPresented: .init(get: { blockError != nil }, set: { if !$0 { blockError = nil } })) {
+            Button(loc("actions.ok")) { blockError = nil }
         } message: {
             if let error = blockError {
                 Text(error)

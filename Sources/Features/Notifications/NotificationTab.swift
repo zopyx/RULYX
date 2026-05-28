@@ -33,8 +33,7 @@ struct NotificationTab: View {
                     listContent
                 }
             }
-            .navigationTitle(loc("notifications.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("notifications.title"))
             .sheet(item: $selectedActor) { actor in
                 NavigationStack {
                     BlueskyProfileView(

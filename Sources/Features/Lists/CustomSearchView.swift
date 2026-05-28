@@ -29,8 +29,7 @@ struct CustomSearchView: View {
     var body: some View {
         listContent
             .listStyle(.insetGrouped)
-            .navigationTitle(loc("customsearch.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("customsearch.title"))
             .modifier(SearchSheetsModifier(
                 selectedPostURI: $selectedPostURI,
                 imagePreview: $imagePreview,
@@ -146,7 +145,7 @@ struct CustomSearchView: View {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.tertiary)
-                TextField("customsearch.placeholder", text: $viewModel.query)
+                TextField(loc("customsearch.placeholder"), text: $viewModel.query)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .focused($searchFocused)
@@ -220,7 +219,7 @@ struct CustomSearchView: View {
 
     private var tabPickerSection: some View {
         Section {
-            Picker("customsearch.tab", selection: $selectedTab) {
+            Picker(loc("customsearch.tab"), selection: $selectedTab) {
                 ForEach(CustomSearchViewModel.Tab.allCases, id: \.self) { tab in
                     Text(verbatim: tabLabel(tab)).tag(tab)
                 }
@@ -271,7 +270,7 @@ struct CustomSearchView: View {
     private var loadingRow: some View {
         HStack {
             Spacer()
-            ProgressView("customsearch.loading")
+            ProgressView(loc("customsearch.loading"))
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -365,7 +364,7 @@ struct CustomSearchView: View {
         if viewModel.isLoadingUsers {
             HStack {
                 Spacer()
-                ProgressView("customsearch.loading")
+                ProgressView(loc("customsearch.loading"))
                 Spacer()
             }
             .listRowSeparator(.hidden)

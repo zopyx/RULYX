@@ -53,7 +53,7 @@ struct MediaBrowserView: View {
                 if !viewModel.items.isEmpty || viewModel.isScanning {
                     if viewModel.availableFilters.count > 1 {
                         HStack(spacing: 8) {
-                            Picker("media.filter_label", selection: $viewModel.filter) {
+                            Picker(loc("media.filter_label"), selection: $viewModel.filter) {
                                 ForEach(viewModel.availableFilters, id: \.self) { f in
                                     Text(filterLabel(f, count: f == .images ? viewModel.imageCount : viewModel.videoCount))
                                         .tag(f)
@@ -153,8 +153,7 @@ struct MediaBrowserView: View {
                     }
                 }
             }
-            .navigationTitle(loc("profile.media.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("profile.media.title"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()
@@ -172,13 +171,13 @@ struct MediaBrowserView: View {
                 NavigationStack {
                     List {
                         Section {
-                            LabeledContent("profile.media.download_total", value: "\(summary.total)")
-                            LabeledContent("profile.media.download_succeeded", value: "\(summary.succeeded)")
+                            LabeledContent(loc("profile.media.download_total"), value: "\(summary.total)")
+                            LabeledContent(loc("profile.media.download_succeeded"), value: "\(summary.succeeded)")
                             if summary.failed > 0 {
-                                LabeledContent("profile.media.download_failed", value: "\(summary.failed)")
+                                LabeledContent(loc("profile.media.download_failed"), value: "\(summary.failed)")
                                     .foregroundStyle(.red)
                             }
-                            LabeledContent("profile.media.download_folder", value: summary.directory.lastPathComponent)
+                            LabeledContent(loc("profile.media.download_folder"), value: summary.directory.lastPathComponent)
                         }
                         if !summary.errors.isEmpty {
                             Section {
@@ -192,11 +191,10 @@ struct MediaBrowserView: View {
                             }
                         }
                     }
-                    .navigationTitle(loc("profile.media.download_complete"))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(loc("profile.media.download_complete"))
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("actions.done") {
+                            Button(loc("actions.done")) {
                                 viewModel.clearDownloadSummary()
                             }
                         }
@@ -253,7 +251,7 @@ struct MediaBrowserView: View {
                     guard !viewModel.selectedIDs.isEmpty else { return }
                     isShowingFolderPicker = true
                 } label: {
-                    Label("profile.media.download_selected", systemImage: "arrow.down.circle")
+                    Label(loc("profile.media.download_selected"), systemImage: "arrow.down.circle")
                         .font(.body.weight(.medium))
                         .lineLimit(1)
                         .padding(.vertical, 6)

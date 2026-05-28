@@ -13,10 +13,10 @@ struct DashboardView: View {
     var body: some View {
         List {
             Section {
-                LabeledContent("dashboard.accounts", value: "\(accountStore.accounts.count)")
-                LabeledContent("dashboard.total_ops", value: "\(workspaceStore.operationLog.count)")
+                LabeledContent(loc("dashboard.accounts"), value: "\(accountStore.accounts.count)")
+                LabeledContent(loc("dashboard.total_ops"), value: "\(workspaceStore.operationLog.count)")
             } header: {
-                Text("dashboard.overview")
+                Text(loc: "dashboard.overview")
             }
 
             if !workspaceStore.operationLog.isEmpty {
@@ -28,7 +28,7 @@ struct DashboardView: View {
                     .frame(height: 180)
                     .chartXAxis { AxisMarks { AxisValueLabel() } }
                 } header: {
-                    Text("dashboard.by_type")
+                    Text(loc: "dashboard.by_type")
                 }
 
                 Section {
@@ -44,13 +44,13 @@ struct DashboardView: View {
                         .padding(.vertical, 2)
                     }
                 } header: {
-                    Text("dashboard.recent")
+                    Text(loc: "dashboard.recent")
                 }
 
                 Section {
                     let top = topModeratedAccounts()
                     if top.isEmpty {
-                        Text("dashboard.no_data_yet").foregroundStyle(.secondary)
+                        Text(loc: "dashboard.no_data_yet").foregroundStyle(.secondary)
                     } else {
                         ForEach(top.prefix(10), id: \.0) { handle, count in
                             HStack {
@@ -61,14 +61,14 @@ struct DashboardView: View {
                         }
                     }
                 } header: {
-                    Text("dashboard.top_moderated")
+                    Text(loc: "dashboard.top_moderated")
                 }
             } else {
-                ContentUnavailableView("dashboard.no_data", systemImage: "chart.bar", description: Text("dashboard.no_data_desc"))
+                ContentUnavailableView(loc("dashboard.no_data"), systemImage: "chart.bar", description: Text(loc: "dashboard.no_data_desc"))
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("dashboard.title")
+        .pageTitle(loc("dashboard.title"))
     }
 
     // MARK: - Computed properties

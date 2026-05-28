@@ -39,8 +39,7 @@ struct ManagePostsView: View {
                     listContent
                 }
             }
-            .navigationTitle(loc("profile.manage_posts.title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("profile.manage_posts.title"))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if viewModel.isSelecting {

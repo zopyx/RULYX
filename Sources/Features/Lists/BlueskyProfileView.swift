@@ -104,8 +104,7 @@ struct BlueskyProfileView: View {
                 )
             }
         }
-        .navigationTitle("")
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(member.actor.handle)
         .overlay {
             if isShowingAvatarPreview, let avatarURL = viewModel.profile?.avatarURL {
                 Color.black.opacity(0.9)
@@ -284,7 +283,7 @@ struct BlueskyProfileView: View {
                     VStack(spacing: 8) {
                         Text(loc: "profile.blocked.title")
                             .font(.title2.weight(.bold))
-                        Text("profile.blocked.\(type.rawValue)_desc")
+                        Text(loc: "profile.blocked.\(type.rawValue)_desc")
                             .font(.body)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -295,7 +294,7 @@ struct BlueskyProfileView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("actions.got_it") { blockedAccessType = nil }
+                        Button(loc("actions.got_it")) { blockedAccessType = nil }
                     }
                 }
             }
@@ -364,7 +363,7 @@ struct BlueskyProfileView: View {
                 .toolbarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("actions.save") {
+                        Button(loc("actions.save")) {
                             internalListStore.addList(name: newInternalListName, color: newInternalListColor)
                             newInternalListName = ""
                             newInternalListColor = .blue
@@ -373,7 +372,7 @@ struct BlueskyProfileView: View {
                         .disabled(newInternalListName.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("actions.cancel") {
+                        Button(loc("actions.cancel")) {
                             newInternalListName = ""
                             showCreateInternalList = false
                         }
@@ -1056,10 +1055,10 @@ struct BlueskyProfileView: View {
                                       let unblocked = unblockedBlockersCount
                             {
                                 if blockedBy == 0 {
-                                    Label("profile.block_back.none_blocking", systemImage: "checkmark.circle.fill")
+                                    Label(loc("profile.block_back.none_blocking"), systemImage: "checkmark.circle.fill")
                                         .foregroundStyle(.green)
                                 } else if unblocked == 0 {
-                                    Label("profile.block_back.all_clear", systemImage: "checkmark.circle.fill")
+                                    Label(loc("profile.block_back.all_clear"), systemImage: "checkmark.circle.fill")
                                         .foregroundStyle(.green)
                                 }
                             }
@@ -1235,7 +1234,7 @@ struct BlueskyProfileView: View {
         }
         .alert(Text(loc: "profile.block_back.confirm.first.title"), isPresented: $showBlockBackConfirm1) {
             Button(loc("actions.cancel"), role: .cancel) {}
-            Button("profile.block_back.action") {
+            Button(loc("profile.block_back.action")) {
                 showBlockBackConfirm2 = true
             }
         } message: {

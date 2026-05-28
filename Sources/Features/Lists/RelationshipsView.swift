@@ -68,17 +68,17 @@ struct RelationshipsView: View {
     private var modeLocalized: String {
         if let handle = profileHandle {
             switch mode {
-            case .followers: return String(localized: "rel.mode.followers_of").replacingOccurrences(of: "{handle}", with: handle)
-            case .following: return String(localized: "rel.mode.following_of").replacingOccurrences(of: "{handle}", with: handle)
-            case .blocking: return String(localized: "rel.mode.blocking")
-            case .blockedBy: return String(localized: "rel.mode.blocked_by")
+            case .followers: return String.localized("rel.mode.followers_of", replacements: ["handle": handle])
+            case .following: return String.localized("rel.mode.following_of", replacements: ["handle": handle])
+            case .blocking: return String.localized("rel.mode.blocking")
+            case .blockedBy: return String.localized("rel.mode.blocked_by")
             }
         }
         switch mode {
-        case .followers: return String(localized: "rel.mode.followers")
-        case .following: return String(localized: "rel.mode.following")
-        case .blocking: return String(localized: "rel.mode.blocking")
-        case .blockedBy: return String(localized: "rel.mode.blocked_by")
+        case .followers: return String.localized("rel.mode.followers")
+        case .following: return String.localized("rel.mode.following")
+        case .blocking: return String.localized("rel.mode.blocking")
+        case .blockedBy: return String.localized("rel.mode.blocked_by")
         }
     }
 
@@ -87,7 +87,7 @@ struct RelationshipsView: View {
     var body: some View {
         Group {
             if isLoading {
-                ProgressView(String(localized: "rel.loading").replacingOccurrences(of: "{mode}", with: modeLocalized.lowercased()))
+                ProgressView(String.localized("rel.loading", replacements: ["mode": modeLocalized.lowercased()]))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let errorMessage {
                 ErrorRetryBanner(message: errorMessage) {
@@ -95,11 +95,6 @@ struct RelationshipsView: View {
                 }
             } else {
                 List {
-                    Section {
-                        Text("\(modeLocalized) (\(clearskyTotal ?? actors.count))")
-                            .font(.title2.weight(.bold))
-                    }
-
                     if !actors.isEmpty {
                         Section {
                             TextField(String.localized("rel.search_placeholder", replacements: ["mode": modeLocalized.lowercased()]), text: $searchQuery)
@@ -117,7 +112,7 @@ struct RelationshipsView: View {
                         ContentUnavailableView {
                             Label(modeLocalized, systemImage: "person.3")
                         } description: {
-                            Text(searchQuery.isEmpty ? String(localized: "rel.no_accounts") : String(localized: "rel.no_matches"))
+                            Text(searchQuery.isEmpty ? String.localized("rel.no_accounts") : String.localized("rel.no_matches"))
                         }
                     } else {
                         ForEach(Array(filteredActors.enumerated()), id: \.element.id) { index, actor in
@@ -130,7 +125,7 @@ struct RelationshipsView: View {
                                 HStack(spacing: 0) {
                                     BlueskyActorRow(actor: actor) {
                                         if actor.isNew {
-                                            Text("rel.new_badge")
+                                            Text(loc: "rel.new_badge")
                                                 .font(.caption2.weight(.semibold))
                                                 .foregroundStyle(.orange)
                                                 .padding(.horizontal, 5)
@@ -157,26 +152,26 @@ struct RelationshipsView: View {
                                     actorToBlock = actor
                                     isShowingBlockConfirm = true
                                 } label: {
-                                    Label("rel.block", systemImage: "hand.raised.fill")
+                                    Label(loc("rel.block"), systemImage: "hand.raised.fill")
                                 }
-                                .accessibilityHint("rel.block.hint")
+                                .accessibilityHint(loc: "rel.block.hint")
 
                                 Button {
                                     selectedActorForList = actor
                                     isShowingListPicker = true
                                 } label: {
-                                    Label("rel.add_to_list", systemImage: "list.bullet")
+                                    Label(loc("rel.add_to_list"), systemImage: "list.bullet")
                                 }
-                                .accessibilityHint("rel.add_to_list.hint")
+                                .accessibilityHint(loc: "rel.add_to_list.hint")
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
                                     actorToBlock = actor
                                     isShowingBlockConfirm = true
                                 } label: {
-                                    Label("rel.block", systemImage: "hand.raised.fill")
+                                    Label(loc("rel.block"), systemImage: "hand.raised.fill")
                                 }
-                                .accessibilityHint("rel.block_swipe.hint")
+                                .accessibilityHint(loc: "rel.block_swipe.hint")
                             }
                         }
                         .onDelete { indexSet in
@@ -190,8 +185,7 @@ struct RelationshipsView: View {
                 .listStyle(.insetGrouped)
             }
         }
-        .navigationTitle("")
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle("\(modeLocalized) (\(clearskyTotal ?? actors.count))")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 16) {
@@ -201,28 +195,28 @@ struct RelationshipsView: View {
                                 isExporting = true
                                 Task { await exportAll(format: .csv) }
                             } label: {
-                                Label { Text("list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
+                                Label { Text(loc: "list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
                             }
 
                             Button {
                                 isExporting = true
                                 Task { await exportAll(format: .json) }
                             } label: {
-                                Label { Text("list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
+                                Label { Text(loc: "list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
                             }
 
                             Button {
                                 isExporting = true
                                 Task { await exportAll(format: .xlsx) }
                             } label: {
-                                Label { Text("list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
+                                Label { Text(loc: "list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
                             }
 
                             Button {
                                 isExporting = true
                                 Task { await exportAll(format: .ods) }
                             } label: {
-                                Label { Text("list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
+                                Label { Text(loc: "list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
                             }
                         } label: {
                             if isExporting {
@@ -257,11 +251,11 @@ struct RelationshipsView: View {
             await load()
         }
         .confirmationDialog(
-            String(localized: "rel.block_confirm"),
+            String.localized("rel.block_confirm"),
             isPresented: $isShowingBlockConfirm,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "rel.block"), role: .destructive) {
+            Button(String.localized("rel.block"), role: .destructive) {
                 guard let actor = actorToBlock,
                       let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
@@ -278,11 +272,11 @@ struct RelationshipsView: View {
                     }
                 }
             }
-            .accessibilityInputLabels(["rel.block"])
-            Button(String(localized: "actions.cancel"), role: .cancel) {}
-                .accessibilityInputLabels(["actions.cancel"])
+            .accessibilityInputLabels([loc("rel.block")])
+            Button(String.localized("actions.cancel"), role: .cancel) {}
+                .accessibilityInputLabels([loc("actions.cancel")])
 
-            Text("rel.block_message")
+            Text(loc: "rel.block_message")
         }
         .sheet(isPresented: $isShowingListPicker) {
             if let actor = selectedActorForList,
@@ -425,7 +419,7 @@ struct RelationshipsView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
         else {
-            errorMessage = String(localized: "rel.select_account_first")
+            errorMessage = String.localized("rel.select_account_first")
             isLoading = false
             return
         }
@@ -490,7 +484,7 @@ struct RelationshipsView: View {
                 errorMessage = AppError.userMessage(from: error)
                 isLoading = false
             } else {
-                statusMessage = String(localized: "rel.loaded_status").replacingOccurrences(of: "{count}", with: "\(actors.count)").replacingOccurrences(of: "{total}", with: "\(initialCount ?? actors.count)")
+                statusMessage = String.localized("rel.loaded_status", replacements: ["count": "\(actors.count)", "total": "\(initialCount ?? actors.count)"])
             }
         }
     }
@@ -530,9 +524,9 @@ struct ListPickerSheet: View {
         NavigationStack {
             Group {
                 if isLoading {
-                    ProgressView("rel.loading_lists")
+                    ProgressView(loc("rel.loading_lists"))
                 } else if lists.isEmpty {
-                    ContentUnavailableView("rel.no_lists_title", systemImage: "tray", description: Text("rel.no_lists_desc"))
+                    ContentUnavailableView(loc("rel.no_lists_title"), systemImage: "tray", description: Text(loc: "rel.no_lists_desc"))
                 } else {
                     List(lists) { list in
                         Button {
@@ -555,16 +549,15 @@ struct ListPickerSheet: View {
                                     .foregroundStyle(Color.skyPrimary)
                             }
                         }
-                        .accessibilityHint("rel.added_to_list.hint")
+                        .accessibilityHint(loc: "rel.added_to_list.hint")
                     }
                 }
             }
-            .navigationTitle("\(String(localized: "rel.add_to_list")) \(actor.handle)")
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle("\(String.localized("rel.add_to_list")) \(actor.handle)")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("actions.cancel") { dismiss() }
-                        .accessibilityHint("rel.close_picker.hint")
+                    Button(loc("actions.cancel")) { dismiss() }
+                        .accessibilityHint(loc: "rel.close_picker.hint")
                 }
             }
             .task {

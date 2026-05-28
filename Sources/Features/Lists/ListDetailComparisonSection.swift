@@ -44,7 +44,7 @@ extension ListDetailView {
                         message: loc("list.compare.no_lists_desc")
                     )
                 } else {
-                    Picker("list.compare.picker_label", selection: $selectedComparisonListID) {
+                    Picker(loc("list.compare.picker_label"), selection: $selectedComparisonListID) {
                         Text(loc: "list.compare.select_list").tag("")
                         ForEach(viewModel.availableLists) { list in
                             Text(list.name).tag(list.id)
@@ -154,8 +154,7 @@ extension ListDetailView {
                         }
                     }
                     .listStyle(.insetGrouped)
-                    .navigationTitle(Text(loc("list.compare.help_title")))
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(Text(loc("list.compare.help_title")))
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton()
@@ -182,7 +181,7 @@ extension ListDetailView {
         private var comparisonToolbar: some View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Menu("list.compare.menu_bucket") {
+                    Menu(loc("list.compare.menu_bucket")) {
                         ForEach(ComparisonBucket.allCases, id: \.self) { bucket in
                             Button(loc(bucketLocKey(bucket))) {
                                 viewModel.selectComparisonBucket(bucket)
@@ -191,7 +190,7 @@ extension ListDetailView {
                     }
                     .accessibilityHint(loc("list.compare.filter_bucket.hint"))
 
-                    Button("list.compare.clear_diff") {
+                    Button(loc("list.compare.clear_diff")) {
                         viewModel.clearComparisonSelection()
                     }
                     .disabled(viewModel.selectedComparisonActorDIDs.isEmpty)

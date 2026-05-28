@@ -49,7 +49,7 @@ struct ReportGeneratorView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("report.title"))
+        .pageTitle(loc("report.title"))
     }
 
     /// Builds a formatted report string from the workspace operation log.

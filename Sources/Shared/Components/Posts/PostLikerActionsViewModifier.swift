@@ -86,11 +86,11 @@ struct PostLikerActionsViewModifier: ViewModifier {
                         + "\n\n" + handles + remainder
                 )
             }
-            .alert("list.detail.alert_title", isPresented: .init(
+            .alert(loc("list.detail.alert_title"), isPresented: .init(
                 get: { manager.blockError != nil },
                 set: { if !$0 { manager.blockError = nil } }
             )) {
-                Button("actions.ok") { manager.blockError = nil }
+                Button(loc("actions.ok")) { manager.blockError = nil }
             } message: {
                 if let error = manager.blockError {
                     Text(error)

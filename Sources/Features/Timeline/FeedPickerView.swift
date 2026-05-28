@@ -33,11 +33,11 @@ struct FeedPickerView: View {
                 }
 
                 Section {
-                    TextField("timeline.feed_uri_placeholder", text: $feedURIInput)
+                    TextField(loc("timeline.feed_uri_placeholder"), text: $feedURIInput)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .font(.caption.monospaced())
-                    TextField("timeline.feed_name_placeholder", text: $feedNameInput)
+                    TextField(loc("timeline.feed_name_placeholder"), text: $feedNameInput)
                     Button {
                         guard !feedURIInput.isEmpty else { return }
                         let name = feedNameInput.isEmpty ? loc("timeline.custom_feed") : feedNameInput
@@ -93,8 +93,7 @@ struct FeedPickerView: View {
                     }
                 }
             }
-            .navigationTitle(loc("timeline.picker_title"))
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("timeline.picker_title"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()

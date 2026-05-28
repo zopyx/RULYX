@@ -108,8 +108,7 @@ struct PostClassificationView: View {
                 }
             }
         }
-        .navigationTitle(loc("post.classify"))
-        .navigationBarTitleDisplayMode(.inline)
+        .pageTitle(loc("post.classify"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 ToolbarCloseButton()

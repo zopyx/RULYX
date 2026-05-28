@@ -31,7 +31,7 @@ struct AccountSwitcherSheet: View {
                         description: Text(loc: "account.no_accounts.desc")
                     )
                 } else {
-                    Section("account.manage.saved") {
+                    Section(loc("account.manage.saved")) {
                         ForEach(accountStore.accounts) { account in
                             Button {
                                 switchAccount(to: account)
@@ -56,7 +56,7 @@ struct AccountSwitcherSheet: View {
                                 Button(role: .destructive) {
                                     accountStore.removeAccount(account, client: blueskyClient)
                                 } label: {
-                                    Label("account.remove", systemImage: "trash")
+                                    Label(loc("account.remove"), systemImage: "trash")
                                 }
                                 .accessibilityHint("Permanently removes this saved account")
 
@@ -64,7 +64,7 @@ struct AccountSwitcherSheet: View {
                                     editLabelText = account.label ?? ""
                                     editingLabelAccount = account
                                 } label: {
-                                    Label("account.edit_label", systemImage: "tag")
+                                    Label(loc("account.edit_label"), systemImage: "tag")
                                 }
                                 .accessibilityHint("Sets a custom label to help identify this account")
                             }
@@ -79,8 +79,7 @@ struct AccountSwitcherSheet: View {
                     }
                 }
             }
-            .navigationTitle(loc: "account.manage.title")
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("account.manage.title"))
             .task {
                 await accountStore.refreshAccountProfiles(using: blueskyClient)
             }
@@ -109,8 +108,8 @@ struct AccountSwitcherSheet: View {
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
             }
-            .alert("account.manage.title", isPresented: .constant(accountStore.errorMessage != nil), actions: {
-                Button("actions.ok") {
+            .alert(loc("account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
+                Button(loc("actions.ok")) {
                     accountStore.errorMessage = nil
                 }
             }, message: {
@@ -119,8 +118,8 @@ struct AccountSwitcherSheet: View {
             .sheet(item: $editingLabelAccount) { account in
                 NavigationStack {
                     List {
-                        Section("account.edit_label.section") {
-                            TextField("account.edit_label.placeholder", text: $editLabelText)
+                        Section(loc("account.edit_label.section")) {
+                            TextField(loc("account.edit_label.placeholder"), text: $editLabelText)
                                 .textInputAutocapitalization(.never)
                             Button(loc("account.edit_label.clear"), role: .destructive) {
                                 accountStore.setLabel(for: account, label: nil)
@@ -128,13 +127,13 @@ struct AccountSwitcherSheet: View {
                             }
                             .accessibilityHint("Removes the current label from this account")
                         }
-                        Section("account.edit_label.suggestions") {
+                        Section(loc("account.edit_label.suggestions")) {
                             ForEach(["Work", "Personal", "Community", "Testing"], id: \.self) { option in
                                 Button {
                                     editLabelText = option
                                 } label: {
                                     HStack {
-                                        Text("account.edit_label.\(option.lowercased())").foregroundStyle(.primary)
+                                        Text(loc: "account.edit_label.\(option.lowercased())").foregroundStyle(.primary)
                                         if editLabelText == option { Spacer()
                                             Image(systemName: "checkmark")
                                         }
@@ -144,18 +143,17 @@ struct AccountSwitcherSheet: View {
                             }
                         }
                     }
-                    .navigationTitle(loc: "account.edit_label.title")
-                    .toolbarTitleDisplayMode(.inline)
+                    .pageTitle(loc("account.edit_label.title"))
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("account.edit_label.save") {
+                            Button(loc("account.edit_label.save")) {
                                 accountStore.setLabel(for: account, label: editLabelText)
                                 editingLabelAccount = nil
                             }
                             .accessibilityHint("Saves the label for this account")
                         }
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("account.edit_label.cancel") { editingLabelAccount = nil }
+                            Button(loc("account.edit_label.cancel")) { editingLabelAccount = nil }
                                 .accessibilityHint("Discards changes and closes the label editor")
                         }
                     }

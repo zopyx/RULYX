@@ -87,8 +87,7 @@ struct LikesListView: View {
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle(loc: "likes.title")
-            .toolbarTitleDisplayMode(.inline)
+            .pageTitle(loc("likes.title"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()

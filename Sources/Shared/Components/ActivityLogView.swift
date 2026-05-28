@@ -34,7 +34,7 @@ struct ActivityLogView: View {
     var body: some View {
         List {
             Section {
-                TextField("activity.search", text: $searchQuery)
+                TextField(loc("activity.search"), text: $searchQuery)
                     .textInputAutocapitalization(.never)
             }
 
@@ -59,7 +59,7 @@ struct ActivityLogView: View {
             }
 
             if filtered.isEmpty {
-                ContentUnavailableView("activity.no_matches", systemImage: "magnifyingglass", description: Text(loc: "activity.no_matches_desc"))
+                ContentUnavailableView(loc("activity.no_matches"), systemImage: "magnifyingglass", description: Text(loc: "activity.no_matches_desc"))
             } else {
                 ForEach(filtered) { entry in
                     VStack(alignment: .leading, spacing: 6) {

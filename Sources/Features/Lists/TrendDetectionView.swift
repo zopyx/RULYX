@@ -39,7 +39,7 @@ struct TrendDetectionView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(loc("trend.title"))
+        .pageTitle(loc("trend.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(loc("trend.scan")) { Task { await scan() } }.disabled(isLoading)

@@ -29,8 +29,7 @@ struct iPadListDetailView: View {
                 using: blueskyClient
             )
         }
-        .navigationTitle(list.name)
-        .toolbarTitleDisplayMode(.inline)
+        .pageTitle(list.name)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button { showExport = true } label: {

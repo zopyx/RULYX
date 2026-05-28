@@ -207,6 +207,14 @@ Every completed task MUST include an accurate description rendered as a table:
 - Dot-notation: `screen.component.description` (e.g., `"onboarding.moderation.desc"`, `"settings.language"`)
 - Key-value pairs flat in JSON (no nesting)
 
+### Localization API — One System Only
+- **All** string lookups MUST use the custom `LocalizationManager` via one of:
+  - `loc("key")` (global free function, returns `String`)
+  - `String.localized("key")` (convenience static, supports `replacements:`)
+  - `Text(loc: "key")` (custom `Text` initializer)
+  - `.navigationTitle(loc: "key")` / `.accessibilityLabel(loc: "key")` / `.accessibilityHint(loc: "key")` (custom view modifiers)
+- **Never** use Apple's native `String(localized:)`, `LocalizedStringResource`, or `LocalizedStringKey` — these bypass the in-app language setting and read the device system language instead, causing language mismatches when the user's in-app selection differs from the device language.
+
 ### Adding new keys
 - All user-facing strings MUST use `loc("key")` — never hardcode English text
 - Every new key must be added to **all 16 language files**

@@ -56,7 +56,7 @@ struct FollowerDiffView: View {
             }
 
             if !isLoading, newFollowers.isEmpty, unfollowed.isEmpty, !followers.isEmpty {
-                ContentUnavailableView("follower_diff.no_changes", systemImage: "person.3", description: Text(loc: "follower_diff.no_changes_desc"))
+                ContentUnavailableView(loc("follower_diff.no_changes"), systemImage: "person.3", description: Text(loc: "follower_diff.no_changes_desc"))
             }
 
             if let statusMessage {
@@ -64,10 +64,10 @@ struct FollowerDiffView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(Text(loc: "follower_diff.title"))
+        .pageTitle(Text(loc: "follower_diff.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("follower_diff.refresh") { Task { await load() } }
+                Button(loc("follower_diff.refresh")) { Task { await load() } }
                     .disabled(isLoading)
                     .accessibilityHint(loc("follower_diff.refresh.hint"))
             }
