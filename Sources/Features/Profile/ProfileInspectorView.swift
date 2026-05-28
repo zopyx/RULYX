@@ -225,11 +225,7 @@ struct ProfileInspectorView: View {
                             reportEvidenceText = ""
                             isShowingReportSheet = true
                         } label: {
-                            Label {
-                                Text(loc: "profile.report")
-                            } icon: {
-                                Image(systemName: "exclamationmark.shield")
-                            }
+                            Label(loc("profile.report"), systemImage: "exclamationmark.shield")
                         }
                         .disabled(isSubmittingReport)
 

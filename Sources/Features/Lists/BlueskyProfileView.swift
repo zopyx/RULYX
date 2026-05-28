@@ -939,7 +939,7 @@ struct BlueskyProfileView: View {
                             reportReasonText = ""
                             viewModel.showReportSheet = true
                         } label: {
-                            Label { Text(loc("profile.report")) } icon: { Image(systemName: "exclamationmark.shield") }
+                            Label(loc("profile.report"), systemImage: "exclamationmark.shield")
                         }
                         .disabled(viewModel.isReporting)
                         .accessibilityHint(loc("profile.report.hint"))
