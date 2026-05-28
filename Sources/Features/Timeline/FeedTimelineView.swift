@@ -50,12 +50,21 @@ struct FeedTimelineView: View {
             }
         }
         .pageTitle(loc("timeline.title"))
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button { showNewPostComposer = true } label: {
-                    Image(systemName: "square.and.pencil")
-                }
+        .overlay(alignment: .bottomTrailing) {
+            Button {
+                showNewPostComposer = true
+            } label: {
+                Image(systemName: "square.and.pencil")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
+                    .background(Circle().fill(Color.skyPrimary))
+                    .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
             }
+            .accessibilityLabel(loc("timeline.new_post"))
+            .padding(.trailing, 16)
+            .padding(.bottom, 16)
+            .transition(.scale.combined(with: .opacity))
         }
         .fullScreenCover(item: $imagePreview) { preview in
             ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {
