@@ -2,14 +2,19 @@ import Foundation
 
 @MainActor
 final class MockURLProtocol: URLProtocol {
-    nonisolated override static func canInit(with request: URLRequest) -> Bool { true }
-    nonisolated override static func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override nonisolated static func canInit(with _: URLRequest) -> Bool {
+        true
+    }
 
-    // Backward-compatible request handler
+    override nonisolated static func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    /// Backward-compatible request handler
     nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 
-    // Chaos injection configuration
-    struct ChaosConfig: Sendable {
+    /// Chaos injection configuration
+    struct ChaosConfig {
         let injectedLatency: UInt64
         let failureProbability: Double
         let statusCodeOverride: Int?
@@ -26,7 +31,7 @@ final class MockURLProtocol: URLProtocol {
             Thread.sleep(forTimeInterval: Double(delay) / 1_000_000_000)
         }
 
-        if Double.random(in: 0...1) < Self.config.failureProbability {
+        if Double.random(in: 0 ... 1) < Self.config.failureProbability {
             client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
             client?.urlProtocolDidFinishLoading(self)
             return
@@ -35,11 +40,10 @@ final class MockURLProtocol: URLProtocol {
         if let handler = Self.requestHandler {
             do {
                 let (response, data) = try handler(request)
-                let finalResponse: HTTPURLResponse
-                if let statusCodeOverride = Self.config.statusCodeOverride {
-                    finalResponse = HTTPURLResponse(url: response.url ?? request.url!, statusCode: statusCodeOverride, httpVersion: "HTTP/1.1", headerFields: [:])!
+                let finalResponse: HTTPURLResponse = if let statusCodeOverride = Self.config.statusCodeOverride {
+                    HTTPURLResponse(url: response.url ?? request.url!, statusCode: statusCodeOverride, httpVersion: "HTTP/1.1", headerFields: [:])!
                 } else {
-                    finalResponse = response
+                    response
                 }
                 client?.urlProtocol(self, didReceive: finalResponse, cacheStoragePolicy: .notAllowed)
                 client?.urlProtocol(self, didLoad: data)
@@ -52,11 +56,10 @@ final class MockURLProtocol: URLProtocol {
 
         let url = request.url?.absoluteString ?? ""
         if let (data, response) = Self.mockResponses[url] {
-            let finalResponse: HTTPURLResponse
-            if let statusCodeOverride = Self.config.statusCodeOverride {
-                finalResponse = HTTPURLResponse(url: response.url ?? request.url!, statusCode: statusCodeOverride, httpVersion: "HTTP/1.1", headerFields: [:])!
+            let finalResponse: HTTPURLResponse = if let statusCodeOverride = Self.config.statusCodeOverride {
+                HTTPURLResponse(url: response.url ?? request.url!, statusCode: statusCodeOverride, httpVersion: "HTTP/1.1", headerFields: [:])!
             } else {
-                finalResponse = response
+                response
             }
             client?.urlProtocol(self, didReceive: finalResponse, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: data)

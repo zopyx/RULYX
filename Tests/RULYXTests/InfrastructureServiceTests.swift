@@ -57,28 +57,28 @@ final class DashboardCacheTests: XCTestCase {
 }
 
 final class SpreadsheetExportTests: XCTestCase {
-    func testGenerateXLSXReturnsNonNilData() {
+    func testGenerateXLSXReturnsNonNilData() throws {
         let data = SpreadsheetExport.generateXLSX(headers: ["Name", "Age"], rows: [["Alice", "30"], ["Bob", "25"]])
         XCTAssertNotNil(data)
-        XCTAssertGreaterThan(data!.count, 0)
+        XCTAssertGreaterThan(try XCTUnwrap(data?.count), 0)
     }
 
-    func testGenerateXLSXHasPKZipSignature() {
-        let data = SpreadsheetExport.generateXLSX(headers: ["H"], rows: [["R"]])!
+    func testGenerateXLSXHasPKZipSignature() throws {
+        let data = try XCTUnwrap(SpreadsheetExport.generateXLSX(headers: ["H"], rows: [["R"]]))
         XCTAssertEqual(data[0], 0x50)
         XCTAssertEqual(data[1], 0x4B)
         XCTAssertEqual(data[2], 0x03)
         XCTAssertEqual(data[3], 0x04)
     }
 
-    func testGenerateODSReturnsNonNilData() {
+    func testGenerateODSReturnsNonNilData() throws {
         let data = SpreadsheetExport.generateODS(headers: ["Col"], rows: [["Val"]])
         XCTAssertNotNil(data)
-        XCTAssertGreaterThan(data!.count, 0)
+        XCTAssertGreaterThan(try XCTUnwrap(data?.count), 0)
     }
 
-    func testGenerateODSHasPKZipSignature() {
-        let data = SpreadsheetExport.generateODS(headers: ["H"], rows: [["R"]])!
+    func testGenerateODSHasPKZipSignature() throws {
+        let data = try XCTUnwrap(SpreadsheetExport.generateODS(headers: ["H"], rows: [["R"]]))
         XCTAssertEqual(data[0], 0x50)
         XCTAssertEqual(data[1], 0x4B)
         XCTAssertEqual(data[2], 0x03)
@@ -123,8 +123,7 @@ private func crc32(data: Data) -> UInt32 {
     for n in 0 ..< 256 {
         var c = UInt32(n)
         for _ in 0 ..< 8 {
-            if c & 1 != 0 { c = 0xEDB8_8320 ^ (c >> 1) }
-            else { c >>= 1 }
+            if c & 1 != 0 { c = 0xEDB8_8320 ^ (c >> 1) } else { c >>= 1 }
         }
         table[n] = c
     }
@@ -173,7 +172,7 @@ final class BlueskyPushNotificationServiceTests: XCTestCase {
 final class AppLockManagerTests: XCTestCase {
     private let manager = AppLockManager.shared
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: "appLockEnabled")
         UserDefaults.standard.removeObject(forKey: "appLockTimeout")
@@ -222,7 +221,7 @@ final class AppLockManagerTests: XCTestCase {
 
 @MainActor
 final class iCloudAccountSyncTests: XCTestCase {
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: "iCloudSyncEnabled")
     }

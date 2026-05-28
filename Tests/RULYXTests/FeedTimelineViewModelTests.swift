@@ -3,12 +3,12 @@ import XCTest
 
 @MainActor
 final class FeedTimelineViewModelTests: XCTestCase {
-    nonisolated(unsafe) private var viewModel: FeedTimelineViewModel!
-    nonisolated(unsafe) private var client: MockTimelineClient!
+    private nonisolated(unsafe) var viewModel: FeedTimelineViewModel!
+    private nonisolated(unsafe) var client: MockTimelineClient!
     private let account = AppAccount(handle: "test.bsky.social")
     private let appPassword = "password"
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         let setup = MainActor.assumeIsolated { () -> (MockTimelineClient, FeedTimelineViewModel) in
             let client = MockTimelineClient()
@@ -20,7 +20,7 @@ final class FeedTimelineViewModelTests: XCTestCase {
         viewModel = setup.1
     }
 
-    nonisolated override func tearDown() {
+    override nonisolated func tearDown() {
         let viewModel = viewModel
         MainActor.assumeIsolated {
             viewModel?.stopPolling()

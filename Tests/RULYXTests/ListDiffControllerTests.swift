@@ -3,9 +3,9 @@ import XCTest
 
 @MainActor
 final class ListDiffControllerTests: XCTestCase {
-    nonisolated(unsafe) private var controller: ListDiffController!
+    private nonisolated(unsafe) var controller: ListDiffController!
 
-    nonisolated override func setUp() async throws {
+    override nonisolated func setUp() async throws {
         try await super.setUp()
         controller = await MainActor.run { ListDiffController() }
     }

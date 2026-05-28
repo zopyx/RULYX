@@ -30,7 +30,7 @@ final class BlueskySessionService401RetryTests: XCTestCase {
         let session = makeSession()
         var operationAttempt = 0
 
-        requestExecutor.onSend = { path, method, _, _, accessToken, _ in
+        requestExecutor.onSend = { path, _, _, _, _, _ in
             if path == "com.atproto.server.refreshSession" {
                 return try JSONDecoder().decode(CreateSessionResponse.self, from: """
                 {"did": "\(session.did)", "handle": "\(session.handle)", "accessJwt": "refreshed-access-jwt", "refreshJwt": "refreshed-refresh-jwt"}
@@ -96,5 +96,7 @@ final class BlueskySessionService401RetryTests: XCTestCase {
 private struct EmptyTestResponse: Decodable {}
 
 private extension Data {
-    var utf8String: String { String(data: self, encoding: .utf8)! }
+    var utf8String: String {
+        String(data: self, encoding: .utf8)!
+    }
 }

@@ -72,8 +72,7 @@ class iCloudAccountSync: ObservableObject {
             ]
         }
         if let encoded = try? JSONSerialization.data(withJSONObject: data),
-           let json = String(data: encoded, encoding: .utf8)
-        {
+           let json = String(data: encoded, encoding: .utf8) {
             store.set(json, forKey: accountKey)
             store.synchronize()
         }

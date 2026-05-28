@@ -1644,7 +1644,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             } else {
                 [threadGate]
             }
-            try await createThreadGate(
+                    _ = try await createThreadGate(
                 postURI: response.uri,
                 rules: rules,
                 account: account,
@@ -1652,7 +1652,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             )
         }
         if !allowQuoting {
-            try await createPostGate(
+            _ = try await createPostGate(
                 postURI: response.uri,
                 account: account,
                 appPassword: appPassword

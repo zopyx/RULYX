@@ -167,8 +167,7 @@ extension ListDetailView {
             do {
                 let content = try String(contentsOf: url, encoding: .utf8)
                 if let account = accountStore.activeAccount,
-                   let appPassword = accountStore.appPassword(for: account)
-                {
+                   let appPassword = accountStore.appPassword(for: account) {
                     Task {
                         await viewModel.prepareImportPreview(
                             from: content,

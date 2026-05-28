@@ -102,10 +102,10 @@ struct ConversationListView: View {
                         }
                     }
                     .listStyle(.plain)
-                    .searchable(text: $searchText, prompt: loc("chat.search.placeholder"))
                     .environment(\.editMode, $editMode)
                 }
             }
+            .searchable(text: $searchText, prompt: loc("chat.search.placeholder"))
             .navigationDestination(for: ChatConversation.self) { convo in
                 ConversationDetailView(conversation: convo)
                     .environmentObject(chatStore)
@@ -113,52 +113,36 @@ struct ConversationListView: View {
             }
             .pageTitle(Text(loc: "tab.chat"))
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        withAnimation {
-                            if editMode.isEditing {
-                                selectedConvos = []
+                if !chatStore.conversations.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        if editMode.isEditing {
+                            Button(loc("chat.select_all")) {
+                                let allIDs = Set(filteredConvos.map(\.id))
+                                if selectedConvos == allIDs {
+                                    selectedConvos = []
+                                } else {
+                                    selectedConvos = allIDs
+                                }
                             }
-                            editMode = editMode.isEditing ? .inactive : .active
+                            .font(.body.weight(.medium))
                         }
-                    } label: {
-                        Image(systemName: editMode.isEditing ? "checkmark" : "pencil")
                     }
-                    .accessibilityLabel(editMode.isEditing ? loc("actions.done") : loc("chat.edit"))
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    if editMode.isEditing {
-                        Button(loc("chat.select_all")) {
-                            let allIDs = Set(filteredConvos.map(\.id))
-                            if selectedConvos == allIDs {
-                                selectedConvos = []
-                            } else {
-                                selectedConvos = allIDs
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if editMode.isEditing {
+                            Button(loc("actions.done")) {
+                                withAnimation {
+                                    selectedConvos = []
+                                    editMode = .inactive
+                                }
                             }
-                        }
-                    } else {
-                        Button {
-                            showNewConvo = true
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                        }
-                        .accessibilityLabel(loc("chat.new"))
-                    }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await chatStore.loadConvos() }
-                    } label: {
-                        if chatStore.isLoadingConvos {
-                            ProgressView()
+                            .font(.body.weight(.medium))
                         } else {
-                            Image(systemName: "arrow.clockwise")
+                            Button(loc("chat.edit")) {
+                                withAnimation { editMode = .active }
+                            }
+                            .font(.subheadline)
                         }
                     }
-                    .accessibilityLabel(loc("chat.reload"))
-                    .disabled(chatStore.isLoadingConvos)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -202,6 +186,24 @@ struct ConversationListView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 8)
                     .background(.bar)
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if !editMode.isEditing {
+                    Button {
+                        showNewConvo = true
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                            .font(.title2.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 56, height: 56)
+                            .background(Circle().fill(Color.skyPrimary))
+                            .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+                    }
+                    .accessibilityLabel(loc("chat.new"))
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 16)
+                    .transition(.scale.combined(with: .opacity))
                 }
             }
             .sheet(isPresented: $showNewConvo) {

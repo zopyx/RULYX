@@ -123,8 +123,7 @@ struct NotificationRow: View {
                 }
                 Spacer()
                 if let createdAt = post.safeRecord.createdAt,
-                   let createdDate = parseDate(createdAt)
-                {
+                   let createdDate = parseDate(createdAt) {
                     Text(relativeTimeString(from: createdDate))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)

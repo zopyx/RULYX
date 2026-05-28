@@ -3,7 +3,7 @@ import XCTest
 
 @MainActor
 final class ViewModelTests: XCTestCase {
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         MainActor.assumeIsolated {
             DashboardCache.clear(forKey: "")

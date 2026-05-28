@@ -2,11 +2,11 @@
 import XCTest
 
 final class LiveBlueskyClientTests: XCTestCase {
-    nonisolated(unsafe) private var client: LiveBlueskyClient!
-    nonisolated(unsafe) private var sessionService: MockSessionService!
-    nonisolated(unsafe) private var requestExecutor: MockRequestExecutor!
-    nonisolated(unsafe) private var mockSession: URLSession!
-    nonisolated(unsafe) private var clearskyHeartbeat: ClearskyHeartbeatService!
+    private nonisolated(unsafe) var client: LiveBlueskyClient!
+    private nonisolated(unsafe) var sessionService: MockSessionService!
+    private nonisolated(unsafe) var requestExecutor: MockRequestExecutor!
+    private nonisolated(unsafe) var mockSession: URLSession!
+    private nonisolated(unsafe) var clearskyHeartbeat: ClearskyHeartbeatService!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -182,7 +182,7 @@ final class LiveBlueskyClientTests: XCTestCase {
             }
 
             if url.contains("/blocklist/did:plc:test"), !url.contains("/single-blocklist/") {
-                let entries = (0..<100).map { index in
+                let entries = (0 ..< 100).map { index in
                     #"{"did":"did:plc:shared\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
                 }.joined(separator: ",")
                 let json = #"{"data":{"blocklist":[\#(entries)]}}"#.data(using: .utf8)!
@@ -199,7 +199,7 @@ final class LiveBlueskyClientTests: XCTestCase {
             }
 
             if url.contains("/single-blocklist/did:plc:test") {
-                let entries = (0..<100).map { index in
+                let entries = (0 ..< 100).map { index in
                     #"{"did":"did:plc:shared\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
                 }.joined(separator: ",")
                 let json = #"{"data":{"blocklist":[\#(entries)]}}"#.data(using: .utf8)!
@@ -207,7 +207,7 @@ final class LiveBlueskyClientTests: XCTestCase {
             }
 
             if url.contains("getProfiles") {
-                var profiles = (0..<100).map { index in
+                var profiles = (0 ..< 100).map { index in
                     #"{"did":"did:plc:shared\#(index)","handle":"shared\#(index).bsky.social"}"#
                 }
                 profiles.append(#"{"did":"did:plc:block-only","handle":"block-only.bsky.social"}"#)
@@ -244,7 +244,7 @@ final class LiveBlueskyClientTests: XCTestCase {
                 "reportedBy": account.did ?? "",
                 "createdAt": "2026-05-18T10:00:00Z",
             ]
-            return (response, try JSONSerialization.data(withJSONObject: body))
+            return try (response, JSONSerialization.data(withJSONObject: body))
         }
 
         sessionService.onAuthenticatedRequest = { _, _ in

@@ -3,10 +3,10 @@ import XCTest
 
 @MainActor
 final class ListsViewModelTests: XCTestCase {
-    nonisolated(unsafe) private var viewModel: ListsViewModel!
-    nonisolated(unsafe) private var client: MockListsClient!
+    private nonisolated(unsafe) var viewModel: ListsViewModel!
+    private nonisolated(unsafe) var client: MockListsClient!
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         let setup = MainActor.assumeIsolated { () -> (ListsViewModel, MockListsClient) in
             DashboardCache.clear(forKey: "did:plc:test")
@@ -45,7 +45,7 @@ final class ListsViewModelTests: XCTestCase {
 
     func testAddList() {
         viewModel.addList(makeList(name: "New List"))
-        let all = viewModel.listsByKind.values.flatMap { $0 }
+        let all = viewModel.listsByKind.values.flatMap(\.self)
         XCTAssertTrue(all.contains(where: { $0.name == "New List" }))
     }
 
@@ -114,6 +114,6 @@ private final class MockListsClient: LiveBlueskyClient {
     }
 
     override func fetchBlockedByCount(for _: AppAccount) async throws -> Int {
-        return 0
+        0
     }
 }

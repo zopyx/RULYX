@@ -3,9 +3,9 @@ import XCTest
 
 @MainActor
 final class ListBatchControllerTests: XCTestCase {
-    nonisolated(unsafe) private var controller: ListBatchController!
+    private nonisolated(unsafe) var controller: ListBatchController!
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         controller = MainActor.assumeIsolated { ListBatchController() }
     }

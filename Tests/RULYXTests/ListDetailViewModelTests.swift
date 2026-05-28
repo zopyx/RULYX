@@ -3,9 +3,9 @@ import XCTest
 
 @MainActor
 final class ListDetailViewModelTests: XCTestCase {
-    nonisolated(unsafe) private var viewModel: ListDetailViewModel!
+    private nonisolated(unsafe) var viewModel: ListDetailViewModel!
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         viewModel = MainActor.assumeIsolated { ListDetailViewModel() }
     }

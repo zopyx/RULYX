@@ -77,8 +77,7 @@ struct FeedTimelineView: View {
         }
         .sheet(isPresented: $showNewPostComposer) {
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account)
-            {
+               let appPassword = accountStore.appPassword(for: account) {
                 ComposePostView(
                     account: account,
                     appPassword: appPassword,
@@ -116,8 +115,7 @@ struct FeedTimelineView: View {
         }
         .sheet(item: $editPostEntry) { entry in
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account)
-            {
+               let appPassword = accountStore.appPassword(for: account) {
                 ComposePostView(
                     account: account,
                     appPassword: appPassword,

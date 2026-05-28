@@ -3,10 +3,10 @@ import XCTest
 
 @MainActor
 final class ModerationWorkspaceStoreTests: XCTestCase {
-    nonisolated(unsafe) private var defaults: UserDefaults!
-    nonisolated(unsafe) private var suiteName: String!
+    private nonisolated(unsafe) var defaults: UserDefaults!
+    private nonisolated(unsafe) var suiteName: String!
 
-    nonisolated override func setUp() async throws {
+    override nonisolated func setUp() async throws {
         try await super.setUp()
         let suiteName = "ModerationWorkspaceStoreTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
@@ -15,7 +15,7 @@ final class ModerationWorkspaceStoreTests: XCTestCase {
         self.defaults = defaults
     }
 
-    nonisolated override func tearDown() async throws {
+    override nonisolated func tearDown() async throws {
         let suiteName = suiteName
         let defaults = defaults
         if let suiteName {

@@ -1,5 +1,5 @@
-@testable import RULYX
 import Foundation
+@testable import RULYX
 import XCTest
 
 final class MediaDownloadServiceTests: XCTestCase {

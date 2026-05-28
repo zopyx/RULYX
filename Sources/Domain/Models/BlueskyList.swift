@@ -76,7 +76,7 @@ struct BlueskyList: Identifiable, Hashable, Codable {
     /// The classification of this list (moderation, internal, regular).
     let kind: Kind
     /// The URL to the list's avatar image.
-    var avatarURL: URL? = nil
+    var avatarURL: URL?
     /// The content hash (CID) for this list record, if available.
     let cid: String?
 

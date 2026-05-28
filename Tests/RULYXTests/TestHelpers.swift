@@ -122,11 +122,11 @@ final class MockSessionService: BlueskySessionServicing {
 final class MockRequestExecutor: @unchecked Sendable, BlueskyRequestExecuting {
     var onSend: (@Sendable (String, String, [URLQueryItem], Any?, String?, URL?) async throws -> Any)?
 
-    func send<Response: Decodable, Body: Encodable>(
+    func send<Response: Decodable>(
         path: String,
         method: String,
         queryItems: [URLQueryItem],
-        body: Body?,
+        body: (some Encodable)?,
         accessToken: String?,
         hostURL: URL?
     ) async throws -> Response {

@@ -1,6 +1,6 @@
 import Foundation
 
-struct GIFResult: Identifiable, Hashable, Sendable {
+struct GIFResult: Identifiable, Hashable {
     let id: String
     let mp4URL: String
     let previewURL: String
@@ -310,6 +310,6 @@ private extension KeyedDecodingContainer {
         if let value = try? decode(String.self, forKey: key) {
             return value
         }
-        return String(try decode(Int.self, forKey: key))
+        return try String(decode(Int.self, forKey: key))
     }
 }

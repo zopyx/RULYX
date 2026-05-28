@@ -6,7 +6,7 @@ import Foundation
 /// Create a new token before starting a search, and check `matches`
 /// before applying the results (discard if the token has been superseded).
 @MainActor
-final class SearchToken: Sendable {
+final class SearchToken {
     private nonisolated let id: UUID
 
     // MARK: - Init

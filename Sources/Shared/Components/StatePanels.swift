@@ -425,8 +425,9 @@ struct SimplifiedReportSheet: View {
                     }
                 } else {
                     Section {
+                        let addLabel = loc("report.support.attachment.add")
                         PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 5, matching: .images) {
-                            Label(loc("report.support.attachment.add"), systemImage: "paperclip")
+                            Label(addLabel, systemImage: "paperclip")
                         }
 
                         if !supportImages.isEmpty {
@@ -655,7 +656,10 @@ private struct SupportMailComposeView: UIViewControllerRepresentable {
             didFinishWith _: MFMailComposeResult,
             error _: Error?
         ) {
-            dismiss()
+            let dismissAction = dismiss
+            Task { @MainActor in
+                dismissAction()
+            }
         }
     }
 }

@@ -3,9 +3,9 @@ import XCTest
 
 final class ChatAPIDTOsTests: XCTestCase {
     func testConvoViewDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"id":"cid1","rev":"r1","members":[{"did":"did:plc:a","handle":"a.bsky.social"}],"muted":false,"status":"accepted","unreadCount":3}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(ConvoViewDTO.self, from: json)
         XCTAssertEqual(dto.id, "cid1")
         XCTAssertEqual(dto.rev, "r1")
@@ -19,9 +19,9 @@ final class ChatAPIDTOsTests: XCTestCase {
     }
 
     func testConvoViewDTOWithLastMessage() throws {
-        let json = """
+        let json = Data("""
         {"id":"cid1","rev":"r1","members":[],"muted":false,"lastMessage":{"$type":"chat.bsky.convo.defs#messageView","id":"msg1","rev":"mr1","text":"Hello","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"},"unreadCount":0}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(ConvoViewDTO.self, from: json)
         XCTAssertNotNil(dto.lastMessage)
         XCTAssertNotNil(dto.lastMessage?.message)
@@ -31,18 +31,18 @@ final class ChatAPIDTOsTests: XCTestCase {
     }
 
     func testConvoViewDTOWithKindDirect() throws {
-        let json = """
+        let json = Data("""
         {"id":"cid1","rev":"r1","members":[],"muted":false,"kind":{},"unreadCount":0}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(ConvoViewDTO.self, from: json)
         XCTAssertNotNil(dto.kind?.direct)
         XCTAssertNil(dto.kind?.group)
     }
 
     func testGroupConvoDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"name":"Group","memberCount":5,"createdAt":"2024-01-01T00:00:00Z","lockStatus":"unlocked"}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(GroupConvoDTO.self, from: json)
         XCTAssertEqual(dto.name, "Group")
         XCTAssertEqual(dto.memberCount, 5)
@@ -50,18 +50,18 @@ final class ChatAPIDTOsTests: XCTestCase {
     }
 
     func testGetMessagesResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"cursor":"c1","messages":[{"$type":"chat.bsky.convo.defs#messageView","id":"m1","rev":"r1","text":"Hi","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let response = try JSONDecoder().decode(GetMessagesResponse.self, from: json)
         XCTAssertEqual(response.cursor, "c1")
         XCTAssertEqual(response.messages.count, 1)
     }
 
     func testMessageUnionDTOMessage() throws {
-        let json = """
+        let json = Data("""
         {"$type":"chat.bsky.convo.defs#messageView","id":"m1","rev":"r1","text":"Hello world","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"}
-        """.data(using: .utf8)!
+        """.utf8)
         let union = try JSONDecoder().decode(MessageUnionDTO.self, from: json)
         XCTAssertNotNil(union.messageView)
         XCTAssertNil(union.deletedMessageView)
@@ -69,61 +69,61 @@ final class ChatAPIDTOsTests: XCTestCase {
     }
 
     func testDeletedMessageViewDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"id":"dm1","rev":"dr1","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(DeletedMessageViewDTO.self, from: json)
         XCTAssertEqual(dto.id, "dm1")
         XCTAssertEqual(dto.sender?.did, "did:plc:s")
     }
 
     func testSystemMessageViewDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"id":"sm1","rev":"sr1","sentAt":"2024-01-01T00:00:00Z"}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(SystemMessageViewDTO.self, from: json)
         XCTAssertEqual(dto.id, "sm1")
     }
 
     func testSystemMessageDataUnionMemberJoin() throws {
-        let json = """
+        let json = Data("""
         {"member":{"did":"did:plc:joined"},"type":"chat.bsky.convo.defs#memberJoin"}
-        """.data(using: .utf8)!
+        """.utf8)
         let data = try JSONDecoder().decode(SystemMessageDataUnion.self, from: json)
         XCTAssertEqual(data.member?.did, "did:plc:joined")
     }
 
     func testSystemMessageDataUnionAddMember() throws {
-        let json = """
+        let json = Data("""
         {"member":{"did":"did:plc:added"},"addedBy":{"did":"did:plc:adder"},"type":"chat.bsky.convo.defs#addMember"}
-        """.data(using: .utf8)!
+        """.utf8)
         let data = try JSONDecoder().decode(SystemMessageDataUnion.self, from: json)
         XCTAssertEqual(data.member?.did, "did:plc:added")
         XCTAssertEqual(data.addedBy?.did, "did:plc:adder")
     }
 
     func testSystemMessageDataUnionEditGroup() throws {
-        let json = """
+        let json = Data("""
         {"oldName":"Old","newName":"New","type":"chat.bsky.convo.defs#editGroup"}
-        """.data(using: .utf8)!
+        """.utf8)
         let data = try JSONDecoder().decode(SystemMessageDataUnion.self, from: json)
         XCTAssertEqual(data.oldName, "Old")
         XCTAssertEqual(data.newName, "New")
     }
 
     func testListConvosResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"cursor":"c1","convos":[{"id":"cid1","rev":"r1","members":[],"muted":false,"unreadCount":0}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let response = try JSONDecoder().decode(ListConvosResponse.self, from: json)
         XCTAssertEqual(response.cursor, "c1")
         XCTAssertEqual(response.convos.count, 1)
     }
 
     func testSendMessageResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"id":"m1","rev":"r1","text":"Hello","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"}
-        """.data(using: .utf8)!
+        """.utf8)
         let response = try JSONDecoder().decode(SendMessageResponse.self, from: json)
         XCTAssertEqual(response.id, "m1")
         XCTAssertEqual(response.text, "Hello")
@@ -131,60 +131,60 @@ final class ChatAPIDTOsTests: XCTestCase {
     }
 
     func testGetConvoResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"convo":{"id":"cid1","rev":"r1","members":[],"muted":false,"unreadCount":0}}
-        """.data(using: .utf8)!
+        """.utf8)
         let response = try JSONDecoder().decode(GetConvoResponse.self, from: json)
         XCTAssertEqual(response.convo.id, "cid1")
     }
 
     func testMessageViewDTOWithReactions() throws {
-        let json = """
+        let json = Data("""
         {"id":"m1","rev":"r1","text":"Hi","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z","reactions":[{"value":"👍","sender":{"did":"did:plc:s"},"createdAt":"2024-01-01T00:00:01Z"}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let msg = try JSONDecoder().decode(MessageViewDTO.self, from: json)
         XCTAssertEqual(msg.reactions?.count, 1)
         XCTAssertEqual(msg.reactions?[0].value, "👍")
     }
 
     func testReactionViewDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"value":"❤️","sender":{"did":"did:plc:s"},"createdAt":"2024-01-01T00:00:00Z"}
-        """.data(using: .utf8)!
+        """.utf8)
         let reaction = try JSONDecoder().decode(ReactionViewDTO.self, from: json)
         XCTAssertEqual(reaction.value, "❤️")
         XCTAssertEqual(reaction.sender.did, "did:plc:s")
     }
 
     func testLogEventUnionDTOBeginConvo() throws {
-        let json = """
+        let json = Data("""
         {"$type":"chat.bsky.convo.defs#beginConvo","convoId":"cid1","rev":"r1"}
-        """.data(using: .utf8)!
+        """.utf8)
         let union = try JSONDecoder().decode(LogEventUnionDTO.self, from: json)
         XCTAssertNotNil(union.beginConvo)
         XCTAssertEqual(union.beginConvo?.convoId, "cid1")
     }
 
     func testLogAcceptConvoDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"convoId":"cid1","rev":"r1"}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(LogAcceptConvoDTO.self, from: json)
         XCTAssertEqual(dto.convoId, "cid1")
     }
 
     func testLogCreateMessageDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"convoId":"cid1","message":{"$type":"chat.bsky.convo.defs#messageView","id":"m1","rev":"r1","text":"Hi","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"},"rev":"r1"}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(LogCreateMessageDTO.self, from: json)
         XCTAssertEqual(dto.convoId, "cid1")
     }
 
     func testLogAddReactionDTODecoding() throws {
-        let json = """
+        let json = Data("""
         {"convoId":"cid1","message":{"$type":"chat.bsky.convo.defs#messageView","id":"m1","rev":"r1","text":"Hi","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"},"reaction":{"value":"❤️","sender":{"did":"did:plc:s"},"createdAt":"2024-01-01T00:00:00Z"},"rev":"r1"}
-        """.data(using: .utf8)!
+        """.utf8)
         let dto = try JSONDecoder().decode(LogAddReactionDTO.self, from: json)
         XCTAssertEqual(dto.reaction?.value, "❤️")
     }

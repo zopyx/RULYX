@@ -1,6 +1,5 @@
-import XCTest
-
 @testable import RULYX
+import XCTest
 
 final class PluralRulesTests: XCTestCase {
     func test_english_one_and_other() {

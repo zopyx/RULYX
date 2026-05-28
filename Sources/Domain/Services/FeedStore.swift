@@ -18,7 +18,7 @@ struct RecentFeedEntry: Codable, Hashable {
 @MainActor
 final class FeedStore: ObservableObject {
     /// The AT URI of the currently selected custom feed. `nil` means "Following".
-    @Published var customFeedURI: String? = nil
+    @Published var customFeedURI: String?
     /// The display name of the currently selected feed.
     @Published var customFeedName: String = ""
 

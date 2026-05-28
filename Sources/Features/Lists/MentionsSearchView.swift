@@ -229,8 +229,7 @@ struct MentionsSearchView: View {
             if !hasAppeared {
                 hasAppeared = true
                 if let prefID = accountStore.preferredSearchAccountID,
-                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
-                {
+                   let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
                     searchAccount = prefAccount
                 } else {
                     searchAccount = accountStore.activeAccount

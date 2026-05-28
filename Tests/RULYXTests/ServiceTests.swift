@@ -4,11 +4,10 @@ import XCTest
 @MainActor
 final class FeedStoreTests: XCTestCase {
     private func makeStore(functionName: String = #function) -> FeedStore {
-        let store = FeedStore(did: functionName)
-        return store
+        FeedStore(did: functionName)
     }
 
-    nonisolated override func tearDown() {
+    override nonisolated func tearDown() {
         super.tearDown()
         UserDefaults.standard.removePersistentDomain(forName: #function)
     }
@@ -108,12 +107,12 @@ final class FeedStoreTests: XCTestCase {
 final class MutedWordsStoreTests: XCTestCase {
     private let defaultsKey = "mutedWords"
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: defaultsKey)
     }
 
-    nonisolated override func tearDown() {
+    override nonisolated func tearDown() {
         super.tearDown()
         UserDefaults.standard.removeObject(forKey: defaultsKey)
     }
@@ -186,7 +185,7 @@ final class MutedWordsStoreTests: XCTestCase {
 final class AnalyticsStoreTests: XCTestCase {
     private nonisolated(unsafe) static let saveKey = "engagementSnapshots"
 
-    nonisolated override func tearDown() {
+    override nonisolated func tearDown() {
         super.tearDown()
         UserDefaults.standard.removeObject(forKey: Self.saveKey)
     }
@@ -302,26 +301,26 @@ final class BlueskySessionServiceTests: XCTestCase {
     func testPersistSession() async throws {
         let (service, _, keychain) = makeService()
         let account = AppAccount(handle: "test.bsky.social")
-        let session = BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: URL(string: "https://bsky.social")!)
+        let session = try BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: XCTUnwrap(URL(string: "https://bsky.social")))
         try await service.persistSession(session, for: account)
         let saved = keychain.savedValues["com.ajung.RULYX.session:\(account.id.uuidString)"]
         XCTAssertNotNil(saved)
-        XCTAssertTrue(saved!.contains("did:plc:t"))
+        XCTAssertTrue(try XCTUnwrap(saved?.contains("did:plc:t")))
     }
 
     func testDeletePersistedSession() async throws {
         let (service, _, keychain) = makeService()
         let account = AppAccount(handle: "test.bsky.social")
-        let session = BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: URL(string: "https://bsky.social")!)
+        let session = try BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: XCTUnwrap(URL(string: "https://bsky.social")))
         try await service.persistSession(session, for: account)
         try service.deletePersistedSession(for: account)
         XCTAssertNil(keychain.savedValues["com.ajung.RULYX.session:\(account.id.uuidString)"])
     }
 
-    func testClearSessionCache() {
+    func testClearSessionCache() throws {
         let (service, _, _) = makeService()
         let account = AppAccount(handle: "test")
-        let session = BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: URL(string: "https://bsky.social")!)
+        let session = try BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: XCTUnwrap(URL(string: "https://bsky.social")))
         let exp = XCTestExpectation()
         Task {
             try await service.persistSession(session, for: account)
@@ -338,17 +337,17 @@ final class BlueskySessionServiceTests: XCTestCase {
             XCTAssertEqual((hostURL as? URL)?.absoluteString, "https://pds.example.com")
             return CreateSessionResponse(did: "did:plc:test", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, didDoc: nil)
         }
-        let session = try await service.authenticate(handle: "test.bsky.social", appPassword: "pw", entrywayURL: URL(string: "https://pds.example.com")!)
+        let session = try await service.authenticate(handle: "test.bsky.social", appPassword: "pw", entrywayURL: XCTUnwrap(URL(string: "https://pds.example.com")))
         XCTAssertEqual(session.did, "did:plc:test")
     }
 }
 
 @MainActor
 final class HTTPClientTests: XCTestCase {
-    nonisolated(unsafe) private var session: URLSession!
+    private nonisolated(unsafe) var session: URLSession!
     private var debugStore: HTTPRequestDebugStore!
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
@@ -374,7 +373,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, expectedData)
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         let (data, response) = try await client.data(for: request)
         XCTAssertEqual(data, expectedData)
         XCTAssertEqual(response.statusCode, 200)
@@ -396,7 +395,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, Data())
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         _ = try await client.data(for: request)
     }
 
@@ -405,7 +404,7 @@ final class HTTPClientTests: XCTestCase {
             throw URLError(.badServerResponse)
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         do {
             _ = try await client.data(for: request)
             XCTFail("Expected error")
@@ -425,7 +424,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, expectedData)
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let (data, _) = try await client.data(from: URL(string: "https://example.com")!)
+        let (data, _) = try await client.data(from: XCTUnwrap(URL(string: "https://example.com")))
         XCTAssertEqual(String(data: data, encoding: .utf8), "test")
     }
 
@@ -436,7 +435,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, expectedData)
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         let (_, response) = try await client.data(for: request)
         XCTAssertEqual(response.statusCode, 503)
         let entry = try XCTUnwrap(debugStore.entries.first)
@@ -453,7 +452,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, expectedData)
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/api")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         _ = try await client.data(for: request)
         let entry = try XCTUnwrap(debugStore.entries.first)
         XCTAssertEqual(entry.state, .failed)
@@ -474,7 +473,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, Data())
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/source")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/source")))
         _ = try await client.data(for: request, source: "Unit Test Source")
         let entry = try XCTUnwrap(debugStore.entries.first)
         XCTAssertEqual(entry.source, "Unit Test Source")
@@ -488,7 +487,7 @@ final class HTTPClientTests: XCTestCase {
             return (response, Data())
         }
         let client = HTTPClient(session: session, debugStore: debugStore)
-        let request = URLRequest(url: URL(string: "https://example.com/origin")!)
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/origin")))
         _ = try await client.data(
             for: request,
             source: "Unit Test Source",

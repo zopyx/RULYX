@@ -166,8 +166,7 @@ final class PushNotificationCoordinator: ObservableObject {
             }
 
             if let memberDID = route.memberDID,
-               let conversation = await chatStore.getOrCreateConvo(memberDID: memberDID)
-            {
+               let conversation = await chatStore.getOrCreateConvo(memberDID: memberDID) {
                 workspaceStore.pendingChatConversation = conversation
                 workspaceStore.selectedTab = .chat
             }

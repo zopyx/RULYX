@@ -147,20 +147,17 @@ final class WorkspacePreferencesStore: ObservableObject {
     /// Loads all preferences from UserDefaults.
     private func load() {
         if let data = defaults.data(forKey: savedSearchesKey),
-           let decoded = try? JSONDecoder().decode([SavedProfileSearch].self, from: data)
-        {
+           let decoded = try? JSONDecoder().decode([SavedProfileSearch].self, from: data) {
             savedSearches = decoded.sorted { $0.lastUsedAt > $1.lastUsedAt }
         }
 
         if let data = defaults.data(forKey: recentSearchesKey),
-           let decoded = try? JSONDecoder().decode([RecentProfileSearch].self, from: data)
-        {
+           let decoded = try? JSONDecoder().decode([RecentProfileSearch].self, from: data) {
             recentSearches = decoded.sorted { $0.usedAt > $1.usedAt }
         }
 
         if let storedSelectedTab = defaults.string(forKey: selectedTabKey),
-           let selectedTab = WorkspaceTab(rawValue: storedSelectedTab)
-        {
+           let selectedTab = WorkspaceTab(rawValue: storedSelectedTab) {
             self.selectedTab = selectedTab
         }
 

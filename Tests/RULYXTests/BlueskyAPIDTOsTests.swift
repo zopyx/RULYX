@@ -3,9 +3,9 @@ import XCTest
 
 final class BlueskyAPIDTOsTests: XCTestCase {
     func testGetListsResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"lists": [{"uri": "at://list/1", "name": "Test", "description": "Desc", "purpose": "app.bsky.graph.defs#modlist", "listItemCount": 5}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(GetListsResponse.self, from: json)
         XCTAssertEqual(result.lists.count, 1)
         XCTAssertEqual(result.lists[0].name, "Test")
@@ -14,9 +14,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testGetBlocksResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"cursor": "abc", "blocks": [{"did": "did:plc:blocked", "handle": "blocked.bsky.social", "displayName": "Blocked"}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(GetBlocksResponse.self, from: json)
         XCTAssertEqual(result.cursor, "abc")
         XCTAssertEqual(result.blocks.count, 1)
@@ -25,9 +25,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testActorViewDecoding() throws {
-        let json = """
+        let json = Data("""
         {"did": "did:plc:actor", "handle": "user.bsky.social", "displayName": "User", "avatar": "https://example.com/avatar.jpg", "createdAt": "2024-01-15T10:30:00Z"}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(ActorView.self, from: json)
         XCTAssertEqual(result.did, "did:plc:actor")
         XCTAssertEqual(result.handle, "user.bsky.social")
@@ -36,9 +36,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testActorViewMinimalDecoding() throws {
-        let json = """
+        let json = Data("""
         {"did": "did:plc:actor", "handle": "user.bsky.social"}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(ActorView.self, from: json)
         XCTAssertEqual(result.did, "did:plc:actor")
         XCTAssertNil(result.displayName)
@@ -46,9 +46,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testProfileViewDetailedDecoding() throws {
-        let json = """
+        let json = Data("""
         {"did": "did:plc:profile", "handle": "profile.bsky.social", "displayName": "Profile", "description": "A test profile", "followersCount": 100, "followsCount": 50, "postsCount": 25}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(ProfileViewDetailed.self, from: json)
         XCTAssertEqual(result.did, "did:plc:profile")
         XCTAssertEqual(result.followersCount, 100)
@@ -57,9 +57,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testProfileViewerStateDecoding() throws {
-        let json = """
+        let json = Data("""
         {"muted": true, "blockedBy": false, "blocking": "at://block/1", "following": "at://follow/1", "followedBy": "at://fby/1"}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(ProfileViewerState.self, from: json)
         XCTAssertTrue(result.muted ?? false)
         XCTAssertFalse(result.blockedBy ?? true)
@@ -68,9 +68,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testCreateSessionResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"did": "did:plc:test", "handle": "test.bsky.social", "accessJwt": "access-token", "refreshJwt": "refresh-token"}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(CreateSessionResponse.self, from: json)
         XCTAssertEqual(result.did, "did:plc:test")
         XCTAssertEqual(result.accessJWT, "access-token")
@@ -78,9 +78,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testCreateSessionResponseNoRefresh() throws {
-        let json = """
+        let json = Data("""
         {"did": "did:plc:test", "handle": "test.bsky.social", "accessJwt": "access-token"}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(CreateSessionResponse.self, from: json)
         XCTAssertEqual(result.accessJWT, "access-token")
         XCTAssertNil(result.refreshJWT)
@@ -88,9 +88,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
 
     func testListsWithMembershipResponseDecoding() throws {
         let jsonData = """
-        {"listsWithMembership":[{"list":{"uri":"at://list/1","name":"Test List","purpose":"app.bsky.graph.defs#curatelist","listItemCount":10},"listItem":{"uri":"at://item/1","subject":{"did":"did:plc:sub","handle":"sub.bsky.social"}}}]}
+        {"listsWithMembership":[{"list":{"uri":"at://list/1","name":"Test List","purpose":"app.bsky.graph.defs#curatelist","listItemCount":10},"listItem":{"uri":"at://item/1","subject":{"did":"did:plc:sub","handle":"sub.bsky.social"}}}]} // swiftlint:disable:this line_length
         """
-        let json = jsonData.data(using: .utf8)!
+        let json = Data(jsonData.utf8)
         let result = try JSONDecoder().decode(ListsWithMembershipResponse.self, from: json)
         XCTAssertEqual(result.listsWithMembership.count, 1)
         XCTAssertEqual(result.listsWithMembership[0].list.name, "Test List")
@@ -98,18 +98,18 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testGetFollowersResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"cursor": "next", "followers": [{"did": "did:plc:f1", "handle": "follower.bsky.social"}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(GetFollowersResponse.self, from: json)
         XCTAssertEqual(result.cursor, "next")
         XCTAssertEqual(result.followers.count, 1)
     }
 
     func testGetFollowsResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"follows": [{"did": "did:plc:fol", "handle": "follow.bsky.social"}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(GetFollowsResponse.self, from: json)
         XCTAssertNil(result.cursor)
         XCTAssertEqual(result.follows.count, 1)
@@ -181,8 +181,16 @@ final class BlueskyAPIDTOsTests: XCTestCase {
 
     func testParseHandleChanges() {
         let entries = [
-            PLCAuditLogEntry(did: "did:plc:test", operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://old-handle.bsky.social"], services: nil), cid: nil, nullified: false, createdAt: "2024-01-01T00:00:00Z"),
-            PLCAuditLogEntry(did: "did:plc:test", operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://new-handle.bsky.social"], services: nil), cid: nil, nullified: false, createdAt: "2024-06-01T00:00:00Z"),
+            PLCAuditLogEntry(
+                did: "did:plc:test",
+                operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://old-handle.bsky.social"], services: nil),
+                cid: nil, nullified: false, createdAt: "2024-01-01T00:00:00Z"
+            ),
+            PLCAuditLogEntry(
+                did: "did:plc:test",
+                operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://new-handle.bsky.social"], services: nil),
+                cid: nil, nullified: false, createdAt: "2024-06-01T00:00:00Z"
+            ),
         ]
         let result = parseHandleChanges(from: entries, currentHandle: "new-handle.bsky.social")
         XCTAssertEqual(result.count, 2)
@@ -192,8 +200,16 @@ final class BlueskyAPIDTOsTests: XCTestCase {
 
     func testParseHandleChangesFiltersNullified() {
         let entries = [
-            PLCAuditLogEntry(did: "did:plc:test", operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://old.bsky.social"], services: nil), cid: nil, nullified: true, createdAt: "2024-01-01T00:00:00Z"),
-            PLCAuditLogEntry(did: "did:plc:test", operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://current.bsky.social"], services: nil), cid: nil, nullified: false, createdAt: "2024-06-01T00:00:00Z"),
+            PLCAuditLogEntry(
+                did: "did:plc:test",
+                operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://old.bsky.social"], services: nil),
+                cid: nil, nullified: true, createdAt: "2024-01-01T00:00:00Z"
+            ),
+            PLCAuditLogEntry(
+                did: "did:plc:test",
+                operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://current.bsky.social"], services: nil),
+                cid: nil, nullified: false, createdAt: "2024-06-01T00:00:00Z"
+            ),
         ]
         let result = parseHandleChanges(from: entries, currentHandle: "current.bsky.social")
         XCTAssertEqual(result.count, 1)
@@ -202,8 +218,16 @@ final class BlueskyAPIDTOsTests: XCTestCase {
 
     func testParseHandleChangesDeduplicates() {
         let entries = [
-            PLCAuditLogEntry(did: "did:plc:test", operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://same.bsky.social"], services: nil), cid: nil, nullified: false, createdAt: "2024-01-01T00:00:00Z"),
-            PLCAuditLogEntry(did: "did:plc:test", operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://same.bsky.social"], services: nil), cid: nil, nullified: false, createdAt: "2024-06-01T00:00:00Z"),
+            PLCAuditLogEntry(
+                did: "did:plc:test",
+                operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://same.bsky.social"], services: nil),
+                cid: nil, nullified: false, createdAt: "2024-01-01T00:00:00Z"
+            ),
+            PLCAuditLogEntry(
+                did: "did:plc:test",
+                operation: PLCOperation(type: "plc_operation", alsoKnownAs: ["at://same.bsky.social"], services: nil),
+                cid: nil, nullified: false, createdAt: "2024-06-01T00:00:00Z"
+            ),
         ]
         let result = parseHandleChanges(from: entries, currentHandle: "same.bsky.social")
         XCTAssertEqual(result.count, 1)
@@ -220,9 +244,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testDIDDocumentDecoding() throws {
-        let json = """
+        let json = Data("""
         {"service": [{"id": "#atproto_pds", "type": "AtprotoPersonalDataServer", "serviceEndpoint": "https://pds.example.com"}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(DIDDocument.self, from: json)
         XCTAssertEqual(result.services.count, 1)
         XCTAssertEqual(result.services[0].id, "#atproto_pds")
@@ -230,9 +254,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testGetListResponseDecoding() throws {
-        let json = """
+        let json = Data("""
         {"cursor": "next", "items": [{"uri": "at://item/1", "subject": {"did": "did:plc:sub", "handle": "sub.bsky.social"}}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(GetListResponse.self, from: json)
         XCTAssertEqual(result.cursor, "next")
         XCTAssertEqual(result.items.count, 1)
@@ -240,9 +264,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testStarterPacksWithMembershipDecoding() throws {
-        let json = """
+        let json = Data("""
         {"starterPacksWithMembership": [{"starterPack": {"uri": "at://pack/1", "name": "Test Pack", "listItemCount": 5}, "listItem": null}]}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(StarterPacksWithMembershipResponse.self, from: json)
         XCTAssertEqual(result.starterPacksWithMembership.count, 1)
         XCTAssertNil(result.starterPacksWithMembership[0].listItem)
@@ -271,24 +295,24 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testEmptyResponseDecoding() throws {
-        let json = "{}".data(using: .utf8)!
+        let json = Data("{}".utf8)
         let result = try JSONDecoder().decode(EmptyResponse.self, from: json)
         XCTAssertNotNil(result)
     }
 
     func testAPIErrorPayloadDecoding() throws {
-        let json = """
+        let json = Data("""
         {"error": "InvalidRequest", "message": "Bad request"}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(APIErrorPayload.self, from: json)
         XCTAssertEqual(result.error, "InvalidRequest")
         XCTAssertEqual(result.message, "Bad request")
     }
 
     func testPLCOperationDecoding() throws {
-        let json = """
+        let json = Data("""
         {"type": "plc_operation", "alsoKnownAs": ["at://handle.bsky.social"], "services": {"atproto_pds": {"type": "AtprotoPersonalDataServer", "endpoint": "https://pds.example.com"}}}
-        """.data(using: .utf8)!
+        """.utf8)
         let result = try JSONDecoder().decode(PLCOperation.self, from: json)
         XCTAssertEqual(result.type, "plc_operation")
         XCTAssertEqual(result.alsoKnownAs?.count, 1)
@@ -296,7 +320,7 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testRichEmbedDecodesExternalView() throws {
-        let json = """
+        let json = Data("""
         {
           "$type": "app.bsky.embed.external#view",
           "external": {
@@ -306,7 +330,7 @@ final class BlueskyAPIDTOsTests: XCTestCase {
             "thumb": "https://cdn.example/thumb.jpg"
           }
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         let embed = try JSONDecoder().decode(RichEmbed.self, from: json)
 
@@ -318,7 +342,7 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testRichEmbedDecodesRecordWithMediaExternalView() throws {
-        let json = """
+        let json = Data("""
         {
           "$type": "app.bsky.embed.recordWithMedia#view",
           "record": {
@@ -334,7 +358,7 @@ final class BlueskyAPIDTOsTests: XCTestCase {
             }
           }
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         let embed = try JSONDecoder().decode(RichEmbed.self, from: json)
 
@@ -345,7 +369,7 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testRichEmbedDecodesExternalViewWhenThumbIsObject() throws {
-        let json = """
+        let json = Data("""
         {
           "$type": "app.bsky.embed.external#view",
           "external": {
@@ -362,7 +386,7 @@ final class BlueskyAPIDTOsTests: XCTestCase {
             }
           }
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         let embed = try JSONDecoder().decode(RichEmbed.self, from: json)
 
@@ -372,9 +396,9 @@ final class BlueskyAPIDTOsTests: XCTestCase {
     }
 
     func testRichEmbedExternalRecognizesTenorAndProvidesInlineMediaURL() throws {
-        let json = """
+        let json = Data("""
         {"uri": "https://tenor.com/view/dance-cat-gif-12345", "title": "Tenor", "description": "Animated preview", "thumb": "https://media.tenor.com/example.gif"}
-        """.data(using: .utf8)!
+        """.utf8)
         let external = try JSONDecoder().decode(RichEmbedExternal.self, from: json)
 
         XCTAssertTrue(external.isTenorEmbed)

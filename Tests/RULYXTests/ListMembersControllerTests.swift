@@ -3,10 +3,10 @@ import XCTest
 
 @MainActor
 final class ListMembersControllerTests: XCTestCase {
-    nonisolated(unsafe) private var controller: ListMembersController!
-    nonisolated(unsafe) private var account: AppAccount!
+    private nonisolated(unsafe) var controller: ListMembersController!
+    private nonisolated(unsafe) var account: AppAccount!
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         controller = MainActor.assumeIsolated { ListMembersController() }
         account = makeAccount()

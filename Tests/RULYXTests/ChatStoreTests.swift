@@ -3,11 +3,11 @@ import XCTest
 
 @MainActor
 final class ChatStoreTests: XCTestCase {
-    nonisolated(unsafe) private var store: ChatStore!
-    nonisolated(unsafe) private var service: MockChatService!
+    private nonisolated(unsafe) var store: ChatStore!
+    private nonisolated(unsafe) var service: MockChatService!
     private let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
         let setup = MainActor.assumeIsolated { () -> (MockChatService, ChatStore) in
@@ -20,7 +20,7 @@ final class ChatStoreTests: XCTestCase {
         store = setup.1
     }
 
-    nonisolated override func tearDown() {
+    override nonisolated func tearDown() {
         let store = store
         MainActor.assumeIsolated {
             store?.stopPolling()
@@ -139,7 +139,7 @@ final class ChatStoreTests: XCTestCase {
         await store.loadConvos()
         let mutedConvo = ChatConversation(id: "c1", rev: "rev-c1", members: [], lastMessage: nil, muted: false, status: .accepted, unreadCount: 0, kind: .direct, groupInfo: nil)
         service.getConvoResult = .success(mutedConvo)
-        let _ = await store.getOrCreateConvo(memberDID: "did:plc:m")
+        _ = await store.getOrCreateConvo(memberDID: "did:plc:m")
         service.unmuteResult = .success(())
         await store.unmute(convoId: "c1")
         let result = store.conversations.first { $0.id == "c1" }

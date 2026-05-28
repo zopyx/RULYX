@@ -74,7 +74,7 @@ final class DirectRepliesViewModel: ObservableObject {
 
     /// Loads the next batch of replies from additional user posts.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        guard !isLoadingMore, let feedCursor else { return }
+        guard !isLoadingMore, feedCursor != nil else { return }
         isLoadingMore = true
         progressLabel = loc("directreplies.scanning_posts")
         defer {

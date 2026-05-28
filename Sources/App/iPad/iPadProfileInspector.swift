@@ -60,8 +60,7 @@ struct iPadProfileInspector: View {
             guard let active = accountStore.activeAccount else { return }
             let password = accountStore.appPassword(for: active) ?? ""
             let dataAccount: AppAccount = if let preferredID = accountStore.preferredSearchAccountID,
-                                             let preferred = accountStore.accounts.first(where: { $0.id == preferredID })
-            {
+                                             let preferred = accountStore.accounts.first(where: { $0.id == preferredID }) {
                 preferred
             } else {
                 active

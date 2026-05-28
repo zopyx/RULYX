@@ -358,8 +358,7 @@ struct ProfileInspectorView: View {
             .sheet(isPresented: $isShowingReportSheet) {
                 if let inspection = viewModel.inspection,
                    let account = accountStore.activeAccount,
-                   let appPassword = activePassword
-                {
+                   let appPassword = activePassword {
                     SimplifiedReportSheet(
                         title: loc("profile.report"),
                         selectedReason: $selectedReportReason,

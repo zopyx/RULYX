@@ -44,7 +44,7 @@ struct iPadDashboardView: View {
             }
             if let active = accountStore.activeAccount {
                 HStack {
-                    Text(active.displayName ?? active.handle)
+                    Text(active.displayName)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()

@@ -3,11 +3,11 @@ import XCTest
 
 @MainActor
 final class BlueskyProfileServiceTests: XCTestCase {
-    nonisolated(unsafe) private var requestExecutor: MockRequestExecutor!
-    nonisolated(unsafe) private var sessionService: MockSessionService!
-    nonisolated(unsafe) private var service: BlueskyProfileService!
+    private nonisolated(unsafe) var requestExecutor: MockRequestExecutor!
+    private nonisolated(unsafe) var sessionService: MockSessionService!
+    private nonisolated(unsafe) var service: BlueskyProfileService!
 
-    nonisolated override func setUp() {
+    override nonisolated func setUp() {
         super.setUp()
         let setup = MainActor.assumeIsolated { () -> (MockRequestExecutor, MockSessionService, BlueskyProfileService) in
             let requestExecutor = MockRequestExecutor()

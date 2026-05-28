@@ -403,8 +403,7 @@ final class BlueskyProfileViewModel: ObservableObject {
 
         do {
             if let recordURI = profile.viewerState?.followingRecordURI,
-               isCurrentlyFollowing
-            {
+               isCurrentlyFollowing {
                 try await client.unfollowActor(
                     recordURI: recordURI,
                     account: account,
@@ -517,8 +516,7 @@ final class BlueskyProfileViewModel: ObservableObject {
 
         do {
             if let recordURI = profile.viewerState?.blockingRecordURI,
-               isCurrentlyBlocking
-            {
+               isCurrentlyBlocking {
                 try await client.unblockActor(
                     recordURI: recordURI,
                     account: account,

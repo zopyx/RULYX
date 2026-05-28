@@ -171,7 +171,7 @@ struct ThreadView: View {
             onReportPost: {
                 guard let activeDID = accountStore.activeAccount?.did else { return }
                 guard post.author?.did != activeDID else { return }
-                if let uri = post.uri {
+                if post.uri != nil {
                     likerActions.postToReport = RichFeedEntry(threadPost: post)
                 }
             },

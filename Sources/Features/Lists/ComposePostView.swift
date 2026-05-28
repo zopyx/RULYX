@@ -166,7 +166,7 @@ struct ComposePostView: View {
                 NavigationStack {
                     List(userLists) { list in
                         Button {
-                            if let cid = list.cid {
+                            if list.cid != nil {
                                 replyRule = .listRule(list: list.id)
                             }
                             showListPicker = false
@@ -292,10 +292,11 @@ struct ComposePostView: View {
         }
     }
 
-    private var addMediaSection: some View {
+    @MainActor private var addMediaSection: some View {
         Section {
+            let addImagesText = loc("compose.add_images")
             PhotosPicker(selection: $selectedItems, maxSelectionCount: maxImages, matching: .images) {
-                Label { Text(loc: "compose.add_images") } icon: { Image(systemName: "photo.on.rectangle.angled") }
+                Label { Text(verbatim: addImagesText) } icon: { Image(systemName: "photo.on.rectangle.angled") }
             }
             .disabled(selectedImages.count >= maxImages || videoAttachment != nil || selectedGIFLinkURL != nil)
             .onChange(of: selectedItems) { _, items in
@@ -430,8 +431,7 @@ struct ComposePostView: View {
         }
 
         if editReplyTo == nil, let reply = editPost.reply, let rootURI = reply.root?.uri, let rootCID = reply.root?.cid,
-           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid
-        {
+           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid {
             editReplyTo = (parentURI, parentCID, rootURI, rootCID)
         }
     }
@@ -468,7 +468,7 @@ struct ComposePostView: View {
             data.count > maxImageFileSize || imageExceedsMaxDimension(data)
         }
         if needsResize {
-            pendingImageResize = { Task { await scaleDownImages() } }
+            pendingImageResize = { Task { scaleDownImages() } }
             showImageResizeAlert = true
         }
     }
@@ -602,7 +602,7 @@ struct ComposePostView: View {
             )
 
             if let editPost {
-                try? await blueskyClient.deleteRecord(
+                _ = try? await blueskyClient.deleteRecord(
                     recordURI: editPost.post.uri,
                     account: account,
                     appPassword: appPassword

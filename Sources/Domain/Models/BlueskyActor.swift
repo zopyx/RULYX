@@ -1,6 +1,6 @@
+import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
-import Foundation
 
 /// Represents a minimal Bluesky actor with core profile information.
 /// Used as a lightweight representation of a user in contexts like list memberships and block lists.

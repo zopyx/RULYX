@@ -18,7 +18,7 @@ final class AccountStoreTests: XCTestCase {
 
     // MARK: - Add Account
 
-    func testAddAccountPersistsAppPassword() async throws {
+    func testAddAccountPersistsAppPassword() async {
         let (store, keychain) = makeStore()
         let client = MockAuthenticatingClient()
 
@@ -238,8 +238,8 @@ final class AccountStoreTests: XCTestCase {
         XCTAssertNil(updatedAccount?.label)
     }
 
-    func testSetLabelPersistsAcrossStoreRecreation() async {
-        let defaults = UserDefaults(suiteName: #function)!
+    func testSetLabelPersistsAcrossStoreRecreation() async throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)
         let keychain = MockKeychainService()
 
@@ -292,8 +292,8 @@ final class AccountStoreTests: XCTestCase {
 
     // MARK: - Persistence
 
-    func testLoadRestoresSavedAccounts() async {
-        let defaults = UserDefaults(suiteName: #function)!
+    func testLoadRestoresSavedAccounts() async throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)
         let keychain = MockKeychainService()
 
@@ -312,8 +312,8 @@ final class AccountStoreTests: XCTestCase {
         XCTAssertEqual(store2.accounts[1].label, "Work")
     }
 
-    func testLoadHandlesCorruptedDataGracefully() {
-        let defaults = UserDefaults(suiteName: #function)!
+    func testLoadHandlesCorruptedDataGracefully() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)
         defaults.set("not-valid-json".data(using: .utf8), forKey: "bluesky.savedAccounts")
 
@@ -329,7 +329,7 @@ final class AccountStoreTests: XCTestCase {
         let (store, _) = makeStore()
         let client = MockAuthenticatingClient()
 
-        let _ = await store.addAccount(handle: "", appPassword: "", client: client)
+        _ = await store.addAccount(handle: "", appPassword: "", client: client)
         XCTAssertNotNil(store.errorMessage)
 
         let didAdd = await addTestAccount(store: store, client: client)
@@ -380,7 +380,7 @@ private final class MockAuthenticatingClient: BlueskyAuthenticating {
         self.shouldFailAuth = shouldFailAuth
     }
 
-    func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil) async throws -> BlueskySession {
+    func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil) async throws -> BlueskySession {
         if shouldFailAuth {
             throw BlueskyAPIError.unauthorized
         }
