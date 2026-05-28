@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 /// Full compose view for creating, replying to, quoting, or editing posts.
-/// Supports text, images (up to 4), GIFs, video, alt text, reply controls
+/// Supports text, images (up to 4), GIFs (beta), video, alt text, reply controls
 /// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
     let account: AppAccount
@@ -16,6 +16,7 @@ struct ComposePostView: View {
     var editPost: RichFeedEntry?
 
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
     @State private var postText = ""
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedImages: [(data: Data, mimeType: String)] = []
@@ -303,20 +304,22 @@ struct ComposePostView: View {
                 Task { await loadImages(from: items) }
             }
 
-            Button {
-                showGIFPicker = true
-            } label: {
-                HStack {
-                    Label { Text(loc: "compose.add_gif") } icon: { Image(systemName: "play.rectangle") }
-                    Spacer()
-                    if isDownloadingGIF {
-                        ProgressView()
-                            .scaleEffect(0.7)
+            if showBetaFeatures {
+                Button {
+                    showGIFPicker = true
+                } label: {
+                    HStack {
+                        Label { Text(loc("compose.add_gif")) } icon: { Image(systemName: "play.rectangle") }
+                        Spacer()
+                        if isDownloadingGIF {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        }
                     }
                 }
+                .disabled(isDownloadingGIF || videoAttachment != nil || selectedGIFLinkURL != nil || !selectedImages.isEmpty)
+                .foregroundStyle(videoAttachment != nil || selectedGIFLinkURL != nil ? Color.skyPrimary : .primary)
             }
-            .disabled(isDownloadingGIF || videoAttachment != nil || selectedGIFLinkURL != nil || !selectedImages.isEmpty)
-            .foregroundStyle(videoAttachment != nil || selectedGIFLinkURL != nil ? Color.skyPrimary : .primary)
         }
     }
 
