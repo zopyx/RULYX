@@ -383,7 +383,7 @@ struct SimplifiedReportSheet: View {
                     Text(loc("profile.report.reason_explanation"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Picker("profile.report.reason", selection: $selectedReason) {
+                    Picker(loc("profile.report.reason"), selection: $selectedReason) {
                         ForEach(ModerationReportReasonType.allCases) { reason in
                             Text(reason.localizedTitle)
                                 .tag(reason)

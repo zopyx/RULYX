@@ -208,11 +208,7 @@ struct ListsView: View {
                         }
 
                         Section {
-                            if internalListStore.lists.isEmpty {
-                                Text(loc("internal.list.empty"))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            } else {
+                            if !internalListStore.lists.isEmpty {
                                 ForEach(internalListStore.lists) { list in
                                     NavigationLink {
                                         InternalListDetailView(list: list)

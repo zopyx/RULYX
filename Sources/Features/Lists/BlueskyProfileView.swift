@@ -815,11 +815,7 @@ struct BlueskyProfileView: View {
                         let handle = member.actor.handle
                         let name = member.actor.displayName
                         let avatar = member.actor.avatarURL?.absoluteString
-                        if internalListStore.lists.isEmpty {
-                            Text(loc("internal.list.empty"))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        } else {
+                        if !internalListStore.lists.isEmpty {
                             ForEach(internalListStore.lists) { list in
                                 let isOnList = internalListStore.isMember(did: memberDID, in: list.id)
                                 Toggle(isOn: Binding(
@@ -955,6 +951,7 @@ struct BlueskyProfileView: View {
 
                         if showBetaFeatures {
                             let isBlockedDM = profile.viewerState?.isBlocking == true || (profile.viewerState?.blockingByListName.isEmpty == false)
+                            let isMutualFollow = profile.viewerState?.isFollowing == true && profile.viewerState?.followsYou == true
                             Button {
                                 Task {
                                     chatStore.setAccount(account, appPassword: appPassword)
@@ -976,9 +973,13 @@ struct BlueskyProfileView: View {
                                         .background(Capsule().fill(.orange))
                                 }
                             }
-                            .disabled(isBlockedDM)
+                            .disabled(isBlockedDM || isMutualFollow)
                             if isBlockedDM {
                                 Text(loc("profile.dm_blocked_notice"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else if isMutualFollow {
+                                Text(loc("profile.dm_mutual_notice"))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
