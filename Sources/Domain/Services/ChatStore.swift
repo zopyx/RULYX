@@ -331,6 +331,9 @@ final class ChatStore: ObservableObject {
                 switch event.kind {
                 case let .createMessage(convoId, message):
                     applyIncomingMessage(message, to: convoId)
+                    if !conversations.contains(where: { $0.id == convoId }) {
+                        hasStructuralEvents = true
+                    }
                 case .beginConvo, .acceptConvo, .leaveConvo, .muteConvo, .unmuteConvo,
                      .addMember, .removeMember, .readConvo:
                     hasStructuralEvents = true
