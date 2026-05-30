@@ -34,6 +34,9 @@ struct RootView: View {
     /// has been shown. Suppresses the onboarding sheet on subsequent launches.
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
 
+    /// Controls the account switcher sheet from the tab bar.
+    @State private var showAccountSwitcher = false
+
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"` (default).
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
@@ -155,14 +158,29 @@ struct RootView: View {
                     .buttonStyle(.plain)
                 }
 
-                // Account switcher — inline in the tab bar
-                AccountTabBarButton(
-                    accountStore: accountStore,
-                    workspaceStore: workspaceStore,
-                    localizationManager: localizationManager,
-                    tint: tint,
-                    onSwitch: switchAccount
-                )
+                // Account button — tap to open switcher sheet
+                Button {
+                    showAccountSwitcher = true
+                } label: {
+                    VStack(spacing: 4) {
+                        if let account = accountStore.activeAccount {
+                            AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 24)
+                                .overlay {
+                                    Circle()
+                                        .stroke(tint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
+                                }
+                        } else {
+                            Image(systemName: "person.crop.circle")
+                                .font(.system(size: 22))
+                        }
+                        Text(localizationManager.localized("tab.accounts"))
+                            .font(.caption2)
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(workspaceStore.selectedTab == .account ? tint : .secondary)
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 4)
             .padding(.top, 6)
@@ -171,6 +189,17 @@ struct RootView: View {
             .preferredColorScheme(preferredScheme)
             .environment(\.locale, localizationManager.locale)
             .environment(\.layoutDirection, localizationManager.layoutDirection)
+
+            // MARK: Account Switcher Sheet
+
+            .sheet(isPresented: $showAccountSwitcher) {
+                AccountSwitcherTabSheet(
+                    accountStore: accountStore,
+                    workspaceStore: workspaceStore,
+                    blueskyClient: blueskyClient,
+                    onSwitch: switchAccount
+                )
+            }
 
             // MARK: Onboarding Sheet
 
@@ -255,82 +284,90 @@ struct RootView: View {
     }
 }
 
-// MARK: - Account Tab Bar Button
+// MARK: - Account Switcher Row
 
-/// A standalone view for the account switcher button in the custom tab bar.
-/// Observed as a separate struct to ensure the label re-renders on account changes.
-private struct AccountTabBarButton: View {
-    @ObservedObject var accountStore: AccountStore
-    @ObservedObject var workspaceStore: ModerationWorkspaceStore
-    let localizationManager: LocalizationManager
-    let tint: Color
-    let onSwitch: (AppAccount) -> Void
+private struct AccountSwitcherRow: View {
+    let account: AppAccount
+    let isActive: Bool
+    let isDeactivated: Bool
+    let action: () -> Void
 
     var body: some View {
-        Menu {
-            if let active = accountStore.activeAccount {
-                ForEach(accountStore.accounts) { acct in
-                    Button {
-                        onSwitch(acct)
-                    } label: {
-                        HStack(spacing: 10) {
-                            Circle()
-                                .fill(Color.accountTint(acct.tintColor))
-                                .frame(width: 10, height: 10)
-                            AccountAvatarView(account: acct, tint: .accountTint(acct.tintColor), size: 24)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(acct.displayName)
-                                    .font(.subheadline.weight(.semibold))
-                                    .lineLimit(1)
-                                Text(acct.handle)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                            Spacer()
-                            if acct.id == accountStore.activeAccountID {
-                                Image(systemName: "checkmark")
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(tint)
-                            }
-                            if accountStore.isDeactivated(acct) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.orange)
-                            }
-                        }
-                    }
-                    .disabled(acct.id == accountStore.activeAccountID || accountStore.isDeactivated(acct))
+        Button(action: action) {
+            HStack(spacing: 12) {
+                AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 36)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(account.displayName)
+                        .font(.body.weight(.semibold))
+                    Text(account.handle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                Divider()
-            }
-            Button {
-                workspaceStore.selectedTab = .account
-            } label: {
-                Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
-            }
-        } label: {
-            VStack(spacing: 4) {
-                if let account = accountStore.activeAccount {
-                    AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 24)
-                        .overlay {
-                            Circle()
-                                .stroke(tint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
-                        }
-                } else {
-                    Image(systemName: "person.crop.circle")
-                        .font(.system(size: 22))
+                Spacer()
+                if isActive {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(Color.skyPrimary)
                 }
-                Text(localizationManager.localized("tab.accounts"))
-                    .font(.caption2)
-                    .lineLimit(1)
+                if isDeactivated {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.orange)
+                }
             }
-            .foregroundStyle(workspaceStore.selectedTab == .account ? tint : .secondary)
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
         }
-        .menuOrder(.fixed)
-        .accessibilityLabel(loc("account.switcher.label"))
+        .disabled(isActive || isDeactivated)
+    }
+}
+
+// MARK: - Account Switcher Sheet
+
+/// Compact sheet for switching accounts from the tab bar.
+private struct AccountSwitcherTabSheet: View {
+    @ObservedObject var accountStore: AccountStore
+    @ObservedObject var workspaceStore: ModerationWorkspaceStore
+    let blueskyClient: LiveBlueskyClient
+    let onSwitch: (AppAccount) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(accountStore.accounts) { acct in
+                        AccountSwitcherRow(
+                            account: acct,
+                            isActive: acct.id == accountStore.activeAccountID,
+                            isDeactivated: accountStore.isDeactivated(acct),
+                            action: { onSwitch(acct)
+                                dismiss()
+                            }
+                        )
+                    }
+                } header: {
+                    Text(loc("account.switcher.accounts_section"))
+                }
+
+                Section {
+                    Button {
+                        dismiss()
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(300))
+                            workspaceStore.selectedTab = .account
+                        }
+                    } label: {
+                        Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
+                    }
+                }
+            }
+            .pageTitle(loc("account.switcher.title"))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarCloseButton()
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 
