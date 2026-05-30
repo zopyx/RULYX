@@ -75,8 +75,6 @@ struct RootView: View {
                     .lineLimit(1)
             }
             .foregroundStyle(isSelected ? tint : .secondary)
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
         }
     }
 
@@ -156,6 +154,8 @@ struct RootView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
                 }
 
                 // Account button — tap to open switcher sheet
@@ -178,9 +178,10 @@ struct RootView: View {
                             .lineLimit(1)
                     }
                     .foregroundStyle(workspaceStore.selectedTab == .account ? tint : .secondary)
-                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
             }
             .padding(.horizontal, 4)
             .padding(.top, 6)
