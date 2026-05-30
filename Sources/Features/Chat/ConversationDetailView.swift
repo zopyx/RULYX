@@ -43,7 +43,7 @@ struct ConversationDetailView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if let error = chatStore.messageError ?? chatStore.error, convoMessages.isEmpty {
+            if let error = chatStore.messageError, convoMessages.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.title2)
@@ -69,6 +69,7 @@ struct ConversationDetailView: View {
         }
         .pageTitle(displayName)
         .task {
+            chatStore.error = nil
             chatStore.setVisibleConversation(conversation.id)
             await chatStore.loadMessages(convoId: conversation.id)
             await chatStore.markRead(convoId: conversation.id, messageId: lastMessageId)
