@@ -183,7 +183,7 @@ final class ChatStore: ObservableObject {
             var updated = messages[convoId] ?? []
             if let pendingIndex = updated.firstIndex(where: { idForMessage($0) == pendingId }) {
                 updated[pendingIndex] = confirmedMsg
-            } else {
+            } else if !updated.contains(where: { idForMessage($0) == result.id }) {
                 updated.append(confirmedMsg)
             }
             messages[convoId] = updated
