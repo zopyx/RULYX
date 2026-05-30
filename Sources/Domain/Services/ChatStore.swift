@@ -70,15 +70,21 @@ final class ChatStore: ObservableObject {
 
     // MARK: - Conversations
 
-    /// Loads the initial page of conversations.
+    /// Loads conversations, fetching all available pages.
     func loadConvos() async {
         guard let account = activeAccount else { return }
         isLoadingConvos = true
         error = nil
         do {
-            let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
-            conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
-            convosCursor = result.cursor
+            var allConvos: [ChatConversation] = []
+            var cursor: String? = nil
+            repeat {
+                let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: cursor)
+                allConvos.append(contentsOf: result.conversations)
+                cursor = result.cursor
+            } while cursor != nil
+            conversations = allConvos.sorted { $0.lastMessageAt > $1.lastMessageAt }
+            convosCursor = nil
             isLoadingConvos = false
         } catch {
             guard !AppError.isCancellation(error) else { return }
