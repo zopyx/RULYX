@@ -16,7 +16,6 @@ struct ComposePostView: View {
     var editPost: RichFeedEntry?
 
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
     @State private var postText = ""
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedImages: [(data: Data, mimeType: String)] = []
@@ -304,22 +303,20 @@ struct ComposePostView: View {
                 Task { await loadImages(from: items) }
             }
 
-            if showBetaFeatures {
-                Button {
-                    showGIFPicker = true
-                } label: {
-                    HStack {
-                        Label { Text(loc("compose.add_gif")) } icon: { Image(systemName: "play.rectangle") }
-                        Spacer()
-                        if isDownloadingGIF {
-                            ProgressView()
-                                .scaleEffect(0.7)
-                        }
+            Button {
+                showGIFPicker = true
+            } label: {
+                HStack {
+                    Label { Text(loc("compose.add_gif")) } icon: { Image(systemName: "play.rectangle") }
+                    Spacer()
+                    if isDownloadingGIF {
+                        ProgressView()
+                            .scaleEffect(0.7)
                     }
                 }
-                .disabled(isDownloadingGIF || videoAttachment != nil || selectedGIFLinkURL != nil || !selectedImages.isEmpty)
-                .foregroundStyle(videoAttachment != nil || selectedGIFLinkURL != nil ? Color.skyPrimary : .primary)
             }
+            .disabled(isDownloadingGIF || videoAttachment != nil || selectedGIFLinkURL != nil || !selectedImages.isEmpty)
+            .foregroundStyle(videoAttachment != nil || selectedGIFLinkURL != nil ? Color.skyPrimary : .primary)
         }
     }
 

@@ -23,9 +23,7 @@ struct SettingsView: View {
     /// UserDefaults key `"debugMode"`: enables debug tools (HTTP request debug view, etc.).
     @AppStorage("debugMode") private var debugMode = false
 
-    /// UserDefaults key `"showBetaFeatures"`: gates access to Timeline, Notifications,
-    /// and Chat tabs in `RootView`.
-    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
+    /// Previously gated beta features — all now always enabled.
 
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"`.
@@ -142,13 +140,7 @@ struct SettingsView: View {
                 // MARK: Internal Section
 
                 Section {
-                    Toggle(isOn: $showBetaFeatures) {
-                        Label {
-                            Text(localizationManager.localized("settings.beta_features"))
-                        } icon: {
-                            Image(systemName: "flask")
-                        }
-                    }
+
 
                     Toggle(isOn: $debugMode) {
                         Label {

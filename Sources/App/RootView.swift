@@ -6,11 +6,9 @@ import SwiftUI
 /// conditionally including beta features (Timeline, Notifications, Chat).
 ///
 /// ## Tab Structure
-/// - **Always visible**: Moderation, Info, Settings, Accounts (4 tabs)
-/// - **Beta-gated** (when `showBetaFeatures` is enabled): Timeline, Notifications, Chat
-/// - iOS tab bar supports at most 5 visible tabs before showing "More". The 4 permanent
-///   + 3 beta tabs = 7 total, which is why screenshot tests split them across
-///   two test methods (`testCaptureCoreTabs` / `testCaptureBetaTabs`).
+/// - **All tabs always visible**: Moderation, Timeline, Notifications, Chat, Info, Settings, Accounts
+/// - iOS tab bar supports at most 5 visible tabs before showing "More". The 7 total tabs
+///   are split across two screenshot test methods (`testCaptureCoreTabs` / `testCaptureBetaTabs`).
 ///
 /// ## Account Switching
 /// Account switching is handled at the `RULYXApp` level via `.task(id: activeAccountID)`.
@@ -22,10 +20,8 @@ import SwiftUI
 /// is presented explaining the app's core features and tabs. Dismissing it
 /// permanently sets `hasSeenOnboarding = true`.
 ///
-/// ## Beta Features Gate
-/// When `showBetaFeatures` is toggled off in Settings, the `.onChange` handler
-/// resets the selected tab to Moderation if the current tab is a beta-only tab,
-/// preventing a blank body from being displayed.
+/// ## Tab Availability
+/// All tabs are always visible; no beta gating.
 struct RootView: View {
     // MARK: - Properties
 
@@ -47,10 +43,6 @@ struct RootView: View {
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"` (default).
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
-
-    /// UserDefaults key `"showBetaFeatures"`: gates access to Timeline, Notifications,
-    /// and Chat tabs. When disabled, only Moderation, Info, Settings, and Accounts appear.
-    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
 
     /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
     /// Returns `.light`, `.dark`, or `nil` for system-following mode.
@@ -105,41 +97,37 @@ struct RootView: View {
                         }
                     }
 
-                // MARK: Beta Tabs (gated by showBetaFeatures)
-
-                if showBetaFeatures {
-                    TimelineTab()
-                        .tag(WorkspaceTab.timeline)
-                        .tabItem {
-                            Label {
-                                Text(localizationManager.localized("tab.timeline"))
-                            } icon: {
-                                Image(systemName: "clock.arrow.circlepath")
-                            }
+                TimelineTab()
+                    .tag(WorkspaceTab.timeline)
+                    .tabItem {
+                        Label {
+                            Text(localizationManager.localized("tab.timeline"))
+                        } icon: {
+                            Image(systemName: "clock.arrow.circlepath")
                         }
+                    }
 
-                    NotificationTab()
-                        .tag(WorkspaceTab.notifications)
-                        .tabItem {
-                            Label {
-                                Text(localizationManager.localized("tab.notifications"))
-                            } icon: {
-                                Image(systemName: "bell")
-                            }
+                NotificationTab()
+                    .tag(WorkspaceTab.notifications)
+                    .tabItem {
+                        Label {
+                            Text(localizationManager.localized("tab.notifications"))
+                        } icon: {
+                            Image(systemName: "bell")
                         }
+                    }
 
-                    ChatTab()
-                        .tag(WorkspaceTab.chat)
-                        .tabItem {
-                            Label {
-                                Text(localizationManager.localized("tab.chat"))
-                            } icon: {
-                                Image(systemName: "bubble.left.and.bubble.right")
-                            }
+                ChatTab()
+                    .tag(WorkspaceTab.chat)
+                    .tabItem {
+                        Label {
+                            Text(localizationManager.localized("tab.chat"))
+                        } icon: {
+                            Image(systemName: "bubble.left.and.bubble.right")
                         }
-                }
+                    }
 
-                // MARK: Info Tab (always visible)
+                // MARK: Info Tab
 
                 InfoView()
                     .tag(WorkspaceTab.info)
@@ -151,7 +139,7 @@ struct RootView: View {
                         }
                     }
 
-                // MARK: Settings Tab (always visible)
+                // MARK: Settings Tab
 
                 SettingsView()
                     .tag(WorkspaceTab.settings)
@@ -163,7 +151,7 @@ struct RootView: View {
                         }
                     }
 
-                // MARK: Accounts Tab (always visible)
+                // MARK: Accounts Tab
 
                 AccountTabView()
                     .tag(WorkspaceTab.account)
@@ -181,16 +169,6 @@ struct RootView: View {
             .preferredColorScheme(preferredScheme)
             .environment(\.locale, localizationManager.locale)
             .environment(\.layoutDirection, localizationManager.layoutDirection)
-
-            // MARK: Beta Gate — Tab Reset
-
-            // When beta features are disabled and the current tab is one of the
-            // beta-only tabs, reset to the Moderation tab to prevent a blank view.
-            .onChange(of: showBetaFeatures) { _, newValue in
-                if !newValue, workspaceStore.selectedTab == .timeline || workspaceStore.selectedTab == .notifications || workspaceStore.selectedTab == .chat {
-                    workspaceStore.selectedTab = .moderation
-                }
-            }
 
             // MARK: Onboarding Sheet
 

@@ -7,12 +7,16 @@ struct NotificationTab: View {
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @StateObject private var viewModel = NotificationViewModel()
     @State private var selectedActor: BlueskyActor?
+    @State private var navigationPath = NavigationPath()
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var mutedWordsStore: MutedWordsStore
+    @EnvironmentObject private var analyticsStore: AnalyticsStore
 
     // MARK: - Body
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             Group {
                 switch viewModel.state {
                 case .initialLoading:
@@ -34,6 +38,17 @@ struct NotificationTab: View {
                 }
             }
             .pageTitle(loc("notifications.title"))
+            .navigationDestination(for: TimelineRoute.self) { route in
+                switch route {
+                case let .thread(postURI):
+                    ThreadView(postURI: postURI)
+                        .environmentObject(accountStore)
+                        .environmentObject(blueskyClient)
+                        .environmentObject(workspaceStore)
+                        .environmentObject(mutedWordsStore)
+                        .environmentObject(analyticsStore)
+                }
+            }
             .sheet(item: $selectedActor) { actor in
                 NavigationStack {
                     BlueskyProfileView(
@@ -73,6 +88,11 @@ struct NotificationTab: View {
                     relatedPost: entry.relatedPost,
                     onAuthorTap: {
                         openProfile(for: entry)
+                    },
+                    onPostTap: {
+                        if let uri = entry.relatedPost?.uri ?? entry.relatedPostURI {
+                            navigationPath.append(TimelineRoute.thread(postURI: uri))
+                        }
                     }
                 )
                 .onAppear {

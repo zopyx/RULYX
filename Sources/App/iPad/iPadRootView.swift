@@ -18,8 +18,6 @@ struct iPadRootView: View {
 
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
-    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
-
     private var preferredScheme: ColorScheme? {
         switch appearanceMode {
         case "light": .light
@@ -47,11 +45,6 @@ struct iPadRootView: View {
             .environment(\.layoutDirection, localizationManager.layoutDirection)
             .tint(clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7))
             .environmentObject(navState)
-        }
-        .onChange(of: showBetaFeatures) { _, newValue in
-            if !newValue, let selection = navState.sidebarSelection, selection.isBetaGated {
-                navState.sidebarSelection = .allLists
-            }
         }
         .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
             onboardingSheet

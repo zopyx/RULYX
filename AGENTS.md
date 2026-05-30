@@ -35,8 +35,8 @@ bundle exec fastlane ios resize_screenshots  # or:
 ### How it works
 
 **Test structure** (`UITests/ScreenshotTests.swift`):
-- `testCaptureCoreTabs` — launches without beta features, captures Moderation, Info, Settings, Accounts (4 always-visible tabs)
-- `testCaptureBetaTabs` — launches with `-showBetaFeatures 1`, captures Moderation, Timeline, Notifications, Chat (the 4 beta tabs)
+- `testCaptureCoreTabs` — launches without beta features, captures Moderation, Timeline, Chat, Info, Settings, Accounts (6 always-visible tabs)
+- `testCaptureBetaTabs` — launches with `-showBetaFeatures 1`, captures Moderation, Timeline, Notifications, Chat (beta tabs include Notifications)
 
 iOS tab bars show at most 5 tabs before placing extras in a "More" list, so the two tests split the 7 total tabs cleanly.
 

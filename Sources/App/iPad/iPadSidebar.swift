@@ -3,7 +3,6 @@ import SwiftUI
 struct iPadSidebar: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @Binding var selection: SidebarItem?
-    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
 
     var body: some View {
         List(selection: $selection) {
@@ -25,15 +24,13 @@ struct iPadSidebar: View {
                 Text(sectionLabel(.searchProfiles))
             }
 
-            if showBetaFeatures {
-                Section {
-                    ForEach(SidebarSection.socialItems, id: \.self) { item in
-                        sidebarLabel(for: item)
-                            .tag(item)
-                    }
-                } header: {
-                    Text(sectionLabel(.social))
+            Section {
+                ForEach(SidebarSection.socialItems, id: \.self) { item in
+                    sidebarLabel(for: item)
+                        .tag(item)
                 }
+            } header: {
+                Text(sectionLabel(.social))
             }
 
             Section {

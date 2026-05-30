@@ -9,6 +9,7 @@ struct NotificationRow: View {
     let notification: NotificationItem
     let relatedPost: RichPost?
     let onAuthorTap: () -> Void
+    let onPostTap: (() -> Void)?
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     // MARK: - Body
@@ -110,6 +111,7 @@ struct NotificationRow: View {
             entry: RichFeedEntry(post: post),
             style: .card,
             callbacks: PostRowCallbacks(
+                onTapThread: onPostTap,
                 onTapImage: nil,
                 onPlayVideo: nil
             )

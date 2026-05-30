@@ -22,7 +22,6 @@ struct BlueskyProfileView: View {
 
     // MARK: - Properties
 
-    @AppStorage("showBetaFeatures") private var showBetaFeatures = false
     @State private var isShowingAvatarPreview = false // Full-screen avatar overlay
     @State private var showPostBrowser = false // Posts browser sheet
     @State private var showMediaBrowser = false // Media browser sheet
@@ -949,12 +948,11 @@ struct BlueskyProfileView: View {
                                 .foregroundStyle(.secondary)
                         }
 
-                        if showBetaFeatures {
-                            let isBlockingThem = profile.viewerState?.isBlocking == true || (profile.viewerState?.blockingByListName.isEmpty == false)
-                            let isBlockedByThem = profile.viewerState?.blockedBy == true
-                            let isMutualFollow = profile.viewerState?.isFollowing == true && profile.viewerState?.followsYou == true
-                            let shouldDisableDM = isBlockingThem || isBlockedByThem || isMutualFollow
-                            Button {
+                        let isBlockingThem = profile.viewerState?.isBlocking == true || (profile.viewerState?.blockingByListName.isEmpty == false)
+                        let isBlockedByThem = profile.viewerState?.blockedBy == true
+                        let isMutualFollow = profile.viewerState?.isFollowing == true && profile.viewerState?.followsYou == true
+                        let shouldDisableDM = isBlockingThem || isBlockedByThem || isMutualFollow
+                        Button {
                                 Task {
                                     chatStore.setAccount(account, appPassword: appPassword)
                                     if let convo = await chatStore.getOrCreateConvo(memberDID: member.actor.did) {
@@ -984,19 +982,18 @@ struct BlueskyProfileView: View {
                                 Text(loc("profile.dm_blocked_by_notice"))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                            } else if isMutualFollow {
+                                } else if isMutualFollow {
                                 Text(loc("profile.dm_mutual_notice"))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-                        }
 
                     } header: {
                         Text(loc: "profile.actions_section")
                     }
                 }
 
-                if isOwnProfile, showBetaFeatures {
+                if isOwnProfile {
                     Section {
                         if !clearskyHeartbeat.isClearskyAvailable {
                             ClearskyBanner()
@@ -1235,7 +1232,7 @@ struct BlueskyProfileView: View {
         .onChange(of: clearskyHeartbeat.isClearskyAvailable) { _, isAvailable in
             if !isAvailable {
                 resetBlockBackCounts()
-            } else if isOwnProfile, showBetaFeatures {
+            } else if isOwnProfile {
                 Task { await fetchBlockCounts() }
             }
         }
@@ -1488,7 +1485,7 @@ struct BlueskyProfileView: View {
     private func fetchBlockCounts() async {
         guard let account = accountStore.activeAccount,
               accountStore.appPassword(for: account) != nil else { return }
-        guard isOwnProfile, showBetaFeatures else {
+        guard isOwnProfile else {
             resetBlockBackCounts()
             return
         }
@@ -1511,7 +1508,7 @@ struct BlueskyProfileView: View {
     private func fetchBlockPreview() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        guard isOwnProfile, showBetaFeatures, clearskyHeartbeat.isClearskyAvailable else { return }
+        guard isOwnProfile, clearskyHeartbeat.isClearskyAvailable else { return }
         isFetchingBlockPreview = true
         showBlockBackPreview = true
         do {

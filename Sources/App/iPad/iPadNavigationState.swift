@@ -17,13 +17,6 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case accounts
     case info
 
-    var isBetaGated: Bool {
-        switch self {
-        case .timeline, .notifications, .chat: true
-        default: false
-        }
-    }
-
     var section: SidebarSection {
         switch self {
         case .allLists, .templates, .rules, .dashboard, .relationships:
