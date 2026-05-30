@@ -175,7 +175,8 @@ final class ModerationAuditStore: ObservableObject {
 
         // Skip writing a new snapshot if the membership is identical.
         if let previousSnapshot,
-           previousSnapshot.members == currentMembers {
+           previousSnapshot.members == currentMembers
+        {
             AppLogger.persistence.debug("Skipped snapshot write for list '\(list.name, privacy: .public)' because membership was unchanged.")
             return ListMembershipSnapshotSummary(
                 listID: list.id,
@@ -261,12 +262,14 @@ final class ModerationAuditStore: ObservableObject {
     /// Loads snapshots and operation log from UserDefaults.
     private func load() {
         if let data = defaults.data(forKey: snapshotsKey),
-           let decoded = try? JSONDecoder().decode([String: [ListMembershipSnapshot]].self, from: data) {
+           let decoded = try? JSONDecoder().decode([String: [ListMembershipSnapshot]].self, from: data)
+        {
             snapshotsByListID = decoded
         }
 
         if let data = defaults.data(forKey: operationLogKey),
-           let decoded = try? JSONDecoder().decode([ModerationOperationLogEntry].self, from: data) {
+           let decoded = try? JSONDecoder().decode([ModerationOperationLogEntry].self, from: data)
+        {
             operationLog = decoded.sorted { $0.createdAt > $1.createdAt }
         }
     }

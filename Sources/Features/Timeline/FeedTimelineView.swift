@@ -86,7 +86,8 @@ struct FeedTimelineView: View {
         }
         .sheet(isPresented: $showNewPostComposer) {
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account) {
+               let appPassword = accountStore.appPassword(for: account)
+            {
                 ComposePostView(
                     account: account,
                     appPassword: appPassword,
@@ -124,7 +125,8 @@ struct FeedTimelineView: View {
         }
         .sheet(item: $editPostEntry) { entry in
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account) {
+               let appPassword = accountStore.appPassword(for: account)
+            {
                 ComposePostView(
                     account: account,
                     appPassword: appPassword,
@@ -654,68 +656,6 @@ private struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_: UIActivityViewController, context _: Context) {}
-}
-
-private struct InlineReplyRow: View {
-    let node: ThreadNode
-    var onNavigateToThread: (() -> Void)?
-
-    var body: some View {
-        let author = node.post.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
-        let record = node.post.record ?? RichRecord(text: "", createdAt: "")
-
-        Button {
-            onNavigateToThread?()
-        } label: {
-            HStack(alignment: .top, spacing: 8) {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 2)
-                    .frame(maxHeight: .infinity)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 4) {
-                        if let avatarURL = author.avatar.flatMap(URL.init) {
-                            AsyncImage(url: avatarURL) { image in
-                                image.resizable().scaledToFill()
-                            } placeholder: {
-                                Circle().fill(Color.skyPrimary.opacity(0.16))
-                            }
-                            .frame(width: 20, height: 20)
-                            .clipShape(Circle())
-                        }
-                        Text(author.displayName ?? author.handle ?? "")
-                            .font(.caption.weight(.semibold))
-                            .lineLimit(1)
-                        if let handle = author.handle {
-                            Text("@\(handle)")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                                .lineLimit(1)
-                        }
-                        Spacer()
-                        if node.post.likeCount.map({ $0 > 0 }) ?? false {
-                            HStack(spacing: 2) {
-                                Image(systemName: "heart")
-                                    .font(.caption2)
-                                Text("\(node.post.likeCount ?? 0)")
-                                    .font(.caption2)
-                            }
-                            .foregroundStyle(.tertiary)
-                        }
-                    }
-                    if let text = record.text, !text.isEmpty {
-                        Text(text)
-                            .font(.subheadline)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-                    }
-                }
-            }
-        }
-        .buttonStyle(.plain)
-        .padding(.vertical, 4)
-    }
 }
 
 #Preview {

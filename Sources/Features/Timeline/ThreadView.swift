@@ -14,18 +14,6 @@ struct ThreadView: View {
     @State private var composeContext: ComposeContext?
     @StateObject private var likerActions = PostLikerActionsManager()
 
-    // MARK: - Computed properties
-
-    private var mentionURLHandler: OpenURLAction {
-        OpenURLAction { url in
-            if url.scheme == "mention", let handle = url.host {
-                openProfile(handle)
-                return .handled
-            }
-            return .systemAction
-        }
-    }
-
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
 
@@ -42,33 +30,60 @@ struct ThreadView: View {
                     description: Text(error)
                 )
             } else if let thread = viewModel.thread {
-                let ancestors = collectAncestors(from: thread)
-                let hasAncestors = !ancestors.isEmpty
-                let reversedAncestors = Array(ancestors.reversed())
-                List {
-                    threadPostSection(thread.post)
+                if thread.post.isBlocked {
+                    ContentUnavailableView(
+                        loc("thread.blocked.title"),
+                        systemImage: "hand.raised.slash",
+                        description: Text(loc: "thread.blocked.desc")
+                    )
+                } else if thread.post.isNotFound {
+                    ContentUnavailableView(
+                        loc("thread.not_found.title"),
+                        systemImage: "trash.slash",
+                        description: Text(loc: "thread.not_found.desc")
+                    )
+                } else {
+                    let ancestors = collectAncestors(from: thread)
+                    let hasAncestors = !ancestors.isEmpty
+                    let reversedAncestors = Array(ancestors.reversed())
+                    List {
+                        PostRowView(
+                            entry: RichFeedEntry(threadPost: thread.post),
+                            style: .full,
+                            callbacks: threadCallbacks(for: thread.post),
+                            avatarSize: 40
+                        )
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
 
-                    if hasAncestors {
-                        Section {
-                            ForEach(Array(reversedAncestors.enumerated()), id: \.offset) { index, ancestor in
-                                ancestorRow(ancestor, isFirst: index == 0, isLast: index == ancestors.count - 1)
+                        if hasAncestors {
+                            Section {
+                                ForEach(Array(reversedAncestors.enumerated()), id: \.offset) { index, ancestor in
+                                    threadConnectorRow(
+                                        node: ancestor,
+                                        style: .ancestor(
+                                            isFirst: index == 0,
+                                            isLast: index == ancestors.count - 1
+                                        )
+                                    )
+                                }
+                            } header: {
+                                Text(loc: "profile.posts.replying_to")
                             }
-                        } header: {
-                            Text(loc: "profile.posts.replying_to")
+                        }
+
+                        if let replies = thread.replies, !replies.isEmpty {
+                            Section {
+                                ForEach(Array(replies.enumerated()), id: \.offset) { index, reply in
+                                    replyTreeNode(reply, depth: 0, isLast: index == replies.count - 1)
+                                }
+                            } header: {
+                                Text(loc: "profile.posts.replies")
+                            }
                         }
                     }
-
-                    if let replies = thread.replies, !replies.isEmpty {
-                        Section {
-                            ForEach(Array(replies.enumerated()), id: \.offset) { index, reply in
-                                replyThreadRow(reply, depth: 0, isLast: index == replies.count - 1)
-                            }
-                        } header: {
-                            Text(loc: "profile.posts.replies")
-                        }
-                    }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
             }
         }
         .pageTitle(loc("profile.posts.thread"))
@@ -127,6 +142,8 @@ struct ThreadView: View {
         .postLikerActions(manager: likerActions)
     }
 
+    // MARK: - Helpers
+
     private func collectAncestors(from node: ThreadNode) -> [ThreadNode] {
         var ancestors: [ThreadNode] = []
         var current = node
@@ -149,18 +166,101 @@ struct ThreadView: View {
         uri.dropFirst("at://".count).split(separator: "/").first.map(String.init) ?? uri
     }
 
-    // MARK: - Shared Helpers
+    // MARK: - Thread Row Components
 
-    private func threadAuthor(_ node: ThreadPostNode) -> RichAuthor {
-        node.author ?? RichAuthor(did: "", handle: "unknown", displayName: nil, avatar: nil)
+    private enum ConnectorStyle {
+        case ancestor(isFirst: Bool, isLast: Bool)
+        case reply(depth: Int, isLast: Bool)
     }
 
-    private func threadRecord(_ node: ThreadPostNode) -> RichRecord {
-        node.record ?? RichRecord(text: "", createdAt: "")
+    private func threadConnectorRow(node: ThreadNode, style: ConnectorStyle) -> some View {
+        let depth: Int = {
+            if case let .reply(d, _) = style { return d }
+            return 0
+        }()
+
+        return HStack(spacing: 6) {
+            connectorLine(style: style, depth: depth)
+                .padding(.leading, CGFloat(depth) * 16)
+
+            PostRowView(
+                entry: RichFeedEntry(threadPost: node.post),
+                style: .threadReply,
+                callbacks: ancestorCallbacks(for: node.post),
+                avatarSize: 28
+            )
+        }
+        .padding(.vertical, 4)
+        .listRowSeparator(.hidden)
     }
+
+    @ViewBuilder
+    private func connectorLine(style: ConnectorStyle, depth _: Int) -> some View {
+        let color: Color = {
+            if case let .reply(d, _) = style {
+                let opacity = max(0.08, 0.3 - Double(d) * 0.06)
+                return Color.gray.opacity(opacity)
+            }
+            return Color.gray.opacity(0.25)
+        }()
+
+        VStack(spacing: 0) {
+            if case let .ancestor(isFirst, _) = style, isFirst {
+                Rectangle()
+                    .fill(color)
+                    .frame(width: 2, height: 8)
+            }
+            Rectangle()
+                .fill(color)
+                .frame(width: 2)
+                .frame(maxHeight: .infinity)
+            if case let .ancestor(_, isLast) = style, isLast {
+                Rectangle()
+                    .fill(color)
+                    .frame(width: 2, height: 8)
+            }
+            if case let .reply(_, isLast) = style, !isLast {
+                Rectangle()
+                    .fill(color)
+                    .frame(width: 2, height: 8)
+            }
+        }
+        .frame(width: 2)
+    }
+
+    private func replyTreeNode(_ node: ThreadNode, depth: Int, isLast: Bool) -> AnyView {
+        AnyView(
+            Group {
+                threadConnectorRow(
+                    node: node,
+                    style: .reply(depth: depth, isLast: isLast)
+                )
+
+                if let replies = node.replies, !replies.isEmpty {
+                    ForEach(Array(replies.enumerated()), id: \.offset) { index, child in
+                        replyTreeNode(child, depth: depth + 1, isLast: index == replies.count - 1)
+                    }
+                }
+            }
+        )
+    }
+
+    // MARK: - Callbacks
 
     private func threadCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
         PostRowCallbacks(
+            onTapImage: { index in
+                let allImages = post.embed?.images ?? []
+                let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                guard index < urls.count else { return }
+                imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+            },
+            onPlayVideo: {
+                if let playlist = post.embed?.video?.playlist, let url = URL(string: playlist) {
+                    videoPreviewURL = url
+                }
+            },
+            onOpenProfile: { handle in openProfile(handle) },
             onReply: { composeContext = makeReplyContext(uri: post.uri, cid: post.cid) },
             onLike: { performLike(uri: post.uri, cid: post.cid) },
             onShowLikes: { if let uri = post.uri { showLikesForURI = uri } },
@@ -196,279 +296,11 @@ struct ThreadView: View {
         )
     }
 
-    // MARK: - Ancestor Row
-
-    @ViewBuilder
-    private func ancestorRow(_ node: ThreadNode, isFirst: Bool = false, isLast: Bool = false) -> some View {
-        let author = threadAuthor(node.post)
-        let record = threadRecord(node.post)
-
-        HStack(spacing: 8) {
-            VStack(spacing: 0) {
-                if isFirst {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.25))
-                        .frame(width: 2, height: 8)
-                }
-                Rectangle()
-                    .fill(Color.gray.opacity(0.25))
-                    .frame(width: 2)
-                    .frame(maxHeight: .infinity)
-                if isLast {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.25))
-                        .frame(width: 2, height: 8)
-                }
-            }
-            .frame(width: 2)
-
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    if let avatar = author.avatar.flatMap(URL.init) {
-                        AsyncImage(url: avatar) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            Circle().fill(Color.skyPrimary.opacity(0.16))
-                        }
-                        .frame(width: 28, height: 28)
-                        .clipShape(Circle())
-                    } else {
-                        Circle()
-                            .fill(Color.skyPrimary.opacity(0.16))
-                            .frame(width: 28, height: 28)
-                            .overlay {
-                                Text((author.displayName ?? author.handle ?? "?").prefix(1).uppercased())
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(Color.skyPrimary)
-                            }
-                    }
-                    Text(author.displayName ?? author.handle ?? "")
-                        .font(.caption.weight(.semibold))
-                        .lineLimit(1)
-                    if let handle = author.handle {
-                        Text("@\(handle)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                    Spacer()
-                    if let created = record.createdAt, let date = parseDate(created) {
-                        Text(relativeTimeString(from: date))
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                    postMenu(for: record.text)
-                }
-                if let text = record.text, !text.isEmpty {
-                    PostTextContent(
-                        text: text,
-                        onOpenProfile: { handle in openProfile(handle) },
-                        font: .subheadline,
-                        lineLimit: 3,
-                        foregroundStyle: .secondary
-                    )
-                }
-                if let embed = node.post.embed {
-                    PostEmbedView(
-                        embed: embed,
-                        onTapImage: { index in
-                            let allImages = embed.images ?? []
-                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                            guard index < urls.count else { return }
-                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                        },
-                        onPlayVideo: {
-                            if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
-                                videoPreviewURL = url
-                            }
-                        }
-                    )
-                }
-            }
-        }
-        .padding(.vertical, 4)
-        .listRowSeparator(.hidden)
-    }
-
-    // MARK: - Thread Post
-
-    private func threadPostSection(_ post: ThreadPostNode) -> some View {
-        let author = threadAuthor(post)
-        let record = threadRecord(post)
-        let callbacks = threadCallbacks(for: post)
-
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                if let avatar = author.avatar.flatMap(URL.init) {
-                    AsyncImage(url: avatar) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Circle().fill(Color.skyPrimary.opacity(0.16))
-                    }
-                    .frame(width: 40, height: 40)
-                    .clipShape(Circle())
-                } else {
-                    Circle()
-                        .fill(Color.skyPrimary.opacity(0.16))
-                        .frame(width: 40, height: 40)
-                        .overlay {
-                            Text((author.displayName ?? author.handle ?? "?").prefix(1).uppercased())
-                                .font(.title3.weight(.bold))
-                                .foregroundStyle(Color.skyPrimary)
-                        }
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(author.displayName ?? author.handle ?? "")
-                        .font(.subheadline.weight(.semibold))
-                    if let handle = author.handle {
-                        Text("@\(handle)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
-                if let created = record.createdAt, let date = parseDate(created) {
-                    Text(relativeTimeString(from: date))
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-            if let text = record.text, !text.isEmpty {
-                PostTextContent(
-                    text: text,
-                    onOpenProfile: { handle in openProfile(handle) }
-                )
-            }
-            if let embed = post.embed {
-                PostEmbedView(
-                    embed: embed,
-                    onTapImage: { index in
-                        let allImages = embed.images ?? []
-                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                        guard index < urls.count else { return }
-                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                    },
-                    onPlayVideo: {
-                        if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
-                            videoPreviewURL = url
-                        }
-                    }
-                )
-            }
-            PostActionBar(
-                replyCount: post.replyCount,
-                repostCount: post.repostCount,
-                likeCount: post.likeCount,
-                isLiked: post.isLikedByMe,
-                isReposted: post.isRepostedByMe,
-                callbacks: callbacks
-            )
-        }
-        .padding(.vertical, 8)
-    }
-
-    // MARK: - Reply Row
-
-    private func threadLineColor(for depth: Int) -> Color {
-        let opacity = max(0.08, 0.3 - Double(depth) * 0.06)
-        return Color.gray.opacity(opacity)
-    }
-
-    private func replyThreadRow(_ reply: ThreadNode, depth: Int, isLast: Bool) -> AnyView {
-        let author = threadAuthor(reply.post)
-        let record = threadRecord(reply.post)
-        let callbacks = threadCallbacks(for: reply.post)
-
-        let content = HStack(spacing: 6) {
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(threadLineColor(for: depth))
-                    .frame(width: 2)
-                    .frame(maxHeight: .infinity)
-                if !isLast {
-                    Rectangle()
-                        .fill(threadLineColor(for: depth))
-                        .frame(width: 2, height: 8)
-                }
-            }
-            .frame(width: 2)
-            .padding(.leading, CGFloat(depth) * 16)
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 6) {
-                    if let avatar = author.avatar.flatMap(URL.init) {
-                        AsyncImage(url: avatar) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            Circle().fill(Color.skyPrimary.opacity(0.16))
-                        }
-                        .frame(width: 28, height: 28)
-                        .clipShape(Circle())
-                    } else {
-                        Circle()
-                            .fill(Color.skyPrimary.opacity(0.16))
-                            .frame(width: 28, height: 28)
-                            .overlay {
-                                Text((author.handle ?? "?").prefix(1).uppercased())
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(Color.skyPrimary)
-                            }
-                    }
-                    Text(author.displayName ?? author.handle ?? "")
-                        .font(.caption.weight(.semibold))
-                    if let handle = author.handle {
-                        Text("@\(handle)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    if let created = record.createdAt, let date = parseDate(created) {
-                        Text(relativeTimeString(from: date))
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                if let text = record.text, !text.isEmpty {
-                    PostTextContent(
-                        text: text,
-                        onOpenProfile: { handle in openProfile(handle) },
-                        font: .subheadline,
-                        lineLimit: 10
-                    )
-                }
-                if let embed = reply.post.embed {
-                    PostEmbedView(
-                        embed: embed,
-                        onTapImage: { index in
-                            let allImages = embed.images ?? []
-                            let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                            guard index < urls.count else { return }
-                            imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                        },
-                        onPlayVideo: {
-                            if let playlist = embed.video?.playlist, let url = URL(string: playlist) {
-                                videoPreviewURL = url
-                            }
-                        }
-                    )
-                }
-                PostActionBar(
-                    replyCount: reply.post.replyCount,
-                    repostCount: reply.post.repostCount,
-                    likeCount: reply.post.likeCount,
-                    isLiked: reply.post.isLikedByMe,
-                    isReposted: reply.post.isRepostedByMe,
-                    callbacks: callbacks
-                )
-                if let replies = reply.replies, !replies.isEmpty {
-                    ForEach(Array(replies.enumerated()), id: \.offset) { index, child in
-                        replyThreadRow(child, depth: depth + 1, isLast: index == replies.count - 1)
-                    }
-                }
-            }
-        }
-        .listRowSeparator(.hidden)
-        return AnyView(content)
+    private func ancestorCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
+        PostRowCallbacks(
+            onCopy: { UIPasteboard.general.string = post.record?.text },
+            onTranslate: { translateText(post.record?.text ?? "") }
+        )
     }
 
     // MARK: - Actions
@@ -574,26 +406,6 @@ struct ThreadView: View {
         return nil
     }
 
-    private func postMenu(for text: String?) -> some View {
-        Menu {
-            Button {
-                UIPasteboard.general.string = text
-            } label: {
-                Label("post.copy", systemImage: "doc.on.doc")
-            }
-            Button {
-                translateText(text ?? "")
-            } label: {
-                Label("post.translate", systemImage: "globe")
-            }
-        } label: {
-            Image(systemName: "gearshape")
-                .font(.body.weight(.medium))
-                .foregroundStyle(.tertiary)
-                .padding(.leading, 4)
-        }
-    }
-
     private func openProfile(_ handle: String) {
         guard let url = URL(string: "https://bsky.app/profile/\(handle)") else { return }
         UIApplication.shared.open(url)
@@ -611,16 +423,12 @@ struct ThreadView: View {
 /// Fetches the full thread via `fetchPostThread` and exposes `thread`, `isLoading`, and `errorMessage`.
 @MainActor
 final class ThreadViewModel: ObservableObject {
-    // MARK: - Properties
-
     /// The loaded thread node containing the post and its replies.
     @Published private(set) var thread: ThreadNode?
     /// True while the thread is loading. Starts as `true`.
     @Published private(set) var isLoading = true
     /// User-facing error message.
     @Published var errorMessage: String?
-
-    // MARK: - Public Methods
 
     /// Handles the case where credentials are missing, showing a localized error.
     func handleMissingCredentials() {

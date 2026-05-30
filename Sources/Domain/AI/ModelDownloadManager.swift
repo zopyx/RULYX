@@ -50,7 +50,8 @@ struct ModelFileManager {
         var total: UInt64 = 0
         for case let url as URL in enumerator {
             if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
-               let size = attrs[.size] as? UInt64 {
+               let size = attrs[.size] as? UInt64
+            {
                 total += size
             }
         }

@@ -25,6 +25,7 @@ struct PostReplyContextView: View {
                         Text(parentAuthor.displayName ?? parentAuthor.handle ?? "")
                             .font(.caption2.weight(.semibold))
                             .lineLimit(1)
+                            .foregroundStyle(.primary)
                         if let handle = parentAuthor.handle {
                             Text("@\(handle)")
                                 .font(.caption2)

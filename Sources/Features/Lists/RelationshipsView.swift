@@ -281,7 +281,8 @@ struct RelationshipsView: View {
         .sheet(isPresented: $isShowingListPicker) {
             if let actor = selectedActorForList,
                let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account) {
+               let appPassword = accountStore.appPassword(for: account)
+            {
                 ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: blueskyClient)
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)

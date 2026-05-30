@@ -106,111 +106,13 @@ struct NotificationRow: View {
 
     /// Inline preview card for the post associated with this notification.
     private func relatedPostCard(_ post: RichPost) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                smallAvatar(for: post.safeAuthor)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(post.safeAuthor.displayName ?? post.safeAuthor.handle ?? "")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                    if let handle = post.safeAuthor.handle {
-                        Text("@\(handle)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                Spacer()
-                if let createdAt = post.safeRecord.createdAt,
-                   let createdDate = parseDate(createdAt) {
-                    Text(relativeTimeString(from: createdDate))
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-
-            if let text = post.safeRecord.text, !text.isEmpty {
-                PostTextContent(
-                    text: text.replacingOccurrences(of: "\n", with: " "),
-                    font: .caption,
-                    lineLimit: 4
-                )
-            }
-
-            if let imageURL = previewImageURL(for: post) {
-                ThumbnailImageView(url: imageURL, maxPixelSize: 320) {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.skyPrimary.opacity(0.08))
-                }
-                .scaledToFill()
-                .frame(maxWidth: .infinity)
-                .frame(height: 140)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-            } else if let external = post.embed?.external {
-                HStack(spacing: 8) {
-                    Image(systemName: "link")
-                        .foregroundStyle(.secondary)
-                    Text(external.title ?? external.uri ?? "")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(8)
-                .background(Color.skyPrimary.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
-            } else if post.embed?.video != nil {
-                HStack(spacing: 8) {
-                    Image(systemName: "play.rectangle.fill")
-                        .foregroundStyle(Color.skyPrimary)
-                    Text(loc: "media.filter.videos")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(8)
-                .background(Color.skyPrimary.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
-            }
-        }
-        .padding(10)
-        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.primary.opacity(0.05), lineWidth: 1)
-        }
-    }
-
-    /// Small avatar thumbnail for the post author in the related post card.
-    private func smallAvatar(for author: RichAuthor) -> some View {
-        Group {
-            if let avatarURL = author.avatar.flatMap(URL.init) {
-                ThumbnailImageView(url: avatarURL, maxPixelSize: 64) {
-                    Circle().fill(Color.skyPrimary.opacity(0.16))
-                }
-                .scaledToFill()
-            } else {
-                Circle()
-                    .fill(Color.skyPrimary.opacity(0.16))
-                    .overlay {
-                        Text((author.displayName ?? author.handle ?? "?").prefix(1).uppercased())
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(Color.skyPrimary)
-                    }
-            }
-        }
-        .frame(width: 24, height: 24)
-        .clipShape(Circle())
-    }
-
-    /// Extracts the first image thumb or fullsize URL from the embed.
-    private func previewImageURL(for post: RichPost) -> URL? {
-        if let thumb = post.embed?.images?.first?.thumb.flatMap(URL.init) {
-            return thumb
-        }
-        if let fullsize = post.embed?.images?.first?.fullsize.flatMap(URL.init) {
-            return fullsize
-        }
-        return nil
+        PostRowView(
+            entry: RichFeedEntry(post: post),
+            style: .card,
+            callbacks: PostRowCallbacks(
+                onTapImage: nil,
+                onPlayVideo: nil
+            )
+        )
     }
 }

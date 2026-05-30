@@ -358,7 +358,8 @@ struct AccountTabView: View {
     @ViewBuilder
     private var preferredSearchRow: some View {
         if let prefID = accountStore.preferredSearchAccountID,
-           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+        {
             AccountRowView(
                 account: prefAccount,
                 isActive: prefAccount.id == accountStore.activeAccountID,

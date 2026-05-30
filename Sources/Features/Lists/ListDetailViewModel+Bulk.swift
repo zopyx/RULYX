@@ -455,7 +455,8 @@ extension ListDetailViewModel {
                 )
 
                 if result.operation == .move,
-                   let member = members.first(where: { $0.actor.did == actor.did }) {
+                   let member = members.first(where: { $0.actor.did == actor.did })
+                {
                     try await client.removeMember(
                         recordURI: member.recordURI,
                         account: account,

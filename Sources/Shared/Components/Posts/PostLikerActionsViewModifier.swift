@@ -61,7 +61,8 @@ struct PostLikerActionsViewModifier: ViewModifier {
             ) {
                 Button(loc("post.block_likers.confirm_block"), role: .destructive) {
                     if let account = accountStore.activeAccount,
-                       let appPassword = accountStore.appPassword(for: account) {
+                       let appPassword = accountStore.appPassword(for: account)
+                    {
                         manager.confirmBlockLikers(activeAccount: account, activePassword: appPassword)
                     }
                 }

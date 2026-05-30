@@ -149,7 +149,8 @@ struct InfoView: View {
     private var buildDate: String {
         if let url = Bundle.main.executableURL,
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
-           let date = attrs[.modificationDate] as? Date {
+           let date = attrs[.modificationDate] as? Date
+        {
             return SharedDateFormatters.buildTimestampUTC.string(from: date)
         }
         return "Unknown"
@@ -671,7 +672,8 @@ private struct DebugInfoView: View {
     private var buildDate: String {
         if let url = Bundle.main.executableURL,
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
-           let date = attrs[.modificationDate] as? Date {
+           let date = attrs[.modificationDate] as? Date
+        {
             return SharedDateFormatters.buildTimestampUTC.string(from: date)
         }
         return "Unknown"

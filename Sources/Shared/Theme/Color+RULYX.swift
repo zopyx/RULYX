@@ -6,7 +6,7 @@ extension Color {
     /// Primary brand blue — adapts to light/dark mode.
     static let skyPrimary = Color(uiColor: UIColor { traitCollection in
         traitCollection.userInterfaceStyle == .dark
-            ? UIColor(red: 0.20, green: 0.65, blue: 1.00, alpha: 1.0)
+            ? UIColor(red: 0.40, green: 0.78, blue: 1.00, alpha: 1.0)
             : UIColor(red: 0.07, green: 0.53, blue: 0.98, alpha: 1.0)
     })
 

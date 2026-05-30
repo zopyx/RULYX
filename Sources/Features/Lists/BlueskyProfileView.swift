@@ -70,7 +70,8 @@ struct BlueskyProfileView: View {
     /// Returns the preferred search account or falls back to the active account.
     private var preferredSearchAccount: AppAccount? {
         if let prefID = accountStore.preferredSearchAccountID,
-           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID }) {
+           let prefAccount = accountStore.accounts.first(where: { $0.id == prefID })
+        {
             prefAccount
         } else {
             accountStore.activeAccount
@@ -92,7 +93,8 @@ struct BlueskyProfileView: View {
     var body: some View {
         Group {
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account) {
+               let appPassword = accountStore.appPassword(for: account)
+            {
                 content(account: account, appPassword: appPassword)
             } else {
                 ContentUnavailableView(
@@ -243,7 +245,8 @@ struct BlueskyProfileView: View {
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             if let account = accountStore.activeAccount,
-               let appPassword = accountStore.appPassword(for: account) {
+               let appPassword = accountStore.appPassword(for: account)
+            {
                 SimplifiedReportSheet(
                     title: loc("profile.report"),
                     selectedReason: $viewModel.selectedReportReason,
@@ -299,7 +302,8 @@ struct BlueskyProfileView: View {
         }
         .sheet(isPresented: $showCreateModerationList) {
             if let sheetAccount = accountStore.activeAccount,
-               let sheetAppPassword = accountStore.appPassword(for: sheetAccount) {
+               let sheetAppPassword = accountStore.appPassword(for: sheetAccount)
+            {
                 ListMetadataSheet(mode: .create(kind: .moderation)) { name, description, _ in
                     Task {
                         await viewModel.createListAndAddActor(
@@ -318,7 +322,8 @@ struct BlueskyProfileView: View {
         }
         .sheet(isPresented: $showCreateRegularList) {
             if let sheetAccount = accountStore.activeAccount,
-               let sheetAppPassword = accountStore.appPassword(for: sheetAccount) {
+               let sheetAppPassword = accountStore.appPassword(for: sheetAccount)
+            {
                 ListMetadataSheet(mode: .create(kind: .regular)) { name, description, _ in
                     Task {
                         await viewModel.createListAndAddActor(
@@ -1054,7 +1059,8 @@ struct BlueskyProfileView: View {
                                 }
                                 .padding(.vertical, 4)
                             } else if let blockedBy = blockedByCount,
-                                      let unblocked = unblockedBlockersCount {
+                                      let unblocked = unblockedBlockersCount
+                            {
                                 if blockedBy == 0 {
                                     Label(loc("profile.block_back.none_blocking"), systemImage: "checkmark.circle.fill")
                                         .foregroundStyle(.green)

@@ -334,7 +334,8 @@ struct ListsView: View {
             .sheet(isPresented: $presentationState.isShowingCreateList) {
                 ListMetadataSheet(mode: .create(kind: presentationState.createListKind)) { name, description, kind in
                     if let account = accountStore.activeAccount,
-                       let appPassword = accountStore.appPassword(for: account) {
+                       let appPassword = accountStore.appPassword(for: account)
+                    {
                         Task {
                             do {
                                 let newList = try await blueskyClient.createList(

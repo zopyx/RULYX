@@ -434,7 +434,8 @@ struct ComposePostView: View {
         }
 
         if editReplyTo == nil, let reply = editPost.reply, let rootURI = reply.root?.uri, let rootCID = reply.root?.cid,
-           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid {
+           let parentURI = reply.parent?.uri, let parentCID = reply.parent?.cid
+        {
             editReplyTo = (parentURI, parentCID, rootURI, rootCID)
         }
     }

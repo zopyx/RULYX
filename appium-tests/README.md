@@ -12,8 +12,8 @@ Minimal WebDriverIO + Appium tests for the RULYX iOS app.
 ## Setup
 
 ```bash
-cd appium-tests
-npm install
+appium driver install xcuitest
+cd appium-tests && npm install
 ```
 
 ## Build the app
@@ -25,9 +25,26 @@ xcodebuild -project RULYX.xcodeproj -scheme RULYX \
   -derivedDataPath build build CODE_SIGNING_ALLOWED=NO
 ```
 
+If you already have a build in DerivedData, update the `appium:app` path in `wdio.conf.js`.
+
 ## Run tests
 
+Ensure a simulator is booted:
+
 ```bash
-cd appium-tests
-npm test
+xcrun simctl boot "iPhone 16 Pro Max"
 ```
+
+Then:
+
+```bash
+cd appium-tests && npm test
+```
+
+Tests pass `--uitesting` to the app on launch, which skips onboarding and sets the language to English.
+
+## Tests
+
+| Test | What it does |
+|------|-------------|
+| `launch.spec.js` | Verifies the app launches and all 4 default tabs (Moderation, Info, Settings, Accounts) are visible by accessibility label |

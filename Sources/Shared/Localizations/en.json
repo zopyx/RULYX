@@ -791,7 +791,7 @@
   "chat.select_all": "Select All",
   "profile.direct_message": "Direct Message",
   "profile.dm_blocked_notice": "Messaging is not available — you are blocking this account.",
-"profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
+  "profile.dm_mutual_notice": "Messaging is not available — you both follow each other.",
   "profile.dm_blocked_by_notice": "Messaging is not available — this account is blocking you.",
   "onboarding.close.label": "Close onboarding",
   "info.github.label": "View on GitHub",
@@ -1208,7 +1208,6 @@
   "ai.error.unsupported_role": "Unsupported model role.",
   "ai.error.download_failed": "Download failed.",
   "ai.error.runtime_not_available": "AI runtime not yet available.",
-
   "sidebar.section.moderation": "Moderation",
   "sidebar.section.search_profiles": "Search & Profiles",
   "sidebar.section.social": "Social",
@@ -1228,28 +1227,27 @@
   "sidebar.accounts": "Accounts",
   "sidebar.info": "Info",
   "sidebar.edit": "Edit",
-
   "shortcut.menu.moderation": "Moderation",
   "shortcut.menu.navigate": "Navigate",
   "shortcut.new_list": "New List",
   "shortcut.search": "Search",
   "shortcut.dashboard": "Dashboard",
-
   "context.open_in_new_window": "Open in New Window",
   "context.add_to_list": "Add to List",
   "context.copy_handle": "Copy Handle",
   "context.block_actor": "Block Actor",
   "context.mute_actor": "Mute Actor",
-
   "empty.select_item": "Select an item to inspect",
   "empty.no_selection": "No Selection",
   "empty.select_profile": "Select a profile to view details",
   "empty.select_list": "Select a list to view its members",
-
   "command_palette.placeholder": "Type a command...",
   "command_palette.no_results": "No matching commands",
-
   "drag.add_to_list": "Drop to add to list",
   "drag.drop_list_here": "Drop list here",
-  "drag.import_file": "Drop a file to import"
+  "drag.import_file": "Drop a file to import",
+  "thread.blocked.title": "Post Not Available",
+  "thread.blocked.desc": "This post is from an account that has blocked you or is suspended.",
+  "thread.not_found.title": "Post Not Found",
+  "thread.not_found.desc": "This post may have been deleted or does not exist."
 }

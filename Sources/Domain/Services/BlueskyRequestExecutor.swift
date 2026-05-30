@@ -97,7 +97,8 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
 
         if httpResponse.statusCode == 401 {
             if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data),
-               let errorCode = errorPayload.error {
+               let errorCode = errorPayload.error
+            {
                 if errorCode == "AccountTakedown" || errorCode == "Deactivated" {
                     throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
                 }

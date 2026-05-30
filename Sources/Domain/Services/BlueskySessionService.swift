@@ -288,14 +288,16 @@ final class BlueskySessionService: BlueskySessionServicing {
 
         if let domainEntryway = entrywayFromDomain(for: handle) {
             if let did = try? await resolveHandle(handle, hostURL: domainEntryway),
-               let pdsURL = try? await resolvePDSURL(forDID: did) {
+               let pdsURL = try? await resolvePDSURL(forDID: did)
+            {
                 return pdsURL
             }
             return domainEntryway
         }
 
         if let did = try? await resolveHandle(handle),
-           let pdsURL = try? await resolvePDSURL(forDID: did) {
+           let pdsURL = try? await resolvePDSURL(forDID: did)
+        {
             return pdsURL
         }
 

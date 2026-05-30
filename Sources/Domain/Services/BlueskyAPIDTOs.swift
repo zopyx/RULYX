@@ -621,10 +621,17 @@ struct RichFeedReply: Decodable {
     let parent: RichPost?
 }
 
-/// Viewer-specific state for a post (like/repost status).
+/// Viewer-specific state for a post (like/repost/blocked/muted status).
 struct PostViewerState: Decodable {
     let like: String?
     let repost: String?
+    let blockedBy: Bool?
+
+    init(like: String? = nil, repost: String? = nil, blockedBy: Bool? = nil) {
+        self.like = like
+        self.repost = repost
+        self.blockedBy = blockedBy
+    }
 }
 
 /// A post with full content and metadata for display in the timeline/feed browser.
@@ -858,6 +865,79 @@ final class ThreadNode: Decodable {
         self.parent = parent
         self.replies = replies
     }
+
+    enum ThreadType: String, Decodable {
+        case post = "app.bsky.feed.defs#threadViewPost"
+        case blocked = "app.bsky.feed.defs#blockedPost"
+        case notFound = "app.bsky.feed.defs#notFoundPost"
+    }
+
+    private struct BlockedPostPayload: Decodable {
+        let uri: String?
+        let blocked: Bool?
+        let author: BlockedAuthor?
+    }
+
+    private struct BlockedAuthor: Decodable {
+        let did: String?
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decodeIfPresent(String.self, forKey: .type)
+
+        switch type {
+        case ThreadType.blocked.rawValue:
+            let payload = try BlockedPostPayload(from: decoder)
+            let viewer = PostViewerState(blockedBy: true)
+            let author = payload.author.map {
+                RichAuthor(did: $0.did, handle: nil, displayName: nil, avatar: nil)
+            }
+            post = ThreadPostNode(
+                uri: payload.uri,
+                cid: nil,
+                author: author,
+                record: nil,
+                embed: nil,
+                viewer: viewer,
+                replyCount: nil,
+                repostCount: nil,
+                likeCount: nil,
+                indexedAt: nil,
+                isBlocked: true
+            )
+            parent = nil
+            replies = nil
+
+        case ThreadType.notFound.rawValue:
+            let uri = try container.decodeIfPresent(String.self, forKey: .uri)
+            post = ThreadPostNode(
+                uri: uri,
+                cid: nil,
+                author: nil,
+                record: nil,
+                embed: nil,
+                viewer: nil,
+                replyCount: nil,
+                repostCount: nil,
+                likeCount: nil,
+                indexedAt: nil,
+                isNotFound: true
+            )
+            parent = nil
+            replies = nil
+
+        default:
+            post = try container.decode(ThreadPostNode.self, forKey: .post)
+            parent = try container.decodeIfPresent(ThreadNode.self, forKey: .parent)
+            replies = try container.decodeIfPresent([ThreadNode].self, forKey: .replies)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case post, parent, replies, uri
+    }
 }
 
 /// A post within a thread, with viewer state.
@@ -872,6 +952,8 @@ struct ThreadPostNode: Decodable {
     let repostCount: Int?
     let likeCount: Int?
     let indexedAt: String?
+    let isBlocked: Bool
+    let isNotFound: Bool
 
     var isLikedByMe: Bool {
         viewer?.like != nil
@@ -887,6 +969,55 @@ struct ThreadPostNode: Decodable {
 
     var myRepostURI: String? {
         viewer?.repost
+    }
+
+    init(
+        uri: String? = nil,
+        cid: String? = nil,
+        author: RichAuthor? = nil,
+        record: RichRecord? = nil,
+        embed: RichEmbed? = nil,
+        viewer: PostViewerState? = nil,
+        replyCount: Int? = nil,
+        repostCount: Int? = nil,
+        likeCount: Int? = nil,
+        indexedAt: String? = nil,
+        isBlocked: Bool = false,
+        isNotFound: Bool = false
+    ) {
+        self.uri = uri
+        self.cid = cid
+        self.author = author
+        self.record = record
+        self.embed = embed
+        self.viewer = viewer
+        self.replyCount = replyCount
+        self.repostCount = repostCount
+        self.likeCount = likeCount
+        self.indexedAt = indexedAt
+        self.isBlocked = isBlocked
+        self.isNotFound = isNotFound
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uri, cid, author, record, embed, viewer
+        case replyCount, repostCount, likeCount, indexedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        uri = try container.decodeIfPresent(String.self, forKey: .uri)
+        cid = try container.decodeIfPresent(String.self, forKey: .cid)
+        author = try container.decodeIfPresent(RichAuthor.self, forKey: .author)
+        record = try container.decodeIfPresent(RichRecord.self, forKey: .record)
+        embed = try container.decodeIfPresent(RichEmbed.self, forKey: .embed)
+        viewer = try container.decodeIfPresent(PostViewerState.self, forKey: .viewer)
+        replyCount = try container.decodeIfPresent(Int.self, forKey: .replyCount)
+        repostCount = try container.decodeIfPresent(Int.self, forKey: .repostCount)
+        likeCount = try container.decodeIfPresent(Int.self, forKey: .likeCount)
+        indexedAt = try container.decodeIfPresent(String.self, forKey: .indexedAt)
+        isBlocked = false
+        isNotFound = false
     }
 }
 

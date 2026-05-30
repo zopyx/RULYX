@@ -302,14 +302,16 @@ final class AccountStore: ObservableObject {
             accounts = try JSONDecoder().decode([AppAccount].self, from: data)
             if let activeIDString = defaults.string(forKey: activeAccountKey),
                let activeID = UUID(uuidString: activeIDString),
-               accounts.contains(where: { $0.id == activeID }) {
+               accounts.contains(where: { $0.id == activeID })
+            {
                 activeAccountID = activeID
             } else {
                 activeAccountID = accounts.first?.id
             }
             if let prefIDString = defaults.string(forKey: preferredSearchKey),
                let prefID = UUID(uuidString: prefIDString),
-               accounts.contains(where: { $0.id == prefID }) {
+               accounts.contains(where: { $0.id == prefID })
+            {
                 preferredSearchAccountID = prefID
             }
         } catch {

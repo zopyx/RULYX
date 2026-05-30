@@ -80,3 +80,40 @@ struct PostTextContent: View {
         }
     }
 }
+
+/// Converts @mentions and URLs in post text to tappable attributed links.
+func postAttributedString(from text: String) -> AttributedString {
+    var attributed = AttributedString(text)
+    guard text.contains("@") || text.contains("://") || text.contains("www.") else { return attributed }
+
+    let nsRange = NSRange(text.startIndex..., in: text)
+
+    let mentionRegex = MentionTextRegex.shared
+    for match in mentionRegex.matches(in: text, range: nsRange).reversed() {
+        guard let range = Range(match.range, in: text),
+              let attrRange = Range(match.range, in: attributed) else { continue }
+        let handle = String(text[range].dropFirst())
+        attributed[attrRange].link = URL(string: "mention://\(handle)")
+        attributed[attrRange].foregroundColor = Color.skyPrimary
+        attributed[attrRange].underlineStyle = .single
+    }
+
+    if let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) {
+        for match in detector.matches(in: text, range: nsRange).reversed() {
+            guard let url = match.url,
+                  let attrRange = Range(match.range, in: attributed) else { continue }
+            attributed[attrRange].link = url
+            attributed[attrRange].foregroundColor = Color.skyPrimary
+            attributed[attrRange].underlineStyle = .single
+        }
+    }
+
+    return attributed
+}
+
+/// Regex for matching @mention patterns in post text.
+private enum MentionTextRegex {
+    static let shared = try! NSRegularExpression(
+        pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?"
+    )
+}
