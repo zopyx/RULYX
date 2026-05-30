@@ -282,6 +282,7 @@ private struct AccountSwitcherRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(account.displayName)
                         .font(.body.weight(.semibold))
+                        .foregroundStyle(.primary)
                     Text(account.handle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -299,6 +300,7 @@ private struct AccountSwitcherRow: View {
                 }
             }
         }
+        .buttonStyle(.plain)
         .disabled(isActive || isDeactivated)
     }
 }
@@ -340,6 +342,7 @@ private struct AccountSwitcherTabSheet: View {
                         }
                     } label: {
                         Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
+                            .foregroundStyle(.primary)
                     }
                 }
             }
