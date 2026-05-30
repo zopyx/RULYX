@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1247,
+    "total_keys": 1251,
     "total_languages": 16,
-    "untranslated_total": 2393
+    "untranslated_total": 2453
   },
   "keys": {
     "account.active": {
@@ -76188,6 +76188,258 @@
       "vi": {
         "text": "Curate high-quality accounts (VI)",
         "untranslated": false
+      }
+    },
+    "thread.blocked.desc": {
+      "en": "This post is from an account that has blocked you or is suspended.",
+      "de": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "This post is from an account that has blocked you or is suspended.",
+        "untranslated": true
+      }
+    },
+    "thread.blocked.title": {
+      "en": "Post Not Available",
+      "de": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Post Not Available",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Post Not Available",
+        "untranslated": true
+      }
+    },
+    "thread.not_found.desc": {
+      "en": "This post may have been deleted or does not exist.",
+      "de": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "This post may have been deleted or does not exist.",
+        "untranslated": true
+      }
+    },
+    "thread.not_found.title": {
+      "en": "Post Not Found",
+      "de": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Post Not Found",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Post Not Found",
+        "untranslated": true
       }
     },
     "time.day_ago": {
