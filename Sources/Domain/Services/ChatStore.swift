@@ -282,6 +282,12 @@ final class ChatStore: ObservableObject {
         messages[convoId] = current
     }
 
+    /// Retries sending a previously failed message.
+    func resendFailedMessage(convoId: String, messageId: String, text: String) async {
+        removeMessage(messageId, from: convoId)
+        await sendMessage(convoId: convoId, text: text)
+    }
+
     /// Gets or creates a 1:1 conversation with a member by their DID.
     func getOrCreateConvo(memberDID: String) async -> ChatConversation? {
         guard let account = activeAccount else { return nil }

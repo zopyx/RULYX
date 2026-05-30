@@ -402,7 +402,6 @@ struct ConversationDetailView: View {
 
     /// Retry sending a failed message.
     private func retrySend(_ msg: ChatMessage) async {
-        chatStore.removeMessage(msg.id, from: conversation.id)
-        await chatStore.sendMessage(convoId: conversation.id, text: msg.text)
+        await chatStore.resendFailedMessage(convoId: conversation.id, messageId: msg.id, text: msg.text)
     }
 }
