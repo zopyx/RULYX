@@ -110,37 +110,25 @@ struct RootView: View {
         let tint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
 
         return VStack(spacing: 0) {
-            // MARK: Clearsky Outage Banner
-
             if !clearskyHeartbeat.isClearskyAvailable {
                 ClearskyBanner()
                     .environmentObject(localizationManager)
             }
 
-            // MARK: Tab Content
-
             ZStack {
                 switch workspaceStore.selectedTab {
-                case .moderation:
-                    ModerationSplitView()
-                case .timeline:
-                    TimelineTab()
-                case .notifications:
-                    NotificationTab()
-                case .chat:
-                    ChatTab()
-                case .info:
-                    InfoView()
-                case .settings:
-                    SettingsView()
-                case .account:
-                    AccountTabView()
+                case .moderation: ModerationSplitView()
+                case .timeline: TimelineTab()
+                case .notifications: NotificationTab()
+                case .chat: ChatTab()
+                case .info: InfoView()
+                case .settings: SettingsView()
+                case .account: AccountTabView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            // MARK: Custom Bottom Bar
-
+        }
+        .safeAreaInset(edge: .bottom) {
             HStack(spacing: 0) {
                 ForEach(tabBarItems) { item in
                     Button {
@@ -158,7 +146,6 @@ struct RootView: View {
                     .contentShape(Rectangle())
                 }
 
-                // Account button — tap to open switcher sheet
                 Button {
                     showAccountSwitcher = true
                 } label: {
@@ -185,88 +172,83 @@ struct RootView: View {
             }
             .padding(.horizontal, 4)
             .padding(.top, 6)
-            .padding(.bottom, safeAreaBottomInset + 4)
+            .padding(.bottom, 4)
             .background(.bar)
-            .preferredColorScheme(preferredScheme)
-            .environment(\.locale, localizationManager.locale)
-            .environment(\.layoutDirection, localizationManager.layoutDirection)
+        }
+        .preferredColorScheme(preferredScheme)
+        .environment(\.locale, localizationManager.locale)
+        .environment(\.layoutDirection, localizationManager.layoutDirection)
+        .sheet(isPresented: $showAccountSwitcher) {
+            AccountSwitcherTabSheet(
+                accountStore: accountStore,
+                workspaceStore: workspaceStore,
+                blueskyClient: blueskyClient,
+                onSwitch: switchAccount
+            )
+        }
+        .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
+            onboardingContent
+        }
+    }
 
-            // MARK: Account Switcher Sheet
+    private var onboardingContent: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // MARK: Header
 
-            .sheet(isPresented: $showAccountSwitcher) {
-                AccountSwitcherTabSheet(
-                    accountStore: accountStore,
-                    workspaceStore: workspaceStore,
-                    blueskyClient: blueskyClient,
-                    onSwitch: switchAccount
-                )
+                    VStack(spacing: 8) {
+                        Image(systemName: "checklist.checked")
+                            .font(.system(size: 48))
+                            .foregroundStyle(Color.skyPrimary)
+                        Image("RulyxLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 36)
+                        Text(verbatim: localizationManager.localized("onboarding.title"))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        Text(verbatim: localizationManager.localized("onboarding.subtitle"))
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.top, 32)
+
+                    // MARK: Feature Rows
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        OnboardingRow(icon: "checklist.checked", color: .skyPrimary, title: localizationManager.localized("tab.moderation"), description: localizationManager.localized("onboarding.moderation.desc"))
+                        OnboardingRow(icon: "person.circle", color: .skyPrimary, title: localizationManager.localized("tab.accounts"), description: localizationManager.localized("onboarding.accounts.desc"))
+                        OnboardingRow(icon: "gearshape", color: .orange, title: localizationManager.localized("tab.settings"), description: localizationManager.localized("onboarding.settings.desc"))
+                        OnboardingRow(icon: "sparkles.rectangle.stack", color: .purple, title: localizationManager.localized("tab.info"), description: localizationManager.localized("onboarding.info.desc"))
+                    }
+
+                    // MARK: Get Started Button
+
+                    Button {
+                        hasSeenOnboarding = true
+                    } label: {
+                        Text(verbatim: localizationManager.localized("onboarding.get_started"))
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    // Custom glass-material prominent button style used consistently
+                    // throughout the app for primary action buttons.
+                    .glassProminentButton()
+                    .padding(.horizontal)
+                }
+                .padding()
             }
-
-            // MARK: Onboarding Sheet
-
-            // On first-ever launch, presents an onboarding sheet that introduces
-            // the app's tabs and core features. Dismissing it sets `hasSeenOnboarding`
-            // to true, preventing future showings.
-            .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
-                NavigationStack {
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            // MARK: Header
-
-                            VStack(spacing: 8) {
-                                Image(systemName: "checklist.checked")
-                                    .font(.system(size: 48))
-                                    .foregroundStyle(Color.skyPrimary)
-                                Image("RulyxLogo")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 36)
-                                Text(verbatim: localizationManager.localized("onboarding.title"))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
-                                Text(verbatim: localizationManager.localized("onboarding.subtitle"))
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
-                            }
-                            .padding(.top, 32)
-
-                            // MARK: Feature Rows
-
-                            VStack(alignment: .leading, spacing: 16) {
-                                OnboardingRow(icon: "checklist.checked", color: .skyPrimary, title: localizationManager.localized("tab.moderation"), description: localizationManager.localized("onboarding.moderation.desc"))
-                                OnboardingRow(icon: "person.circle", color: .skyPrimary, title: localizationManager.localized("tab.accounts"), description: localizationManager.localized("onboarding.accounts.desc"))
-                                OnboardingRow(icon: "gearshape", color: .orange, title: localizationManager.localized("tab.settings"), description: localizationManager.localized("onboarding.settings.desc"))
-                                OnboardingRow(icon: "sparkles.rectangle.stack", color: .purple, title: localizationManager.localized("tab.info"), description: localizationManager.localized("onboarding.info.desc"))
-                            }
-
-                            // MARK: Get Started Button
-
-                            Button {
-                                hasSeenOnboarding = true
-                            } label: {
-                                Text(verbatim: localizationManager.localized("onboarding.get_started"))
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                            }
-                            .buttonStyle(.borderedProminent)
-                            // Custom glass-material prominent button style used consistently
-                            // throughout the app for primary action buttons.
-                            .glassProminentButton()
-                            .padding(.horizontal)
-                        }
-                        .padding()
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(localizationManager.localized("onboarding.close")) {
+                        hasSeenOnboarding = true
                     }
-                    .toolbarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button(localizationManager.localized("onboarding.close")) {
-                                hasSeenOnboarding = true
-                            }
-                            .accessibilityLabel(loc: "onboarding.close.label")
-                        }
-                    }
+                    .accessibilityLabel(loc: "onboarding.close.label")
                 }
             }
         }
