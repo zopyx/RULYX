@@ -54,6 +54,106 @@ struct RootView: View {
         }
     }
 
+    /// Floating account switcher at the bottom-trailing edge, above the tab bar.
+    private var accountSwitcherFloatingButton: some View {
+        Group {
+            if let account = accountStore.activeAccount {
+                Menu {
+                    ForEach(accountStore.accounts) { acct in
+                        Button {
+                            switchAccount(acct)
+                        } label: {
+                            HStack(spacing: 10) {
+                                Circle()
+                                    .fill(Color.accountTint(acct.tintColor))
+                                    .frame(width: 10, height: 10)
+                                accountAvatarView(for: acct, tint: .accountTint(acct.tintColor), size: 24)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(acct.displayName)
+                                        .font(.subheadline.weight(.semibold))
+                                        .lineLimit(1)
+                                    Text(acct.handle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
+                                Spacer()
+                                if acct.id == accountStore.activeAccountID {
+                                    Image(systemName: "checkmark")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(Color.skyPrimary)
+                                }
+                                if accountStore.isDeactivated(acct) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.caption)
+                                        .foregroundStyle(.orange)
+                                }
+                            }
+                        }
+                        .disabled(acct.id == accountStore.activeAccountID || accountStore.isDeactivated(acct))
+                    }
+                    if !accountStore.accounts.isEmpty {
+                        Divider()
+                    }
+                    Button {
+                        workspaceStore.selectedTab = .account
+                    } label: {
+                        Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
+                    }
+                } label: {
+                    accountAvatarView(for: account, tint: .accountTint(account.tintColor), size: 36)
+                        .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+                }
+                .menuOrder(.fixed)
+                .accessibilityLabel(loc("account.switcher.label"))
+            }
+        }
+    }
+
+    private func switchAccount(_ account: AppAccount) {
+        let generator = UISelectionFeedbackGenerator()
+        generator.prepare()
+        Task {
+            await accountStore.switchAccount(to: account, using: blueskyClient)
+            workspaceStore.returnToModerationRoot()
+            generator.selectionChanged()
+        }
+    }
+
+    @ViewBuilder
+    private func accountAvatarView(for account: AppAccount, tint: Color, size: CGFloat) -> some View {
+        if let avatarURL = account.avatarURL {
+            AsyncImage(url: avatarURL) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Circle()
+                    .fill(tint)
+                    .overlay {
+                        Text(account.displayName.prefix(1).uppercased())
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white)
+                    }
+            }
+            .frame(width: size, height: size)
+            .clipShape(Circle())
+            .overlay {
+                Circle()
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+            }
+        } else {
+            Circle()
+                .fill(tint)
+                .frame(width: size, height: size)
+                .overlay {
+                    Text(account.displayName.prefix(1).uppercased())
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -169,6 +269,11 @@ struct RootView: View {
             .preferredColorScheme(preferredScheme)
             .environment(\.locale, localizationManager.locale)
             .environment(\.layoutDirection, localizationManager.layoutDirection)
+            .overlay(alignment: .bottomTrailing) {
+                accountSwitcherFloatingButton
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 56)
+            }
 
             // MARK: Onboarding Sheet
 

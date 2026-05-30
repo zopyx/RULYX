@@ -8,7 +8,6 @@ struct TimelineTab: View {
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject var mutedWordsStore: MutedWordsStore
     @EnvironmentObject var analyticsStore: AnalyticsStore
-    @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var viewModel = FeedTimelineViewModel()
     @State private var navigationPath = NavigationPath()
 
@@ -22,15 +21,6 @@ struct TimelineTab: View {
                 .environmentObject(workspaceStore)
                 .environmentObject(mutedWordsStore)
                 .environmentObject(analyticsStore)
-                .toolbar {
-                    accountSwitcherToolbar(
-                        accountStore: accountStore,
-                        blueskyClient: blueskyClient,
-                        workspaceStore: workspaceStore,
-                        localizationManager: localizationManager,
-                        onManageAccounts: { workspaceStore.selectedTab = .account }
-                    )
-                }
                 .navigationDestination(for: TimelineRoute.self) { route in
                     switch route {
                     case let .thread(postURI):
