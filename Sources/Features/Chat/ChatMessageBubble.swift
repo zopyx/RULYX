@@ -8,6 +8,15 @@ struct ChatMessageBubble: View {
     let message: ChatMessage
     let isOutgoing: Bool
     var onOpenProfile: ((String) -> Void)?
+    var onRetry: (() -> Void)?
+
+    private var isPending: Bool {
+        message.id.hasPrefix("pending-")
+    }
+
+    private var hasFailed: Bool {
+        message.rev == "failed"
+    }
 
     /// Shared time-only formatter for timestamps.
     private static let timeFormatter: DateFormatter = {
@@ -42,12 +51,36 @@ struct ChatMessageBubble: View {
                     })
 
                 HStack(spacing: 4) {
+                    if isPending {
+                        Image(systemName: "clock")
+                            .font(.caption2)
+                            .foregroundStyle(isOutgoing ? .white.opacity(0.5) : Color(.tertiaryLabel))
+                    }
+
+                    if hasFailed {
+                        Button {
+                            onRetry?()
+                        } label: {
+                            Image(systemName: "exclamationmark.circle.fill")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
+                    }
+
                     if !message.reactions.isEmpty {
-                        HStack(spacing: 2) {
-                            ForEach(Array(message.reactions.prefix(3)), id: \.senderDID) { reaction in
-                                Text(reaction.value)
+                        let grouped = Dictionary(grouping: message.reactions, by: { $0.value })
+                        ForEach(Array(grouped.keys.sorted()), id: \.self) { emoji in
+                            HStack(spacing: 2) {
+                                Text(emoji)
                                     .font(.caption2)
+                                if grouped[emoji]!.count > 1 {
+                                    Text("\(grouped[emoji]!.count)")
+                                        .font(.system(size: 9, weight: .semibold))
+                                }
                             }
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(.ultraThinMaterial))
                         }
                     }
 
@@ -59,7 +92,15 @@ struct ChatMessageBubble: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(isOutgoing ? Color.skyPrimary : Color(.systemGray5))
+            .opacity(isPending ? 0.6 : 1.0)
             .clipShape(BubbleShape(isOutgoing: isOutgoing))
+            .contextMenu {
+                Button {
+                    UIPasteboard.general.string = message.text
+                } label: {
+                    Label(loc("post.copy"), systemImage: "doc.on.doc")
+                }
+            }
 
             if !isOutgoing { Spacer(minLength: 60) }
         }

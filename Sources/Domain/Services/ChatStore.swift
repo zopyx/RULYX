@@ -150,13 +150,28 @@ final class ChatStore: ObservableObject {
 
     // MARK: - Send
 
-    /// Sends a text message to a conversation. Appends the new message to the local cache on success.
+    /// Sends a text message to a conversation with optimistic local insertion.
+    /// The message appears immediately as pending; it's replaced with the server response on success.
     func sendMessage(convoId: String, text: String) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let senderDID = currentAccountDID else { return }
+        let pendingId = "pending-\(UUID().uuidString)"
+        let pendingMsg = ChatMessageKind.message(ChatMessage(
+            id: pendingId,
+            rev: "",
+            text: text,
+            senderDID: senderDID,
+            sentAt: .now,
+            reactions: []
+        ))
+
+        var current = messages[convoId] ?? []
+        current.append(pendingMsg)
+        messages[convoId] = current
+
         isSendingMessage = true
         do {
             let result = try await chatService.sendMessage(convoId: convoId, text: text, account: account, appPassword: activeAppPassword)
-            let newMsg = ChatMessageKind.message(ChatMessage(
+            let confirmedMsg = ChatMessageKind.message(ChatMessage(
                 id: result.id,
                 rev: result.rev,
                 text: result.text,
@@ -164,11 +179,24 @@ final class ChatStore: ObservableObject {
                 sentAt: result.sentAt,
                 reactions: []
             ))
-            var current = messages[convoId] ?? []
-            current.append(newMsg)
-            messages[convoId] = current
+
+            var updated = messages[convoId] ?? []
+            if let pendingIndex = updated.firstIndex(where: { idForMessage($0) == pendingId }) {
+                updated[pendingIndex] = confirmedMsg
+            } else {
+                updated.append(confirmedMsg)
+            }
+            messages[convoId] = updated
             isSendingMessage = false
         } catch {
+            var updated = messages[convoId] ?? []
+            if let pendingIndex = updated.firstIndex(where: { idForMessage($0) == pendingId }) {
+                if case var .message(m) = updated[pendingIndex] {
+                    m = ChatMessage(id: pendingId, rev: "failed", text: m.text, senderDID: m.senderDID, sentAt: m.sentAt, reactions: m.reactions)
+                    updated[pendingIndex] = .message(m)
+                }
+            }
+            messages[convoId] = updated
             self.error = error
             isSendingMessage = false
         }
@@ -245,6 +273,13 @@ final class ChatStore: ObservableObject {
         try? await chatService.leaveConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
         conversations.removeAll { $0.id == convoId }
         messages.removeValue(forKey: convoId)
+    }
+
+    /// Removes a single message from the local cache by its ID. Used for retry of failed messages.
+    func removeMessage(_ messageId: String, from convoId: String) {
+        var current = messages[convoId] ?? []
+        current.removeAll { idForMessage($0) == messageId }
+        messages[convoId] = current
     }
 
     /// Gets or creates a 1:1 conversation with a member by their DID.

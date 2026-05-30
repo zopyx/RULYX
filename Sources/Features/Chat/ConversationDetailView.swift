@@ -329,9 +329,14 @@ struct ConversationDetailView: View {
     private func messageView(for kind: ChatMessageKind) -> some View {
         switch kind {
         case let .message(msg):
-            ChatMessageBubble(message: msg, isOutgoing: msg.senderDID == chatStore.currentAccountDID, onOpenProfile: { handle in
-                mentionProfileHandle = handle
-            })
+            ChatMessageBubble(
+                message: msg,
+                isOutgoing: msg.senderDID == chatStore.currentAccountDID,
+                onOpenProfile: { handle in
+                    mentionProfileHandle = handle
+                },
+                onRetry: msg.rev == "failed" ? { Task { await retrySend(msg) } } : nil
+            )
         case let .deleted(d):
             deletedMessageView(d)
         case let .system(s):
@@ -393,5 +398,11 @@ struct ConversationDetailView: View {
         case let .deleted(d): d.id
         case let .system(s): s.id
         }
+    }
+
+    /// Retry sending a failed message.
+    private func retrySend(_ msg: ChatMessage) async {
+        chatStore.removeMessage(msg.id, from: conversation.id)
+        await chatStore.sendMessage(convoId: conversation.id, text: msg.text)
     }
 }
