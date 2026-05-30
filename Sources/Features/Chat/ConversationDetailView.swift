@@ -42,7 +42,7 @@ struct ConversationDetailView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             if let error = chatStore.messageError, convoMessages.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle")
@@ -58,12 +58,11 @@ struct ConversationDetailView: View {
                     .buttonStyle(.bordered)
                 }
                 .padding()
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else {
                 scrollView
+                    .padding(.bottom, 52)
             }
-
-            Divider()
 
             sendBar
         }
@@ -299,6 +298,7 @@ struct ConversationDetailView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
+        .frame(minHeight: 44)
         .background(.bar)
     }
 
