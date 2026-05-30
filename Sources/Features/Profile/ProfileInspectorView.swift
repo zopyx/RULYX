@@ -8,7 +8,6 @@ struct ProfileInspectorView: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var viewModel = ProfileInspectorViewModel()
-    @State private var isShowingQuickAccountSwitcher = false
     @State private var isShowingAccountManagement = false
     @State private var reportEvidenceText = ""
     @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault
@@ -340,15 +339,13 @@ struct ProfileInspectorView: View {
             }
             .pageTitle(loc("profile.title"))
             .toolbar {
-                accountSwitcherToolbar(isPresented: $isShowingQuickAccountSwitcher, accountStore: accountStore, localizationManager: localizationManager)
-            }
-            .sheet(isPresented: $isShowingQuickAccountSwitcher) {
-                AccountQuickSwitcherSheet(
-                    isPresented: $isShowingQuickAccountSwitcher,
+                accountSwitcherToolbar(
+                    accountStore: accountStore,
+                    blueskyClient: blueskyClient,
+                    workspaceStore: workspaceStore,
+                    localizationManager: localizationManager,
                     onManageAccounts: openAccountManagement
                 )
-                .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
             }
             .sheet(isPresented: $isShowingAccountManagement) {
                 AccountSwitcherSheet(isPresented: $isShowingAccountManagement)
@@ -439,12 +436,9 @@ struct ProfileInspectorView: View {
         return "-"
     }
 
-    /// Closes the quick switcher and opens the full account management sheet.
+    /// Opens the full account management sheet.
     private func openAccountManagement() {
-        isShowingQuickAccountSwitcher = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            isShowingAccountManagement = true
-        }
+        isShowingAccountManagement = true
     }
 
     /// Builds a pre-filled support email draft for reporting the profile.

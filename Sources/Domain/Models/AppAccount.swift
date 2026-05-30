@@ -21,6 +21,8 @@ struct AppAccount: Identifiable, Codable, Hashable {
     var entrywayURL: URL?
     /// An optional user-assigned label to distinguish multiple accounts.
     var label: String?
+    /// An optional accent tint color identifier ("blue", "green", "orange", "purple", "red", "teal", "pink").
+    var tintColor: String?
     /// The date this account was added to the app.
     var createdAt: Date
     /// The date this account was last used for an operation.

@@ -38,6 +38,15 @@ struct NotificationTab: View {
                 }
             }
             .pageTitle(loc("notifications.title"))
+            .toolbar {
+                accountSwitcherToolbar(
+                    accountStore: accountStore,
+                    blueskyClient: blueskyClient,
+                    workspaceStore: workspaceStore,
+                    localizationManager: localizationManager,
+                    onManageAccounts: { workspaceStore.selectedTab = .account }
+                )
+            }
             .navigationDestination(for: TimelineRoute.self) { route in
                 switch route {
                 case let .thread(postURI):

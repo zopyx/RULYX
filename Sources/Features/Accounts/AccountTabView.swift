@@ -173,6 +173,14 @@ struct AccountTabView: View {
                 }
             }
             .pageTitle(loc("account.manage.title"))
+            .toolbar {
+                accountSwitcherToolbar(
+                    accountStore: accountStore,
+                    blueskyClient: blueskyClient,
+                    workspaceStore: workspaceStore,
+                    localizationManager: localizationManager
+                )
+            }
             .navigationBarBackButtonHidden(true)
             .task {
                 await accountStore.refreshAccountProfiles(using: blueskyClient)

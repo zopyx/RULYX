@@ -7,6 +7,8 @@ struct ConversationListView: View {
     @EnvironmentObject var chatStore: ChatStore
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var showNewConvo = false
     @State private var searchText = ""
     @State private var navPath: [ChatConversation] = []
@@ -25,8 +27,6 @@ struct ConversationListView: View {
             }
         }
     }
-
-    @EnvironmentObject private var localizationManager: LocalizationManager
 
     // MARK: - Body
 
@@ -113,6 +113,13 @@ struct ConversationListView: View {
             }
             .pageTitle(Text(loc: "tab.chat"))
             .toolbar {
+                accountSwitcherToolbar(
+                    accountStore: accountStore,
+                    blueskyClient: blueskyClient,
+                    workspaceStore: workspaceStore,
+                    localizationManager: localizationManager,
+                    onManageAccounts: { workspaceStore.selectedTab = .account }
+                )
                 if !chatStore.conversations.isEmpty {
                     ToolbarItem(placement: .topBarLeading) {
                         if editMode.isEditing {

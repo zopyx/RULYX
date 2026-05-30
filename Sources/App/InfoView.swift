@@ -19,6 +19,9 @@ struct InfoView: View {
     // MARK: - Properties
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @Environment(\.colorScheme) private var colorScheme
 
     /// The currently selected info tab (overview / features / legal).
@@ -82,6 +85,15 @@ struct InfoView: View {
                 .navigationTitle("")
                 .toolbarTitleDisplayMode(.inline)
                 .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbar {
+                    accountSwitcherToolbar(
+                        accountStore: accountStore,
+                        blueskyClient: blueskyClient,
+                        workspaceStore: workspaceStore,
+                        localizationManager: localizationManager,
+                        onManageAccounts: { workspaceStore.selectedTab = .account }
+                    )
+                }
             }
         }
 

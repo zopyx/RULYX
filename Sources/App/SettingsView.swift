@@ -19,11 +19,11 @@ struct SettingsView: View {
     @EnvironmentObject private var appLockManager: AppLockManager
     @EnvironmentObject private var httpRequestDebugStore: HTTPRequestDebugStore
     @EnvironmentObject private var aiService: LiveAIService
+    @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
 
     /// UserDefaults key `"debugMode"`: enables debug tools (HTTP request debug view, etc.).
     @AppStorage("debugMode") private var debugMode = false
-
-    /// Previously gated beta features — all now always enabled.
 
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"`.
@@ -140,8 +140,6 @@ struct SettingsView: View {
                 // MARK: Internal Section
 
                 Section {
-
-
                     Toggle(isOn: $debugMode) {
                         Label {
                             Text(localizationManager.localized("settings.debug"))
@@ -195,6 +193,15 @@ struct SettingsView: View {
                 }
             }
             .pageTitle(localizationManager.localized("settings.title"))
+            .toolbar {
+                accountSwitcherToolbar(
+                    accountStore: accountStore,
+                    blueskyClient: blueskyClient,
+                    workspaceStore: workspaceStore,
+                    localizationManager: localizationManager,
+                    onManageAccounts: { workspaceStore.selectedTab = .account }
+                )
+            }
 
             // MARK: Sheet — HTTP Request Debug View
 
