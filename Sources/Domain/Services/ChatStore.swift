@@ -326,22 +326,27 @@ final class ChatStore: ObservableObject {
         do {
             let (events, newCursor) = try await chatService.getLog(cursor: logCursor, account: account, appPassword: activeAppPassword)
             logCursor = newCursor
+            var hasStructuralEvents = false
             for event in events {
                 switch event.kind {
                 case let .createMessage(convoId, message):
                     applyIncomingMessage(message, to: convoId)
-                default:
-                    break
+                case .beginConvo, .acceptConvo, .leaveConvo, .muteConvo, .unmuteConvo,
+                     .addMember, .removeMember, .readConvo:
+                    hasStructuralEvents = true
+                case .addReaction, .removeReaction, .deleteMessage:
+                    hasStructuralEvents = true
                 }
             }
-            // Brief delay then reload conversation list to pick up any reordering.
-            try await Task.sleep(nanoseconds: 300_000_000)
-            let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
-            conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
-            convosCursor = result.cursor
+            if hasStructuralEvents {
+                try await Task.sleep(nanoseconds: 300_000_000)
+                let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
+                conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
+                convosCursor = result.cursor
+            }
+
             updateAppBadge()
 
-            // Refresh the visible conversation's messages if we're viewing one.
             if let visibleID = visibleConversationID {
                 await refreshMessages(convoId: visibleID)
             }
