@@ -366,7 +366,7 @@ final class ChatStore: ObservableObject {
     // MARK: - Polling
 
     /// Starts a polling loop that checks the chat event log at the given interval.
-    func startPolling(interval: TimeInterval = 5) {
+    func startPolling(interval: TimeInterval = 3) {
         stopPolling()
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -473,8 +473,10 @@ final class ChatStore: ObservableObject {
             kind: existing.kind,
             groupInfo: existing.groupInfo
         )
-        conversations[index] = updated
-        conversations.sort { $0.lastMessageAt > $1.lastMessageAt }
+        var updatedConversations = conversations
+        updatedConversations[index] = updated
+        updatedConversations.sort { $0.lastMessageAt > $1.lastMessageAt }
+        conversations = updatedConversations
 
         if shouldIncrementUnread, !existing.muted {
             postLocalNotification(for: message, in: existing)
