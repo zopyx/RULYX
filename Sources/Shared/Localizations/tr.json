@@ -1260,5 +1260,6 @@
   "account.add.auth.oauth.sign_in": "Sign in with Browser",
   "account.add.oauth.info": "Browser Sign-In",
   "account.add.oauth.description": "Authenticate directly with your PDS via your web browser. No app password needed.",
-  "account.auth.oauth_badge": "OAuth"
+  "account.auth.oauth_badge": "OAuth",
+  "account.add.oauth.note": "You will be redirected to your provider's login page. No app password required."
 }

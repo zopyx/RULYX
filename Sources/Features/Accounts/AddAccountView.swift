@@ -111,12 +111,36 @@ struct AddAccountView: View {
                         } header: {
                             Text(loc: "account.add.why_password")
                         }
-                    } else {
-                        Section {
-                            Text(loc: "account.add.oauth.description")
-                                .foregroundStyle(.secondary)
-                        } header: {
-                            Text(loc: "account.add.oauth.info")
+                    }
+                }
+
+                // OAuth: Sign-in button and info note below the form
+                if authMethod == .oauth, !needsAuthFactorToken {
+                    Section {
+                        VStack(spacing: 14) {
+                            Button {
+                                Task { await signInWithOAuth() }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "person.badge.key.fill")
+                                        .font(.body.weight(.semibold))
+                                    Text(loc: "account.add.auth.oauth.sign_in")
+                                        .font(.body.weight(.semibold))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.skyPrimary)
+                            .disabled(handle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accountStore.isAddingAccount)
+
+                            HStack(spacing: 8) {
+                                Image(systemName: "lock.shield")
+                                    .foregroundStyle(.secondary)
+                                Text(loc: "account.add.oauth.note")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
@@ -149,14 +173,7 @@ struct AddAccountView: View {
                             }
                         }
                         .disabled(authFactorToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accountStore.isAddingAccount)
-                    } else if authMethod == .oauth {
-                        Button(loc("account.add.auth.oauth.sign_in")) {
-                            Task {
-                                await signInWithOAuth()
-                            }
-                        }
-                        .disabled(handle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accountStore.isAddingAccount)
-                    } else {
+                    } else if authMethod == .password {
                         Button(loc("account.add.save")) {
                             Task {
                                 await saveWithPassword()
