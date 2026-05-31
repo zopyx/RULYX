@@ -19,12 +19,24 @@ final class OAuthEndpointResolver: @unchecked Sendable {
     /// - Parameter pdsURL: The PDS base URL (e.g. `https://bsky.social`).
     /// - Returns: The resolved Authorization Server metadata.
     func resolveAuthorizationServer(pdsURL: URL) async throws -> OAuthAuthorizationServerMetadata {
-        let resource = try await fetchProtectedResourceFromPDS(pdsURL: pdsURL)
-        let asURL = resource.authorizationServers.first ?? pdsURL
+        // Try fetching the protected resource metadata first (step 1).
+        // If it 404s (not deployed yet on this PDS), fall back to using
+        // the PDS URL itself as the Authorization Server.
+        let asURL: URL
+        do {
+            let resource = try await fetchProtectedResourceFromPDS(pdsURL: pdsURL)
+            asURL = resource.authorizationServers.first ?? pdsURL
+        } catch OAuthEndpointError.protectedResourceFetchFailed(_) {
+            asURL = pdsURL
+        }
+
+        // Step 2: fetch the authorization server metadata from the AS.
+        // If it also 404s, the PDS does not support OAuth.
         return try await fetchAuthorizationServerMetadata(asURL: asURL)
     }
 
     /// Fetch `/.well-known/oauth-protected-resource` from the PDS.
+    /// Throws `OAuthEndpointError.protectedResourceFetchFailed` on non-2xx.
     private func fetchProtectedResourceFromPDS(pdsURL: URL) async throws -> OAuthProtectedResource {
         let url = pdsURL.appendingPathComponent(".well-known/oauth-protected-resource")
         let (data, response) = try await httpClient.data(from: url, source: "OAuth")

@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1263,
+    "total_keys": 1264,
     "total_languages": 16,
-    "untranslated_total": 2633
+    "untranslated_total": 2648
   },
   "keys": {
     "account.active": {
@@ -1533,6 +1533,69 @@
       "vi": {
         "text": "保存 (VI)",
         "untranslated": false
+      }
+    },
+    "account.add.select_provider": {
+      "en": "Select a provider",
+      "de": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Select a provider",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Select a provider",
+        "untranslated": true
       }
     },
     "account.add.title": {
