@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1261,
+    "total_keys": 1262,
     "total_languages": 16,
-    "untranslated_total": 2603
+    "untranslated_total": 2618
   },
   "keys": {
     "account.active": {
@@ -1659,6 +1659,69 @@
       "vi": {
         "text": "为什么使用应用密码？ (VI)",
         "untranslated": false
+      }
+    },
+    "account.auth.oauth_badge": {
+      "en": "OAuth",
+      "de": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "it": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "es": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "th": {
+        "text": "OAuth",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "OAuth",
+        "untranslated": true
       }
     },
     "account.deactivated": {

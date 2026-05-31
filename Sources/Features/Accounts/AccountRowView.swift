@@ -32,6 +32,7 @@ struct AccountRowView: View {
                 HStack(spacing: 6) {
                     Text(account.displayName)
                         .font(.headline)
+                        .foregroundStyle(.primary)
                     if let label = account.label {
                         Text(label)
                             .font(.caption2.weight(.semibold))
