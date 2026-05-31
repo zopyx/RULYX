@@ -137,7 +137,10 @@ struct AddAccountView: View {
                     }
                 }
             }
-            .alert(loc("account.add.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
+            .alert(loc("account.add.title"), isPresented: Binding(
+                get: { accountStore.errorMessage != nil },
+                set: { if !$0 { accountStore.errorMessage = nil } }
+            ), actions: {
                 Button(loc("actions.ok")) {
                     accountStore.errorMessage = nil
                 }
@@ -319,12 +322,13 @@ struct AddAccountView: View {
                 let handle = try await blueskyClient.resolveHandleFromDID(session.did)
                 AppLogger.persistence.info("Resolved handle: \(handle, privacy: .public)")
 
-                accountStore.addOAuthAccount(
+                let addResult = accountStore.addOAuthAccount(
                     handle: handle,
                     did: session.did,
                     pdsURL: session.pdsURL,
                     entrywayURL: entrywayURL
                 )
+                guard addResult == .success else { return }
                 AppLogger.persistence.info("OAuth account added")
 
                 await accountStore.refreshAccountProfiles(using: blueskyClient)
@@ -332,12 +336,13 @@ struct AddAccountView: View {
             } catch {
                 AppLogger.persistence.error("Failed to resolve handle: \(error.localizedDescription, privacy: .public)")
                 // Fallback: use DID as handle
-                accountStore.addOAuthAccount(
+                let addResult = accountStore.addOAuthAccount(
                     handle: session.did,
                     did: session.did,
                     pdsURL: session.pdsURL,
                     entrywayURL: entrywayURL
                 )
+                guard addResult == .success else { return }
             }
 
             dismiss()

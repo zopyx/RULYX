@@ -69,10 +69,11 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         let dpop = try OAuthDPoP(keyTag: dpopKeyTag, keychain: keychain)
 
         // 3. Submit PAR — no login_hint, user enters their handle on the provider's page
-        let parURL = try await submitPAR(
+        let (parURL, asNonce) = try await submitPAR(
             asMetadata: asMetadata,
             pkce: pkce,
             state: state,
+            dpop: dpop,
             handle: nil
         )
 
@@ -87,6 +88,8 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
             code: code,
             pkce: pkce,
             dpopKeyTag: dpopKeyTag,
+            dpop: dpop,
+            asNonce: asNonce,
             asMetadata: asMetadata,
             did: nil,
             handle: nil,
@@ -116,10 +119,11 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         let dpop = try OAuthDPoP(keyTag: dpopKeyTag, keychain: keychain)
 
         // 4. Submit PAR
-        let parURL = try await submitPAR(
+        let (parURL, asNonce) = try await submitPAR(
             asMetadata: asMetadata,
             pkce: pkce,
             state: state,
+            dpop: dpop,
             handle: handle
         )
 
@@ -134,6 +138,8 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
             code: code,
             pkce: pkce,
             dpopKeyTag: dpopKeyTag,
+            dpop: dpop,
+            asNonce: asNonce,
             asMetadata: asMetadata,
             did: did,
             handle: handle,
@@ -182,38 +188,41 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         asMetadata: OAuthAuthorizationServerMetadata,
         pkce: OAuthPKCE,
         state: String,
+        dpop: OAuthDPoP,
         handle: String?
-    ) async throws -> URL {
+    ) async throws -> (authorizationURL: URL, nonce: String?) {
         guard let parEndpoint = asMetadata.pushedAuthorizationRequestEndpoint else {
             throw OAuthFlowError.parNotSupported
         }
 
-        let parBody = PARBody(
-            clientID: clientID,
-            responseType: "code",
-            codeChallenge: pkce.challenge,
-            codeChallengeMethod: pkce.method,
-            state: state,
-            redirectURI: "\(callbackScheme):\(callbackPath)",
-            scope: "atproto transition:generic transition:chat.bsky",
-            loginHint: handle
+        let parameters: [(String, String?)] = [
+            ("client_id", clientID),
+            ("response_type", "code"),
+            ("code_challenge", pkce.challenge),
+            ("code_challenge_method", pkce.method),
+            ("state", state),
+            ("redirect_uri", "\(callbackScheme):\(callbackPath)"),
+            ("scope", "atproto transition:generic transition:chat.bsky"),
+            ("login_hint", handle),
+        ]
+
+        let (data, httpResponse) = try await sendOAuthFormRequest(
+            url: parEndpoint,
+            parameters: parameters,
+            dpop: dpop,
+            nonce: nil,
+            source: "OAuth PAR"
         )
-        let bodyData = try JSONEncoder().encode(parBody)
-
-        var request = URLRequest(url: parEndpoint)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.httpBody = bodyData
-
-        let (data, httpResponse) = try await httpClient.data(for: request, source: "OAuth PAR")
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw OAuthFlowError.parFailed(httpResponse.statusCode)
         }
 
         let parResponse = try JSONDecoder().decode(PARResponse.self, from: data)
-        return authorizationURL(asMetadata: asMetadata, requestURI: parResponse.requestURI)
+        return (
+            authorizationURL(asMetadata: asMetadata, requestURI: parResponse.requestURI),
+            dpopNonce(from: httpResponse)
+        )
     }
 
     private func authorizationURL(asMetadata: OAuthAuthorizationServerMetadata, requestURI: String) -> URL {
@@ -294,6 +303,8 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         code: String,
         pkce: OAuthPKCE,
         dpopKeyTag: String,
+        dpop: OAuthDPoP,
+        asNonce: String?,
         asMetadata: OAuthAuthorizationServerMetadata,
         did: String?,
         handle: String?,
@@ -301,21 +312,33 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
     ) async throws -> OAuthSession {
         let tokenURL = asMetadata.tokenEndpoint
 
-        let tokenBody = TokenExchangeBody(
-            clientID: clientID,
-            code: code,
-            codeVerifier: pkce.verifier,
-            redirectURI: "\(callbackScheme):\(callbackPath)"
+        let parameters: [(String, String?)] = [
+            ("grant_type", "authorization_code"),
+            ("client_id", clientID),
+            ("code", code),
+            ("code_verifier", pkce.verifier),
+            ("redirect_uri", "\(callbackScheme):\(callbackPath)"),
+        ]
+
+        var (data, httpResponse) = try await sendOAuthFormRequest(
+            url: tokenURL,
+            parameters: parameters,
+            dpop: dpop,
+            nonce: asNonce,
+            source: "OAuth Token Exchange"
         )
-        let bodyData = try JSONEncoder().encode(tokenBody)
 
-        var request = URLRequest(url: tokenURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.httpBody = bodyData
-
-        let (data, httpResponse) = try await httpClient.data(for: request, source: "OAuth Token Exchange")
+        if !(200 ..< 300).contains(httpResponse.statusCode),
+           let retryNonce = dpopNonce(from: httpResponse)
+        {
+            (data, httpResponse) = try await sendOAuthFormRequest(
+                url: tokenURL,
+                parameters: parameters,
+                dpop: dpop,
+                nonce: retryNonce,
+                source: "OAuth Token Exchange Retry"
+            )
+        }
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw OAuthFlowError.tokenExchangeFailed(httpResponse.statusCode)
@@ -377,65 +400,53 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         guard expiresIn > 0 else { return nil }
         return Date().addingTimeInterval(TimeInterval(expiresIn))
     }
+
+    private func sendOAuthFormRequest(
+        url: URL,
+        parameters: [(String, String?)],
+        dpop: OAuthDPoP,
+        nonce: String?,
+        source: String
+    ) async throws -> (Data, HTTPURLResponse) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(
+            try dpop.proof(httpMethod: "POST", httpURL: url, accessTokenHash: nil, nonce: nonce),
+            forHTTPHeaderField: "DPoP"
+        )
+        request.httpBody = formURLEncodedData(parameters)
+        return try await httpClient.data(for: request, source: source)
+    }
+
+    private func formURLEncodedData(_ parameters: [(String, String?)]) -> Data {
+        let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
+        let body = parameters.compactMap { key, value -> String? in
+            guard let value else { return nil }
+            let encodedKey = key.addingPercentEncoding(withAllowedCharacters: allowed) ?? key
+            let encodedValue = value.addingPercentEncoding(withAllowedCharacters: allowed) ?? value
+            return "\(encodedKey)=\(encodedValue)"
+        }.joined(separator: "&")
+        return Data(body.utf8)
+    }
+
+    private func dpopNonce(from response: HTTPURLResponse) -> String? {
+        for (key, value) in response.allHeaderFields {
+            guard String(describing: key).caseInsensitiveCompare("DPoP-Nonce") == .orderedSame else { continue }
+            return value as? String ?? String(describing: value)
+        }
+        return nil
+    }
 }
 
 // MARK: - Request / Response Models
-
-private struct PARBody: Encodable {
-    let clientID: String
-    let responseType: String
-    let codeChallenge: String
-    let codeChallengeMethod: String
-    let state: String
-    let redirectURI: String
-    let scope: String
-    let loginHint: String?
-
-    enum CodingKeys: String, CodingKey {
-        case clientID = "client_id"
-        case responseType = "response_type"
-        case codeChallenge = "code_challenge"
-        case codeChallengeMethod = "code_challenge_method"
-        case state
-        case redirectURI = "redirect_uri"
-        case scope
-        case loginHint = "login_hint"
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(clientID, forKey: .clientID)
-        try container.encode(responseType, forKey: .responseType)
-        try container.encode(codeChallenge, forKey: .codeChallenge)
-        try container.encode(codeChallengeMethod, forKey: .codeChallengeMethod)
-        try container.encode(state, forKey: .state)
-        try container.encode(redirectURI, forKey: .redirectURI)
-        try container.encode(scope, forKey: .scope)
-        try container.encodeIfPresent(loginHint, forKey: .loginHint)
-    }
-}
 
 private struct PARResponse: Decodable {
     let requestURI: String
 
     enum CodingKeys: String, CodingKey {
         case requestURI = "request_uri"
-    }
-}
-
-private struct TokenExchangeBody: Encodable {
-    let grantType = "authorization_code"
-    let clientID: String
-    let code: String
-    let codeVerifier: String
-    let redirectURI: String
-
-    enum CodingKeys: String, CodingKey {
-        case grantType = "grant_type"
-        case clientID = "client_id"
-        case code
-        case codeVerifier = "code_verifier"
-        case redirectURI = "redirect_uri"
     }
 }
 

@@ -9,10 +9,16 @@ import Foundation
 final class OAuthTokenRefresher: @unchecked Sendable {
     private let httpClient: HTTPClient
     private let keychain: KeychainServicing
+    private let clientID: String
 
-    init(httpClient: HTTPClient = HTTPClient(), keychain: KeychainServicing = KeychainService()) {
+    init(
+        httpClient: HTTPClient = HTTPClient(),
+        keychain: KeychainServicing = KeychainService(),
+        clientID: String = "https://zopyx.github.io/RULYX/oauth-client-metadata.json"
+    ) {
         self.httpClient = httpClient
         self.keychain = keychain
+        self.clientID = clientID
     }
 
     /// Refreshes the access token for a session.
@@ -21,24 +27,25 @@ final class OAuthTokenRefresher: @unchecked Sendable {
     /// - Throws: `OAuthRefreshError` if the refresh fails or the session is invalid.
     func refreshSession(_ session: OAuthSession) async throws -> OAuthSession {
         let dpop = try OAuthDPoP(keyTag: session.dpopKeyTag, keychain: keychain)
+        let tokenURL = session.authorizationServerURL.appendingPathComponent("oauth/token")
 
         let proof = try dpop.proof(
             httpMethod: "POST",
-            httpURL: session.authorizationServerURL.appendingPathComponent(oAuthTokenPath),
+            httpURL: tokenURL,
             accessTokenHash: nil,
             nonce: session.asNonce
         )
 
-        let body = RefreshTokenBody(refreshToken: session.refreshToken)
-        let bodyData = try JSONEncoder().encode(body)
-
-        var request = URLRequest(url: session.authorizationServerURL.appendingPathComponent(oAuthTokenPath))
+        var request = URLRequest(url: tokenURL)
         request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("DPoP \(session.accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue(proof, forHTTPHeaderField: "DPoP")
-        request.httpBody = bodyData
+        request.httpBody = formURLEncodedData([
+            ("grant_type", "refresh_token"),
+            ("client_id", clientID),
+            ("refresh_token", session.refreshToken),
+        ])
 
         let (data, httpResponse) = try await httpClient.data(for: request, source: "OAuth Token Refresh")
         let responseData = data
@@ -81,27 +88,24 @@ final class OAuthTokenRefresher: @unchecked Sendable {
 
     // MARK: - Private
 
-    /// The OAuth token endpoint path (appended to the AS URL).
-    private let oAuthTokenPath = "/oauth/token"
-
     /// Computes the expiry date from an `expires_in` value (seconds from now).
     private func expiryDate(expiresIn: Int) -> Date? {
         guard expiresIn > 0 else { return nil }
         return Date().addingTimeInterval(TimeInterval(expiresIn))
     }
+
+    private func formURLEncodedData(_ parameters: [(String, String)]) -> Data {
+        let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
+        let body = parameters.map { key, value in
+            let encodedKey = key.addingPercentEncoding(withAllowedCharacters: allowed) ?? key
+            let encodedValue = value.addingPercentEncoding(withAllowedCharacters: allowed) ?? value
+            return "\(encodedKey)=\(encodedValue)"
+        }.joined(separator: "&")
+        return Data(body.utf8)
+    }
 }
 
 // MARK: - Request / Response Models
-
-private struct RefreshTokenBody: Encodable {
-    let grantType = "refresh_token"
-    let refreshToken: String
-
-    enum CodingKeys: String, CodingKey {
-        case grantType = "grant_type"
-        case refreshToken = "refresh_token"
-    }
-}
 
 private struct TokenRefreshResponse: Decodable {
     let accessToken: String

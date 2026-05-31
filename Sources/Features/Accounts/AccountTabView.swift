@@ -183,7 +183,10 @@ struct AccountTabView: View {
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
             }
-            .alert(Text(loc: "account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
+            .alert(Text(loc: "account.manage.title"), isPresented: Binding(
+                get: { accountStore.errorMessage != nil },
+                set: { if !$0 { accountStore.errorMessage = nil } }
+            ), actions: {
                 Button(loc("actions.ok")) {
                     accountStore.errorMessage = nil
                 }

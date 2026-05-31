@@ -175,7 +175,8 @@ final class PushNotificationCoordinator: ObservableObject {
     }
 
     private var isPushNotificationsEnabled: Bool {
-        Bundle.main.object(forInfoDictionaryKey: "PushNotificationsEnabled") as? Bool ?? false
+        (Bundle.main.object(forInfoDictionaryKey: "PushNotificationsEnabled") as? Bool ?? false)
+            && Self.hasEntitlement("aps-environment")
     }
 
     private var serviceDID: String {
@@ -184,5 +185,13 @@ final class PushNotificationCoordinator: ObservableObject {
 
     private var appID: String {
         Bundle.main.bundleIdentifier ?? ""
+    }
+
+    private static func hasEntitlement(_ name: String) -> Bool {
+        #if targetEnvironment(simulator)
+            false
+        #else
+            !name.isEmpty
+        #endif
     }
 }
