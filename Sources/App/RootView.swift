@@ -355,6 +355,7 @@ private struct AccountSwitcherTabSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        .presentationBackground(Color(.systemBackground))
     }
 }
 
