@@ -23,8 +23,8 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
     private let endpointResolver: OAuthEndpointResolver
     private let tokenRefresher: OAuthTokenRefresher
 
-    /// The client_id for OAuth. For development, the AT Protocol allows `http://localhost/`.
-    /// For production, this must be a public HTTPS URL hosting the client metadata JSON.
+    /// The client_id for OAuth. Must be a public HTTPS URL hosting the client metadata JSON.
+    /// Uses the raw GitHub URL by default for development. Override in production.
     private let clientID: String
 
     /// The custom URL scheme for the OAuth redirect callback.
@@ -39,7 +39,7 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         tokenStore: OAuthTokenStore = OAuthTokenStore(),
         endpointResolver: OAuthEndpointResolver = OAuthEndpointResolver(),
         tokenRefresher: OAuthTokenRefresher = OAuthTokenRefresher(),
-        clientID: String = "http://localhost/"
+        clientID: String = "https://raw.githubusercontent.com/zopyx/RULYX/feat/oauth/oauth-client-metadata.json"
     ) {
         self.httpClient = httpClient
         self.keychain = keychain
