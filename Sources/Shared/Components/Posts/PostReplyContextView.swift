@@ -23,18 +23,18 @@ struct PostReplyContextView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 4) {
                         Text(parentAuthor.displayName ?? parentAuthor.handle ?? "")
-                            .font(.caption2.weight(.semibold))
+                            .font(.caption.weight(.semibold))
                             .lineLimit(1)
                             .foregroundStyle(.primary)
                         if let handle = parentAuthor.handle {
                             Text("@\(handle)")
-                                .font(.caption2)
+                                .font(.caption)
                                 .foregroundStyle(.tertiary)
                                 .lineLimit(1)
                         }
                     }
                     Text(parent.safeRecord.text ?? "")
-                        .font(.caption2)
+                        .font(.caption)
                         .lineLimit(2)
                         .foregroundStyle(.secondary)
                 }

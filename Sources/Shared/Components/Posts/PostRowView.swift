@@ -97,7 +97,7 @@ struct PostRowView: View {
                     onTapThread: callbacks.onTapThread,
                     onOpenProfile: callbacks.onOpenProfile,
                     onOpenURL: callbacks.onOpenURL,
-                    font: .caption,
+                    font: .callout,
                     lineLimit: 4
                 )
             }

@@ -50,7 +50,7 @@ struct PostActionBar: View {
                                 .font(.callout)
                         }
                     }
-                    .foregroundStyle(isReposted ? Color.green : Color.gray.opacity(0.6))
+                    .foregroundStyle(isReposted ? Color.green : Color(.secondaryLabel))
                 }
                 .buttonStyle(.plain)
             }
@@ -65,14 +65,14 @@ struct PostActionBar: View {
                     Button(action: { onLike() }) {
                         Image(systemName: isLiked ? "heart.fill" : "heart")
                             .font(.body.weight(.medium))
-                            .foregroundStyle(isLiked ? Color.red : Color.gray.opacity(0.6))
+                            .foregroundStyle(isLiked ? Color.red : Color(.secondaryLabel))
                             .scaleEffect(isLiked ? 1.1 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
                     }
                 }
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(.secondary)
             if let onQuote = callbacks.onQuote {
                 actionButton(icon: "quote.bubble", count: nil, action: onQuote)
             }
@@ -81,7 +81,7 @@ struct PostActionBar: View {
                 gearMenu
             }
         }
-        .foregroundStyle(.tertiary)
+        .foregroundStyle(.secondary)
     }
 
     // MARK: - Gear Menu
@@ -220,7 +220,7 @@ struct PostActionBar: View {
         } label: {
             Image(systemName: "gearshape")
                 .font(.body.weight(.medium))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
         .accessibilityLabel(loc("post.gear_menu"))
     }
