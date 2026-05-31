@@ -52,7 +52,7 @@ struct AccountRowView: View {
                     .foregroundStyle(.secondary)
 
                 let hasEntryway = entrywayLabel != nil
-                if hasEntryway || isActive {
+                if hasEntryway || isActive || account.authMethod == .oauth {
                     HStack(spacing: 6) {
                         if let label = entrywayLabel {
                             Text(label)
@@ -67,6 +67,24 @@ struct AccountRowView: View {
                                         Color.clear.background(Color.secondary.opacity(0.15), in: Capsule())
                                     }
                                 }
+                        }
+                        if account.authMethod == .oauth {
+                            HStack(spacing: 4) {
+                                Image(systemName: "person.badge.key.fill")
+                                    .font(.caption2.weight(.semibold))
+                                Text(loc("account.auth.oauth_badge"))
+                                    .font(.caption2.weight(.semibold))
+                            }
+                            .foregroundStyle(.mint)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background {
+                                if #available(iOS 26, *) {
+                                    Color.clear.glassEffect(.regular.tint(.mint), in: .rect(cornerRadius: .infinity))
+                                } else {
+                                    Color.clear.background(Color.mint.opacity(0.14), in: Capsule())
+                                }
+                            }
                         }
                         if isActive {
                             HStack(spacing: 4) {

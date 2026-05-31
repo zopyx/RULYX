@@ -291,6 +291,14 @@ final class AccountStore: ObservableObject {
             try? client.deletePersistedSession(for: account)
         }
 
+        // Clean up OAuth tokens if this is an OAuth account
+        if account.authMethod == .oauth, let did = account.did {
+            let oauthStore = OAuthTokenStore(keychain: keychain)
+            try? oauthStore.deleteSession(for: did)
+            let dpop = try? OAuthDPoP(keyTag: did, keychain: keychain)
+            try? dpop?.deleteKey()
+        }
+
         accounts.removeAll { $0.id == account.id }
 
         if activeAccountID == account.id {
