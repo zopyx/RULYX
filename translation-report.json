@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1255,
+    "total_keys": 1261,
     "total_languages": 16,
-    "untranslated_total": 2513
+    "untranslated_total": 2603
   },
   "keys": {
     "account.active": {
@@ -338,6 +338,258 @@
         "untranslated": true
       }
     },
+    "account.add.auth.method": {
+      "en": "Sign-in method",
+      "de": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Sign-in method",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Sign-in method",
+        "untranslated": true
+      }
+    },
+    "account.add.auth.oauth": {
+      "en": "Browser",
+      "de": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Browser",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Browser",
+        "untranslated": true
+      }
+    },
+    "account.add.auth.oauth.sign_in": {
+      "en": "Sign in with Browser",
+      "de": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Sign in with Browser",
+        "untranslated": true
+      }
+    },
+    "account.add.auth.password": {
+      "en": "App Password",
+      "de": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "it": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "es": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "th": {
+        "text": "App Password",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "App Password",
+        "untranslated": true
+      }
+    },
     "account.add.bluesky": {
       "en": "Bluesky",
       "de": {
@@ -651,6 +903,132 @@
       "vi": {
         "text": "Mở biểu mẫu để thêm tài khoản Bluesky mới",
         "untranslated": false
+      }
+    },
+    "account.add.oauth.description": {
+      "en": "Authenticate directly with your PDS via your web browser. No app password needed.",
+      "de": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Authenticate directly with your PDS via your web browser. No app password needed.",
+        "untranslated": true
+      }
+    },
+    "account.add.oauth.info": {
+      "en": "Browser Sign-In",
+      "de": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Browser Sign-In",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Browser Sign-In",
+        "untranslated": true
       }
     },
     "account.add.other": {
