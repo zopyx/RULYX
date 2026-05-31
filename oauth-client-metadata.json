@@ -1,10 +1,10 @@
 {
-  "client_id": "https://raw.githubusercontent.com/zopyx/RULYX/feat/oauth/oauth-client-metadata.json",
+  "client_id": "https://zopyx.github.io/RULYX/oauth-client-metadata.json",
   "application_type": "native",
   "grant_types": ["authorization_code", "refresh_token"],
   "scope": "atproto transition:generic transition:chat.bsky",
   "response_types": ["code"],
-  "redirect_uris": ["com.ajung.rulyx:/oauth-callback"],
+  "redirect_uris": ["io.github.zopyx:/oauth-callback"],
   "dpop_bound_access_tokens": true,
   "token_endpoint_auth_method": "none"
 }

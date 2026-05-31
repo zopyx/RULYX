@@ -33,7 +33,7 @@ targets:
         NSFaceIDUsageDescription: "Rulyx uses Face ID to protect your accounts and moderation data."
         CFBundleURLTypes:
           - CFBundleURLSchemes:
-              - com.ajung.rulyx
+              - io.github.zopyx
         PushNotificationsEnabled: true
         BskyPushServiceDID: did:web:api.bsky.app
     settings:

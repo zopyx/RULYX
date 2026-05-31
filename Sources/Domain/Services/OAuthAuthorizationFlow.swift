@@ -28,7 +28,8 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
     private let clientID: String
 
     /// The custom URL scheme for the OAuth redirect callback.
-    private let callbackScheme = "com.ajung.rulyx"
+    /// Must be the FQDN of the client_id in reverse order.
+    private let callbackScheme = "io.github.zopyx"
     /// The OAuth redirect URI path.
     private let callbackPath = "/oauth-callback"
 
@@ -39,7 +40,7 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         tokenStore: OAuthTokenStore = OAuthTokenStore(),
         endpointResolver: OAuthEndpointResolver = OAuthEndpointResolver(),
         tokenRefresher: OAuthTokenRefresher = OAuthTokenRefresher(),
-        clientID: String = "https://raw.githubusercontent.com/zopyx/RULYX/feat/oauth/oauth-client-metadata.json"
+        clientID: String = "https://zopyx.github.io/RULYX/oauth-client-metadata.json"
     ) {
         self.httpClient = httpClient
         self.keychain = keychain
