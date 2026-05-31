@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// Configures a larger shared URL cache (50MB memory, 200MB disk) for caching
@@ -157,15 +158,17 @@ struct RULYXApp: App {
 
                     // MARK: Lifecycle — Step 5: Chat (per Active Account)
 
-                    // Configures the chat store for the currently active account.
-                    // Re-runs whenever `activeAccountID` changes (user switches account).
-                    // Sets credentials, starts polling, loads conversations, and syncs push state.
-                    .task(id: deps.accountStore.activeAccountID) {
-                        let appPassword = deps.accountStore.activeAccount.flatMap { deps.accountStore.appPassword(for: $0) }
-                        deps.chatStore.setAccount(deps.accountStore.activeAccount, appPassword: appPassword)
-                        deps.chatStore.startPolling()
-                        await deps.chatStore.loadConvos()
-                        deps.pushNotificationCoordinator.syncAccounts()
+                    // Initial chat setup for the active account.
+                    .task {
+                        await reloadChatForActiveAccount(showPrompts: deps.accountStore.activeAccount != nil)
+                    }
+                    // AccountStore is a nested ObservableObject owned by AppDependencies;
+                    // subscribe directly so chat reloads are not dependent on App body
+                    // re-evaluation.
+                    .onReceive(deps.accountStore.$activeAccountID.removeDuplicates().dropFirst()) { _ in
+                        Task { @MainActor in
+                            await reloadChatForActiveAccount(showPrompts: deps.accountStore.activeAccount != nil)
+                        }
                     }
 
                     // MARK: Lifecycle — Push Account Sync
@@ -314,6 +317,20 @@ struct RULYXApp: App {
         }
         .commandsRemoved()
         .handlesExternalEvents(matching: ["profile"])
+    }
+
+    private func reloadChatForActiveAccount(showPrompts: Bool) async {
+        let account = deps.accountStore.activeAccount
+        let appPassword = account.flatMap { deps.accountStore.appPassword(for: $0) }
+        AppLogger.persistence.info("Chat account reload requested for \(account?.handle ?? "none", privacy: .public)")
+        await deps.chatStore.rebuildConversations(
+            for: account,
+            appPassword: appPassword,
+            clearCaches: true,
+            showPrompts: showPrompts
+        )
+        deps.chatStore.startPolling()
+        deps.pushNotificationCoordinator.syncAccounts()
     }
 }
 

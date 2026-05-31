@@ -13,8 +13,9 @@ final class BlueskySessionService401RetryTests: XCTestCase {
         requestExecutor = MockRequestExecutor()
         keychain = MockKeychain()
         service = BlueskySessionService(requestExecutor: requestExecutor, keychain: keychain)
-        account = makeAccount()
-        try? keychain.save(try! JSONEncoder().encode(makeSession()).utf8String, service: "com.ajung.RULYX.session", account: account.id.uuidString)
+        let session = makeSession()
+        account = makeAccount(handle: session.handle, did: session.did)
+        try? keychain.save(try! JSONEncoder().encode(session).utf8String, service: "com.ajung.RULYX.session", account: account.id.uuidString)
     }
 
     override func tearDown() {

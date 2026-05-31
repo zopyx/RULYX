@@ -5,6 +5,9 @@ import Foundation
 /// managing read state, and conversation lifecycle (leave, mute, unmute).
 @MainActor
 protocol ChatServicing {
+    /// Clears any in-memory caches used by the chat service.
+    func clearCaches()
+
     // MARK: - Conversations
 
     /// Lists conversations with optional status filter and pagination.

@@ -212,6 +212,7 @@ final class AccountStore: ObservableObject {
     /// Switches the active account and clears all caches (HTTP cache, DashboardCache, RelationshipCache).
     func switchAccount(to account: AppAccount, using client: LiveBlueskyClient) async {
         guard accounts.contains(account) else { return }
+        AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .public)")
         client.clearCache()
         await Task.detached(priority: .utility) {
             DashboardCache.clearAll()
@@ -222,6 +223,7 @@ final class AccountStore: ObservableObject {
             accounts[index].lastUsedAt = .now
         }
         persist()
+        AppLogger.persistence.info("Account switch completed for \(account.handle, privacy: .public)")
     }
 
     /// Returns `true` if the given account has been flagged as deactivated.

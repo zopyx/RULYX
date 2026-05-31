@@ -308,6 +308,45 @@ final class BlueskySessionServiceTests: XCTestCase {
         XCTAssertTrue(try XCTUnwrap(saved?.contains("did:plc:t")))
     }
 
+    func testAuthenticatedRequestDiscardsMismatchedPersistedSession() async throws {
+        let (service, executor, keychain) = makeService()
+        let account = AppAccount(handle: "beta.bsky.social", did: "did:plc:beta")
+        let wrongSession = try BlueskySession(
+            did: "did:plc:alpha",
+            handle: "alpha.bsky.social",
+            accessJWT: "alpha-jwt",
+            refreshJWT: nil,
+            pdsURL: XCTUnwrap(URL(string: "https://bsky.social"))
+        )
+        let wrongSessionData = try JSONEncoder().encode(wrongSession)
+        let wrongSessionValue = try XCTUnwrap(String(data: wrongSessionData, encoding: .utf8))
+        try keychain.save(
+            wrongSessionValue,
+            service: "com.ajung.RULYX.session",
+            account: account.id.uuidString
+        )
+
+        executor.onSend = { path, _, _, _, _, _ in
+            XCTAssertEqual(path, "com.atproto.server.createSession")
+            return CreateSessionResponse(
+                did: "did:plc:beta",
+                handle: "beta.bsky.social",
+                accessJWT: "beta-jwt",
+                refreshJWT: "beta-refresh",
+                didDoc: nil
+            )
+        }
+
+        let sessionHandle: String = try await service.performAuthenticatedRequest(
+            account: account,
+            appPassword: "password",
+            operation: { session in session.handle }
+        )
+
+        XCTAssertEqual(sessionHandle, "beta.bsky.social")
+        XCTAssertTrue(try XCTUnwrap(keychain.savedValues["com.ajung.RULYX.session:\(account.id.uuidString)"]?.contains("did:plc:beta")))
+    }
+
     func testDeletePersistedSession() async throws {
         let (service, _, keychain) = makeService()
         let account = AppAccount(handle: "test.bsky.social")
@@ -319,7 +358,7 @@ final class BlueskySessionServiceTests: XCTestCase {
 
     func testClearSessionCache() throws {
         let (service, _, _) = makeService()
-        let account = AppAccount(handle: "test")
+        let account = AppAccount(handle: "test.bsky.social", did: "did:plc:t")
         let session = try BlueskySession(did: "did:plc:t", handle: "test.bsky.social", accessJWT: "jwt", refreshJWT: nil, pdsURL: XCTUnwrap(URL(string: "https://bsky.social")))
         let exp = XCTestExpectation()
         Task {

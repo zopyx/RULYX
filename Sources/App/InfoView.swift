@@ -579,15 +579,17 @@ private struct DebugInfoView: View {
             .pageTitle(localizationManager.localized("debug.diagnostics"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ToolbarCloseButton()
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        // Copies all diagnostics as tab-separated text to the clipboard.
-                        let text = diagnostics.map { "\($0.0): \($0.1)" }.joined(separator: "\n")
-                        UIPasteboard.general.string = text
-                    } label: {
-                        Image(systemName: "doc.on.doc")
+                    HStack {
+                        Button {
+                            // Copies all diagnostics as tab-separated text to the clipboard.
+                            let text = diagnostics.map { "\($0.0): \($0.1)" }.joined(separator: "\n")
+                            UIPasteboard.general.string = text
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                        }
+                        .accessibilityLabel(localizationManager.localized("post.copy"))
+
+                        ToolbarCloseButton()
                     }
                 }
             }

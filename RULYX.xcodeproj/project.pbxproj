@@ -248,6 +248,7 @@
 		D6E5CF5F164959F1E4EE3EEB /* StatePanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57053C65176DBDA9C7D5E7E9 /* StatePanels.swift */; };
 		D82407480CC64963EB48674F /* ActionQueueStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F8024F2606E01EAC5C0AF3 /* ActionQueueStoreTests.swift */; };
 		DA7F74AA2C1A94AFB40050D2 /* iPadNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61A6EAC9955CEDB8DC9D24F /* iPadNotificationsView.swift */; };
+		DC720D0D203CB0C053497109 /* ChatStatusBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7BFB1D29D75F3D69ABA8FEB /* ChatStatusBanner.swift */; };
 		DD58B2A91BC7086D806410E6 /* ListDiffControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4ECC0E25DA75F1AFBD6A358 /* ListDiffControllerTests.swift */; };
 		DD6DAD575A71ACC33E77C95A /* ModerationAuditStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52463180B718A02DC76271D5 /* ModerationAuditStoreTests.swift */; };
 		E06BCE10E79FB2583810EA42 /* InfrastructureServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF78B4DDF8BD53DBFB6CD7DC /* InfrastructureServiceTests.swift */; };
@@ -553,6 +554,7 @@
 		D4F6D1DF0921A11BEE1A9854 /* AppLockManagerTimeoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockManagerTimeoutTests.swift; sourceTree = "<group>"; };
 		D56702946833B4C168C9F620 /* StringCSVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringCSVTests.swift; sourceTree = "<group>"; };
 		D7A39B45AC0B961A32846F08 /* BlueskyAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAppDelegate.swift; sourceTree = "<group>"; };
+		D7BFB1D29D75F3D69ABA8FEB /* ChatStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStatusBanner.swift; sourceTree = "<group>"; };
 		D9247E08E5551755A2ED991A /* BlueskySessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskySessionService.swift; sourceTree = "<group>"; };
 		DC0ECA2AA45475B39419E281 /* BlueskyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyList.swift; sourceTree = "<group>"; };
 		E13525C9AD087392E70A31A8 /* BlueskyRequestExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyRequestExecutorTests.swift; sourceTree = "<group>"; };
@@ -902,6 +904,7 @@
 				00247ABCA73D8B2603E8CDE3 /* ActorSearchResultRow.swift */,
 				4DDA82F772411DBDF26E3BB4 /* AppStyling.swift */,
 				7E73015FFF0E908DAB113970 /* BlueskyActorRow.swift */,
+				D7BFB1D29D75F3D69ABA8FEB /* ChatStatusBanner.swift */,
 				58E92F175C3C35100F674497 /* ClearskyBanner.swift */,
 				4F9ACE422B7A3A392487CBA6 /* DirectionalSymbol.swift */,
 				7A5D7000E53B53FE6C003496 /* GIFPickerView.swift */,
@@ -1362,6 +1365,7 @@
 				41DFAEB97DA5BCE2392C999D /* ChatModels.swift in Sources */,
 				F8C9D827F47501C80D29CEDF /* ChatService.swift in Sources */,
 				FA9E21318F69F3D0236FBD91 /* ChatServicing.swift in Sources */,
+				DC720D0D203CB0C053497109 /* ChatStatusBanner.swift in Sources */,
 				9E0C71BA65E2D438907F7E96 /* ChatStore.swift in Sources */,
 				E9A18336F1F918BAB3ADE296 /* ChatTab.swift in Sources */,
 				6EA2CC9DCA4B500405B6081F /* ClearskyBanner.swift in Sources */,

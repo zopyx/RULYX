@@ -21,6 +21,10 @@ final class ChatService: ChatServicing {
         self.httpClient = httpClient
     }
 
+    func clearCaches() {
+        sessionService.clearSessionCache()
+    }
+
     // MARK: - Conversations
 
     /// Lists conversations with optional status and cursor pagination.

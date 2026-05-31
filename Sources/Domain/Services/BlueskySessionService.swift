@@ -106,6 +106,9 @@ final class BlueskySessionService: BlueskySessionServicing {
     }
 
     func persistSession(_ authSession: BlueskySession, for account: AppAccount) async throws {
+        guard session(authSession, belongsTo: account) else {
+            throw BlueskyAPIError.unauthorized
+        }
         let data = try JSONEncoder().encode(authSession)
         guard let value = String(data: data, encoding: .utf8) else {
             throw BlueskyAPIError.invalidResponse
@@ -173,6 +176,11 @@ final class BlueskySessionService: BlueskySessionServicing {
     ) async throws -> BlueskySession {
         let sessionKey = account.id.uuidString
         if let cachedSession = cachedSessions[sessionKey] {
+            guard session(cachedSession, belongsTo: account) else {
+                cachedSessions.removeValue(forKey: sessionKey)
+                try? keychain.delete(service: persistedSessionService, account: sessionKey)
+                return try await recreateSession(for: account, appPassword: appPassword)
+            }
             if shouldRefresh(cachedSession.accessJWT) {
                 return try await recoverSession(
                     currentSession: cachedSession,
@@ -184,6 +192,10 @@ final class BlueskySessionService: BlueskySessionServicing {
         }
 
         if let restoredSession = try restoredSession(for: account) {
+            guard session(restoredSession, belongsTo: account) else {
+                try? keychain.delete(service: persistedSessionService, account: sessionKey)
+                return try await recreateSession(for: account, appPassword: appPassword)
+            }
             cachedSessions[sessionKey] = restoredSession
             if shouldRefresh(restoredSession.accessJWT) {
                 return try await recoverSession(
@@ -195,12 +207,18 @@ final class BlueskySessionService: BlueskySessionServicing {
             return restoredSession
         }
 
+        return try await recreateSession(for: account, appPassword: appPassword)
+    }
+
+    private func recreateSession(
+        for account: AppAccount,
+        appPassword: String?
+    ) async throws -> BlueskySession {
         guard let appPassword else {
             throw BlueskyAPIError.missingCredentials
         }
 
         let newSession = try await authenticate(handle: account.handle, appPassword: appPassword)
-        cachedSessions[sessionKey] = newSession
         try await persistSession(newSession, for: account)
         return newSession
     }
@@ -213,19 +231,15 @@ final class BlueskySessionService: BlueskySessionServicing {
         let sessionKey = account.id.uuidString
 
         if let refreshedSession = try await refreshSession(currentSession) {
+            guard session(refreshedSession, belongsTo: account) else {
+                return try await recreateSession(for: account, appPassword: appPassword)
+            }
             cachedSessions[sessionKey] = refreshedSession
             try await persistSession(refreshedSession, for: account)
             return refreshedSession
         }
 
-        guard let appPassword else {
-            throw BlueskyAPIError.unauthorized
-        }
-
-        let recreatedSession = try await authenticate(handle: account.handle, appPassword: appPassword)
-        cachedSessions[sessionKey] = recreatedSession
-        try await persistSession(recreatedSession, for: account)
-        return recreatedSession
+        return try await recreateSession(for: account, appPassword: appPassword)
     }
 
     private func refreshSession(_ existingSession: BlueskySession) async throws -> BlueskySession? {
@@ -279,6 +293,13 @@ final class BlueskySessionService: BlueskySessionServicing {
             )
         }
         return restored
+    }
+
+    private func session(_ session: BlueskySession, belongsTo account: AppAccount) -> Bool {
+        if let did = account.did, !did.isEmpty {
+            return session.did == did
+        }
+        return session.handle.caseInsensitiveCompare(account.handle) == .orderedSame
     }
 
     private func authenticationURL(forHandle handle: String) async throws -> URL {

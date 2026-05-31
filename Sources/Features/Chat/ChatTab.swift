@@ -10,11 +10,6 @@ struct ChatTab: View {
         ConversationListView()
             .environmentObject(chatStore)
             .environmentObject(accountStore)
-            .onChange(of: accountStore.activeAccount?.did) { _, _ in
-                let pw = accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
-                chatStore.setAccount(accountStore.activeAccount, appPassword: pw)
-                Task { await chatStore.loadConvos() }
-            }
     }
 }
 

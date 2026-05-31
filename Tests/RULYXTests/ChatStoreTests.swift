@@ -44,6 +44,53 @@ final class ChatStoreTests: XCTestCase {
         XCTAssertEqual(store.currentAccountDID, "did:plc:test")
     }
 
+    func testSetAccountDifferentStoredAccountWithSameDIDClearsData() async {
+        service.convosResult = .success(makePagedConvos(count: 1))
+        service.messagesResult = .success(makePagedMessages(count: 1))
+        await store.loadConvos()
+        await store.loadMessages(convoId: "c1")
+        XCTAssertFalse(store.conversations.isEmpty)
+        XCTAssertFalse(store.messages.isEmpty)
+
+        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:test")
+        store.setAccount(secondAccount, appPassword: "password")
+
+        XCTAssertTrue(store.conversations.isEmpty)
+        XCTAssertTrue(store.messages.isEmpty)
+        XCTAssertEqual(store.currentAccountDID, "did:plc:test")
+    }
+
+    func testRebuildConversationsClearsMessagesAndLoadsFreshList() async {
+        service.convosResult = .success(makePagedConvos(count: 1))
+        service.messagesResult = .success(makePagedMessages(count: 1))
+        await store.loadConvos()
+        await store.loadMessages(convoId: "c1")
+        XCTAssertFalse(store.messages.isEmpty)
+
+        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:second")
+        service.convosResultsByHandle = [
+            secondAccount.handle: PagedConvos(conversations: [makeConvo(id: "second-account")], cursor: nil),
+        ]
+        await store.rebuildConversations(for: secondAccount, appPassword: "password")
+
+        XCTAssertEqual(store.conversations.map(\.id), ["second-account"])
+        XCTAssertTrue(store.messages.isEmpty)
+        XCTAssertEqual(store.currentAccountDID, "did:plc:second")
+    }
+
+    func testRebuildConversationsCanClearCachesAndShowReloadPrompt() async {
+        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:second")
+        service.convosResultsByHandle = [
+            secondAccount.handle: PagedConvos(conversations: [makeConvo(id: "second-account")], cursor: nil),
+        ]
+
+        await store.rebuildConversations(for: secondAccount, appPassword: "password", clearCaches: true, showPrompts: true)
+
+        XCTAssertTrue(service.didClearCaches)
+        XCTAssertEqual(store.statusMessage, "Reloading for second.bsky.social")
+        XCTAssertEqual(store.conversations.map(\.id), ["second-account"])
+    }
+
     // MARK: - Conversations
 
     func testLoadConvosPopulates() async {
@@ -66,6 +113,24 @@ final class ChatStoreTests: XCTestCase {
         await store.loadConvos()
         XCTAssertFalse(store.isLoadingConvos)
         XCTAssertTrue(store.conversations.isEmpty)
+    }
+
+    func testLoadConvosIgnoresStaleResultAfterAccountSwitch() async {
+        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:second")
+        service.convosResultsByHandle = [
+            account.handle: PagedConvos(conversations: [makeConvo(id: "old-account")], cursor: nil),
+            secondAccount.handle: PagedConvos(conversations: [makeConvo(id: "new-account")], cursor: nil),
+        ]
+        service.listConvosDelayNanos = 50_000_000
+
+        let staleLoad = Task { await store.rebuildConversations(for: account, appPassword: "password") }
+        try? await Task.sleep(nanoseconds: 10_000_000)
+
+        service.listConvosDelayNanos = 0
+        await store.rebuildConversations(for: secondAccount, appPassword: "password")
+        await staleLoad.value
+
+        XCTAssertEqual(store.conversations.map(\.id), ["new-account"])
     }
 
     func testLoadMoreConvos() async {
@@ -214,6 +279,8 @@ final class ChatStoreTests: XCTestCase {
 @MainActor
 private final class MockChatService: ChatServicing {
     var convosResult: Result<PagedConvos, Error>?
+    var convosResultsByHandle: [String: PagedConvos] = [:]
+    var listConvosDelayNanos: UInt64 = 0
     var messagesResult: Result<PagedMessages, Error>?
     var sendResult: Result<ChatMessageSendResult, Error>?
     var getConvoResult: Result<ChatConversation, Error>?
@@ -222,8 +289,19 @@ private final class MockChatService: ChatServicing {
     var leaveResult: Result<Void, Error>?
     var logResult: Result<([ChatLogEvent], String?), Error>?
     private(set) var didUpdateRead = false
+    private(set) var didClearCaches = false
 
-    func listConvos(account _: AppAccount, appPassword _: String?, status _: String?, cursor _: String?) async throws -> PagedConvos {
+    func clearCaches() {
+        didClearCaches = true
+    }
+
+    func listConvos(account: AppAccount, appPassword _: String?, status _: String?, cursor _: String?) async throws -> PagedConvos {
+        if listConvosDelayNanos > 0 {
+            try await Task.sleep(nanoseconds: listConvosDelayNanos)
+        }
+        if let result = convosResultsByHandle[account.handle] {
+            return result
+        }
         guard let result = convosResult else { throw BlueskyAPIError.server("No mock") }
         return try result.get()
     }

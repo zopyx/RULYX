@@ -129,6 +129,11 @@ struct RootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.bottom, 8)
         }
+        .safeAreaInset(edge: .top) {
+            if let statusMessage = chatStore.statusMessage {
+                ChatStatusBanner(message: statusMessage)
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             HStack(spacing: 0) {
                 ForEach(tabBarItems) { item in

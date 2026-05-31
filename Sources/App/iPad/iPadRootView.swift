@@ -46,6 +46,11 @@ struct iPadRootView: View {
             .tint(clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7))
             .environmentObject(navState)
         }
+        .safeAreaInset(edge: .top) {
+            if let statusMessage = chatStore.statusMessage {
+                ChatStatusBanner(message: statusMessage)
+            }
+        }
         .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
             onboardingSheet
         }

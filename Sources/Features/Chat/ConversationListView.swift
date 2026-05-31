@@ -235,14 +235,19 @@ struct ConversationListView: View {
                 await chatStore.loadConvos()
             }
             .task {
-                guard chatStore.conversations.isEmpty, accountStore.activeAccount != nil else { return }
-                let pw = accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
-                chatStore.setAccount(accountStore.activeAccount, appPassword: pw)
-                await chatStore.loadConvos()
                 openPendingConversationIfNeeded()
+                guard chatStore.conversations.isEmpty, !chatStore.isLoadingConvos, accountStore.activeAccount != nil else { return }
+                let pw = accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
+                await chatStore.rebuildConversations(for: accountStore.activeAccount, appPassword: pw)
             }
             .onAppear {
                 openPendingConversationIfNeeded()
+            }
+            .onChange(of: accountStore.activeAccountID) { _, _ in
+                navPath = []
+                selectedConvos = []
+                editMode = .inactive
+                searchText = ""
             }
             .onChange(of: workspaceStore.pendingChatConversation) { _, _ in
                 openPendingConversationIfNeeded()

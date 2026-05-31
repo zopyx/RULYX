@@ -10,6 +10,12 @@ import UserNotifications
 /// new events via the chat log endpoint. It also supports manual sync via `syncLog()`.
 @MainActor
 final class ChatStore: ObservableObject {
+    private struct ChatAccountContext: Equatable {
+        let generation: UUID
+        let accountID: AppAccount.ID
+        let did: String?
+    }
+
     /// All conversations, sorted by `lastMessageAt` descending.
     @Published private(set) var conversations: [ChatConversation] = []
     /// Messages keyed by conversation ID. Newest messages are at the end of each array.
@@ -28,6 +34,8 @@ final class ChatStore: ObservableObject {
     @Published var error: Error?
     /// The last message-level error that occurred.
     @Published var messageError: Error?
+    /// Short user-visible status shown while switching chat accounts.
+    @Published var statusMessage: String?
 
     /// The underlying chat service (network layer).
     private let chatService: ChatServicing
@@ -39,6 +47,10 @@ final class ChatStore: ObservableObject {
     private var messageCursors: [String: String] = [:]
     /// The polling task for real-time event delivery.
     private var pollingTask: Task<Void, Never>?
+    /// The current chat loading context. Any response from an older context is discarded.
+    private var activeContext: ChatAccountContext?
+    /// The stored account ID for the active chat context.
+    private var activeAccountID: AppAccount.ID?
     /// The currently active account.
     private var activeAccount: AppAccount?
     /// The app password for the active account.
@@ -47,6 +59,8 @@ final class ChatStore: ObservableObject {
     private var visibleConversationID: String?
     /// The DID of the currently active account (used to compute unread increments).
     private(set) var currentAccountDID: String?
+    /// The task responsible for dismissing transient status text.
+    private var statusDismissTask: Task<Void, Never>?
 
     // MARK: - Init
 
@@ -56,32 +70,88 @@ final class ChatStore: ObservableObject {
 
     // MARK: - Account
 
-    /// Sets the active account and password. Clears all state and stops polling when account is `nil`.
+    /// Sets the active account and password. When the stored account changes, clears all
+    /// chat state so the UI immediately shows loading / empty before fresh data arrives.
     func setAccount(_ account: AppAccount?, appPassword: String?) {
+        let accountDidChange = activeAccountID != account?.id || currentAccountDID != account?.did
+
+        activeAccountID = account?.id
         activeAccount = account
         activeAppPassword = appPassword
         currentAccountDID = account?.did
-        if account == nil {
+
+        if accountDidChange {
+            activeContext = account.map { ChatAccountContext(generation: UUID(), accountID: $0.id, did: $0.did) }
             stopPolling()
-            conversations = []
-            messages = [:]
+            resetConversationState(isLoading: account != nil)
+        } else if activeContext == nil, let account {
+            activeContext = ChatAccountContext(generation: UUID(), accountID: account.id, did: account.did)
+        }
+    }
+
+    /// Switches chat to `account` by discarding every cached conversation/message and
+    /// rebuilding the visible conversation list from the chat service response.
+    func rebuildConversations(for account: AppAccount?, appPassword: String?, clearCaches: Bool = false, showPrompts: Bool = false) async {
+        AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none", privacy: .public); clearCaches=\(clearCaches, privacy: .public); showPrompts=\(showPrompts, privacy: .public)")
+        activeAccountID = account?.id
+        activeAccount = account
+        activeAppPassword = appPassword
+        currentAccountDID = account?.did
+        let context = account.map { ChatAccountContext(generation: UUID(), accountID: $0.id, did: $0.did) }
+        activeContext = context
+        stopPolling()
+
+        if clearCaches {
+            chatService.clearCaches()
+        }
+
+        resetConversationState(isLoading: account != nil)
+
+        if showPrompts, clearCaches {
+            setStatusMessage("Caches Cleared", autoDismiss: false)
+        }
+
+        guard let account else {
+            if !showPrompts {
+                statusMessage = nil
+            }
+            return
+        }
+
+        if showPrompts {
+            try? await Task.sleep(nanoseconds: 1_200_000_000)
+            guard context.map(isCurrentContext) ?? false else { return }
+            setStatusMessage("Reloading for \(account.handle)", autoDismiss: false)
+        }
+
+        await loadConvos()
+
+        if showPrompts, context.map(isCurrentContext) ?? false {
+            setStatusMessage("Reloading for \(account.handle)", autoDismiss: true)
         }
     }
 
     // MARK: - Conversations
 
-    /// Loads all conversations.
+    /// Loads the first page of conversations.
     func loadConvos() async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         isLoadingConvos = true
         error = nil
         do {
             let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
+            guard isCurrentContext(context) else {
+                return
+            }
             conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
             convosCursor = result.cursor
             isLoadingConvos = false
         } catch {
-            guard !AppError.isCancellation(error) else { return }
+            guard isCurrentContext(context) else { return }
+            guard !AppError.isCancellation(error) else {
+                isLoadingConvos = false
+                return
+            }
             self.error = error
             isLoadingConvos = false
         }
@@ -89,12 +159,14 @@ final class ChatStore: ObservableObject {
 
     /// Loads the next page of conversations using the stored cursor.
     func loadMoreConvos() async {
-        guard let account = activeAccount, let cursor = convosCursor else { return }
+        guard let account = activeAccount, let context = activeContext, let cursor = convosCursor else { return }
         do {
             let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: cursor)
+            guard isCurrentContext(context) else { return }
             conversations = (conversations + result.conversations).sorted { $0.lastMessageAt > $1.lastMessageAt }
             convosCursor = result.cursor
         } catch {
+            guard isCurrentContext(context) else { return }
             self.error = error
         }
     }
@@ -103,11 +175,12 @@ final class ChatStore: ObservableObject {
 
     /// Loads messages for a conversation. Marks the conversation as read after loading.
     func loadMessages(convoId: String) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         isLoadingMessages = true
         messageError = nil
         do {
             let result = try await chatService.getMessages(convoId: convoId, cursor: nil, limit: 50, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
             messages[convoId] = result.messages.reversed()
             messageCursors[convoId] = result.cursor
             hasMoreMessages[convoId] = result.cursor != nil
@@ -122,6 +195,7 @@ final class ChatStore: ObservableObject {
                 try? await chatService.updateRead(convoId: convoId, messageId: lastId, account: account, appPassword: activeAppPassword)
             }
         } catch {
+            guard isCurrentContext(context) else { return }
             AppLogger.persistence.error("Failed to load messages for \(convoId, privacy: .public): \(error.localizedDescription, privacy: .public)")
             messageError = error
             isLoadingMessages = false
@@ -130,11 +204,12 @@ final class ChatStore: ObservableObject {
 
     /// Loads older (paginated) messages for a conversation. Deduplicates against existing messages.
     func loadMoreMessages(convoId: String) async {
-        guard let account = activeAccount, let cursor = messageCursors[convoId], cursor != "" else { return }
+        guard let account = activeAccount, let context = activeContext, let cursor = messageCursors[convoId], cursor != "" else { return }
         guard hasMoreMessages[convoId] != false else { return }
         isLoadingMoreMessages = true
         do {
             let result = try await chatService.getMessages(convoId: convoId, cursor: cursor, limit: 50, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
             messageCursors[convoId] = result.cursor
             hasMoreMessages[convoId] = result.cursor != nil
             let existing = messages[convoId] ?? []
@@ -143,6 +218,7 @@ final class ChatStore: ObservableObject {
             messages[convoId] = newMessages + existing
             isLoadingMoreMessages = false
         } catch {
+            guard isCurrentContext(context) else { return }
             messageError = error
             isLoadingMoreMessages = false
         }
@@ -153,7 +229,7 @@ final class ChatStore: ObservableObject {
     /// Sends a text message to a conversation with optimistic local insertion.
     /// The message appears immediately as pending; it's replaced with the server response on success.
     func sendMessage(convoId: String, text: String) async {
-        guard let account = activeAccount, let senderDID = currentAccountDID else { return }
+        guard let account = activeAccount, let context = activeContext, let senderDID = currentAccountDID else { return }
         let pendingId = "pending-\(UUID().uuidString)"
         let pendingMsg = ChatMessageKind.message(ChatMessage(
             id: pendingId,
@@ -171,6 +247,7 @@ final class ChatStore: ObservableObject {
         isSendingMessage = true
         do {
             let result = try await chatService.sendMessage(convoId: convoId, text: text, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
             let confirmedMsg = ChatMessageKind.message(ChatMessage(
                 id: result.id,
                 rev: result.rev,
@@ -189,6 +266,7 @@ final class ChatStore: ObservableObject {
             messages[convoId] = updated
             isSendingMessage = false
         } catch {
+            guard isCurrentContext(context) else { return }
             var updated = messages[convoId] ?? []
             if let pendingIndex = updated.firstIndex(where: { idForMessage($0) == pendingId }) {
                 if case var .message(m) = updated[pendingIndex] {
@@ -206,8 +284,9 @@ final class ChatStore: ObservableObject {
 
     /// Marks a conversation as read. Updates the unread count to 0 locally.
     func markRead(convoId: String, messageId: String?) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         try? await chatService.updateRead(convoId: convoId, messageId: messageId, account: account, appPassword: activeAppPassword)
+        guard isCurrentContext(context) else { return }
         if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
             var updated = conversations[idx]
             updated = ChatConversation(
@@ -227,8 +306,9 @@ final class ChatStore: ObservableObject {
 
     /// Mutes a conversation locally and on the server.
     func mute(convoId: String) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         try? await chatService.muteConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+        guard isCurrentContext(context) else { return }
         if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
             var updated = conversations[idx]
             updated = ChatConversation(
@@ -248,8 +328,9 @@ final class ChatStore: ObservableObject {
 
     /// Unmutes a conversation locally and on the server.
     func unmute(convoId: String) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         try? await chatService.unmuteConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+        guard isCurrentContext(context) else { return }
         if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
             var updated = conversations[idx]
             updated = ChatConversation(
@@ -269,8 +350,9 @@ final class ChatStore: ObservableObject {
 
     /// Leaves a conversation. Removes it from the local cache.
     func leave(convoId: String) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         try? await chatService.leaveConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+        guard isCurrentContext(context) else { return }
         conversations.removeAll { $0.id == convoId }
         messages.removeValue(forKey: convoId)
     }
@@ -290,12 +372,14 @@ final class ChatStore: ObservableObject {
 
     /// Gets or creates a 1:1 conversation with a member by their DID.
     func getOrCreateConvo(memberDID: String) async -> ChatConversation? {
-        guard let account = activeAccount else { return nil }
+        guard let account = activeAccount, let context = activeContext else { return nil }
         do {
             let conversation = try await chatService.getConvoForMembers(members: [memberDID], account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return nil }
             upsertConversation(conversation)
             return conversation
         } catch {
+            guard isCurrentContext(context) else { return nil }
             self.error = error
             return nil
         }
@@ -303,9 +387,10 @@ final class ChatStore: ObservableObject {
 
     /// Refreshes messages for a conversation (replaces the full message list).
     private func refreshMessages(convoId: String) async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         do {
             let result = try await chatService.getMessages(convoId: convoId, cursor: nil, limit: 50, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
             messages[convoId] = result.messages.reversed()
         } catch {
             if let urlError = error as? URLError, urlError.code == .cancelled { return }
@@ -322,9 +407,10 @@ final class ChatStore: ObservableObject {
     /// Performs a one-shot sync of the chat event log. Updates conversations and messages.
     /// Called from push notification handling or app foreground.
     func syncLog() async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         do {
             let (events, newCursor) = try await chatService.getLog(cursor: logCursor, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
             logCursor = newCursor
             var hasStructuralEvents = false
             for event in events {
@@ -344,6 +430,7 @@ final class ChatStore: ObservableObject {
             if hasStructuralEvents {
                 try await Task.sleep(nanoseconds: 300_000_000)
                 let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
+                guard isCurrentContext(context) else { return }
                 conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
                 convosCursor = result.cursor
             }
@@ -354,6 +441,7 @@ final class ChatStore: ObservableObject {
                 await refreshMessages(convoId: visibleID)
             }
         } catch {
+            guard isCurrentContext(context) else { return }
             if let urlError = error as? URLError, urlError.code == .cancelled { return }
             AppLogger.persistence.error("Chat syncLog failed: \(error.localizedDescription, privacy: .public)")
             self.error = error
@@ -396,12 +484,52 @@ final class ChatStore: ObservableObject {
         }
     }
 
+    /// Clears all per-account chat data.
+    private func resetConversationState(isLoading: Bool) {
+        statusDismissTask?.cancel()
+        statusDismissTask = nil
+        statusMessage = nil
+        conversations = []
+        messages = [:]
+        convosCursor = nil
+        logCursor = nil
+        messageCursors = [:]
+        hasMoreMessages = [:]
+        visibleConversationID = nil
+        error = nil
+        messageError = nil
+        isLoadingConvos = isLoading
+        isLoadingMessages = false
+        isLoadingMoreMessages = false
+        isSendingMessage = false
+    }
+
+    /// Returns whether an async response still belongs to the current chat context.
+    private func isCurrentContext(_ context: ChatAccountContext) -> Bool {
+        activeContext == context
+    }
+
+    private func setStatusMessage(_ message: String, autoDismiss: Bool) {
+        statusDismissTask?.cancel()
+        statusMessage = message
+        AppLogger.persistence.info("Chat status prompt: \(message, privacy: .public)")
+
+        guard autoDismiss else { return }
+        statusDismissTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            guard !Task.isCancelled else { return }
+            self?.statusMessage = nil
+            self?.statusDismissTask = nil
+        }
+    }
+
     /// Polls the chat event log and applies incremental updates.
     /// Rebuilds the conversation list if structural changes are detected.
     private func pollLog() async {
-        guard let account = activeAccount else { return }
+        guard let account = activeAccount, let context = activeContext else { return }
         do {
             let (events, newCursor) = try await chatService.getLog(cursor: logCursor, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
             logCursor = newCursor
 
             var needsReload = false
@@ -431,6 +559,7 @@ final class ChatStore: ObservableObject {
             if needsReload {
                 try await Task.sleep(nanoseconds: 500_000_000)
                 let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
+                guard isCurrentContext(context) else { return }
                 conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
                 convosCursor = result.cursor
             }
@@ -441,6 +570,7 @@ final class ChatStore: ObservableObject {
                 await refreshMessages(convoId: visibleID)
             }
         } catch {
+            guard isCurrentContext(context) else { return }
             if let urlError = error as? URLError, urlError.code == .cancelled { return }
             AppLogger.persistence.error("Chat pollLog failed: \(error.localizedDescription, privacy: .public)")
             self.error = error

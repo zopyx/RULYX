@@ -70,9 +70,8 @@ struct ChatConversation: Identifiable, Hashable {
 
     // MARK: - Equatable
 
-    /// Two conversations are equal if they share the same ID and revision token.
     static func == (lhs: ChatConversation, rhs: ChatConversation) -> Bool {
-        lhs.id == rhs.id && lhs.rev == rhs.rev
+        lhs.id == rhs.id
     }
 }
 
