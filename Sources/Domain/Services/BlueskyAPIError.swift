@@ -12,6 +12,8 @@ enum BlueskyAPIError: LocalizedError {
     case missingCredentials
     /// The server's SSL certificate did not match the pinned fingerprint.
     case sslPinFailure
+    /// Email 2FA verification code is required to complete authentication.
+    case authFactorTokenRequired
     /// The account has been deactivated (includes server message).
     case deactivated(String)
     /// A generic server-side error (includes server message).
@@ -25,6 +27,8 @@ enum BlueskyAPIError: LocalizedError {
             "Bluesky returned an unexpected response."
         case .unauthorized:
             "Bluesky rejected the credentials. Check the handle and app password."
+        case .authFactorTokenRequired:
+            "A verification code has been sent to your email."
         case .missingCredentials:
             "No saved app password was found for this account."
         case .sslPinFailure:

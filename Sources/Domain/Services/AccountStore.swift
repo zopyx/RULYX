@@ -112,6 +112,16 @@ final class AccountStore: ObservableObject {
 
     // MARK: - Account Management
 
+    /// The result of an `addAccount` attempt.
+    enum AccountAddResult {
+        /// Account was authenticated and added successfully.
+        case success
+        /// Email 2FA verification code is required. Call `completeAuthWithFactor` with the code.
+        case needsAuthFactorToken
+        /// Authentication failed. Check `errorMessage` for details.
+        case failure
+    }
+
     /// Authenticates a new account and adds it to the store.
     ///
     /// - Parameters:
@@ -119,7 +129,8 @@ final class AccountStore: ObservableObject {
     ///   - appPassword: The app password for authentication.
     ///   - entrywayURL: Optional PDS entryway URL for custom PDS accounts.
     ///   - client: The authentication client.
-    /// - Returns: `true` on success, `false` on failure (`errorMessage` is set).
+    /// - Returns: `.success` on success, `.needsAuthFactorToken` when an email 2FA code is required,
+    ///            `.failure` on other errors (`errorMessage` is set).
     ///
     /// Validates inputs, checks for duplicates, authenticates against the PDS,
     /// saves the password to Keychain, persists the session, and inserts the account.
@@ -128,17 +139,75 @@ final class AccountStore: ObservableObject {
         appPassword: String,
         entrywayURL: URL? = nil,
         client: BlueskyAuthenticating
-    ) async -> Bool {
+    ) async -> AccountAddResult {
         let trimmedHandle = handle.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedPassword = appPassword.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedHandle.isEmpty, !trimmedPassword.isEmpty else {
             errorMessage = String.localized("account.error.handle_and_password_required")
-            return false
+            return .failure
         }
 
         if accounts.contains(where: { $0.handle.caseInsensitiveCompare(trimmedHandle) == .orderedSame }) {
             errorMessage = String.localized("account.error.already_exists")
+            return .failure
+        }
+
+        isAddingAccount = true
+        defer { isAddingAccount = false }
+
+        do {
+            let session = try await client.authenticate(
+                handle: trimmedHandle,
+                appPassword: trimmedPassword,
+                entrywayURL: entrywayURL,
+                authFactorToken: nil
+            )
+            let account = AppAccount(
+                handle: session.handle,
+                displayName: session.handle,
+                did: session.did,
+                pdsURL: session.pdsURL,
+                entrywayURL: entrywayURL
+            )
+            try keychain.save(trimmedPassword, service: passwordService, account: account.id.uuidString)
+            try await client.persistSession(session, for: account)
+            accounts.insert(account, at: 0)
+            activeAccountID = account.id
+            persist()
+            errorMessage = nil
+            return .success
+        } catch BlueskyAPIError.authFactorTokenRequired {
+            return .needsAuthFactorToken
+        } catch let caughtError {
+            errorMessage = AppError.userMessage(from: caughtError)
+            return .failure
+        }
+    }
+
+    /// Completes authentication with an email 2FA verification code.
+    /// Must be called after `addAccount` returns `.needsAuthFactorToken`.
+    ///
+    /// - Parameters:
+    ///   - handle: The same handle used in the initial `addAccount` call.
+    ///   - appPassword: The same app password used in the initial call.
+    ///   - authFactorToken: The verification code sent via email.
+    ///   - entrywayURL: The same entryway URL used in the initial call.
+    ///   - client: The authentication client.
+    /// - Returns: `true` on success, `false` on failure (`errorMessage` is set).
+    func completeAuthWithFactor(
+        handle: String,
+        appPassword: String,
+        authFactorToken: String,
+        entrywayURL: URL? = nil,
+        client: BlueskyAuthenticating
+    ) async -> Bool {
+        let trimmedHandle = handle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPassword = appPassword.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedToken = authFactorToken.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedHandle.isEmpty, !trimmedPassword.isEmpty, !trimmedToken.isEmpty else {
+            errorMessage = String.localized("account.error.handle_and_password_required")
             return false
         }
 
@@ -149,7 +218,8 @@ final class AccountStore: ObservableObject {
             let session = try await client.authenticate(
                 handle: trimmedHandle,
                 appPassword: trimmedPassword,
-                entrywayURL: entrywayURL
+                entrywayURL: entrywayURL,
+                authFactorToken: trimmedToken
             )
             let account = AppAccount(
                 handle: session.handle,
@@ -165,8 +235,15 @@ final class AccountStore: ObservableObject {
             persist()
             errorMessage = nil
             return true
-        } catch {
-            errorMessage = AppError.userMessage(from: error)
+        } catch let caughtError as BlueskyAPIError {
+            if case .authFactorTokenRequired = caughtError {
+                errorMessage = AppError.userMessage(from: BlueskyAPIError.authFactorTokenRequired)
+            } else {
+                errorMessage = AppError.userMessage(from: caughtError)
+            }
+            return false
+        } catch let genericError {
+            errorMessage = AppError.userMessage(from: genericError)
             return false
         }
     }

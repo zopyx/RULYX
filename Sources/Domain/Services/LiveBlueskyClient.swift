@@ -61,8 +61,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     // MARK: - Authentication & Session
 
     /// Authenticates against the Bluesky PDS using a handle and app password.
-    func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil) async throws -> BlueskySession {
-        try await sessionService.authenticate(handle: handle, appPassword: appPassword, entrywayURL: entrywayURL)
+    func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil, authFactorToken: String? = nil) async throws -> BlueskySession {
+        try await sessionService.authenticate(handle: handle, appPassword: appPassword, entrywayURL: entrywayURL, authFactorToken: authFactorToken)
     }
 
     /// Persists the session token for an account to the Keychain.

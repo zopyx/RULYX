@@ -26,7 +26,7 @@ final class LiveAuthenticationTests: XCTestCase {
             client: client
         )
 
-        XCTAssertTrue(added, store.errorMessage ?? "Expected live login to succeed.")
+        XCTAssertEqual(added, .success, store.errorMessage ?? "Expected live login to succeed.")
         XCTAssertEqual(store.accounts.count, 1)
 
         guard let account = store.activeAccount else {
@@ -87,7 +87,7 @@ final class LiveAuthenticationTests: XCTestCase {
             client: client
         )
 
-        XCTAssertTrue(added, store.errorMessage ?? "Expected live login to succeed.")
+        XCTAssertEqual(added, .success, store.errorMessage ?? "Expected live login to succeed.")
         guard let account = store.activeAccount else {
             return XCTFail("Expected an active account after login.")
         }
@@ -134,7 +134,7 @@ final class LiveAuthenticationTests: XCTestCase {
             appPassword: credentials.appPassword,
             client: client
         )
-        XCTAssertTrue(added1, "First login should succeed.")
+        XCTAssertEqual(added1, .success, "First login should succeed.")
         XCTAssertEqual(store.accounts.count, 1)
 
         guard let account1 = store.activeAccount else {
@@ -152,7 +152,7 @@ final class LiveAuthenticationTests: XCTestCase {
             appPassword: credentials.appPassword,
             client: client
         )
-        XCTAssertTrue(added2, "Second login after logout should succeed.")
+        XCTAssertEqual(added2, .success, "Second login after logout should succeed.")
         XCTAssertEqual(store.accounts.count, 1)
 
         guard let account2 = store.activeAccount else {

@@ -102,6 +102,9 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
                 if errorCode == "AccountTakedown" || errorCode == "Deactivated" {
                     throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
                 }
+                if errorCode == "AuthFactorTokenRequired" {
+                    throw BlueskyAPIError.authFactorTokenRequired
+                }
             }
             throw BlueskyAPIError.unauthorized
         }
@@ -111,6 +114,9 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
                 let errorCode = errorPayload.error ?? ""
                 if errorCode == "AccountTakedown" || errorCode == "Deactivated" {
                     throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
+                }
+                if errorCode == "AuthFactorTokenRequired" {
+                    throw BlueskyAPIError.authFactorTokenRequired
                 }
                 throw BlueskyAPIError.server(errorPayload.message ?? errorCode)
             }

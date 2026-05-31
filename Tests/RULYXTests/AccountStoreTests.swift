@@ -12,7 +12,7 @@ final class AccountStoreTests: XCTestCase {
     }
 
     @discardableResult
-    private func addTestAccount(store: AccountStore, client: BlueskyAuthenticating, handle: String = "moderator.bsky.social") async -> Bool {
+    private func addTestAccount(store: AccountStore, client: BlueskyAuthenticating, handle: String = "moderator.bsky.social") async -> AccountStore.AccountAddResult {
         await store.addAccount(handle: handle, appPassword: "abcd-efgh-ijkl-mnop", client: client)
     }
 
@@ -24,7 +24,7 @@ final class AccountStoreTests: XCTestCase {
 
         let didAdd = await addTestAccount(store: store, client: client)
 
-        XCTAssertTrue(didAdd)
+        XCTAssertEqual(didAdd, .success)
         XCTAssertEqual(store.accounts.count, 1)
         XCTAssertNil(store.errorMessage)
 
@@ -45,7 +45,7 @@ final class AccountStoreTests: XCTestCase {
 
         let didAdd = await store.addAccount(handle: "", appPassword: "abcd-efgh-ijkl-mnop", client: client)
 
-        XCTAssertFalse(didAdd)
+        XCTAssertEqual(didAdd, .failure)
         XCTAssertEqual(store.errorMessage, String.localized("account.error.handle_and_password_required"))
         XCTAssertTrue(store.accounts.isEmpty)
     }
@@ -56,7 +56,7 @@ final class AccountStoreTests: XCTestCase {
 
         let didAdd = await store.addAccount(handle: "moderator.bsky.social", appPassword: "", client: client)
 
-        XCTAssertFalse(didAdd)
+        XCTAssertEqual(didAdd, .failure)
         XCTAssertEqual(store.errorMessage, String.localized("account.error.handle_and_password_required"))
         XCTAssertTrue(store.accounts.isEmpty)
     }
@@ -66,11 +66,11 @@ final class AccountStoreTests: XCTestCase {
         let client = MockAuthenticatingClient()
 
         let first = await addTestAccount(store: store, client: client)
-        XCTAssertTrue(first)
+        XCTAssertEqual(first, .success)
 
         let second = await addTestAccount(store: store, client: client)
 
-        XCTAssertFalse(second)
+        XCTAssertEqual(second, .failure)
         XCTAssertEqual(store.errorMessage, String.localized("account.error.already_exists"))
         XCTAssertEqual(store.accounts.count, 1)
     }
@@ -81,7 +81,7 @@ final class AccountStoreTests: XCTestCase {
 
         let didAdd = await store.addAccount(handle: "  moderator.bsky.social  ", appPassword: "  abcd-efgh-ijkl-mnop  ", client: client)
 
-        XCTAssertTrue(didAdd)
+        XCTAssertEqual(didAdd, .success)
         XCTAssertEqual(store.accounts.count, 1)
         XCTAssertEqual(store.activeAccount?.handle, "moderator.bsky.social")
     }
@@ -92,7 +92,7 @@ final class AccountStoreTests: XCTestCase {
 
         let didAdd = await addTestAccount(store: store, client: client)
 
-        XCTAssertFalse(didAdd)
+        XCTAssertEqual(didAdd, .failure)
         XCTAssertNotNil(store.errorMessage)
         XCTAssertTrue(store.accounts.isEmpty)
     }
@@ -334,7 +334,7 @@ final class AccountStoreTests: XCTestCase {
 
         let didAdd = await addTestAccount(store: store, client: client)
 
-        XCTAssertTrue(didAdd)
+        XCTAssertEqual(didAdd, .success)
         XCTAssertNil(store.errorMessage)
     }
 
@@ -380,7 +380,7 @@ private final class MockAuthenticatingClient: BlueskyAuthenticating {
         self.shouldFailAuth = shouldFailAuth
     }
 
-    func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil) async throws -> BlueskySession {
+    func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil, authFactorToken _: String? = nil) async throws -> BlueskySession {
         if shouldFailAuth {
             throw BlueskyAPIError.unauthorized
         }

@@ -29,9 +29,11 @@ protocol BlueskyAuthenticating {
     ///   - handle: The Bluesky handle of the account.
     ///   - appPassword: The app password for authentication.
     ///   - entrywayURL: An optional custom entryway URL; if `nil`, resolves automatically.
+    ///   - authFactorToken: An optional 2FA verification code sent via email.
     /// - Returns: A `BlueskySession` with access and refresh JWTs.
-    /// - Throws: If authentication fails or the PDS cannot be resolved.
-    func authenticate(handle: String, appPassword: String, entrywayURL: URL?) async throws -> BlueskySession
+    /// - Throws: If authentication fails, returns `BlueskyAPIError.authFactorTokenRequired`
+    ///           when an email 2FA code is needed, or other auth errors.
+    func authenticate(handle: String, appPassword: String, entrywayURL: URL?, authFactorToken: String?) async throws -> BlueskySession
 
     /// Persists a session to secure storage (keychain) for later restoration.
     /// - Parameters:

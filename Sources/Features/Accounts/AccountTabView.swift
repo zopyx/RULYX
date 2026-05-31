@@ -330,13 +330,13 @@ struct AccountTabView: View {
                         }
                         let entrywayHost = entry["entrywayURL"]
                         let entrywayURL = entrywayHost.flatMap { URL(string: "https://\($0)") }
-                        let success = await accountStore.addAccount(
+                        let result = await accountStore.addAccount(
                             handle: handle,
                             appPassword: password,
                             entrywayURL: entrywayURL,
                             client: blueskyClient
                         )
-                        if success { added += 1 } else { skipped += 1 }
+                        if result == .success { added += 1 } else { skipped += 1 }
                     }
                     if added > 0 {
                         importSuccess = loc("account.import.count").replacingOccurrences(of: "{n}", with: "\(added)")

@@ -57,6 +57,8 @@ struct AppError: LocalizedError, Equatable {
                 return AppError(category: .decoding, message: apiError.localizedDescription)
             case .unauthorized, .missingCredentials:
                 return AppError(category: .authentication, message: apiError.localizedDescription)
+            case .authFactorTokenRequired:
+                return AppError(category: .authentication, message: apiError.localizedDescription)
             case .sslPinFailure:
                 return AppError(category: .network, message: apiError.localizedDescription)
             case .deactivated:

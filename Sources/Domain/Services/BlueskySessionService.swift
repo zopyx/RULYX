@@ -14,9 +14,10 @@ protocol BlueskySessionServicing {
     ///   - handle: The Bluesky handle (e.g. `user.bsky.social`).
     ///   - appPassword: The app password for authentication.
     ///   - entrywayURL: An optional custom entryway URL; if `nil`, resolves automatically via handle domain.
+    ///   - authFactorToken: An optional 2FA verification code sent via email.
     /// - Returns: A `BlueskySession` containing DIDs, JWTs, and the resolved PDS URL.
-    /// - Throws: If authentication fails or the PDS URL cannot be resolved.
-    func authenticate(handle: String, appPassword: String, entrywayURL: URL?) async throws -> BlueskySession
+    /// - Throws: `BlueskyAPIError.authFactorTokenRequired` if email 2FA code is needed.
+    func authenticate(handle: String, appPassword: String, entrywayURL: URL?, authFactorToken: String?) async throws -> BlueskySession
 
     /// Persists a session to the keychain for the given account and caches it in memory.
     /// - Parameters:
@@ -74,8 +75,8 @@ final class BlueskySessionService: BlueskySessionServicing {
         self.keychain = keychain
     }
 
-    func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil) async throws -> BlueskySession {
-        let requestBody = CreateSessionRequest(identifier: handle, password: appPassword)
+    func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil, authFactorToken: String? = nil) async throws -> BlueskySession {
+        let requestBody = CreateSessionRequest(identifier: handle, password: appPassword, authFactorToken: authFactorToken)
         let authURL: URL = if let entrywayURL {
             entrywayURL
         } else {
@@ -407,6 +408,13 @@ final class BlueskySessionService: BlueskySessionServicing {
 struct CreateSessionRequest: Encodable {
     let identifier: String
     let password: String
+    let authFactorToken: String?
+
+    init(identifier: String, password: String, authFactorToken: String? = nil) {
+        self.identifier = identifier
+        self.password = password
+        self.authFactorToken = authFactorToken
+    }
 }
 
 struct CreateSessionResponse: Decodable {
@@ -415,6 +423,8 @@ struct CreateSessionResponse: Decodable {
     let accessJWT: String
     let refreshJWT: String?
     let didDoc: DIDDocument?
+    let email: String?
+    let emailAuthFactor: Bool?
 
     enum CodingKeys: String, CodingKey {
         case did
@@ -422,6 +432,26 @@ struct CreateSessionResponse: Decodable {
         case accessJWT = "accessJwt"
         case refreshJWT = "refreshJwt"
         case didDoc
+        case email
+        case emailAuthFactor
+    }
+
+    init(
+        did: String,
+        handle: String,
+        accessJWT: String,
+        refreshJWT: String?,
+        didDoc: DIDDocument?,
+        email: String? = nil,
+        emailAuthFactor: Bool? = nil
+    ) {
+        self.did = did
+        self.handle = handle
+        self.accessJWT = accessJWT
+        self.refreshJWT = refreshJWT
+        self.didDoc = didDoc
+        self.email = email
+        self.emailAuthFactor = emailAuthFactor
     }
 }
 
