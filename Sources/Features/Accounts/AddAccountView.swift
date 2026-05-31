@@ -303,23 +303,41 @@ struct AddAccountView: View {
 
         do {
             let session = try await oauthAuthorizationFlow.signIn(entrywayURL: entrywayURL)
+            AppLogger.persistence.info("OAuth sign-in succeeded: did=\(session.did, privacy: .public)")
+
             try oauthTokenStore.saveSession(session, for: session.did)
+            AppLogger.persistence.info("OAuth session saved")
 
-            // Resolve the handle from the DID after successful auth
-            let handle = try await blueskyClient.resolveHandleFromDID(session.did)
+            do {
+                let handle = try await blueskyClient.resolveHandleFromDID(session.did)
+                AppLogger.persistence.info("Resolved handle: \(handle, privacy: .public)")
 
-            accountStore.addOAuthAccount(
-                handle: handle,
-                did: session.did,
-                pdsURL: session.pdsURL,
-                entrywayURL: entrywayURL
-            )
+                accountStore.addOAuthAccount(
+                    handle: handle,
+                    did: session.did,
+                    pdsURL: session.pdsURL,
+                    entrywayURL: entrywayURL
+                )
+                AppLogger.persistence.info("OAuth account added")
 
-            await accountStore.refreshAccountProfiles(using: blueskyClient)
+                await accountStore.refreshAccountProfiles(using: blueskyClient)
+                AppLogger.persistence.info("Profiles refreshed")
+            } catch {
+                AppLogger.persistence.error("Failed to resolve handle: \(error.localizedDescription, privacy: .public)")
+                // Fallback: use DID as handle
+                accountStore.addOAuthAccount(
+                    handle: session.did,
+                    did: session.did,
+                    pdsURL: session.pdsURL,
+                    entrywayURL: entrywayURL
+                )
+            }
+
             dismiss()
         } catch OAuthFlowError.userCancelled {
-            // User cancelled — no error to show
+            AppLogger.persistence.info("OAuth sign-in cancelled")
         } catch {
+            AppLogger.persistence.error("OAuth sign-in failed: \(error.localizedDescription, privacy: .public)")
             accountStore.errorMessage = error.localizedDescription
         }
     }
