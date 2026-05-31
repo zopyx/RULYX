@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1251,
+    "total_keys": 1255,
     "total_languages": 16,
-    "untranslated_total": 2453
+    "untranslated_total": 2513
   },
   "keys": {
     "account.active": {
@@ -84,6 +84,258 @@
       "vi": {
         "text": "活跃 (VI)",
         "untranslated": false
+      }
+    },
+    "account.add.2fa.code_placeholder": {
+      "en": "Verification code",
+      "de": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Verification code",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Verification code",
+        "untranslated": true
+      }
+    },
+    "account.add.2fa.description": {
+      "en": "A verification code was sent to your email.",
+      "de": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "A verification code was sent to your email.",
+        "untranslated": true
+      }
+    },
+    "account.add.2fa.title": {
+      "en": "Two-Factor Authentication",
+      "de": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Two-Factor Authentication",
+        "untranslated": true
+      }
+    },
+    "account.add.2fa.verify": {
+      "en": "Verify",
+      "de": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Verify",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Verify",
+        "untranslated": true
       }
     },
     "account.add.bluesky": {
