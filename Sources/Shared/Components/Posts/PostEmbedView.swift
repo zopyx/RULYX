@@ -111,7 +111,8 @@ struct PostEmbedView: View {
                             Rectangle().fill(Color.skyPrimary.opacity(0.08))
                         }
                         .aspectRatio(contentMode: isSingle ? .fit : .fill)
-                        .frame(height: isSingle ? 300 : 130)
+                        .frame(height: isSingle ? nil : 130)
+                        .frame(maxHeight: isSingle ? 300 : nil)
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .overlay(alignment: .topLeading) {

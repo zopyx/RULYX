@@ -348,11 +348,6 @@ private struct AccountSwitcherTabSheet: View {
                 }
             }
             .pageTitle(loc("account.switcher.title"))
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    ToolbarCloseButton()
-                }
-            }
         }
         .presentationDetents([.medium, .large])
         .presentationBackground(Color(.systemBackground))
