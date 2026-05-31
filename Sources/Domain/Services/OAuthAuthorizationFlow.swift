@@ -52,6 +52,52 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
 
     // MARK: - Full Auth Flow
 
+    /// Runs the complete OAuth sign-in flow using a PDS entryway URL.
+    /// The user authenticates directly on the provider's web page — no handle needed up front.
+    /// The DID and handle are obtained from the OAuth token response after successful auth.
+    /// - Parameter entrywayURL: The PDS entryway URL (e.g. `https://bsky.social` or `https://eurosky.social`).
+    /// - Returns: An `OAuthSession` on success.
+    func signIn(entrywayURL: URL) async throws -> OAuthSession {
+        // 1. Resolve Authorization Server metadata from the PDS
+        let asMetadata = try await endpointResolver.resolveAuthorizationServer(pdsURL: entrywayURL)
+        let asURL = asMetadata.issuer
+
+        // 2. Generate PKCE, DPoP key, state
+        let pkce = OAuthPKCE()
+        let state = UUID().uuidString
+        let dpopKeyTag = UUID().uuidString
+        let dpop = try OAuthDPoP(keyTag: dpopKeyTag, keychain: keychain)
+
+        // 3. Submit PAR — no login_hint, user enters their handle on the provider's page
+        let parURL = try await submitPAR(
+            asMetadata: asMetadata,
+            pkce: pkce,
+            state: state,
+            dpop: dpop,
+            handle: nil
+        )
+
+        // 4. Open browser for user auth
+        let callbackURL = try await openAuthenticationSession(authorizationURL: parURL)
+
+        // 5. Handle callback — validate state, extract code
+        let code = try handleCallback(callbackURL: callbackURL, expectedState: state)
+
+        // 6. Exchange code for tokens — the DID comes from the `sub` claim
+        let session = try await exchangeCode(
+            code: code,
+            pkce: pkce,
+            dpop: dpop,
+            dpopKeyTag: dpopKeyTag,
+            asMetadata: asMetadata,
+            did: nil,
+            handle: nil,
+            pdsURL: entrywayURL
+        )
+
+        return session
+    }
+
     /// Runs the complete OAuth sign-in flow for a given handle.
     /// - Parameters:
     ///   - handle: The Bluesky handle to authenticate.
@@ -142,7 +188,7 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         pkce: OAuthPKCE,
         state: String,
         dpop: OAuthDPoP,
-        handle: String
+        handle: String?
     ) async throws -> URL {
         guard let parEndpoint = asMetadata.pushedAuthorizationRequestEndpoint else {
             throw OAuthFlowError.parNotSupported
@@ -284,8 +330,8 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         dpop: OAuthDPoP,
         dpopKeyTag: String,
         asMetadata: OAuthAuthorizationServerMetadata,
-        did: String,
-        handle: String,
+        did: String?,
+        handle: String?,
         pdsURL: URL
     ) async throws -> OAuthSession {
         let tokenURL = asMetadata.tokenEndpoint
@@ -360,21 +406,31 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         data: Data,
         httpResponse: HTTPURLResponse,
         dpopKeyTag: String,
-        did: String,
-        handle: String,
+        did: String?,
+        handle: String?,
         pdsURL: URL,
         asURL: URL
     ) throws -> OAuthSession {
         let response = try JSONDecoder().decode(TokenExchangeResponse.self, from: data)
         let nonce = httpResponse.allHeaderFields["DPoP-Nonce"] as? String
 
+        // Use the DID from the `sub` claim if not provided (handle-first flow)
+        let resolvedDID: String
+        if let did, !did.isEmpty {
+            resolvedDID = did
+        } else if let sub = response.sub {
+            resolvedDID = sub
+        } else {
+            throw OAuthFlowError.missingDID
+        }
+
         guard let expiresIn = response.expiresIn, let expiry = expiryDate(expiresIn: expiresIn) else {
             throw OAuthFlowError.invalidExpiry
         }
 
         return OAuthSession(
-            did: did,
-            handle: handle,
+            did: resolvedDID,
+            handle: handle ?? resolvedDID,
             pdsURL: pdsURL,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
@@ -403,7 +459,7 @@ private struct PARBody: Encodable {
     let state: String
     let redirectURI: String
     let scope: String
-    let loginHint: String
+    let loginHint: String?
 
     enum CodingKeys: String, CodingKey {
         case clientID = "client_id"
@@ -468,6 +524,7 @@ enum OAuthFlowError: Error, LocalizedError {
     case invalidCallback
     case stateMismatch
     case missingCode
+    case missingDID
     case parNotSupported
     case parFailed(Int)
     case tokenExchangeFailed(Int)
@@ -489,6 +546,8 @@ enum OAuthFlowError: Error, LocalizedError {
             "Security state mismatch. Please try again."
         case .missingCode:
             "No authorization code was returned."
+        case .missingDID:
+            "The authorization response did not include a DID."
         case .parNotSupported:
             "This PDS does not support OAuth."
         case .parFailed(let code):

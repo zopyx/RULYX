@@ -1516,6 +1516,19 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Resolves a handle to a DID via the ClearSky `get-did` endpoint.
+    /// Resolves a DID to a handle via the AT Protocol's public profile endpoint.
+    func resolveHandleFromDID(_ did: String) async throws -> String {
+        let profile: ProfileViewDetailed = try await requestExecutor.send(
+            path: "app.bsky.actor.getProfile",
+            method: "GET",
+            queryItems: [URLQueryItem(name: "actor", value: did)],
+            accessToken: nil,
+            hostURL: URL(string: "https://bsky.social")!
+        )
+        return profile.handle
+    }
+
+    /// Resolves a handle to a DID via the ClearSky `get-did` endpoint.
     private func resolveHandleToDID(handle: String) async throws -> String {
         try guardClearskyAvailable()
         guard let url = URL(string: "https://public.api.clearsky.services/api/v1/anon/get-did/\(handle)") else {
