@@ -19,6 +19,7 @@ struct InfoView: View {
     // MARK: - Properties
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var chatStore: ChatStore
     @Environment(\.colorScheme) private var colorScheme
 
     /// The currently selected info tab (overview / features / legal).
@@ -100,6 +101,7 @@ struct InfoView: View {
         .sheet(isPresented: $showDebugInfo) {
             DebugInfoView()
                 .environmentObject(localizationManager)
+                .environmentObject(chatStore)
         }
     }
 
@@ -585,6 +587,7 @@ struct InfoView: View {
 /// mode, thermal state, accessibility settings, and app version/build info.
 private struct DebugInfoView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var chatStore: ChatStore
     @Environment(\.dismiss) private var dismiss
 
     /// Collected diagnostics tuples (label, value) populated on appear.
@@ -656,6 +659,12 @@ private struct DebugInfoView: View {
         add("Version", "v\(ver) (\(bld))")
         add("App Version", ver)
         add("App Build", bld)
+
+        // Chat diagnostics
+        add("Chat Status", chatStore.statusMessage ?? "idle")
+        add("Chat Conversations", "\(chatStore.conversations.count)")
+        add("Chat Loading", chatStore.isLoadingConvos ? "Yes" : "No")
+        add("Chat Account DID", chatStore.currentAccountDID ?? "nil")
 
         return result
     }

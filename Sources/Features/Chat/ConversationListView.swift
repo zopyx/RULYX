@@ -364,7 +364,7 @@ struct ConversationListView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(lastMessageTime)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.primary)
 
                     if conversation.unreadCount > 0 {
                         Text("\(conversation.unreadCount)")
