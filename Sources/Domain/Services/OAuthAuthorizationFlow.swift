@@ -472,6 +472,18 @@ private struct PARBody: Encodable {
         case scope
         case loginHint = "login_hint"
     }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(clientID, forKey: .clientID)
+        try container.encode(responseType, forKey: .responseType)
+        try container.encode(codeChallenge, forKey: .codeChallenge)
+        try container.encode(codeChallengeMethod, forKey: .codeChallengeMethod)
+        try container.encode(state, forKey: .state)
+        try container.encode(redirectURI, forKey: .redirectURI)
+        try container.encode(scope, forKey: .scope)
+        try container.encodeIfPresent(loginHint, forKey: .loginHint)
+    }
 }
 
 private struct PARResponse: Decodable {
