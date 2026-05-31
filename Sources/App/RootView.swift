@@ -127,6 +127,7 @@ struct RootView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.bottom, 8)
         }
         .safeAreaInset(edge: .bottom) {
             HStack(spacing: 0) {

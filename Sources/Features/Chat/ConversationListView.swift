@@ -292,6 +292,9 @@ struct ConversationListView: View {
             if others.count > 3 {
                 return (names + ["+\(others.count - 3)"]).joined(separator: ", ")
             }
+            if others.isEmpty {
+                return loc("chat.unknown")
+            }
             return names.joined(separator: ", ")
         }
 
