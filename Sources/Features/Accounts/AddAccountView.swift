@@ -219,15 +219,15 @@ struct AddAccountView: View {
         let trimmedHandle = handle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedHandle.isEmpty else { return }
 
-        do {
-            let session = try await oauthAuthorizationFlow.signIn(handle: trimmedHandle)
-            try oauthTokenStore.saveSession(session, for: session.did)
+        let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
+        } else {
+            selectedProvider.entrywayURL
+        }
 
-            let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
-            } else {
-                selectedProvider.entrywayURL
-            }
+        do {
+            let session = try await oauthAuthorizationFlow.signIn(handle: trimmedHandle, entrywayURL: entrywayURL)
+            try oauthTokenStore.saveSession(session, for: session.did)
 
             accountStore.addOAuthAccount(
                 handle: session.handle,

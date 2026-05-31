@@ -53,11 +53,14 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
     // MARK: - Full Auth Flow
 
     /// Runs the complete OAuth sign-in flow for a given handle.
-    /// - Parameter handle: The Bluesky handle to authenticate.
+    /// - Parameters:
+    ///   - handle: The Bluesky handle to authenticate.
+    ///   - entrywayURL: Optional PDS entryway URL. If provided, handle resolution
+    ///     is routed through this PDS instead of the default bsky.social.
     /// - Returns: An `OAuthSession` on success.
-    func signIn(handle: String) async throws -> OAuthSession {
+    func signIn(handle: String, entrywayURL: URL? = nil) async throws -> OAuthSession {
         // 1. Resolve handle → DID → PDS URL
-        let (did, pdsURL) = try await resolveAccount(handle: handle)
+        let (did, pdsURL) = try await resolveAccount(handle: handle, entrywayURL: entrywayURL)
 
         // 2. Resolve Authorization Server metadata
         let asMetadata = try await endpointResolver.resolveAuthorizationServer(pdsURL: pdsURL)
@@ -101,23 +104,26 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
 
     // MARK: - Step 1: Resolve Account
 
-    private func resolveAccount(handle: String) async throws -> (did: String, pdsURL: URL) {
+    private func resolveAccount(handle: String, entrywayURL: URL?) async throws -> (did: String, pdsURL: URL) {
+        let hostURL = entrywayURL ?? URL(string: "https://bsky.social")!
+
         // Resolve handle to DID via the AT Protocol
         let did: String = try await requestExecutor.send(
             path: "com.atproto.identity.resolveHandle",
             method: "GET",
             queryItems: [URLQueryItem(name: "handle", value: handle)],
             accessToken: nil,
-            hostURL: URL(string: "https://bsky.social")!
+            hostURL: hostURL
         )
 
-        // Resolve DID to PDS URL
+        // Resolve DID to PDS URL — use the entryway as hint, fall back to bsky.social
+        let didHostURL = entrywayURL ?? URL(string: "https://bsky.social")!
         let didDocument: DIDDocument = try await requestExecutor.send(
             path: "com.atproto.identity.resolveDid",
             method: "GET",
             queryItems: [URLQueryItem(name: "did", value: did)],
             accessToken: nil,
-            hostURL: URL(string: "https://bsky.social")!
+            hostURL: didHostURL
         )
 
         guard let pdsEndpoint = didDocument.services.first(where: {
