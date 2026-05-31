@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1262,
+    "total_keys": 1263,
     "total_languages": 16,
-    "untranslated_total": 2618
+    "untranslated_total": 2633
   },
   "keys": {
     "account.active": {
@@ -1028,6 +1028,69 @@
       },
       "vi": {
         "text": "Browser Sign-In",
+        "untranslated": true
+      }
+    },
+    "account.add.oauth.note": {
+      "en": "You will be redirected to your provider's login page. No app password required.",
+      "de": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "You will be redirected to your provider's login page. No app password required.",
         "untranslated": true
       }
     },
