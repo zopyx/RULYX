@@ -19,14 +19,17 @@ enum ProviderOption: String, CaseIterable, Identifiable {
     }
 }
 
-/// Form view for adding a new Bluesky account — select PDS provider
-/// (Bluesky, Eurosky, or custom), enter handle and app password.
+/// Form view for adding a new Bluesky account.
+/// Supports two authentication methods:
+/// - **App Password** (classic): handle + app password via `createSession`
+/// - **Sign in with Browser** (OAuth): handle-only, browser-based auth via OAuth 2.0 + PKCE + DPoP
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
 
+    @State private var authMethod: AuthMethod = .password
     @State private var handle = ""
     @State private var appPassword = ""
     @State private var selectedProvider: ProviderOption = .bluesky
@@ -52,6 +55,14 @@ struct AddAccountView: View {
                     }
                 } else {
                     Section {
+                        Picker(selection: $authMethod) {
+                            Text(loc: "account.add.auth.password").tag(AuthMethod.password)
+                            Text(loc: "account.add.auth.oauth").tag(AuthMethod.oauth)
+                        } label: {
+                            Text(loc: "account.add.auth.method")
+                        }
+                        .pickerStyle(.segmented)
+
                         Picker(selection: $selectedProvider) {
                             ForEach(ProviderOption.allCases) { option in
                                 if option == .bluesky {
@@ -82,18 +93,29 @@ struct AddAccountView: View {
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
 
-                        SecureField(loc("account.add.placeholder.password"), text: $appPassword)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
+                        if authMethod == .password {
+                            SecureField(loc("account.add.placeholder.password"), text: $appPassword)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                        }
                     } header: {
                         Text(loc: "account.add.credentials")
                     }
 
-                    Section {
-                        Text(loc: "account.add.password_hint")
-                            .foregroundStyle(.secondary)
-                    } header: {
-                        Text(loc: "account.add.why_password")
+                    if authMethod == .password {
+                        Section {
+                            Text(loc: "account.add.password_hint")
+                                .foregroundStyle(.secondary)
+                        } header: {
+                            Text(loc: "account.add.why_password")
+                        }
+                    } else {
+                        Section {
+                            Text(loc: "account.add.oauth.description")
+                                .foregroundStyle(.secondary)
+                        } header: {
+                            Text(loc: "account.add.oauth.info")
+                        }
                     }
                 }
             }
@@ -125,30 +147,17 @@ struct AddAccountView: View {
                             }
                         }
                         .disabled(authFactorToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accountStore.isAddingAccount)
+                    } else if authMethod == .oauth {
+                        Button(loc("account.add.auth.oauth.sign_in")) {
+                            Task {
+                                await signInWithOAuth()
+                            }
+                        }
+                        .disabled(handle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accountStore.isAddingAccount)
                     } else {
                         Button(loc("account.add.save")) {
                             Task {
-                                let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                    URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
-                                } else {
-                                    selectedProvider.entrywayURL
-                                }
-                                let result = await accountStore.addAccount(
-                                    handle: handle,
-                                    appPassword: appPassword,
-                                    entrywayURL: entrywayURL,
-                                    client: blueskyClient
-                                )
-                                switch result {
-                                case .success:
-                                    await accountStore.refreshAccountProfiles(using: blueskyClient)
-                                    dismiss()
-                                case .needsAuthFactorToken:
-                                    needsAuthFactorToken = true
-                                    authFactorEntrywayURL = entrywayURL
-                                case .failure:
-                                    break
-                                }
+                                await saveWithPassword()
                             }
                         }
                         .disabled(
@@ -180,6 +189,35 @@ struct AddAccountView: View {
         }
     }
 
+    private func saveWithPassword() async {
+        let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
+        } else {
+            selectedProvider.entrywayURL
+        }
+        let result = await accountStore.addAccount(
+            handle: handle,
+            appPassword: appPassword,
+            entrywayURL: entrywayURL,
+            client: blueskyClient
+        )
+        switch result {
+        case .success:
+            await accountStore.refreshAccountProfiles(using: blueskyClient)
+            dismiss()
+        case .needsAuthFactorToken:
+            needsAuthFactorToken = true
+            authFactorEntrywayURL = entrywayURL
+        case .failure:
+            break
+        }
+    }
+
+    private func signInWithOAuth() async {
+        // Phase 3 — will open ASWebAuthenticationSession here
+        // For now, show a placeholder
+        accountStore.errorMessage = "OAuth sign-in is coming in a future update."
+    }
 }
 
 #Preview {

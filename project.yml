@@ -31,6 +31,9 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         NSFaceIDUsageDescription: "Rulyx uses Face ID to protect your accounts and moderation data."
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - com.ajung.rulyx
         PushNotificationsEnabled: true
         BskyPushServiceDID: did:web:api.bsky.app
     settings:

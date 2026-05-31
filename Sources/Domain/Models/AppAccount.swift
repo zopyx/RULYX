@@ -1,5 +1,15 @@
 import Foundation
 
+/// The authentication method used for a Bluesky account.
+enum AuthMethod: String, Codable, CaseIterable, Identifiable {
+    /// Legacy app password via `com.atproto.server.createSession`.
+    case password
+    /// OAuth 2.0 Authorization Code flow with PKCE + DPoP.
+    case oauth
+
+    var id: String { rawValue }
+}
+
 /// Represents a Bluesky account stored in the app.
 /// Persisted via Codable; secrets (password/session) are stored separately in the keychain.
 struct AppAccount: Identifiable, Codable, Hashable {
@@ -7,6 +17,8 @@ struct AppAccount: Identifiable, Codable, Hashable {
 
     /// A unique identifier for this stored account.
     let id: UUID
+    /// The authentication method used for this account.
+    let authMethod: AuthMethod
     /// The Bluesky handle associated with this account.
     var handle: String
     /// The display name shown in the account UI; defaults to the handle if no display name is set.
@@ -32,6 +44,7 @@ struct AppAccount: Identifiable, Codable, Hashable {
 
     init(
         id: UUID = UUID(),
+        authMethod: AuthMethod = .password,
         handle: String,
         displayName: String? = nil,
         did: String? = nil,
@@ -43,6 +56,7 @@ struct AppAccount: Identifiable, Codable, Hashable {
         lastUsedAt: Date = .now
     ) {
         self.id = id
+        self.authMethod = authMethod
         self.handle = handle
         // Falls back to the handle when no display name is provided.
         self.displayName = displayName ?? handle

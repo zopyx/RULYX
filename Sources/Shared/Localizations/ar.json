@@ -1265,10 +1265,15 @@
   "thread.blocked.title": "Post Not Available",
   "thread.blocked.desc": "This post is from an account that has blocked you or is suspended.",
   "thread.not_found.title": "Post Not Found",
-  "thread.not_found.desc": "This post may have been deleted or does not exist."
-,
+  "thread.not_found.desc": "This post may have been deleted or does not exist.",
   "account.add.2fa.title": "Two-Factor Authentication",
   "account.add.2fa.description": "A verification code was sent to your email.",
   "account.add.2fa.code_placeholder": "Verification code",
-  "account.add.2fa.verify": "Verify"
+  "account.add.2fa.verify": "Verify",
+  "account.add.auth.method": "Sign-in method",
+  "account.add.auth.password": "App Password",
+  "account.add.auth.oauth": "Browser",
+  "account.add.auth.oauth.sign_in": "Sign in with Browser",
+  "account.add.oauth.info": "Browser Sign-In",
+  "account.add.oauth.description": "Authenticate directly with your PDS via your web browser. No app password needed."
 }

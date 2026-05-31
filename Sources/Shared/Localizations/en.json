@@ -1253,5 +1253,11 @@
   "account.add.2fa.title": "Two-Factor Authentication",
   "account.add.2fa.description": "A verification code was sent to your email.",
   "account.add.2fa.code_placeholder": "Verification code",
-  "account.add.2fa.verify": "Verify"
+  "account.add.2fa.verify": "Verify",
+  "account.add.auth.method": "Sign-in method",
+  "account.add.auth.password": "App Password",
+  "account.add.auth.oauth": "Browser",
+  "account.add.auth.oauth.sign_in": "Sign in with Browser",
+  "account.add.oauth.info": "Browser Sign-In",
+  "account.add.oauth.description": "Authenticate directly with your PDS via your web browser. No app password needed."
 }
