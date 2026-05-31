@@ -86,7 +86,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         let session = try await exchangeCode(
             code: code,
             pkce: pkce,
-            dpop: dpop,
             dpopKeyTag: dpopKeyTag,
             asMetadata: asMetadata,
             did: nil,
@@ -134,7 +133,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         let session = try await exchangeCode(
             code: code,
             pkce: pkce,
-            dpop: dpop,
             dpopKeyTag: dpopKeyTag,
             asMetadata: asMetadata,
             did: did,
@@ -295,7 +293,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
     private func exchangeCode(
         code: String,
         pkce: OAuthPKCE,
-        dpop: OAuthDPoP,
         dpopKeyTag: String,
         asMetadata: OAuthAuthorizationServerMetadata,
         did: String?,
@@ -303,13 +300,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         pdsURL: URL
     ) async throws -> OAuthSession {
         let tokenURL = asMetadata.tokenEndpoint
-
-        let dpopProof = try dpop.proof(
-            httpMethod: "POST",
-            httpURL: tokenURL,
-            accessTokenHash: nil,
-            nonce: nil
-        )
 
         let tokenBody = TokenExchangeBody(
             clientID: clientID,
@@ -323,37 +313,9 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(dpopProof, forHTTPHeaderField: "DPoP")
         request.httpBody = bodyData
 
         let (data, httpResponse) = try await httpClient.data(for: request, source: "OAuth Token Exchange")
-
-        // Handle DPoP nonce error
-        if httpResponse.statusCode == 401 {
-            if let nonce = httpResponse.allHeaderFields["DPoP-Nonce"] as? String {
-                let retryProof = try dpop.proof(
-                    httpMethod: "POST",
-                    httpURL: tokenURL,
-                    accessTokenHash: nil,
-                    nonce: nonce
-                )
-                request.setValue(retryProof, forHTTPHeaderField: "DPoP")
-                let (retryData, retryResponse) = try await httpClient.data(for: request, source: "OAuth Token Exchange")
-                guard (200 ..< 300).contains(retryResponse.statusCode) else {
-                    throw OAuthFlowError.tokenExchangeFailed(retryResponse.statusCode)
-                }
-                return try decodeTokenResponse(
-                    data: retryData,
-                    httpResponse: retryResponse,
-                    dpopKeyTag: dpopKeyTag,
-                    did: did,
-                    handle: handle,
-                    pdsURL: pdsURL,
-                    asURL: asMetadata.issuer
-                )
-            }
-            throw OAuthFlowError.tokenExchangeFailed(httpResponse.statusCode)
-        }
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw OAuthFlowError.tokenExchangeFailed(httpResponse.statusCode)

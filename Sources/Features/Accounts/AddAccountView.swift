@@ -137,6 +137,13 @@ struct AddAccountView: View {
                     }
                 }
             }
+            .alert(loc("account.add.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
+                Button(loc("actions.ok")) {
+                    accountStore.errorMessage = nil
+                }
+            }, message: {
+                Text(accountStore.errorMessage ?? "")
+            })
         }
     }
 
