@@ -1,5 +1,5 @@
 {
-  "client_id": "https://raw.githubusercontent.com/zopyx/RULYX/main/oauth-client-metadata.json",
+  "client_id": "https://raw.githubusercontent.com/zopyx/RULYX/feat/oauth/oauth-client-metadata.json",
   "application_type": "native",
   "grant_types": ["authorization_code", "refresh_token"],
   "scope": "atproto transition:generic transition:chat.bsky",
