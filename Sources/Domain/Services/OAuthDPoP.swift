@@ -138,6 +138,20 @@ private struct DPoPPayload: Encodable {
     let iat: Int
     let ath: String?
     let nonce: String?
+
+    enum CodingKeys: String, CodingKey {
+        case jti, htm, htu, iat, ath, nonce
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(jti, forKey: .jti)
+        try container.encode(htm, forKey: .htm)
+        try container.encode(htu, forKey: .htu)
+        try container.encode(iat, forKey: .iat)
+        try container.encodeIfPresent(ath, forKey: .ath)
+        try container.encodeIfPresent(nonce, forKey: .nonce)
+    }
 }
 
 /// Minimal JWK representation for an EC P-256 public key.
