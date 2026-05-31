@@ -54,6 +54,10 @@ final class AppDependencies: ObservableObject {
     let clearskyHeartbeat: ClearskyHeartbeatService
     let internalListStore: InternalListStore
     let aiService: LiveAIService
+    let oauthTokenStore: OAuthTokenStore
+    let oauthEndpointResolver: OAuthEndpointResolver
+    let oauthTokenRefresher: OAuthTokenRefresher
+    let oauthAuthorizationFlow: OAuthAuthorizationFlow
 
     // MARK: - Init
 
@@ -82,6 +86,18 @@ final class AppDependencies: ObservableObject {
         chatStore = ChatStore(chatService: ChatService(requestExecutor: requestExecutor, sessionService: sessionService))
         internalListStore = InternalListStore()
         aiService = LiveAIService()
+        let oauthHTTPClient = HTTPClient(session: URLSession.shared)
+        oauthTokenStore = OAuthTokenStore(keychain: keychain)
+        oauthEndpointResolver = OAuthEndpointResolver(httpClient: oauthHTTPClient)
+        oauthTokenRefresher = OAuthTokenRefresher(httpClient: oauthHTTPClient, keychain: keychain)
+        oauthAuthorizationFlow = OAuthAuthorizationFlow(
+            httpClient: oauthHTTPClient,
+            keychain: keychain,
+            requestExecutor: requestExecutor,
+            tokenStore: oauthTokenStore,
+            endpointResolver: oauthEndpointResolver,
+            tokenRefresher: oauthTokenRefresher
+        )
         pushNotificationCoordinator = PushNotificationCoordinator(
             pushService: BlueskyPushNotificationService(requestExecutor: requestExecutor, sessionService: sessionService),
             accountStore: accountStore,

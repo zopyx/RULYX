@@ -5,7 +5,7 @@ import Foundation
 /// The AT Protocol OAuth flow requires two discovery steps:
 /// 1. Fetch `/.well-known/oauth-protected-resource` from the PDS → get the Authorization Server URL
 /// 2. Fetch `/.well-known/oauth-authorization-server` from the AS → get all OAuth endpoints
-final class OAuthEndpointResolver {
+final class OAuthEndpointResolver: @unchecked Sendable {
     private let httpClient: HTTPClient
 
     init(httpClient: HTTPClient = HTTPClient()) {
@@ -19,13 +19,13 @@ final class OAuthEndpointResolver {
     /// - Parameter pdsURL: The PDS base URL (e.g. `https://bsky.social`).
     /// - Returns: The resolved Authorization Server metadata.
     func resolveAuthorizationServer(pdsURL: URL) async throws -> OAuthAuthorizationServerMetadata {
-        let resource = try await fetchProtectedResource(pdsURL: pdsURL)
+        let resource = try await fetchProtectedResourceFromPDS(pdsURL: pdsURL)
         let asURL = resource.authorizationServers.first ?? pdsURL
         return try await fetchAuthorizationServerMetadata(asURL: asURL)
     }
 
     /// Fetch `/.well-known/oauth-protected-resource` from the PDS.
-    private func fetchProtectedResource(pdsURL: URL) async throws -> OAuthProtectedResource {
+    private func fetchProtectedResourceFromPDS(pdsURL: URL) async throws -> OAuthProtectedResource {
         let url = pdsURL.appendingPathComponent(".well-known/oauth-protected-resource")
         let (data, response) = try await httpClient.data(from: url, source: "OAuth")
         guard (200 ..< 300).contains(response.statusCode) else {
@@ -54,7 +54,7 @@ final class OAuthEndpointResolver {
 
     /// Fetches just the protected resource metadata from the PDS.
     func fetchProtectedResource(pdsURL: URL) async throws -> OAuthProtectedResource {
-        try await fetchProtectedResource(pdsURL: pdsURL)
+        try await fetchProtectedResourceFromPDS(pdsURL: pdsURL)
     }
 }
 

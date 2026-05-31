@@ -6,7 +6,7 @@ import Foundation
 /// - Refresh tokens are **single-use** — each successful refresh returns a new refresh token
 /// - Requests must include a DPoP proof JWT bound to the token endpoint URL
 /// - Concurrent refresh attempts must be serialized (uses an actor for locking)
-final class OAuthTokenRefresher {
+final class OAuthTokenRefresher: @unchecked Sendable {
     private let httpClient: HTTPClient
     private let keychain: KeychainServicing
 
@@ -143,18 +143,21 @@ enum OAuthRefreshError: Error, LocalizedError {
 /// An actor that serializes token refresh attempts to prevent race conditions
 /// when multiple requests simultaneously detect an expired token.
 actor OAuthRefreshCoordinator {
+    private let tokenStore: OAuthTokenStore
+    private let refresher: OAuthTokenRefresher
     private var pendingTask: Task<OAuthSession, Error>?
 
-    func refreshIfNeeded(
-        accountID: String,
-        tokenStore: OAuthTokenStore,
-        refresher: OAuthTokenRefresher
-    ) async throws -> OAuthSession {
+    init(tokenStore: OAuthTokenStore, refresher: OAuthTokenRefresher) {
+        self.tokenStore = tokenStore
+        self.refresher = refresher
+    }
+
+    func refreshIfNeeded(accountID: String) async throws -> OAuthSession {
         if let existing = pendingTask {
             return try await existing.value
         }
 
-        let task = Task { () throws -> OAuthSession in
+        let task = Task { [tokenStore, refresher] () throws -> OAuthSession in
             guard var session = try tokenStore.readSession(for: accountID) else {
                 throw OAuthRefreshError.sessionNotFound
             }

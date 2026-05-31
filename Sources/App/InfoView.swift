@@ -195,7 +195,7 @@ struct InfoView: View {
             claimTile(icon: "dollarsign.circle.fill", text: localizationManager.localized("info.claim.free"), color: .skyPrimary)
             claimTile(icon: "swift", text: localizationManager.localized("info.claim.opensource"), color: .skyAccent)
             claimTile(icon: "hand.raised.slash.fill", text: localizationManager.localized("info.claim.notracking"), color: Color(red: 0.05, green: 0.70, blue: 0.60))
-            claimTile(icon: "megaphone.slash.fill", text: localizationManager.localized("info.claim.noads"), color: .skyOrange)
+            claimTile(icon: "speaker.slash.fill", text: localizationManager.localized("info.claim.noads"), color: .skyOrange)
         }
     }
 
@@ -292,6 +292,29 @@ struct InfoView: View {
                     loc("info.feature.moderation.block"),
                     loc("info.feature.moderation.block_all"),
                     loc("info.feature.moderation.membership"),
+                ]
+            )
+
+            featureCard(
+                icon: "arrow.left.arrow.right.square",
+                color: .mint,
+                title: localizationManager.localized("info.feature.compare"),
+                items: [
+                    loc("info.feature.compare.compare"),
+                    loc("info.feature.compare.transfer"),
+                    loc("info.feature.compare.export"),
+                ]
+            )
+
+            featureCard(
+                icon: "clock.arrow.circlepath",
+                color: .purple,
+                title: localizationManager.localized("info.feature.audit"),
+                items: [
+                    loc("info.feature.audit.snapshots"),
+                    loc("info.feature.audit.log"),
+                    loc("info.feature.audit.pending"),
+                    loc("info.feature.audit.searches"),
                 ]
             )
         }

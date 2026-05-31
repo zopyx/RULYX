@@ -5,7 +5,7 @@ import Foundation
 /// Each account's OAuth session is stored under a Keychain service
 /// `com.ajung.RULYX.oauth-session` keyed by the account's UUID string.
 /// DPoP private keys are stored by a separate `OAuthDPoP` instance.
-final class OAuthTokenStore {
+final class OAuthTokenStore: ObservableObject, @unchecked Sendable {
     private let keychain: KeychainServicing
     private static let sessionService = "com.ajung.RULYX.oauth-session"
 

@@ -28,6 +28,8 @@ struct AddAccountView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var oauthAuthorizationFlow: OAuthAuthorizationFlow
+    @EnvironmentObject private var oauthTokenStore: OAuthTokenStore
 
     @State private var authMethod: AuthMethod = .password
     @State private var handle = ""
@@ -214,9 +216,33 @@ struct AddAccountView: View {
     }
 
     private func signInWithOAuth() async {
-        // Phase 3 — will open ASWebAuthenticationSession here
-        // For now, show a placeholder
-        accountStore.errorMessage = "OAuth sign-in is coming in a future update."
+        let trimmedHandle = handle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedHandle.isEmpty else { return }
+
+        do {
+            let session = try await oauthAuthorizationFlow.signIn(handle: trimmedHandle)
+            try oauthTokenStore.saveSession(session, for: session.did)
+
+            let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
+            } else {
+                selectedProvider.entrywayURL
+            }
+
+            accountStore.addOAuthAccount(
+                handle: session.handle,
+                did: session.did,
+                pdsURL: session.pdsURL,
+                entrywayURL: entrywayURL
+            )
+
+            await accountStore.refreshAccountProfiles(using: blueskyClient)
+            dismiss()
+        } catch OAuthFlowError.userCancelled {
+            // User cancelled — no error to show
+        } catch {
+            accountStore.errorMessage = error.localizedDescription
+        }
     }
 }
 

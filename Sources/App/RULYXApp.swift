@@ -82,6 +82,8 @@ struct RULYXApp: App {
                     .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(deps.internalListStore)
                     .environmentObject(deps.aiService)
+                    .environmentObject(deps.oauthTokenStore)
+                    .environmentObject(deps.oauthAuthorizationFlow)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
 
@@ -311,6 +313,8 @@ struct RULYXApp: App {
                     .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(deps.internalListStore)
                     .environmentObject(deps.aiService)
+                    .environmentObject(deps.oauthTokenStore)
+                    .environmentObject(deps.oauthAuthorizationFlow)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
             }

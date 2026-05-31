@@ -185,6 +185,35 @@ final class AccountStore: ObservableObject {
         }
     }
 
+    /// Adds an account authenticated via OAuth to the store.
+    /// No password or session is stored here — the OAuth session is managed by `OAuthTokenStore`.
+    func addOAuthAccount(handle: String, did: String, pdsURL: URL?, entrywayURL: URL? = nil) {
+        let trimmedHandle = handle.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedHandle.isEmpty else {
+            errorMessage = String.localized("account.error.handle_and_password_required")
+            return
+        }
+
+        if accounts.contains(where: { $0.handle.caseInsensitiveCompare(trimmedHandle) == .orderedSame }) {
+            errorMessage = String.localized("account.error.already_exists")
+            return
+        }
+
+        let account = AppAccount(
+            authMethod: .oauth,
+            handle: trimmedHandle,
+            displayName: trimmedHandle,
+            did: did,
+            pdsURL: pdsURL,
+            entrywayURL: entrywayURL
+        )
+        accounts.insert(account, at: 0)
+        activeAccountID = account.id
+        errorMessage = nil
+        persist()
+    }
+
     /// Completes authentication with an email 2FA verification code.
     /// Must be called after `addAccount` returns `.needsAuthFactorToken`.
     ///
