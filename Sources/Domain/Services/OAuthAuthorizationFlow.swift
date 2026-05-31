@@ -61,7 +61,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
     func signIn(entrywayURL: URL) async throws -> OAuthSession {
         // 1. Resolve Authorization Server metadata from the PDS
         let asMetadata = try await endpointResolver.resolveAuthorizationServer(pdsURL: entrywayURL)
-        let asURL = asMetadata.issuer
 
         // 2. Generate PKCE, DPoP key, state
         let pkce = OAuthPKCE()
@@ -74,7 +73,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
             asMetadata: asMetadata,
             pkce: pkce,
             state: state,
-            dpop: dpop,
             handle: nil
         )
 
@@ -111,7 +109,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
 
         // 2. Resolve Authorization Server metadata
         let asMetadata = try await endpointResolver.resolveAuthorizationServer(pdsURL: pdsURL)
-        let asURL = asMetadata.issuer
 
         // 3. Generate PKCE, DPoP key, state
         let pkce = OAuthPKCE()
@@ -124,7 +121,6 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
             asMetadata: asMetadata,
             pkce: pkce,
             state: state,
-            dpop: dpop,
             handle: handle
         )
 
@@ -188,19 +184,11 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         asMetadata: OAuthAuthorizationServerMetadata,
         pkce: OAuthPKCE,
         state: String,
-        dpop: OAuthDPoP,
         handle: String?
     ) async throws -> URL {
         guard let parEndpoint = asMetadata.pushedAuthorizationRequestEndpoint else {
             throw OAuthFlowError.parNotSupported
         }
-
-        let dpopProof = try dpop.proof(
-            httpMethod: "POST",
-            httpURL: parEndpoint,
-            accessTokenHash: nil,
-            nonce: nil
-        )
 
         let parBody = PARBody(
             clientID: clientID,
@@ -218,30 +206,9 @@ final class OAuthAuthorizationFlow: NSObject, ObservableObject, ASWebAuthenticat
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(dpopProof, forHTTPHeaderField: "DPoP")
         request.httpBody = bodyData
 
         let (data, httpResponse) = try await httpClient.data(for: request, source: "OAuth PAR")
-
-        // Handle DPoP nonce error
-        if httpResponse.statusCode == 401 {
-            if let nonce = httpResponse.allHeaderFields["DPoP-Nonce"] as? String {
-                let retryProof = try dpop.proof(
-                    httpMethod: "POST",
-                    httpURL: parEndpoint,
-                    accessTokenHash: nil,
-                    nonce: nonce
-                )
-                request.setValue(retryProof, forHTTPHeaderField: "DPoP")
-                let (retryData, retryResponse) = try await httpClient.data(for: request, source: "OAuth PAR")
-                guard (200 ..< 300).contains(retryResponse.statusCode) else {
-                    throw OAuthFlowError.parFailed(retryResponse.statusCode)
-                }
-                let parResponse = try JSONDecoder().decode(PARResponse.self, from: retryData)
-                return authorizationURL(asMetadata: asMetadata, requestURI: parResponse.requestURI)
-            }
-            throw OAuthFlowError.parFailed(httpResponse.statusCode)
-        }
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw OAuthFlowError.parFailed(httpResponse.statusCode)
