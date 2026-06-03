@@ -52,6 +52,7 @@ struct ConversationListView: View {
                     .padding()
                 } else if chatStore.conversations.isEmpty {
                     VStack(spacing: 12) {
+                        Spacer()
                         Image(systemName: "bubble.left.and.bubble.right")
                             .font(.system(size: 48))
                             .foregroundStyle(.tertiary)
@@ -61,6 +62,7 @@ struct ConversationListView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
+                        Spacer()
                     }
                     .padding()
                 } else {

@@ -75,6 +75,11 @@ final class InternalListStore: ObservableObject {
         return list.members.contains(where: { $0.id == did })
     }
 
+    func listID(from compositeID: String) -> InternalList.ID {
+        let stripped = compositeID.replacingOccurrences(of: "internal:", with: "")
+        return UUID(uuidString: stripped) ?? UUID()
+    }
+
     func memberStatus(did: String) -> [InternalList.ID: Bool] {
         var status: [InternalList.ID: Bool] = [:]
         for list in lists {

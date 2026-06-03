@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /// Manages a user's posts with search/filter and CSV/JSON export capabilities.
@@ -25,41 +26,8 @@ final class UserPostsViewModel: ObservableObject {
     /// Inclusive end date for filtering posts.
     @Published var toDate: Date?
 
-    // MARK: - Computed Properties
-
     /// Posts filtered by search text and date range, sorted newest-first.
-    var sortedFilteredPosts: [RichFeedEntry] {
-        var result = posts
-
-        if !searchText.isEmpty {
-            let query = searchText.lowercased()
-            result = result.filter { entry in
-                entry.post.safeRecord.text?.lowercased().contains(query) ?? false
-            }
-        }
-
-        if let fromDate {
-            result = result.filter { entry in
-                guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
-                return d >= fromDate
-            }
-        }
-
-        if let toDate {
-            result = result.filter { entry in
-                guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
-                return d <= toDate
-            }
-        }
-
-        result.sort { a, b in
-            let dateA = parseDate(a.post.safeRecord.createdAt) ?? .distantPast
-            let dateB = parseDate(b.post.safeRecord.createdAt) ?? .distantPast
-            return dateA > dateB
-        }
-
-        return result
-    }
+    @Published private(set) var sortedFilteredPosts: [RichFeedEntry] = []
 
     // MARK: - Private Properties
 
@@ -67,11 +35,52 @@ final class UserPostsViewModel: ObservableObject {
     private var cursor: String?
     /// The DID of the profile whose posts are being viewed.
     private let did: String
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
 
     init(did: String) {
         self.did = did
+
+        $posts
+            .combineLatest($searchText, $fromDate, $toDate)
+            .map { posts, searchText, fromDate, toDate in
+                var result = posts
+
+                if !searchText.isEmpty {
+                    let query = searchText.lowercased()
+                    result = result.filter { entry in
+                        entry.post.safeRecord.text?.lowercased().contains(query) ?? false
+                    }
+                }
+
+                if let fromDate {
+                    result = result.filter { entry in
+                        guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
+                        return d >= fromDate
+                    }
+                }
+
+                if let toDate {
+                    result = result.filter { entry in
+                        guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
+                        return d <= toDate
+                    }
+                }
+
+                result.sort { a, b in
+                    let dateA = parseDate(a.post.safeRecord.createdAt) ?? .distantPast
+                    let dateB = parseDate(b.post.safeRecord.createdAt) ?? .distantPast
+                    return dateA > dateB
+                }
+
+                return result
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] filtered in
+                self?.sortedFilteredPosts = filtered
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods

@@ -41,6 +41,10 @@ struct PostRowCallbacks {
     var onAddAllLikersToList: ((BlueskyList) -> Void)?
     /// Classify the post using AI.
     var onClassify: (() -> Void)?
+    /// Block the post author.
+    var onBlockAuthor: (() -> Void)?
+    /// Add the post author to the given list.
+    var onAddAuthorToList: ((BlueskyList) -> Void)?
 
     /// Override for the liked state (e.g. when optimistic updates or preview data differ from server).
     var isLiked: Bool = false
@@ -74,6 +78,8 @@ struct PostRowCallbacks {
         onBlockAllLikers: (() -> Void)? = nil,
         onAddAllLikersToList: ((BlueskyList) -> Void)? = nil,
         onClassify: (() -> Void)? = nil,
+        onBlockAuthor: (() -> Void)? = nil,
+        onAddAuthorToList: ((BlueskyList) -> Void)? = nil,
         isLiked: Bool = false,
         isReposted: Bool = false,
         overrideLikeCount: Int? = nil,
@@ -98,6 +104,8 @@ struct PostRowCallbacks {
         self.onBlockAllLikers = onBlockAllLikers
         self.onAddAllLikersToList = onAddAllLikersToList
         self.onClassify = onClassify
+        self.onBlockAuthor = onBlockAuthor
+        self.onAddAuthorToList = onAddAuthorToList
         self.isLiked = isLiked
         self.isReposted = isReposted
         self.overrideLikeCount = overrideLikeCount

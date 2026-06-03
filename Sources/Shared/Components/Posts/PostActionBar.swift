@@ -54,25 +54,29 @@ struct PostActionBar: View {
                 }
                 .buttonStyle(.plain)
             }
-            HStack(spacing: 4) {
-                if let count = effectiveLikeCount {
-                    Button(action: { callbacks.onShowLikes?() }) {
+            if let count = effectiveLikeCount {
+                Button(action: { callbacks.onShowLikes?() }) {
+                    HStack(spacing: 4) {
                         Text("\(count)")
                             .font(.callout)
-                    }
-                }
-                if let onLike = callbacks.onLike {
-                    Button(action: { onLike() }) {
                         Image(systemName: isLiked ? "heart.fill" : "heart")
                             .font(.body.weight(.medium))
                             .foregroundStyle(isLiked ? Color.red : Color(.secondaryLabel))
-                            .scaleEffect(isLiked ? 1.1 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
                     }
                 }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+            } else if let onLike = callbacks.onLike {
+                Button(action: { onLike() }) {
+                    Image(systemName: isLiked ? "heart.fill" : "heart")
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(isLiked ? Color.red : Color(.secondaryLabel))
+                        .scaleEffect(isLiked ? 1.1 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
             if let onQuote = callbacks.onQuote {
                 actionButton(icon: "quote.bubble", count: nil, action: onQuote)
             }
@@ -87,7 +91,9 @@ struct PostActionBar: View {
     // MARK: - Gear Menu
 
     private var hasGearMenuItems: Bool {
-        callbacks.onBlockAllLikers != nil
+        callbacks.onBlockAuthor != nil
+            || callbacks.onAddAuthorToList != nil
+            || callbacks.onBlockAllLikers != nil
             || (!callbacks.availableLikerTargetLists.isEmpty && callbacks.onAddAllLikersToList != nil)
             || callbacks.onClassify != nil
             || callbacks.onCopy != nil
@@ -100,6 +106,66 @@ struct PostActionBar: View {
     /// Context menu with advanced actions, nested by list kind for "add likers to list".
     private var gearMenu: some View {
         Menu {
+            if let onBlockAuthor = callbacks.onBlockAuthor {
+                Button {
+                    onBlockAuthor()
+                } label: {
+                    Label {
+                        Text(loc: "actions.block")
+                    } icon: {
+                        Image(systemName: "hand.raised.slash")
+                    }
+                }
+            }
+            if let onAddAuthorToList = callbacks.onAddAuthorToList, !callbacks.availableLikerTargetLists.isEmpty {
+                Menu {
+                    if !moderationLikerTargetLists.isEmpty {
+                        Menu {
+                            ForEach(moderationLikerTargetLists) { list in
+                                Button {
+                                    onAddAuthorToList(list)
+                                } label: {
+                                    Label(list.name, systemImage: list.kind.symbolName)
+                                }
+                            }
+                        } label: {
+                            Text(loc: "lists.moderation_lists")
+                        }
+                    }
+                    if !internalLikerTargetLists.isEmpty {
+                        Menu {
+                            ForEach(internalLikerTargetLists) { list in
+                                Button {
+                                    onAddAuthorToList(list)
+                                } label: {
+                                    Label(list.name, systemImage: list.kind.symbolName)
+                                }
+                            }
+                        } label: {
+                            Text(loc: "lists.internal_lists")
+                        }
+                    }
+                    if !regularLikerTargetLists.isEmpty {
+                        Menu {
+                            ForEach(regularLikerTargetLists) { list in
+                                Button {
+                                    onAddAuthorToList(list)
+                                } label: {
+                                    Label(list.name, systemImage: list.kind.symbolName)
+                                }
+                            }
+                        } label: {
+                            Text(loc: "lists.lists")
+                        }
+                    }
+                } label: {
+                    Label {
+                        Text(loc: "actions.add_to_list")
+                    } icon: {
+                        Image(systemName: "text.badge.plus")
+                    }
+                }
+            }
             if let onBlockAllLikers = callbacks.onBlockAllLikers {
                 Button {
                     onBlockAllLikers()

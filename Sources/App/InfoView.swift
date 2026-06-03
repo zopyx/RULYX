@@ -195,7 +195,7 @@ struct InfoView: View {
             claimTile(icon: "dollarsign.circle.fill", text: localizationManager.localized("info.claim.free"), color: .skyPrimary)
             claimTile(icon: "swift", text: localizationManager.localized("info.claim.opensource"), color: .skyAccent)
             claimTile(icon: "hand.raised.slash.fill", text: localizationManager.localized("info.claim.notracking"), color: Color(red: 0.05, green: 0.70, blue: 0.60))
-            claimTile(icon: "megaphone.slash.fill", text: localizationManager.localized("info.claim.noads"), color: .skyOrange)
+            claimTile(icon: "rectangle.slash", text: localizationManager.localized("info.claim.noads"), color: .skyOrange)
         }
     }
 
