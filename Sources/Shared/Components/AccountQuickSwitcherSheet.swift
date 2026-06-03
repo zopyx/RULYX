@@ -43,7 +43,7 @@ struct AccountQuickSwitcherSheet: View {
                             }
                         }
                         .buttonStyle(.plain)
-                        .disabled(switchingAccountID != nil)
+                        .disabled(switchingAccountID != nil || account.id == accountStore.activeAccountID)
                         .accessibilityHint("Switches to \(account.label ?? account.handle)")
                     }
                 } header: {

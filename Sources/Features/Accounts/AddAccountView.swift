@@ -19,25 +19,18 @@ enum ProviderOption: String, CaseIterable, Identifiable {
     }
 }
 
-/// Form view for adding a new Bluesky account.
-/// Supports two authentication methods:
-/// - **App Password** (classic): handle + app password via `createSession`
-/// - **Sign in with Browser** (OAuth): pick a provider, then authenticate via browser
+/// Form view for adding a new Bluesky account — select PDS provider
+/// (Bluesky, Eurosky, or custom), enter handle and app password.
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @EnvironmentObject private var oauthAuthorizationFlow: OAuthAuthorizationFlow
-    @EnvironmentObject private var oauthTokenStore: OAuthTokenStore
 
-    @State private var authMethod: AuthMethod = .password
     @State private var handle = ""
     @State private var appPassword = ""
     @State private var selectedProvider: ProviderOption = .bluesky
     @State private var customPDS = ""
-    @State private var oauthProvider: ProviderOption?
-    @State private var oauthCustomPDS = ""
     @State private var needsAuthFactorToken = false
     @State private var authFactorToken = ""
     @State private var authFactorEntrywayURL: URL?
@@ -59,21 +52,48 @@ struct AddAccountView: View {
                     }
                 } else {
                     Section {
-                        Picker(selection: $authMethod) {
-                            Text(loc: "account.add.auth.password").tag(AuthMethod.password)
-                            Text(loc: "account.add.auth.oauth").tag(AuthMethod.oauth)
+                        Picker(selection: $selectedProvider) {
+                            ForEach(ProviderOption.allCases) { option in
+                                if option == .bluesky {
+                                    Text(loc: "account.add.bluesky").tag(option)
+                                } else if option == .eurosky {
+                                    Text(loc: "account.add.eurosky").tag(option)
+                                } else {
+                                    Text(loc: "account.add.other").tag(option)
+                                }
+                            }
                         } label: {
-                            Text(loc: "account.add.auth.method")
+                            Text(loc: "account.add.provider")
                         }
-                        .pickerStyle(.segmented)
+                        .accessibilityHint(loc("account.select_pds.hint"))
+
+                        if selectedProvider == .other {
+                            TextField(loc("account.add.placeholder.url"), text: $customPDS)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                                .keyboardType(.URL)
+                        }
+                    } header: {
+                        Text(loc: "account.add.provider")
                     }
 
-                    if authMethod == .password {
-                        passwordProviderSection
-                        credentialsSection
-                        passwordHintSection
-                    } else {
-                        oauthProviderSection
+                    Section {
+                        TextField(loc("account.add.placeholder.handle"), text: $handle)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+
+                        SecureField(loc("account.add.placeholder.password"), text: $appPassword)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    } header: {
+                        Text(loc: "account.add.credentials")
+                    }
+
+                    Section {
+                        Text(loc: "account.add.password_hint")
+                            .foregroundStyle(.secondary)
+                    } header: {
+                        Text(loc: "account.add.why_password")
                     }
                 }
             }
@@ -105,10 +125,30 @@ struct AddAccountView: View {
                             }
                         }
                         .disabled(authFactorToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accountStore.isAddingAccount)
-                    } else if authMethod == .password {
+                    } else {
                         Button(loc("account.add.save")) {
                             Task {
-                                await saveWithPassword()
+                                let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
+                                } else {
+                                    selectedProvider.entrywayURL
+                                }
+                                let result = await accountStore.addAccount(
+                                    handle: handle,
+                                    appPassword: appPassword,
+                                    entrywayURL: entrywayURL,
+                                    client: blueskyClient
+                                )
+                                switch result {
+                                case .success:
+                                    await accountStore.refreshAccountProfiles(using: blueskyClient)
+                                    dismiss()
+                                case .needsAuthFactorToken:
+                                    needsAuthFactorToken = true
+                                    authFactorEntrywayURL = entrywayURL
+                                case .failure:
+                                    break
+                                }
                             }
                         }
                         .disabled(
@@ -137,222 +177,9 @@ struct AddAccountView: View {
                     }
                 }
             }
-            .alert(loc("account.add.title"), isPresented: Binding(
-                get: { accountStore.errorMessage != nil },
-                set: { if !$0 { accountStore.errorMessage = nil } }
-            ), actions: {
-                Button(loc("actions.ok")) {
-                    accountStore.errorMessage = nil
-                }
-            }, message: {
-                Text(accountStore.errorMessage ?? "")
-            })
         }
     }
 
-    // MARK: - Password Sections
-
-    private var passwordProviderSection: some View {
-        Section {
-            Picker(selection: $selectedProvider) {
-                ForEach(ProviderOption.allCases) { option in
-                    if option == .bluesky {
-                        Text(loc: "account.add.bluesky").tag(option)
-                    } else if option == .eurosky {
-                        Text(loc: "account.add.eurosky").tag(option)
-                    } else {
-                        Text(loc: "account.add.other").tag(option)
-                    }
-                }
-            } label: {
-                Text(loc: "account.add.provider")
-            }
-            .accessibilityHint(loc("account.select_pds.hint"))
-
-            if selectedProvider == .other {
-                TextField(loc("account.add.placeholder.url"), text: $customPDS)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .keyboardType(.URL)
-            }
-        } header: {
-            Text(loc: "account.add.provider")
-        }
-    }
-
-    private var credentialsSection: some View {
-        Section {
-            TextField(loc("account.add.placeholder.handle"), text: $handle)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-
-            SecureField(loc("account.add.placeholder.password"), text: $appPassword)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-        } header: {
-            Text(loc: "account.add.credentials")
-        }
-    }
-
-    private var passwordHintSection: some View {
-        Section {
-            Text(loc: "account.add.password_hint")
-                .foregroundStyle(.secondary)
-        } header: {
-            Text(loc: "account.add.why_password")
-        }
-    }
-
-    // MARK: - OAuth Section
-
-    private var oauthProviderSection: some View {
-        Section {
-            Picker(selection: $oauthProvider) {
-                Text(loc: "account.add.select_provider").tag(Optional<ProviderOption>.none)
-                ForEach(ProviderOption.allCases) { option in
-                    if option == .bluesky {
-                        Text(loc: "account.add.bluesky").tag(Optional(option))
-                    } else if option == .eurosky {
-                        Text(loc: "account.add.eurosky").tag(Optional(option))
-                    } else {
-                        Text(loc: "account.add.other").tag(Optional(option))
-                    }
-                }
-            } label: {
-                Text(loc: "account.add.provider")
-            }
-
-            if oauthProvider == .other {
-                TextField(loc("account.add.placeholder.url"), text: $oauthCustomPDS)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .keyboardType(.URL)
-            }
-
-            if let provider = oauthProvider {
-                VStack(spacing: 14) {
-                    Button {
-                        Task { await signInWithOAuth() }
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "person.badge.key.fill")
-                                .font(.body.weight(.semibold))
-                            Text(signInButtonLabel(for: provider))
-                                .font(.body.weight(.semibold))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.skyPrimary)
-                    .disabled(accountStore.isAddingAccount)
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "lock.shield")
-                            .foregroundStyle(.secondary)
-                        Text(loc: "account.add.oauth.note")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.top, 8)
-            }
-        } header: {
-            Text(loc: "account.add.provider")
-        }
-    }
-
-    private func signInButtonLabel(for provider: ProviderOption) -> String {
-        let name: String = switch provider {
-        case .bluesky: "Bluesky"
-        case .eurosky: "Eurosky"
-        case .other:
-            oauthCustomPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                ? loc("account.add.auth.oauth.sign_in")
-                : oauthCustomPDS.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-        return "\(loc("account.add.auth.oauth.sign_in")) \(name)"
-    }
-
-    // MARK: - Actions
-
-    private func saveWithPassword() async {
-        let entrywayURL: URL? = if selectedProvider == .other, !customPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            URL(string: customPDS.trimmingCharacters(in: .whitespacesAndNewlines))
-        } else {
-            selectedProvider.entrywayURL
-        }
-        let result = await accountStore.addAccount(
-            handle: handle,
-            appPassword: appPassword,
-            entrywayURL: entrywayURL,
-            client: blueskyClient
-        )
-        switch result {
-        case .success:
-            await accountStore.refreshAccountProfiles(using: blueskyClient)
-            dismiss()
-        case .needsAuthFactorToken:
-            needsAuthFactorToken = true
-            authFactorEntrywayURL = entrywayURL
-        case .failure:
-            break
-        }
-    }
-
-    private func signInWithOAuth() async {
-        guard let provider = oauthProvider else { return }
-
-        let entrywayURL: URL? = if provider == .other, !oauthCustomPDS.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            URL(string: oauthCustomPDS.trimmingCharacters(in: .whitespacesAndNewlines))
-        } else {
-            provider.entrywayURL
-        }
-
-        guard let entrywayURL else { return }
-
-        do {
-            let session = try await oauthAuthorizationFlow.signIn(entrywayURL: entrywayURL)
-            AppLogger.persistence.info("OAuth sign-in succeeded: did=\(session.did, privacy: .public)")
-
-            try oauthTokenStore.saveSession(session, for: session.did)
-            AppLogger.persistence.info("OAuth session saved")
-
-            do {
-                let handle = try await blueskyClient.resolveHandleFromDID(session.did)
-                AppLogger.persistence.info("Resolved handle: \(handle, privacy: .public)")
-
-                let addResult = accountStore.addOAuthAccount(
-                    handle: handle,
-                    did: session.did,
-                    pdsURL: session.pdsURL,
-                    entrywayURL: entrywayURL
-                )
-                guard addResult == .success else { return }
-                AppLogger.persistence.info("OAuth account added")
-
-                await accountStore.refreshAccountProfiles(using: blueskyClient)
-                AppLogger.persistence.info("Profiles refreshed")
-            } catch {
-                AppLogger.persistence.error("Failed to resolve handle: \(error.localizedDescription, privacy: .public)")
-                // Fallback: use DID as handle
-                let addResult = accountStore.addOAuthAccount(
-                    handle: session.did,
-                    did: session.did,
-                    pdsURL: session.pdsURL,
-                    entrywayURL: entrywayURL
-                )
-                guard addResult == .success else { return }
-            }
-
-            dismiss()
-        } catch OAuthFlowError.userCancelled {
-            AppLogger.persistence.info("OAuth sign-in cancelled")
-        } catch {
-            AppLogger.persistence.error("OAuth sign-in failed: \(error.localizedDescription, privacy: .public)")
-            accountStore.errorMessage = error.localizedDescription
-        }
-    }
 }
 
 #Preview {

@@ -86,64 +86,6 @@ final class AccountStoreTests: XCTestCase {
         XCTAssertEqual(store.activeAccount?.handle, "moderator.bsky.social")
     }
 
-    func testAddOAuthAccountAddsAndActivatesAccount() {
-        let (store, _) = makeStore()
-
-        let result = store.addOAuthAccount(
-            handle: "moderator.bsky.social",
-            did: "did:plc:moderator",
-            pdsURL: URL(string: "https://bsky.social"),
-            entrywayURL: URL(string: "https://bsky.social")
-        )
-
-        XCTAssertEqual(result, .success)
-        XCTAssertEqual(store.accounts.count, 1)
-        XCTAssertEqual(store.activeAccount?.authMethod, .oauth)
-        XCTAssertEqual(store.activeAccount?.handle, "moderator.bsky.social")
-        XCTAssertEqual(store.activeAccount?.did, "did:plc:moderator")
-        XCTAssertNil(store.errorMessage)
-    }
-
-    func testAddOAuthAccountRejectsDuplicateHandle() {
-        let (store, _) = makeStore()
-
-        let first = store.addOAuthAccount(
-            handle: "moderator.bsky.social",
-            did: "did:plc:moderator",
-            pdsURL: URL(string: "https://bsky.social")
-        )
-        let second = store.addOAuthAccount(
-            handle: "MODERATOR.bsky.social",
-            did: "did:plc:other",
-            pdsURL: URL(string: "https://bsky.social")
-        )
-
-        XCTAssertEqual(first, .success)
-        XCTAssertEqual(second, .failure)
-        XCTAssertEqual(store.accounts.count, 1)
-        XCTAssertEqual(store.errorMessage, String.localized("account.error.already_exists"))
-    }
-
-    func testAddOAuthAccountRejectsDuplicateDID() {
-        let (store, _) = makeStore()
-
-        let first = store.addOAuthAccount(
-            handle: "moderator.bsky.social",
-            did: "did:plc:moderator",
-            pdsURL: URL(string: "https://bsky.social")
-        )
-        let second = store.addOAuthAccount(
-            handle: "renamed.bsky.social",
-            did: "did:plc:moderator",
-            pdsURL: URL(string: "https://bsky.social")
-        )
-
-        XCTAssertEqual(first, .success)
-        XCTAssertEqual(second, .failure)
-        XCTAssertEqual(store.accounts.count, 1)
-        XCTAssertEqual(store.errorMessage, String.localized("account.error.already_exists"))
-    }
-
     func testAddAccountFailsOnAuthError() async {
         let (store, _) = makeStore()
         let client = MockAuthenticatingClient(shouldFailAuth: true)

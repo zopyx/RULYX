@@ -34,7 +34,6 @@ struct AccountSwitcherSheet: View {
                     Section(loc("account.manage.saved")) {
                         ForEach(accountStore.accounts) { account in
                             Button {
-                                guard switchingAccountID == nil else { return }
                                 switchAccount(to: account)
                             } label: {
                                 HStack {
@@ -51,6 +50,7 @@ struct AccountSwitcherSheet: View {
                                 }
                             }
                             .buttonStyle(.plain)
+                            .disabled(switchingAccountID != nil)
                             .accessibilityHint("Switches the active account to \(account.label ?? account.handle)")
                             .contextMenu {
                                 Button(role: .destructive) {

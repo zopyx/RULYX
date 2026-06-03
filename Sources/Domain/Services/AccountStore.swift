@@ -185,40 +185,6 @@ final class AccountStore: ObservableObject {
         }
     }
 
-    /// Adds an account authenticated via OAuth to the store.
-    /// No password or session is stored here — the OAuth session is managed by `OAuthTokenStore`.
-    @discardableResult
-    func addOAuthAccount(handle: String, did: String, pdsURL: URL?, entrywayURL: URL? = nil) -> AccountAddResult {
-        let trimmedHandle = handle.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedDID = did.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !trimmedHandle.isEmpty, !trimmedDID.isEmpty else {
-            errorMessage = String.localized("account.error.handle_and_password_required")
-            return .failure
-        }
-
-        if accounts.contains(where: {
-            $0.handle.caseInsensitiveCompare(trimmedHandle) == .orderedSame || $0.did == trimmedDID
-        }) {
-            errorMessage = String.localized("account.error.already_exists")
-            return .failure
-        }
-
-        let account = AppAccount(
-            authMethod: .oauth,
-            handle: trimmedHandle,
-            displayName: trimmedHandle,
-            did: trimmedDID,
-            pdsURL: pdsURL,
-            entrywayURL: entrywayURL
-        )
-        accounts.insert(account, at: 0)
-        activeAccountID = account.id
-        errorMessage = nil
-        persist()
-        return .success
-    }
-
     /// Completes authentication with an email 2FA verification code.
     /// Must be called after `addAccount` returns `.needsAuthFactorToken`.
     ///
@@ -294,14 +260,6 @@ final class AccountStore: ObservableObject {
 
         if let client {
             try? client.deletePersistedSession(for: account)
-        }
-
-        // Clean up OAuth tokens if this is an OAuth account
-        if account.authMethod == .oauth, let did = account.did {
-            let oauthStore = OAuthTokenStore(keychain: keychain)
-            try? oauthStore.deleteSession(for: did)
-            let dpop = try? OAuthDPoP(keyTag: did, keychain: keychain)
-            try? dpop?.deleteKey()
         }
 
         accounts.removeAll { $0.id == account.id }
