@@ -986,12 +986,20 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             request.timeoutInterval = 30
             let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                let body = String(data: data, encoding: .utf8) ?? "empty"
+                AppLogger.performance.error("Clearsky API \(endpoint) returned HTTP \(httpResponse.statusCode): \(body, privacy: .public)")
                 return []
             }
             guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
+                let body = String(data: data, encoding: .utf8) ?? "empty"
+                if let error = try? JSONDecoder().decode(ClearskyAPIErrorResponse.self, from: data) {
+                    AppLogger.performance.error("Clearsky API \(endpoint) error: \(error.errorType ?? "unknown") — \(error.message ?? body, privacy: .public)")
+                } else {
+                    AppLogger.performance.error("Clearsky API \(endpoint) decoding failed — body: \(body, privacy: .public)")
+                }
                 return []
             }
-            let entries = decoded.data.blocklist
+            let entries = decoded.data.blocklist ?? []
             allEntries.append(contentsOf: entries)
             // If fewer than 100 entries, this was the last page.
             if entries.count < 100 { break }

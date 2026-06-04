@@ -118,7 +118,20 @@ struct ClearskyBlocklistResponse: Decodable {
 }
 
 struct ClearskyBlocklistData: Decodable {
-    let blocklist: [ClearskyBlocklistEntry]
+    let blocklist: [ClearskyBlocklistEntry]?
+}
+
+/// Error response from the Clearsky API (e.g. AccountNotFound).
+struct ClearskyAPIErrorResponse: Decodable {
+    let errorType: String?
+    let message: String?
+    let status: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case errorType = "error_type"
+        case message
+        case status
+    }
 }
 
 /// A single entry in a ClearSky blocklist.

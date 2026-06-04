@@ -70,6 +70,18 @@ final class ListsViewModel: ObservableObject {
             hasCache = false
         }
 
+        // If DashboardCache has nil counts but RelationshipCache has cached
+        // actor lists (from a prior detail view visit), derive the count
+        // so the numbers persist across view recreation.
+        if blockingCount == nil, let did = account.did {
+            let blockingKey = "blocking_\(did)"
+            let blockedByKey = "blockedBy_\(did)"
+            let cachedBlocking = RelationshipCache.load(forKey: blockingKey)
+            let cachedBlockedBy = RelationshipCache.load(forKey: blockedByKey)
+            if !cachedBlocking.isEmpty { blockingCount = cachedBlocking.count }
+            if !cachedBlockedBy.isEmpty { blockedByCount = cachedBlockedBy.count }
+        }
+
         if !hasCache { isLoading = true }
         if isExplicitRefresh { isRefreshing = true }
         errorMessage = nil
