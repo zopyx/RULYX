@@ -88,6 +88,7 @@ struct MentionsSearchView: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(viewModel.entries, id: \.post.uri) { entry in
+                    let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
                     let entryCallbacks = PostRowCallbacks(
                         onTapImage: { index in
                             let allImages = entry.post.embed?.images ?? []
@@ -120,6 +121,8 @@ struct MentionsSearchView: View {
                             handleAddAllLikersToList(postURI: entry.post.uri, list: list)
                         },
                         onClassify: { likerActions.postToClassify = entry },
+                        onBlockAuthor: authorCB.onBlock,
+                        onAddAuthorToList: authorCB.onAddToList,
                         availableLikerTargetLists: availableTargetLists
                     )
                     PostRowView(

@@ -9,6 +9,7 @@ struct ManagePostsView: View {
     @StateObject private var viewModel: ManagePostsViewModel
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
 
     init(did: String) {
@@ -410,11 +411,14 @@ struct ManagePostsView: View {
                     }
                 }
             }
-            PostRowView(
+            let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+            return PostRowView(
                 entry: entry,
                 style: .compact,
                 callbacks: PostRowCallbacks(
                     onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
+                    onBlockAuthor: authorCB.onBlock,
+                    onAddAuthorToList: authorCB.onAddToList,
                     isLiked: entry.post.isLikedByMe,
                     isReposted: entry.post.isRepostedByMe
                 )

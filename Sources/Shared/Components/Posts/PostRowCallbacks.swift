@@ -1,5 +1,38 @@
 import Foundation
 
+@MainActor
+func makeAuthorCallbacks(
+    author: RichAuthor?,
+    accountStore: AccountStore,
+    blueskyClient: LiveBlueskyClient,
+    internalListStore: InternalListStore
+) -> (onBlock: (() -> Void)?, onAddToList: ((BlueskyList) -> Void)?) {
+    let onBlock: (() -> Void)? = {
+        guard let authorDID = author?.did,
+              let account = accountStore.activeAccount,
+              let password = accountStore.appPassword(for: account) else { return }
+        Task {
+            try? await blueskyClient.blockActor(did: authorDID, account: account, appPassword: password)
+        }
+    }
+
+    let onAddToList: ((BlueskyList) -> Void)? = { list in
+        guard let author,
+              let authorDID = author.did,
+              let account = accountStore.activeAccount,
+              let password = accountStore.appPassword(for: account) else { return }
+        Task {
+            if list.kind == .internal {
+                internalListStore.addMember(did: authorDID, handle: author.handle ?? authorDID, displayName: author.displayName, avatarURL: author.avatar, to: internalListStore.listID(from: list.id))
+            } else {
+                try? await blueskyClient.addActor(did: authorDID, to: list, account: account, appPassword: password)
+            }
+        }
+    }
+
+    return (onBlock, onAddToList)
+}
+
 // MARK: - PostRowCallbacks
 
 /// Aggregates all user-action callbacks and state overrides for a post row.

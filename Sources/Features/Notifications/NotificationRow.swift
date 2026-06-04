@@ -10,6 +10,9 @@ struct NotificationRow: View {
     let relatedPost: RichPost?
     let onAuthorTap: () -> Void
     let onPostTap: (() -> Void)?
+    var onBlockAuthor: (() -> Void)?
+    var onAddAuthorToList: ((BlueskyList) -> Void)?
+    var availableTargetLists: [BlueskyList] = []
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     // MARK: - Body
@@ -113,7 +116,10 @@ struct NotificationRow: View {
             callbacks: PostRowCallbacks(
                 onTapThread: onPostTap,
                 onTapImage: nil,
-                onPlayVideo: nil
+                onPlayVideo: nil,
+                onBlockAuthor: onBlockAuthor,
+                onAddAuthorToList: onAddAuthorToList,
+                availableLikerTargetLists: availableTargetLists
             )
         )
     }

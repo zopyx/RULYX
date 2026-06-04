@@ -149,6 +149,7 @@ struct UserPostsView: View {
             searchSection
 
             ForEach(viewModel.sortedFilteredPosts, id: \.post.uri) { entry in
+                let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
                 PostRowView(
                     entry: entry,
                     style: .compact,
@@ -193,27 +194,8 @@ struct UserPostsView: View {
                             likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
                         },
                         onClassify: { likerActions.postToClassify = entry },
-                        onBlockAuthor: {
-                            guard let authorDID = entry.post.author?.did,
-                                  let account = accountStore.activeAccount,
-                                  let password = accountStore.appPassword(for: account) else { return }
-                            Task {
-                                try? await blueskyClient.blockActor(did: authorDID, account: account, appPassword: password)
-                            }
-                        },
-                        onAddAuthorToList: { list in
-                            guard let author = entry.post.author,
-                                  let authorDID = author.did,
-                                  let account = accountStore.activeAccount,
-                                  let password = accountStore.appPassword(for: account) else { return }
-                            Task {
-                                if list.kind == .internal {
-                                    internalListStore.addMember(did: authorDID, handle: author.handle ?? authorDID, displayName: author.displayName, avatarURL: author.avatar, to: internalListStore.listID(from: list.id))
-                                } else {
-                                    try? await blueskyClient.addActor(did: authorDID, to: list, account: account, appPassword: password)
-                                }
-                            }
-                        },
+                        onBlockAuthor: authorCB.onBlock,
+                        onAddAuthorToList: authorCB.onAddToList,
                         availableLikerTargetLists: likerActions.availableTargetLists
                     )
                 )

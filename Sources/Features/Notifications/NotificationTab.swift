@@ -12,6 +12,8 @@ struct NotificationTab: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var mutedWordsStore: MutedWordsStore
     @EnvironmentObject private var analyticsStore: AnalyticsStore
+    @EnvironmentObject private var internalListStore: InternalListStore
+    @State private var availableTargetLists: [BlueskyList] = []
 
     // MARK: - Body
 
@@ -72,6 +74,7 @@ struct NotificationTab: View {
             else { return }
             await viewModel.load(account: account, appPassword: appPassword, using: blueskyClient)
             await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: blueskyClient)
+            await loadTargetLists(account: account, appPassword: appPassword)
         }
         .onChange(of: accountStore.activeAccount?.did) { _, _ in
             viewModel.reset()
@@ -93,7 +96,10 @@ struct NotificationTab: View {
                         if let uri = entry.relatedPost?.uri ?? entry.relatedPostURI {
                             navigationPath.append(TimelineRoute.thread(postURI: uri))
                         }
-                    }
+                    },
+                    onBlockAuthor: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore).onBlock,
+                    onAddAuthorToList: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore).onAddToList,
+                    availableTargetLists: availableTargetLists
                 )
                 .onAppear {
                     if entry.id == viewModel.entries.last?.id {
@@ -140,6 +146,32 @@ struct NotificationTab: View {
             }
         }
         .padding(.top)
+    }
+
+    private func loadTargetLists(account: AppAccount, appPassword: String) async {
+        var lists: [BlueskyList] = []
+        do {
+            lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+        } catch {
+            AppLogger.moderation.error("Failed to load target lists: \(error.localizedDescription, privacy: .public)")
+        }
+        let internalLists = internalListStore.lists.map { internalList in
+            BlueskyList(
+                id: "internal:\(internalList.id.uuidString)",
+                name: internalList.name,
+                description: "Internal",
+                memberCount: internalList.memberCount,
+                kind: .internal,
+                cid: nil
+            )
+        }
+        lists.append(contentsOf: internalLists)
+        availableTargetLists = lists.sorted { lhs, rhs in
+            if lhs.kind != rhs.kind {
+                return lhs.kind.sortOrder < rhs.kind.sortOrder
+            }
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
     }
 
     /// Pull-to-refresh: marks all read then reloads.

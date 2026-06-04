@@ -329,7 +329,8 @@ struct CustomSearchView: View {
     }
 
     private func postRowView(entry: RichFeedEntry, entries: [RichFeedEntry], isLoadingMore: Bool, hasMore: Bool, loadMore: @escaping () async -> Void) -> some View {
-        CustomSearchPostRow(
+        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+        return CustomSearchPostRow(
             entry: entry,
             entries: entries,
             hasMore: hasMore,
@@ -355,7 +356,9 @@ struct CustomSearchView: View {
                 guard let activeDID = accountStore.activeAccount?.did else { return }
                 guard entry.post.author?.did != activeDID else { return }
                 likerActions.postToReport = entry
-            }
+            },
+            onBlockAuthor: authorCB.onBlock,
+            onAddAuthorToList: authorCB.onAddToList
         )
     }
 

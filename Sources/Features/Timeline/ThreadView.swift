@@ -248,7 +248,8 @@ struct ThreadView: View {
     // MARK: - Callbacks
 
     private func threadCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
-        PostRowCallbacks(
+        let authorCB = makeAuthorCallbacks(author: post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+        return PostRowCallbacks(
             onTapImage: { index in
                 let allImages = post.embed?.images ?? []
                 let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
@@ -290,6 +291,8 @@ struct ThreadView: View {
             onClassify: {
                 likerActions.postToClassify = RichFeedEntry(threadPost: post)
             },
+            onBlockAuthor: authorCB.onBlock,
+            onAddAuthorToList: authorCB.onAddToList,
             isLiked: post.isLikedByMe,
             isReposted: post.isRepostedByMe,
             availableLikerTargetLists: likerActions.availableTargetLists
@@ -297,9 +300,12 @@ struct ThreadView: View {
     }
 
     private func ancestorCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
-        PostRowCallbacks(
+        let authorCB = makeAuthorCallbacks(author: post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+        return PostRowCallbacks(
             onCopy: { UIPasteboard.general.string = post.record?.text },
-            onTranslate: { translateText(post.record?.text ?? "") }
+            onTranslate: { translateText(post.record?.text ?? "") },
+            onBlockAuthor: authorCB.onBlock,
+            onAddAuthorToList: authorCB.onAddToList
         )
     }
 

@@ -19,6 +19,8 @@ struct CustomSearchPostRow: View {
     var onAddAllLikersToList: ((BlueskyList) -> Void)?
     var onClassify: (() -> Void)?
     var onReportPost: (() -> Void)?
+    var onBlockAuthor: (() -> Void)?
+    var onAddAuthorToList: ((BlueskyList) -> Void)?
 
     // MARK: - Body
 
@@ -51,6 +53,8 @@ struct CustomSearchPostRow: View {
                 onBlockAllLikers: onBlockAllLikers,
                 onAddAllLikersToList: onAddAllLikersToList,
                 onClassify: onClassify,
+                onBlockAuthor: onBlockAuthor,
+                onAddAuthorToList: onAddAuthorToList,
                 availableLikerTargetLists: availableTargetLists
             )
         )

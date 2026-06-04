@@ -16,13 +16,47 @@ struct ConversationListView: View {
     // MARK: - Computed properties
 
     /// Conversations filtered by the search text.
+    /// Searches member names, group name, last message text, and any loaded message history.
     private var filteredConvos: [ChatConversation] {
         guard !searchText.isEmpty else { return chatStore.conversations }
+        let query = searchText.lowercased()
         return chatStore.conversations.filter { convo in
-            convo.members.contains { member in
-                member.handle.localizedCaseInsensitiveContains(searchText) ||
-                    (member.displayName?.localizedCaseInsensitiveContains(searchText) ?? false)
+            // 1. Member display name / handle
+            if convo.members.contains(where: { member in
+                member.handle.lowercased().contains(query) ||
+                    (member.displayName?.lowercased().contains(query) ?? false)
+            }) {
+                return true
             }
+            // 2. Group name
+            if let groupName = convo.groupInfo?.name.lowercased(), groupName.contains(query) {
+                return true
+            }
+            // 3. Last message preview text
+            if let lastMessage = convo.lastMessage {
+                switch lastMessage {
+                case let .message(msg):
+                    if msg.text.lowercased().contains(query) {
+                        return true
+                    }
+                case .deleted, .system:
+                    break
+                }
+            }
+            // 4. Loaded message history (conversations the user has opened)
+            if let messages = chatStore.messages[convo.id] {
+                for kind in messages {
+                    switch kind {
+                    case let .message(msg):
+                        if msg.text.lowercased().contains(query) {
+                            return true
+                        }
+                    case .deleted, .system:
+                        break
+                    }
+                }
+            }
+            return false
         }
     }
 
@@ -357,7 +391,7 @@ struct ConversationListView: View {
 
                     Text(lastMessagePreview)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(.label).opacity(0.7))
                         .lineLimit(2)
                 }
 
@@ -366,7 +400,7 @@ struct ConversationListView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(lastMessageTime)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(Color(.label).opacity(0.7))
 
                     if conversation.unreadCount > 0 {
                         Text("\(conversation.unreadCount)")

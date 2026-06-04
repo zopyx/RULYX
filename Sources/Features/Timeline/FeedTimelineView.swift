@@ -275,7 +275,8 @@ struct FeedTimelineView: View {
     // MARK: - Post row
 
     private func postRowView(for entry: RichFeedEntry) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+        return VStack(alignment: .leading, spacing: 0) {
             PostRowView(
                 entry: entry,
                 style: .full,
@@ -316,6 +317,8 @@ struct FeedTimelineView: View {
                         likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
                     },
                     onClassify: { likerActions.postToClassify = entry },
+                    onBlockAuthor: authorCB.onBlock,
+                    onAddAuthorToList: authorCB.onAddToList,
                     isLiked: viewModel.effectiveIsLiked(uri: entry.post.uri),
                     isReposted: viewModel.effectiveIsReposted(uri: entry.post.uri),
                     overrideLikeCount: viewModel.effectiveLikeCount(uri: entry.post.uri),
