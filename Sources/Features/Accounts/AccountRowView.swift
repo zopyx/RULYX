@@ -32,6 +32,7 @@ struct AccountRowView: View {
                 HStack(spacing: 6) {
                     Text(account.displayName)
                         .font(.headline)
+                        .foregroundStyle(.primary)
                     if let label = account.label {
                         Text(label)
                             .font(.caption2.weight(.semibold))
@@ -51,46 +52,40 @@ struct AccountRowView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                let hasEntryway = entrywayLabel != nil
-                if hasEntryway || isActive {
-                    HStack(spacing: 6) {
-                        if let label = entrywayLabel {
-                            Text(label)
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background {
-                                    if #available(iOS 26, *) {
-                                        Color.clear.glassEffect(.regular, in: .rect(cornerRadius: .infinity))
-                                    } else {
-                                        Color.clear.background(Color.secondary.opacity(0.15), in: Capsule())
-                                    }
-                                }
-                        }
-                        if isActive {
-                            HStack(spacing: 4) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.caption2.weight(.semibold))
-                                Text(loc("account.active"))
-                                    .font(.caption2.weight(.semibold))
-                            }
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background {
-                                if #available(iOS 26, *) {
-                                    Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
-                                } else {
-                                    Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
-                                }
+                if let label = entrywayLabel {
+                    Text(label)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background {
+                            if #available(iOS 26, *) {
+                                Color.clear.glassEffect(.regular, in: .rect(cornerRadius: .infinity))
+                            } else {
+                                Color.clear.background(Color.secondary.opacity(0.15), in: Capsule())
                             }
                         }
-                    }
                 }
             }
 
             Spacer()
+
+            if isActive {
+                HStack(spacing: 4) {
+                    Text(loc("account.active"))
+                        .font(.caption2.weight(.semibold))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background {
+                    if #available(iOS 26, *) {
+                        Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
+                    } else {
+                        Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
+                    }
+                }
+            }
 
             if isDeactivated {
                 HStack(spacing: 4) {

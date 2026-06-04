@@ -18,6 +18,7 @@ struct AccountSwitcherSheet: View {
     @State private var editLabelText = ""
     @State private var switchingAccountID: AppAccount.ID?
     @State private var editMode: EditMode = .inactive
+    @State private var showAccountHelp = false
 
     // MARK: - Body
 
@@ -31,7 +32,7 @@ struct AccountSwitcherSheet: View {
                         description: Text(loc: "account.no_accounts.desc")
                     )
                 } else {
-                    Section(loc("account.manage.saved")) {
+                    Section {
                         ForEach(accountStore.accounts) { account in
                             Button {
                                 switchAccount(to: account)
@@ -76,6 +77,11 @@ struct AccountSwitcherSheet: View {
                                 accountStore.removeAccount(account, client: blueskyClient)
                             }
                         }
+                    } header: {
+                        HStack {
+                            Text(loc("account.manage.saved"))
+                            HelpInfoButton(action: { showAccountHelp = true }, accessibilityLabel: loc("account.manage.saved"))
+                        }
                     }
                 }
             }
@@ -107,6 +113,24 @@ struct AccountSwitcherSheet: View {
                 AddAccountView()
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
+            }
+            .sheet(isPresented: $showAccountHelp) {
+                NavigationStack {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(loc("account.manage.saved.info"))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                    .pageTitle(loc("account.manage.saved"))
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            ToolbarCloseButton(action: { showAccountHelp = false })
+                        }
+                    }
+                }
+                .presentationDetents([.height(200)])
             }
             .alert(loc("account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
                 Button(loc("actions.ok")) {

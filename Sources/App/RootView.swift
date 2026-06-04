@@ -295,9 +295,18 @@ private struct AccountSwitcherRow: View {
                 }
                 Spacer()
                 if isActive {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(Color.skyPrimary)
+                    Text(loc("account.active"))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background {
+                            if #available(iOS 26, *) {
+                                Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
+                            } else {
+                                Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
+                            }
+                        }
                 }
                 if isDeactivated {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -307,7 +316,7 @@ private struct AccountSwitcherRow: View {
             }
         }
         .buttonStyle(.plain)
-        .disabled(isActive || isDeactivated)
+        .disabled(isDeactivated)
     }
 }
 
@@ -335,8 +344,6 @@ private struct AccountSwitcherTabSheet: View {
                             }
                         )
                     }
-                } header: {
-                    Text(loc("account.switcher.accounts_section"))
                 }
 
                 Section {
