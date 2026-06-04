@@ -604,6 +604,7 @@
   "account.switcher.accounts_section": "账户",
   "account.switcher.manage": "管理账户",
   "account.manage.saved": "已保存的账户",
+  "account.manage.saved.info": "All accounts you have signed into appear here. The active account is used for moderation actions like blocking and muting. Tap an account to switch.",
   "account.manage.back": "返回",
   "account.manage.add": "添加账户",
   "account.manage.more": "更多",

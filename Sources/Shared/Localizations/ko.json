@@ -604,6 +604,7 @@
   "account.switcher.accounts_section": "Accounts (한국어)",
   "account.switcher.manage": "Manage Accounts (한국어)",
   "account.manage.saved": "Saved Accounts (한국어)",
+  "account.manage.saved.info": "All accounts you have signed into appear here. The active account is used for moderation actions like blocking and muting. Tap an account to switch.",
   "account.manage.back": "戻る (한국어)",
   "account.manage.add": "Add Account (한국어)",
   "account.manage.more": "More (한국어)",

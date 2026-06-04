@@ -604,6 +604,7 @@
   "account.switcher.accounts_section": "Accounts (RU)",
   "account.switcher.manage": "Manage Accounts (RU)",
   "account.manage.saved": "Saved Accounts (RU)",
+  "account.manage.saved.info": "All accounts you have signed into appear here. The active account is used for moderation actions like blocking and muting. Tap an account to switch.",
   "account.manage.back": "Back (RU)",
   "account.manage.add": "Add Account (RU)",
   "account.manage.more": "More (RU)",

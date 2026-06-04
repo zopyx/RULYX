@@ -604,6 +604,7 @@
   "account.switcher.accounts_section": "Accounts (NL)",
   "account.switcher.manage": "Accounts verwalten (NL)",
   "account.manage.saved": "Gespeicherte Accounts (NL)",
+  "account.manage.saved.info": "All accounts you have signed into appear here. The active account is used for moderation actions like blocking and muting. Tap an account to switch.",
   "account.manage.back": "Zurück (NL)",
   "account.manage.add": "Account hinzufügen (NL)",
   "account.manage.more": "More (NL)",

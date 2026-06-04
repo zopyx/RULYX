@@ -603,6 +603,7 @@
   "account.switcher.accounts_section": "Accounts (AR)",
   "account.switcher.manage": "Manage Accounts (AR)",
   "account.manage.saved": "Saved Accounts (AR)",
+  "account.manage.saved.info": "All accounts you have signed into appear here. The active account is used for moderation actions like blocking and muting. Tap an account to switch.",
   "account.manage.back": "Back (AR)",
   "account.manage.add": "Add Account (AR)",
   "account.manage.more": "More (AR)",

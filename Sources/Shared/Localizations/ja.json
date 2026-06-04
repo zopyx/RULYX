@@ -604,6 +604,7 @@
   "account.switcher.accounts_section": "アカウント",
   "account.switcher.manage": "アカウント管理",
   "account.manage.saved": "保存済みアカウント",
+  "account.manage.saved.info": "All accounts you have signed into appear here. The active account is used for moderation actions like blocking and muting. Tap an account to switch.",
   "account.manage.back": "戻る",
   "account.manage.add": "アカウントを追加",
   "account.manage.more": "その他",
