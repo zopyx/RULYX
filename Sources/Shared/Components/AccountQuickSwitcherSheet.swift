@@ -24,28 +24,32 @@ struct AccountQuickSwitcherSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    ForEach(accountStore.accounts) { account in
-                        Button {
-                            switchAccount(to: account)
-                        } label: {
-                            HStack {
-                                AccountRowView(
-                                    account: account,
-                                    isActive: account.id == accountStore.activeAccountID,
-                                    isDeactivated: accountStore.isDeactivated(account)
-                                )
-                                if switchingAccountID == account.id {
-                                    Spacer()
-                                    ProgressView()
-                                        .scaleEffect(0.7)
-                                }
+                Text(loc("account.switcher.title"))
+                    .font(.title2.weight(.bold))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+
+                ForEach(accountStore.accounts) { account in
+                    Button {
+                        switchAccount(to: account)
+                    } label: {
+                        HStack {
+                            AccountRowView(
+                                account: account,
+                                isActive: account.id == accountStore.activeAccountID,
+                                isDeactivated: accountStore.isDeactivated(account)
+                            )
+                            if switchingAccountID == account.id {
+                                Spacer()
+                                ProgressView()
+                                    .scaleEffect(0.7)
                             }
                         }
-                        .buttonStyle(.plain)
-                        .disabled(switchingAccountID != nil)
-                        .accessibilityHint("Switches to \(account.label ?? account.handle)")
                     }
+                    .buttonStyle(.plain)
+                    .disabled(switchingAccountID != nil)
+                    .accessibilityHint("Switches to \(account.label ?? account.handle)")
                 }
 
                 Section {
@@ -61,10 +65,10 @@ struct AccountQuickSwitcherSheet: View {
                     .accessibilityHint("Opens the full account management screen")
                 }
             }
-            .pageTitle(loc("account.switcher.title"))
             .listStyle(.plain)
             .listSectionSpacing(.compact)
             .environment(\.defaultMinListHeaderHeight, 0)
+            .toolbar(.hidden)
         }
         .presentationDetents([.height(360), .medium])
         .presentationDragIndicator(.visible)
