@@ -10,6 +10,7 @@ struct ListDetailView: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
+    @EnvironmentObject var internalListStore: InternalListStore
     @StateObject var viewModel = ListDetailViewModel()
     @StateObject var batchState = ListBatchProgressState()
     @State var currentList: BlueskyList
@@ -408,6 +409,17 @@ struct ListDetailView: View {
                 ownerActor: ownerActor,
                 imagePreview: $imagePreview
             )
+
+            Section {
+                NavigationLink {
+                    ListTimelineView(list: currentList)
+                        .environmentObject(accountStore)
+                        .environmentObject(blueskyClient)
+                        .environmentObject(internalListStore)
+                } label: {
+                    Label(loc("list.timeline.link"), systemImage: "clock.arrow.circlepath")
+                }
+            }
 
             if !isOwnedList, currentList.kind == .moderation {
                 ListDetailSubscribeSection(
