@@ -38,6 +38,13 @@ final class UserPostsViewModel: ObservableObject {
     @Published private var optimisticLikeCounts: [String: Int] = [:]
     @Published private var optimisticRepostCounts: [String: Int] = [:]
 
+    // MARK: - Scanning
+
+    /// True while auto-scanning threads for replies from other users.
+    @Published private(set) var isScanning = false
+    /// Progress label shown during thread scanning.
+    @Published private(set) var scanProgressLabel: String?
+
     // MARK: - Inline Threads
 
     @Published var expandedThreadURIs: Set<String> = []
@@ -116,6 +123,7 @@ final class UserPostsViewModel: ObservableObject {
             cursor = response.cursor
             hasMore = cursor != nil
             resetOptimisticState()
+            await autoExpandThreads(account: account, appPassword: appPassword, using: client)
         } catch {
             guard !AppError.isCancellation(error) else { return }
             cursor = oldCursor
@@ -142,6 +150,7 @@ final class UserPostsViewModel: ObservableObject {
             errorMessage = AppError.userMessage(from: error)
             AppLogger.moderation.error("Failed to load posts: \(error.localizedDescription, privacy: .public)")
         }
+        await autoExpandThreads(account: account, appPassword: appPassword, using: client)
     }
 
     /// Loads the next page of posts and appends to `posts`.
@@ -160,6 +169,7 @@ final class UserPostsViewModel: ObservableObject {
             errorMessage = AppError.userMessage(from: error)
             AppLogger.moderation.error("Failed to load more posts: \(error.localizedDescription, privacy: .public)")
         }
+        await autoExpandThreads(account: account, appPassword: appPassword, using: client)
     }
 
     // MARK: - Optimistic Interactions
@@ -257,6 +267,66 @@ final class UserPostsViewModel: ObservableObject {
         } catch {
             AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// After loading posts, automatically expand threads for posts with replies,
+    /// filtering to only show replies from users other than the profile author.
+    func autoExpandThreads(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        let replyPosts = posts.filter { ($0.post.replyCount ?? 0) > 0 }
+        guard !replyPosts.isEmpty else { return }
+        isScanning = true
+        defer {
+            isScanning = false
+            scanProgressLabel = nil
+        }
+
+        let uris = replyPosts.map(\.post.uri)
+        let total = uris.count
+        var processed = 0
+
+        for uri in uris {
+            guard !Task.isCancelled else { return }
+            // Skip already-expanded threads
+            guard !expandedThreadURIs.contains(uri) else {
+                processed += 1
+                continue
+            }
+
+            processed += 1
+            scanProgressLabel = loc("directreplies.scanning_progress")
+                .replacingOccurrences(of: "{n}", with: "\(processed)")
+                .replacingOccurrences(of: "{total}", with: "\(total)")
+
+            do {
+                let thread: ThreadNode
+                if let cached = ThreadCacheService.shared.get(uri: uri) {
+                    thread = cached
+                } else {
+                    let response = try await client.fetchPostThread(uri: uri, depth: 3, account: account, appPassword: appPassword)
+                    ThreadCacheService.shared.set(uri: uri, thread: response.thread)
+                    thread = response.thread
+                }
+
+                let filtered = filterOtherReplies(from: thread, myDID: did)
+                if filtered.replies?.isEmpty == false {
+                    inlineThreads[uri] = filtered
+                    expandedThreadURIs.insert(uri)
+                }
+            } catch {
+                AppLogger.moderation.error("Thread fetch failed for \(uri): \(error.localizedDescription, privacy: .public)")
+            }
+        }
+    }
+
+    /// Recursively filters a thread node to keep only replies from users other than `myDID`.
+    private func filterOtherReplies(from node: ThreadNode, myDID: String) -> ThreadNode {
+        let filteredReplies = node.replies?.compactMap { reply -> ThreadNode? in
+            let authorDID = reply.post.author?.did
+            guard authorDID != nil, authorDID != myDID else { return nil }
+            let childFiltered = filterOtherReplies(from: reply, myDID: myDID)
+            return ThreadNode(post: reply.post, parent: nil, replies: childFiltered.replies)
+        }
+        return ThreadNode(post: node.post, parent: nil, replies: filteredReplies)
     }
 
     // MARK: - Entry Management

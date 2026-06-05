@@ -158,6 +158,18 @@ struct UserPostsView: View {
         List {
             searchSection
 
+            if viewModel.isScanning, let label = viewModel.scanProgressLabel {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .scaleEffect(0.7)
+                    Text(label)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+            }
+
             ForEach(viewModel.sortedFilteredPosts, id: \.post.uri) { entry in
                 postRowView(for: entry)
                     .postInfiniteScroll(
