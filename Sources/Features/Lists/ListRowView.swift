@@ -14,7 +14,7 @@ struct ListRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(list.name)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.skyPrimary)
                     .lineLimit(2)
                 Text(list.description)
                     .font(.caption)

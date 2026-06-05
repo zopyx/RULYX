@@ -62,6 +62,7 @@ struct AccountQuickSwitcherSheet: View {
                 }
             }
             .pageTitle(loc("account.switcher.title"))
+            .environment(\.defaultMinListHeaderHeight, 0)
         }
         .presentationDetents([.height(360), .medium])
         .presentationDragIndicator(.visible)
