@@ -1,10 +1,10 @@
 import Combine
 import Foundation
 
-/// Manages a user's posts with search/filter and CSV/JSON export capabilities.
+/// Manages a user's posts with search/filter, CSV/JSON export, optimistic interactions, and inline thread expansion.
 ///
 /// Loads paginated feed data via `fetchRichFeed`, supports client-side text and date filtering,
-/// and provides `sortedFilteredPosts` for display. Exports to CSV or JSON strings.
+/// optimistic like/repost toggles, inline thread caching/expansion, and provides `sortedFilteredPosts` for display.
 @MainActor
 final class UserPostsViewModel: ObservableObject {
     // MARK: - Properties
@@ -28,6 +28,20 @@ final class UserPostsViewModel: ObservableObject {
 
     /// Posts filtered by search text and date range, sorted newest-first.
     @Published private(set) var sortedFilteredPosts: [RichFeedEntry] = []
+
+    // MARK: - Optimistic Interactions
+
+    @Published private var optimisticLikes: [String: Bool] = [:]
+    @Published private var optimisticReposts: [String: Bool] = [:]
+    @Published private var optimisticLikeURIs: [String: String] = [:]
+    @Published private var optimisticRepostURIs: [String: String] = [:]
+    @Published private var optimisticLikeCounts: [String: Int] = [:]
+    @Published private var optimisticRepostCounts: [String: Int] = [:]
+
+    // MARK: - Inline Threads
+
+    @Published var expandedThreadURIs: Set<String> = []
+    @Published var inlineThreads: [String: ThreadNode] = [:]
 
     // MARK: - Private Properties
 
@@ -101,6 +115,7 @@ final class UserPostsViewModel: ObservableObject {
             posts = response.feed
             cursor = response.cursor
             hasMore = cursor != nil
+            resetOptimisticState()
         } catch {
             guard !AppError.isCancellation(error) else { return }
             cursor = oldCursor
@@ -147,6 +162,113 @@ final class UserPostsViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Optimistic Interactions
+
+    func toggleLike(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        guard let entry = posts.first(where: { $0.post.uri == uri }),
+              let cid = entry.post.cid else { return }
+        let wasLiked = effectiveIsLiked(uri: uri)
+        let oldCount = effectiveLikeCount(uri: uri)
+        optimisticLikes[uri] = !wasLiked
+        optimisticLikeCounts[uri] = oldCount + (wasLiked ? -1 : 1)
+        do {
+            if wasLiked, let likeURI = effectiveMyLikeURI(uri: uri) {
+                _ = try await client.deleteRecord(recordURI: likeURI, account: account, appPassword: appPassword)
+                optimisticLikeURIs.removeValue(forKey: uri)
+            } else {
+                let response = try await client.createLike(uri: uri, cid: cid, account: account, appPassword: appPassword)
+                optimisticLikeURIs[uri] = response.uri
+            }
+        } catch {
+            optimisticLikes.removeValue(forKey: uri)
+            optimisticLikeCounts.removeValue(forKey: uri)
+            if wasLiked { optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI }
+            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func toggleRepost(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        guard let entry = posts.first(where: { $0.post.uri == uri }),
+              let cid = entry.post.cid else { return }
+        let wasReposted = effectiveIsReposted(uri: uri)
+        let oldCount = effectiveRepostCount(uri: uri)
+        optimisticReposts[uri] = !wasReposted
+        optimisticRepostCounts[uri] = oldCount + (wasReposted ? -1 : 1)
+        do {
+            if wasReposted, let repostURI = effectiveMyRepostURI(uri: uri) {
+                _ = try await client.deleteRecord(recordURI: repostURI, account: account, appPassword: appPassword)
+                optimisticRepostURIs.removeValue(forKey: uri)
+            } else {
+                let response = try await client.createRepost(uri: uri, cid: cid, account: account, appPassword: appPassword)
+                optimisticRepostURIs[uri] = response.uri
+            }
+        } catch {
+            optimisticReposts.removeValue(forKey: uri)
+            optimisticRepostCounts.removeValue(forKey: uri)
+            if wasReposted { optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI }
+            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func effectiveIsLiked(uri: String) -> Bool {
+        optimisticLikes[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.isLikedByMe ?? false
+    }
+
+    func effectiveIsReposted(uri: String) -> Bool {
+        optimisticReposts[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.isRepostedByMe ?? false
+    }
+
+    func effectiveMyLikeURI(uri: String) -> String? {
+        optimisticLikeURIs[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.myLikeURI
+    }
+
+    func effectiveMyRepostURI(uri: String) -> String? {
+        optimisticRepostURIs[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.myRepostURI
+    }
+
+    func effectiveLikeCount(uri: String) -> Int {
+        if let count = optimisticLikeCounts[uri] { return count }
+        return posts.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
+    }
+
+    func effectiveRepostCount(uri: String) -> Int {
+        if let count = optimisticRepostCounts[uri] { return count }
+        return posts.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
+    }
+
+    // MARK: - Inline Threads
+
+    func toggleInlineThread(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        if expandedThreadURIs.contains(uri) {
+            expandedThreadURIs.remove(uri)
+            inlineThreads.removeValue(forKey: uri)
+            return
+        }
+        if let cached = ThreadCacheService.shared.get(uri: uri) {
+            inlineThreads[uri] = cached
+            expandedThreadURIs.insert(uri)
+            return
+        }
+        do {
+            let response = try await client.fetchPostThread(uri: uri, account: account, appPassword: appPassword)
+            ThreadCacheService.shared.set(uri: uri, thread: response.thread)
+            inlineThreads[uri] = response.thread
+            expandedThreadURIs.insert(uri)
+        } catch {
+            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    // MARK: - Entry Management
+
+    func removeEntry(uri: String) {
+        posts.removeAll { $0.post.uri == uri }
+    }
+
+    func insertEntry(_ entry: RichFeedEntry, at index: Int) {
+        posts.insert(entry, at: min(index, posts.count))
+    }
+
     // MARK: - Export
 
     /// Exports the filtered/sorted posts as a CSV string with header row.
@@ -191,5 +313,19 @@ final class UserPostsViewModel: ObservableObject {
             ] as [String: Any]
         }
         return (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys])) ?? Data()
+    }
+
+    // MARK: - Private
+
+    private func resetOptimisticState() {
+        optimisticLikes.removeAll()
+        optimisticReposts.removeAll()
+        optimisticLikeURIs.removeAll()
+        optimisticRepostURIs.removeAll()
+        optimisticLikeCounts.removeAll()
+        optimisticRepostCounts.removeAll()
+        expandedThreadURIs.removeAll()
+        inlineThreads.removeAll()
+        ThreadCacheService.shared.invalidateAll()
     }
 }
