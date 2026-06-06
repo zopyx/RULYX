@@ -36,6 +36,15 @@ class LiveAIService: ObservableObject {
             description: "Microsoft Phi-3 mini 3.8B parameter model, 4-bit quantized.",
             requires: "17.0"
         ),
+        ModelBundle(
+            id: "qwen3-1.7b-q4km",
+            name: "Qwen3 1.7B (Q4_K_M)",
+            role: .textGenerator,
+            downloadURL: URL(string: "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/qwen3-1.7b-q4_k_m.gguf")!,
+            fileSize: 1_180_000_000,
+            description: "Qwen3 1.7B parameter model, Q4_K_M quantized. Compact and efficient for on-device moderation and content analysis.",
+            requires: "17.0"
+        ),
     ]
 
     private struct CatalogManifest: Decodable {

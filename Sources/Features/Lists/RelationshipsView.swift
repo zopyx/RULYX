@@ -247,7 +247,7 @@ struct RelationshipsView: View {
         .refreshable {
             await refresh()
         }
-        .task {
+        .task(id: accountStore.activeAccountID) {
             await load()
         }
         .confirmationDialog(
@@ -424,6 +424,7 @@ struct RelationshipsView: View {
             return
         }
 
+        actors = []
         errorMessage = nil
 
         let cached: [BlueskyActor] = if let key = cacheKey {

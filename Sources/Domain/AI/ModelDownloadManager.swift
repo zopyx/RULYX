@@ -155,14 +155,18 @@ extension ModelDownloadManager: URLSessionDownloadDelegate {
         downloadTask: URLSessionDownloadTask,
         didFinishDownloadingTo location: URL
     ) {
+        let safeURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        guard (try? FileManager.default.copyItem(at: location, to: safeURL)) != nil else { return }
         Task {
+            defer { try? FileManager.default.removeItem(at: safeURL) }
             guard let entry = await registry.lookup(downloadTask.taskIdentifier) else { return }
             let dest = fileManager.localURL(for: entry.modelID)
             let parent = dest.deletingLastPathComponent()
             try? FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
             do {
                 try? FileManager.default.removeItem(at: dest)
-                try FileManager.default.moveItem(at: location, to: dest)
+                try FileManager.default.moveItem(at: safeURL, to: dest)
                 await MainActor.run { progress[entry.modelID] = 1.0 }
                 entry.continuation.resume(returning: dest)
                 await registry.unregister(downloadTask.taskIdentifier)

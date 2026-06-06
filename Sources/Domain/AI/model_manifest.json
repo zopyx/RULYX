@@ -8,6 +8,15 @@
       "fileSize": 2350000000,
       "description": "Microsoft Phi-3 mini 3.8B parameter model, 4-bit quantized. Suitable for moderation suggestions and content analysis.",
       "requires": "17.0"
+    },
+    {
+      "id": "qwen3-1.7b-q4km",
+      "name": "Qwen3 1.7B (Q4_K_M)",
+      "role": "textGenerator",
+      "downloadURL": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/qwen3-1.7b-q4_k_m.gguf",
+      "fileSize": 1180000000,
+      "description": "Qwen3 1.7B parameter model, Q4_K_M quantized. Compact and efficient for on-device moderation and content analysis.",
+      "requires": "17.0"
     }
   ]
 }

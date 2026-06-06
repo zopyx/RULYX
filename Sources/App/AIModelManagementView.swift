@@ -108,6 +108,11 @@ private struct ModelRow: View {
                         .foregroundStyle(.tertiary)
                         .lineLimit(2)
                 }
+
+                if case let .downloading(progress) = state {
+                    ProgressView(value: progress, total: 1.0)
+                        .tint(.skyPrimary)
+                }
             }
 
             Spacer()
@@ -118,24 +123,37 @@ private struct ModelRow: View {
                     .buttonStyle(.bordered)
                     .font(.caption.weight(.medium))
                     .controlSize(.small)
-            case let .downloading(progress):
-                VStack(alignment: .trailing, spacing: 2) {
-                    ProgressView(value: progress, total: 1.0)
-                        .frame(width: 60)
-                    Text(Int(progress * 100).formatted() + "%")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+            case .downloading:
+                ZStack {
+                    Circle()
+                        .stroke(Color(.systemGray5), lineWidth: 4)
+                        .frame(width: 36, height: 36)
+                    Circle()
+                        .trim(from: 0, to: downloadProgress)
+                        .stroke(Color.skyPrimary, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                        .frame(width: 36, height: 36)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 0.2), value: downloadProgress)
+                    Text(Int(downloadProgress * 100).formatted() + "%")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.primary)
                 }
             case .ready:
-                Button(loc("ai.models.delete"), role: .destructive, action: onDelete)
-                    .buttonStyle(.bordered)
-                    .font(.caption.weight(.medium))
-                    .controlSize(.small)
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.caption)
+                    Button(loc("ai.models.delete"), role: .destructive, action: onDelete)
+                        .buttonStyle(.bordered)
+                        .font(.caption.weight(.medium))
+                        .controlSize(.small)
+                }
             case let .failed(msg):
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(msg)
                         .font(.caption2)
                         .foregroundStyle(.red)
+                        .lineLimit(1)
                     Button(loc("ai.models.retry"), action: onDownload)
                         .buttonStyle(.bordered)
                         .font(.caption.weight(.medium))
@@ -144,6 +162,11 @@ private struct ModelRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private var downloadProgress: Double {
+        if case let .downloading(p) = state { return max(p, 0.01) }
+        return 0
     }
 
     private var roleLabel: String {
