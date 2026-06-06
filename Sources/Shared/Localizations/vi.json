@@ -1148,6 +1148,7 @@
   "ai.models.section": "Available Models",
   "ai.models.download": "Download",
   "ai.models.delete": "Delete",
+  "ai.models.storage": "Storage used",
   "ai.models.retry": "Retry",
   "ai.models.refresh": "Refresh",
   "ai.models.empty": "No Models Available",
