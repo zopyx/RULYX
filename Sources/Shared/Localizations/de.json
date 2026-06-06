@@ -1148,6 +1148,7 @@
   "ai.models.section": "Verfügbare Modelle",
   "ai.models.download": "Herunterladen",
   "ai.models.delete": "Löschen",
+  "ai.models.storage": "Storage used",
   "ai.models.retry": "Wiederholen",
   "ai.models.refresh": "Aktualisieren",
   "ai.models.empty": "Keine KI-Modelle verfügbar",
