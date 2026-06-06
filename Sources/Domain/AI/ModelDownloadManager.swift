@@ -95,7 +95,13 @@ final class ModelDownloadManager: NSObject {
     private let fileManager: ModelFileManager
 
     /// The URLSession used for model downloads, configured lazily.
-    private lazy var session: URLSession = .init(configuration: .default, delegate: self, delegateQueue: nil)
+    /// Uses `.default` with `urlCache = nil` since cache policy on the request
+    /// is ignored for download tasks by URLSession.
+    private lazy var session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.urlCache = nil
+        return .init(configuration: config, delegate: self, delegateQueue: nil)
+    }()
 
     /// Current download progress for each model ID (0.0–1.0).
     private(set) var progress: [String: Double] = [:]
@@ -109,14 +115,8 @@ final class ModelDownloadManager: NSObject {
     }
 
     /// Begins downloading a model file from the given URL.
-    /// - Parameters:
-    ///   - id: The model identifier for tracking.
-    ///   - url: The remote URL to download from.
-    /// - Returns: The local file URL of the downloaded model.
     func downloadModel(id: String, from url: URL) async throws -> URL {
-        var request = URLRequest(url: url)
-        request.cachePolicy = .reloadIgnoringLocalCacheData
-        let task = session.downloadTask(with: request)
+        let task = session.downloadTask(with: url)
         failures.removeValue(forKey: id)
         return try await withCheckedThrowingContinuation { continuation in
             Task {
@@ -134,10 +134,6 @@ final class ModelDownloadManager: NSObject {
         failures.removeValue(forKey: id)
     }
 
-    /// Removes the cached response for the given URL from the session cache.
-    func removeCachedResponse(for url: URL) {
-        session.configuration.urlCache?.removeCachedResponse(for: URLRequest(url: url))
-    }
 }
 
 // MARK: - URLSessionDownloadDelegate
