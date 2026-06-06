@@ -63,7 +63,9 @@ struct PostClassificationView: View {
                             model: model,
                             state: state,
                             isSelected: selectedModelIDs.contains(model.id),
-                            onTap: { toggleSelection(model.id) }
+                            onTap: { toggleSelection(model.id) },
+                            onDownload: { Task { await downloadModel(model) } },
+                            onDelete: { Task { await deleteModel(model.id) } }
                         )
                     }
                 } header: {
@@ -148,6 +150,16 @@ struct PostClassificationView: View {
         }
     }
 
+    private func downloadModel(_ model: ModelBundle) async {
+        do {
+            try await aiService.download(model)
+        } catch {}
+    }
+
+    private func deleteModel(_ modelID: String) async {
+        try? await aiService.delete(modelID)
+    }
+
     /// Runs classification or generation on the post using all selected
     /// models sequentially, collecting results.
     private func runClassification() {
@@ -180,57 +192,65 @@ struct PostClassificationView: View {
 // MARK: - ModelSelectionRow
 
 /// A row displaying a model's name, role, download state, and a selection
-/// checkbox. Only models in the ``.ready`` state are interactive.
+/// checkbox. Only models in the ``.ready`` state can be selected.
+/// Models not yet downloaded show inline download/delete actions.
 private struct ModelSelectionRow: View {
-    /// The model bundle to display.
     let model: ModelBundle
-    /// The current download state of the model.
     let state: ModelDownloadState
-    /// Whether the model is currently selected for classification.
     let isSelected: Bool
-    /// Closure invoked when the row is tapped.
     let onTap: () -> Void
+    let onDownload: () -> Void
+    let onDelete: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(model.name)
-                        .font(.subheadline)
-                    HStack(spacing: 4) {
-                        Text(roleLabel)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        if state != .ready {
-                            Text("·")
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
-                            Text(stateLabel)
+        HStack {
+            Button(action: onTap) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(model.name)
+                            .font(.subheadline)
+
+                        HStack(spacing: 4) {
+                            Text(roleLabel)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                            if state != .ready {
+                                Text("·")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                                Text(stateLabel)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    Spacer()
+
+                    if state == .ready {
+                        if isSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.blue)
+                        } else {
+                            Image(systemName: "circle")
+                                .foregroundStyle(.tertiary)
                         }
                     }
                 }
-                Spacer()
-                if state == .ready {
-                    if isSelected {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.blue)
-                    } else {
-                        Image(systemName: "circle")
-                            .foregroundStyle(.tertiary)
-                    }
-                } else {
-                    Image(systemName: "lock")
-                        .foregroundStyle(.tertiary)
-                }
+            }
+            .foregroundStyle(state == .ready ? .primary : .secondary)
+            .disabled(state != .ready)
+
+            if state != .ready || (state == .ready && isSelected) {
+                ModelDownloadIndicator(
+                    state: state,
+                    onDownload: onDownload,
+                    onDelete: onDelete
+                )
             }
         }
-        .foregroundStyle(state == .ready ? .primary : .secondary)
-        .disabled(state != .ready)
     }
 
-    /// Localized label for the model's role.
     private var roleLabel: String {
         switch model.role {
         case .textClassifier: loc("ai.models.role.classifier")
@@ -238,7 +258,6 @@ private struct ModelSelectionRow: View {
         }
     }
 
-    /// Localized label for the model's download state.
     private var stateLabel: String {
         switch state {
         case .notDownloaded: loc("ai.models.not_downloaded_label")

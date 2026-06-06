@@ -114,7 +114,9 @@ final class ModelDownloadManager: NSObject {
     ///   - url: The remote URL to download from.
     /// - Returns: The local file URL of the downloaded model.
     func downloadModel(id: String, from url: URL) async throws -> URL {
-        let task = session.downloadTask(with: url)
+        var request = URLRequest(url: url)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        let task = session.downloadTask(with: request)
         failures.removeValue(forKey: id)
         return try await withCheckedThrowingContinuation { continuation in
             Task {
@@ -130,6 +132,11 @@ final class ModelDownloadManager: NSObject {
     func cancelDownload(id: String) {
         progress.removeValue(forKey: id)
         failures.removeValue(forKey: id)
+    }
+
+    /// Removes the cached response for the given URL from the session cache.
+    func removeCachedResponse(for url: URL) {
+        session.configuration.urlCache?.removeCachedResponse(for: URLRequest(url: url))
     }
 }
 
