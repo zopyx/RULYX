@@ -114,6 +114,17 @@ class LiveAIService: ObservableObject {
         rebuildStates()
     }
 
+    /// Cancels an in-progress download and clears its state.
+    func cancelDownload(_ modelID: String) {
+        downloadManager.cancelDownload(id: modelID)
+        rebuildStates()
+    }
+
+    /// Returns the total disk usage of all downloaded model files in bytes.
+    func totalDiskUsage() -> UInt64 {
+        fileManager.totalDiskUsage()
+    }
+
     /// Deletes a downloaded model from disk and clears its download state.
     /// - Parameter modelID: The identifier of the model to remove.
     func delete(_ modelID: String) async throws {
