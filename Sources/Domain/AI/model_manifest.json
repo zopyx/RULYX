@@ -10,12 +10,12 @@
       "requires": "17.0"
     },
     {
-      "id": "qwen3-1.7b-q4km",
-      "name": "Qwen3 1.7B (Q4_K_M)",
+      "id": "qwen3-1.7b-q8",
+      "name": "Qwen3 1.7B (Q8_0)",
       "role": "textGenerator",
-      "downloadURL": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/qwen3-1.7b-q4_k_m.gguf",
-      "fileSize": 1180000000,
-      "description": "Qwen3 1.7B parameter model, Q4_K_M quantized. Compact and efficient for on-device moderation and content analysis.",
+      "downloadURL": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q8_0.gguf",
+      "fileSize": 1834426016,
+      "description": "Official Qwen3 1.7B model, Q8_0 quantized, for on-device moderation and content analysis.",
       "requires": "17.0"
     }
   ]

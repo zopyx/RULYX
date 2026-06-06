@@ -6,6 +6,8 @@ struct AIModelManagementView: View {
     @State private var models: [ModelBundle] = []
     @State private var isRefreshing = false
     @State private var diskUsage: UInt64 = 0
+    @State private var downloadErrorMessage = ""
+    @State private var isDownloadErrorPresented = false
 
     var body: some View {
         ScrollView {
@@ -36,9 +38,14 @@ struct AIModelManagementView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle(loc("ai.models.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         .refreshable { await refresh() }
         .task { await refresh() }
+        .alert(loc("ai.error.download_failed"), isPresented: $isDownloadErrorPresented) {
+            Button(loc("actions.ok")) {}
+        } message: {
+            Text(downloadErrorMessage)
+        }
     }
 
     private var storageCard: some View {
@@ -59,19 +66,22 @@ struct AIModelManagementView: View {
         defer { isRefreshing = false }
         try? await aiService.refreshCatalog()
         models = await aiService.catalog
-        diskUsage = await aiService.totalDiskUsage()
+        diskUsage = aiService.totalDiskUsage()
     }
 
     private func downloadModel(_ model: ModelBundle) async {
         do {
             try await aiService.download(model)
-        } catch {}
-        diskUsage = await aiService.totalDiskUsage()
+        } catch {
+            downloadErrorMessage = error.localizedDescription
+            isDownloadErrorPresented = true
+        }
+        diskUsage = aiService.totalDiskUsage()
     }
 
     private func deleteModel(_ modelID: String) async {
         try? await aiService.delete(modelID)
-        diskUsage = await aiService.totalDiskUsage()
+        diskUsage = aiService.totalDiskUsage()
     }
 
     private func formattedSize(_ bytes: Int64) -> String {
@@ -82,11 +92,18 @@ struct AIModelManagementView: View {
 // MARK: - ModelCard
 
 private struct ModelCard: View {
+    private enum PendingAction {
+        case download
+        case delete
+    }
+
     let model: ModelBundle
     let state: ModelDownloadState
     let onDownload: () -> Void
     let onCancel: () -> Void
     let onDelete: () -> Void
+    @State private var pendingAction = PendingAction.download
+    @State private var isConfirmationPresented = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -148,16 +165,32 @@ private struct ModelCard: View {
             }
         }
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16, style: .continuous))
+        .confirmationDialog(
+            model.name,
+            isPresented: $isConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            switch pendingAction {
+            case .download:
+                Button(loc("ai.models.download"), action: onDownload)
+            case .delete:
+                Button(loc("ai.models.delete"), role: .destructive, action: onDelete)
+            }
+            Button(loc("actions.cancel"), role: .cancel) {}
+        }
     }
 
     @ViewBuilder
     private var stateIndicator: some View {
         switch state {
         case .notDownloaded:
-            Button(loc("ai.models.download"), action: onDownload)
-                .buttonStyle(.borderedProminent)
-                .font(.caption.weight(.semibold))
-                .controlSize(.small)
+            Button(loc("ai.models.download")) {
+                pendingAction = .download
+                isConfirmationPresented = true
+            }
+            .buttonStyle(.borderedProminent)
+            .font(.caption.weight(.semibold))
+            .controlSize(.small)
 
         case let .downloading(progress):
             ZStack {
@@ -180,10 +213,13 @@ private struct ModelCard: View {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                     .font(.title3)
-                Button(loc("ai.models.delete"), role: .destructive, action: onDelete)
-                    .buttonStyle(.bordered)
-                    .font(.caption.weight(.medium))
-                    .controlSize(.small)
+                Button(loc("ai.models.delete"), role: .destructive) {
+                    pendingAction = .delete
+                    isConfirmationPresented = true
+                }
+                .buttonStyle(.bordered)
+                .font(.caption.weight(.medium))
+                .controlSize(.small)
             }
 
         case let .failed(msg):

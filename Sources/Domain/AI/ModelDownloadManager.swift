@@ -141,6 +141,11 @@ final class ModelDownloadManager: NSObject {
         failures.removeValue(forKey: id)
     }
 
+    /// Records a validation failure after a download task itself completed.
+    func recordFailure(id: String, message: String) {
+        progress.removeValue(forKey: id)
+        failures[id] = message
+    }
 }
 
 // MARK: - URLSessionDownloadDelegate

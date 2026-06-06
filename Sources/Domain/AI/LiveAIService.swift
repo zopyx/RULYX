@@ -37,12 +37,12 @@ class LiveAIService: ObservableObject {
             requires: "17.0"
         ),
         ModelBundle(
-            id: "qwen3-1.7b-q4km",
-            name: "Qwen3 1.7B (Q4_K_M)",
+            id: "qwen3-1.7b-q8",
+            name: "Qwen3 1.7B (Q8_0)",
             role: .textGenerator,
-            downloadURL: URL(string: "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/qwen3-1.7b-q4_k_m.gguf")!,
-            fileSize: 1_180_000_000,
-            description: "Qwen3 1.7B parameter model, Q4_K_M quantized. Compact and efficient for on-device moderation and content analysis.",
+            downloadURL: URL(string: "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q8_0.gguf")!,
+            fileSize: 1_834_426_016,
+            description: "Official Qwen3 1.7B model, Q8_0 quantized, for on-device moderation and content analysis.",
             requires: "17.0"
         ),
     ]
@@ -117,8 +117,11 @@ class LiveAIService: ObservableObject {
            let size = attrs[.size] as? Int64,
            size < model.fileSize / 2
         {
+            let error = AIError("Downloaded file (\(ByteCountFormatter().string(fromByteCount: size))) is much smaller than expected (\(ByteCountFormatter().string(fromByteCount: model.fileSize))). The model URL may be incorrect.")
             try? fileManager.delete(model.id)
-            throw AIError("Downloaded file (\(ByteCountFormatter().string(fromByteCount: size))) is much smaller than expected (\(ByteCountFormatter().string(fromByteCount: model.fileSize))). The model URL may be incorrect.")
+            downloadManager.recordFailure(id: model.id, message: error.localizedDescription)
+            rebuildStates()
+            throw error
         }
 
         rebuildStates()
