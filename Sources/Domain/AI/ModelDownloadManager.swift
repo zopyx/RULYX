@@ -116,7 +116,14 @@ final class ModelDownloadManager: NSObject {
 
     /// Begins downloading a model file from the given URL.
     func downloadModel(id: String, from url: URL) async throws -> URL {
-        let task = session.downloadTask(with: url)
+        func cacheBustedURL() -> URL {
+            guard var comps = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url }
+            var items = comps.queryItems ?? []
+            items.append(URLQueryItem(name: "_cb", value: UUID().uuidString.prefix(8).lowercased()))
+            comps.queryItems = items
+            return comps.url ?? url
+        }
+        let task = session.downloadTask(with: cacheBustedURL())
         failures.removeValue(forKey: id)
         return try await withCheckedThrowingContinuation { continuation in
             Task {

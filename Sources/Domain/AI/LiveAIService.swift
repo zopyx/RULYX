@@ -111,6 +111,16 @@ class LiveAIService: ObservableObject {
             throw error
         }
         _ = try await downloadTask.value
+
+        let local = fileManager.localURL(for: model.id)
+        if let attrs = try? FileManager.default.attributesOfItem(atPath: local.path),
+           let size = attrs[.size] as? Int64,
+           size < model.fileSize / 2
+        {
+            try? fileManager.delete(model.id)
+            throw AIError("Downloaded file (\(ByteCountFormatter().string(fromByteCount: size))) is much smaller than expected (\(ByteCountFormatter().string(fromByteCount: model.fileSize))). The model URL may be incorrect.")
+        }
+
         rebuildStates()
     }
 
