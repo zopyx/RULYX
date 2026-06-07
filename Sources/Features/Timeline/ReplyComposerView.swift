@@ -19,6 +19,7 @@ struct ReplyComposerView: View {
     @State private var isPosting = false
     @State private var parentPost: RichPost?
     @State private var errorMessage: String?
+    @State private var profileToShow: BlueskyActor?
 
     private let maxChars = 300
 
@@ -39,7 +40,7 @@ struct ReplyComposerView: View {
                     .frame(minHeight: 100)
                     .overlay(alignment: .topLeading) {
                         if postText.isEmpty {
-                            Text(loc("post.placeholder"))
+                            Text(loc("compose.placeholder"))
                                 .font(.body)
                                 .foregroundStyle(.tertiary)
                                 .padding(.horizontal, 20)
@@ -68,21 +69,21 @@ struct ReplyComposerView: View {
                             .foregroundStyle(.red)
                             .lineLimit(1)
                     }
-
-                    Button(loc("actions.reply")) {
-                        Task { await post() }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
-                    .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
             }
-            .pageTitle(loc("post.reply"))
+            .background(Color(.systemBackground))
+            .pageTitle(loc("compose.reply_title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(loc("actions.cancel")) { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(loc("actions.reply")) {
+                        Task { await post() }
+                    }
+                    .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                 }
             }
         }
@@ -90,6 +91,22 @@ struct ReplyComposerView: View {
             await loadParentPost()
         }
         .interactiveDismissDisabled(!postText.isEmpty)
+        .sheet(item: $profileToShow) { actor in
+            NavigationStack {
+                BlueskyProfileView(
+                    member: BlueskyListMember(
+                        recordURI: "profile:\(actor.did)",
+                        actor: actor
+                    ),
+                    list: nil
+                )
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ToolbarCloseButton(action: { profileToShow = nil })
+                    }
+                }
+            }
+        }
     }
 
     /// Shows the parent post author, avatar, and truncated text.
@@ -97,30 +114,51 @@ struct ReplyComposerView: View {
     private func parentPreview(_ post: RichPost) -> some View {
         let author = post.safeAuthor
         VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
-                if let avatar = author.avatar.flatMap(URL.init) {
-                    AsyncImage(url: avatar) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Circle().fill(Color.skyPrimary.opacity(0.16))
+            Button {
+                profileToShow = BlueskyActor(
+                    did: author.did ?? author.handle ?? "",
+                    handle: author.handle ?? "",
+                    displayName: author.displayName,
+                    avatarURL: author.avatar.flatMap(URL.init)
+                )
+            } label: {
+                HStack(spacing: 6) {
+                    if let avatar = author.avatar.flatMap(URL.init) {
+                        AsyncImage(url: avatar) { image in
+                            image.resizable().scaledToFill()
+                        } placeholder: {
+                            Circle().fill(Color.skyPrimary.opacity(0.16))
+                        }
+                        .frame(width: 24, height: 24)
+                        .clipShape(Circle())
                     }
-                    .frame(width: 24, height: 24)
-                    .clipShape(Circle())
+                    Text(author.displayName ?? author.handle ?? "")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    if let handle = author.handle {
+                        Text("@\(handle)")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    Spacer()
                 }
-                Text(author.displayName ?? author.handle ?? "")
-                    .font(.caption.weight(.semibold))
-                if let handle = author.handle {
-                    Text("@\(handle)")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
-                Spacer()
             }
+            .buttonStyle(.plain)
             if let text = post.safeRecord.text, !text.isEmpty {
-                Text(text)
-                    .font(.subheadline)
-                    .lineLimit(4)
-                    .foregroundStyle(.secondary)
+                PostTextContent(
+                    text: text,
+                    onOpenProfile: { handle in
+                        profileToShow = BlueskyActor(
+                            did: handle,
+                            handle: handle,
+                            displayName: nil,
+                            avatarURL: nil
+                        )
+                    },
+                    font: .subheadline,
+                    lineLimit: 4,
+                    foregroundStyle: .secondary
+                )
             }
         }
         .padding(12)
