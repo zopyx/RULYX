@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Tworzy nową listę na podstawie tego szablonu",
   "compose.add_images": "Dodaj obrazy",
   "compose.alt_placeholder": "Tekst alternatywny",
+  "compose.alt_edit_title": "Edytuj tekst alternatywny",
   "compose.error": "Błąd",
   "compose.images_section": "Obrazy",
   "compose.remove_image": "Usuń obraz",

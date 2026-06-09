@@ -874,6 +874,7 @@
   "list_templates.create.hint": "إنشاء قائمة جديدة من هذا القالب",
   "compose.add_images": "إضافة صور",
   "compose.alt_placeholder": "نص بديل",
+  "compose.alt_edit_title": "تحرير النص البديل",
   "compose.error": "خطأ",
   "compose.images_section": "الصور",
   "compose.remove_image": "إزالة الصورة",

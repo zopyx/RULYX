@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Crea una nueva lista a partir de esta plantilla.",
   "compose.add_images": "Añadir imágenes",
   "compose.alt_placeholder": "Texto alternativo",
+  "compose.alt_edit_title": "Editar texto alternativo",
   "compose.error": "Error",
   "compose.images_section": "Imágenes",
   "compose.remove_image": "Eliminar imagen",

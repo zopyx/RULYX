@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 /// Full compose view for creating, replying to, quoting, or editing posts.
-/// Supports text, images (up to 10), GIFs (beta), video, alt text, reply controls
+/// Supports text, images (up to 4), GIFs (beta), video, alt text, reply controls
 /// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
     let account: AppAccount
@@ -42,8 +42,9 @@ struct ComposePostView: View {
     @State private var showImageResizeAlert = false
     @State private var pendingImageResize: (() -> Void)?
     @State private var isScaling = false
+    @State private var altEditIndex: Int?
 
-    private let maxImages = 10
+    private let maxImages = 4
     private let maxImageDimension: CGFloat = 3600
     private let maxImageFileSize = 1_887_437
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -156,6 +157,14 @@ struct ComposePostView: View {
                         .background(.ultraThinMaterial)
                 }
             }
+            .sheet(isPresented: .init(
+                get: { altEditIndex != nil },
+                set: { if !$0 { altEditIndex = nil } }
+            )) {
+                if let index = altEditIndex, index < selectedImages.count {
+                    altTextEditView(index: index)
+                }
+            }
             .alert(Text(loc: "compose.error"), isPresented: .constant(errorMessage != nil)) {
                 Button(loc("actions.ok")) { errorMessage = nil }
             } message: {
@@ -240,46 +249,92 @@ struct ComposePostView: View {
             Section {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
-                            let altBinding = Binding(
-                                get: { index < imageAlts.count ? imageAlts[index] : "" },
-                                set: { if index < imageAlts.count { imageAlts[index] = $0 } }
-                            )
+                        ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, _ in
                             VStack(spacing: 4) {
-                                ZStack(alignment: .topTrailing) {
-                                    if let uiImage = UIImage(data: image.data) {
+                                // Thumbnail with alt badge + tap to edit
+                                ZStack(alignment: .bottomLeading) {
+                                    if let uiImage = UIImage(data: selectedImages[index].data) {
                                         Image(uiImage: uiImage)
                                             .resizable()
                                             .scaledToFill()
                                             .frame(width: 100, height: 100)
                                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { altEditIndex = index }
                                     }
-                                    Button {
-                                        selectedImages.remove(at: index)
-                                        imageAlts.remove(at: index)
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.title3)
-                                            .foregroundStyle(.red)
-                                            .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
+
+                                    // Alt-status badge
+                                    if index < imageAlts.count {
+                                        if imageAlts[index].isEmpty {
+                                            Text("ALT")
+                                                .font(.caption2.weight(.semibold))
+                                                .foregroundStyle(.white)
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 2)
+                                                .background(.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 4))
+                                                .padding(6)
+                                        } else {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(.green)
+                                                .background(Circle().fill(.white).frame(width: 12, height: 12))
+                                                .padding(6)
+                                        }
                                     }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel(loc("compose.remove_image"))
-                                    .frame(minWidth: 44, minHeight: 44)
-                                    .contentShape(Rectangle())
+
+                                    // Remove button
+                                    HStack {
+                                        Spacer()
+                                        VStack {
+                                            Button {
+                                                selectedImages.remove(at: index)
+                                                imageAlts.remove(at: index)
+                                            } label: {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .font(.title3)
+                                                    .foregroundStyle(.red)
+                                                    .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityLabel(loc("compose.remove_image"))
+                                            .frame(minWidth: 44, minHeight: 44)
+                                            .contentShape(Rectangle())
+                                            Spacer()
+                                        }
+                                    }
                                     .offset(x: 4, y: -4)
                                 }
-                                TextField(loc("compose.alt_placeholder"), text: altBinding)
-                                    .font(.caption)
-                                    .textFieldStyle(.plain)
-                                    .frame(width: 100)
+
+                                // Alt text preview below thumbnail
+                                if index < imageAlts.count, !imageAlts[index].isEmpty {
+                                    Text(imageAlts[index])
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                        .frame(width: 100)
+                                        .onTapGesture { altEditIndex = index }
+                                } else {
+                                    Text(loc("compose.alt_placeholder"))
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                        .frame(width: 100)
+                                        .onTapGesture { altEditIndex = index }
+                                }
                             }
                         }
                     }
                     .padding(.vertical, 4)
                 }
             } header: {
-                Text(loc: "compose.images_section")
+                HStack {
+                    Text(loc("compose.images_section"))
+                    Spacer()
+                    Text("\(selectedImages.count)/\(maxImages)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
             }
         }
     }
@@ -672,6 +727,54 @@ struct ComposePostView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
+                }
+            }
+        }
+    }
+
+    private func altTextEditView(index: Int) -> some View {
+        let altBinding = Binding(
+            get: { index < imageAlts.count ? imageAlts[index] : "" },
+            set: { if index < imageAlts.count { imageAlts[index] = $0 } }
+        )
+        return NavigationStack {
+            VStack(spacing: 16) {
+                if let uiImage = UIImage(data: selectedImages[index].data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 250)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+                Text("\(loc("compose.alt_placeholder")) \(index + 1)/\(selectedImages.count)")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                TextEditor(text: altBinding)
+                    .font(.body)
+                    .frame(minHeight: 120)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(.quaternary, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                HStack {
+                    Text("\(altBinding.wrappedValue.count)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                    Spacer()
+                }
+            }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(loc("actions.cancel")) { altEditIndex = nil }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(loc("actions.done")) { altEditIndex = nil }
                 }
             }
         }

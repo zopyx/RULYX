@@ -875,6 +875,7 @@
   "list_templates.create.hint": "このテンプレートから新しいリストを作成します",
   "compose.add_images": "画像を追加",
   "compose.alt_placeholder": "代替テキスト",
+  "compose.alt_edit_title": "代替テキストを編集",
   "compose.error": "エラー",
   "compose.images_section": "画像",
   "compose.remove_image": "画像を削除",

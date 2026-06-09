@@ -875,6 +875,7 @@
   "list_templates.create.hint": "从此模板创建一个新列表",
   "compose.add_images": "添加图片",
   "compose.alt_placeholder": "替代文本",
+  "compose.alt_edit_title": "编辑替代文本",
   "compose.error": "错误",
   "compose.images_section": "图片",
   "compose.remove_image": "删除图片",

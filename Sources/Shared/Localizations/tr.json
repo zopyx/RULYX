@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Bu şablondan yeni bir liste oluşturur",
   "compose.add_images": "Görsel ekle",
   "compose.alt_placeholder": "Alternatif metin",
+  "compose.alt_edit_title": "Alternatif metni düzenle",
   "compose.error": "Hata",
   "compose.images_section": "Görseller",
   "compose.remove_image": "Resmi kaldır",

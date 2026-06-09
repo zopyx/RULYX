@@ -875,6 +875,7 @@
   "list_templates.create.hint": "สร้างรายการใหม่จากเทมเพลตนี้",
   "compose.add_images": "เพิ่มรูปภาพ",
   "compose.alt_placeholder": "ข้อความทดแทน",
+  "compose.alt_edit_title": "แก้ไขข้อความทดแทน",
   "compose.error": "ข้อผิดพลาด",
   "compose.images_section": "รูปภาพ",
   "compose.remove_image": "ลบรูปภาพ",

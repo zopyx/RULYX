@@ -977,6 +977,7 @@
   "splash.tagline": "Bluesky moderation made easy",
   "compose.add_images": "Add Images",
   "compose.alt_placeholder": "Alt text",
+  "compose.alt_edit_title": "Edit Alt Text",
   "compose.error": "Error",
   "compose.images_section": "Images",
   "compose.remove_image": "Remove image",

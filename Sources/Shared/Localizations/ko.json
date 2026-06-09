@@ -875,6 +875,7 @@
   "list_templates.create.hint": "이 템플릿에서 새 목록을 만듭니다.",
   "compose.add_images": "이미지 추가",
   "compose.alt_placeholder": "대체 텍스트",
+  "compose.alt_edit_title": "대체 텍스트 편집",
   "compose.error": "오류",
   "compose.images_section": "이미지",
   "compose.remove_image": "이미지 제거",

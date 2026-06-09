@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Creëert een nieuwe lijst op basis van deze sjabloon",
   "compose.add_images": "Afbeeldingen toevoegen",
   "compose.alt_placeholder": "Alt-tekst",
+  "compose.alt_edit_title": "Alt-tekst bewerken",
   "compose.error": "Fout",
   "compose.images_section": "Afbeeldingen",
   "compose.remove_image": "Afbeelding verwijderen",

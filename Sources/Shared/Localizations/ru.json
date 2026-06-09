@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Создает новый список из этого шаблона",
   "compose.add_images": "Добавить изображения",
   "compose.alt_placeholder": "Альтернативный текст",
+  "compose.alt_edit_title": "Редактировать альтернативный текст",
   "compose.error": "Ошибка",
   "compose.images_section": "Изображения",
   "compose.remove_image": "Удалить изображение",

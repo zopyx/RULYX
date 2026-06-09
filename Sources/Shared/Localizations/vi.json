@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Tạo một danh sách mới từ mẫu này",
   "compose.add_images": "Thêm hình ảnh",
   "compose.alt_placeholder": "Văn bản thay thế",
+  "compose.alt_edit_title": "Chỉnh sửa văn bản thay thế",
   "compose.error": "Lỗi",
   "compose.images_section": "Hình ảnh",
   "compose.remove_image": "Xóa hình ảnh",

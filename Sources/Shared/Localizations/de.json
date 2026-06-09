@@ -875,6 +875,7 @@
   "list_templates.create.hint": "Erstellt eine neue Liste aus dieser Vorlage",
   "compose.add_images": "Bilder hinzufügen",
   "compose.alt_placeholder": "Alt-Text",
+  "compose.alt_edit_title": "Alt-Text bearbeiten",
   "compose.error": "Fehler",
   "compose.images_section": "Bilder",
   "compose.remove_image": "Bild entfernen",
