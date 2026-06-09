@@ -101,8 +101,8 @@ struct ReplyComposerView: View {
                     list: nil
                 )
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        ToolbarCloseButton(action: { profileToShow = nil })
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(loc("actions.done")) { profileToShow = nil }
                     }
                 }
             }

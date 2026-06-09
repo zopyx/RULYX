@@ -61,8 +61,8 @@ struct NotificationTab: View {
                         list: nil
                     )
                     .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            ToolbarCloseButton(action: { selectedActor = nil })
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button(loc("actions.done")) { selectedActor = nil }
                         }
                     }
                 }

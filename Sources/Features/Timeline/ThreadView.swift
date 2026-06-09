@@ -18,6 +18,7 @@ struct ThreadView: View {
     @State private var videoPreviewURL: URL?
     @State private var showLikesForURI: String?
     @State private var composeContext: ComposeContext?
+    @State private var profileToShow: BlueskyActor?
     @StateObject private var likerActions = PostLikerActionsManager()
 
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -129,6 +130,22 @@ struct ThreadView: View {
                 )
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
+            }
+        }
+        .sheet(item: $profileToShow) { actor in
+            NavigationStack {
+                BlueskyProfileView(
+                    member: BlueskyListMember(
+                        recordURI: "profile:\(actor.did)",
+                        actor: actor
+                    ),
+                    list: nil
+                )
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(loc("actions.done")) { profileToShow = nil }
+                    }
+                }
             }
         }
         .task {
@@ -273,7 +290,15 @@ struct ThreadView: View {
                     videoPreviewURL = url
                 }
             },
-            onOpenProfile: { handle in openProfile(handle) },
+            onOpenProfile: { handle in
+                if let author = post.author {
+                    profileToShow = BlueskyActor(
+                        did: author.did ?? handle,
+                        handle: author.handle ?? handle,
+                        displayName: author.displayName
+                    )
+                }
+            },
             onReply: { composeContext = makeReplyContext(uri: post.uri, cid: post.cid) },
             onLike: { performLike(uri: post.uri, cid: post.cid) },
             onShowLikes: { if let uri = post.uri { showLikesForURI = uri } },
@@ -314,6 +339,15 @@ struct ThreadView: View {
     private func ancestorCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
         let authorCB = makeAuthorCallbacks(author: post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
         return PostRowCallbacks(
+            onOpenProfile: { handle in
+                if let author = post.author {
+                    profileToShow = BlueskyActor(
+                        did: author.did ?? handle,
+                        handle: author.handle ?? handle,
+                        displayName: author.displayName
+                    )
+                }
+            },
             onCopy: { UIPasteboard.general.string = post.record?.text },
             onTranslate: { translateText(post.record?.text ?? "") },
             onBlockAuthor: authorCB.onBlock,
@@ -422,11 +456,6 @@ struct ThreadView: View {
             if let found = findPostInReplies(reply.replies, uri: uri) { return found }
         }
         return nil
-    }
-
-    private func openProfile(_ handle: String) {
-        guard let url = URL(string: "https://bsky.app/profile/\(handle)") else { return }
-        UIApplication.shared.open(url)
     }
 
     private func translateText(_ text: String) {
