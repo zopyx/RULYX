@@ -29,6 +29,7 @@ struct FeedTimelineView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @StateObject private var likerActions = PostLikerActionsManager()
+    @State private var aiClassifications: [String: [String: Double]] = [:]
 
     // MARK: - Body
 
@@ -187,6 +188,9 @@ struct FeedTimelineView: View {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
             await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+        }
+        .task(id: viewModel.state) {
+            await classifyVisiblePosts()
         }
         .onDisappear {
             initialLoadTask?.cancel()
@@ -367,6 +371,12 @@ struct FeedTimelineView: View {
                         Label(loc("timeline.mute_word").replacingOccurrences(of: "{word}", with: word), systemImage: "textformat.subscript")
                     }
                 }
+            }
+
+            if let scores = aiClassifications[entry.post.uri], !scores.isEmpty {
+                AIPostBadge(scores: scores)
+                    .padding(.leading, 12)
+                    .padding(.bottom, 4)
             }
 
             inlineThreadSection(for: entry)
@@ -641,6 +651,20 @@ struct FeedTimelineView: View {
         } catch {
             AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    private func classifyVisiblePosts() async {
+        let entries = viewModel.visibleEntries
+        let uncached = entries.filter { aiClassifications[$0.post.uri] == nil }
+        guard !uncached.isEmpty else { return }
+        let engine = InferenceEngine()
+        var newScores = aiClassifications
+        for entry in uncached {
+            guard let text = entry.post.safeRecord.text, !text.isEmpty else { continue }
+            let scores = engine.classify(text: text)
+            newScores[entry.post.uri] = scores
+        }
+        aiClassifications = newScores
     }
 
     private func shareURL(for entry: RichFeedEntry) -> URL? {

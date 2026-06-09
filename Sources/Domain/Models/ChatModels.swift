@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents the kind of a chat conversation.
-enum ChatConversationKind: String {
+enum ChatConversationKind: String, Hashable, Equatable {
     /// A one-on-one direct message conversation.
     case direct
     /// A multi-participant group conversation.
@@ -9,7 +9,7 @@ enum ChatConversationKind: String {
 }
 
 /// Represents the current status of a chat conversation.
-enum ChatConversationStatus: String {
+enum ChatConversationStatus: String, Hashable, Equatable {
     /// An incoming conversation request that has not yet been accepted.
     case request
     /// A conversation that has been accepted by the user.
@@ -17,7 +17,7 @@ enum ChatConversationStatus: String {
 }
 
 /// Represents the different kinds of messages that can appear in a conversation timeline.
-enum ChatMessageKind {
+enum ChatMessageKind: Hashable, Equatable {
     /// A regular text message with full content.
     case message(ChatMessage)
     /// A message that has been deleted; only metadata remains.
@@ -27,7 +27,7 @@ enum ChatMessageKind {
 }
 
 /// Represents a Bluesky chat conversation with full metadata.
-struct ChatConversation: Identifiable, Hashable {
+struct ChatConversation: Identifiable, Hashable, Equatable {
     // MARK: - Properties
 
     /// The unique identifier for this conversation.
@@ -61,22 +61,10 @@ struct ChatConversation: Identifiable, Hashable {
         case let .system(s): s.sentAt
         }
     }
-
-    // MARK: - Hashable
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-
-    // MARK: - Equatable
-
-    static func == (lhs: ChatConversation, rhs: ChatConversation) -> Bool {
-        lhs.id == rhs.id
-    }
 }
 
 /// Metadata for a group conversation.
-struct ChatGroupInfo {
+struct ChatGroupInfo: Hashable, Equatable {
     /// The display name of the group.
     let name: String
     /// The number of members in the group.
@@ -88,7 +76,7 @@ struct ChatGroupInfo {
 }
 
 /// Represents a participant in a chat conversation.
-struct ChatMemberProfile: Identifiable {
+struct ChatMemberProfile: Identifiable, Hashable, Equatable {
     /// The DID of the chat member.
     let did: String
     /// The Bluesky handle of the member.
@@ -104,7 +92,7 @@ struct ChatMemberProfile: Identifiable {
 }
 
 /// Represents a regular text message in a chat conversation.
-struct ChatMessage: Identifiable {
+struct ChatMessage: Identifiable, Hashable, Equatable {
     /// The unique identifier for this message.
     let id: String
     /// The revision token for this message.
@@ -121,7 +109,7 @@ struct ChatMessage: Identifiable {
 
 /// Represents a deleted message in a chat conversation.
 /// Retains only the metadata; the text content is no longer available.
-struct ChatDeletedMessage: Identifiable {
+struct ChatDeletedMessage: Identifiable, Hashable, Equatable {
     /// The unique identifier for the deleted message.
     let id: String
     /// The revision token at the time of deletion.
@@ -133,7 +121,7 @@ struct ChatDeletedMessage: Identifiable {
 }
 
 /// Represents a system event message in a chat conversation.
-struct ChatSystemMessage: Identifiable {
+struct ChatSystemMessage: Identifiable, Hashable, Equatable {
     /// The unique identifier for this system message.
     let id: String
     /// The revision token for this system message.
@@ -145,7 +133,7 @@ struct ChatSystemMessage: Identifiable {
 }
 
 /// Represents the specific type of a system event in a chat conversation.
-enum ChatSystemMessageData {
+enum ChatSystemMessageData: Hashable, Equatable {
     /// A member was added by another member.
     case addMember(memberDID: String, addedByDID: String)
     /// A member was removed by another member.
@@ -167,7 +155,7 @@ enum ChatSystemMessageData {
 }
 
 /// Represents a reaction (emoji) applied to a chat message.
-struct ChatReaction {
+struct ChatReaction: Hashable, Equatable {
     /// The reaction value (e.g., an emoji character).
     let value: String
     /// The DID of the user who sent the reaction.

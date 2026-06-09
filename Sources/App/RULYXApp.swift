@@ -193,13 +193,15 @@ struct RULYXApp: App {
                         }
                     }
                     // On becoming active: attempts biometric unlock, resumes the Clearsky
-                    // heartbeat, re-registers push notifications, and resumes chat polling.
+                    // heartbeat, re-registers push notifications, resumes chat polling,
+                    // and triggers an immediate log sync.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                         DispatchQueue.main.async {
                             appLockManager.appDidBecomeActive()
                             deps.clearskyHeartbeat.start()
                             deps.pushNotificationCoordinator.start()
                             deps.chatStore.startPolling()
+                            deps.chatStore.signalSync()
                         }
                     }
 
@@ -330,6 +332,7 @@ struct RULYXApp: App {
             showPrompts: showPrompts
         )
         deps.chatStore.startPolling()
+        deps.chatStore.signalSync()
         deps.pushNotificationCoordinator.syncAccounts()
     }
 }

@@ -60,7 +60,6 @@ struct HTTPRequestDebugView: View {
                     ForEach(filteredEntries) { entry in
                         HTTPRequestDebugRow(
                             entry: entry,
-                            localizationManager: localizationManager,
                             onSelectErrorPayload: {
                                 selectedErrorEntry = entry
                             }
@@ -83,55 +82,87 @@ struct HTTPRequestDebugView: View {
     }
 }
 
-/// A single row displaying a logged HTTP request's URL, method, status,
-/// duration, source, and an optional "View Error" button.
+// MARK: - Row
+
+/// A single row displaying a logged HTTP request.
+///
+/// Layout:
+///   Line 1: <METHOD> <URL>
+///   Line 2: <status>  <ISO8601 timestamp>  <duration ms>
+///   Line 3: <source>
+///   Line 4 (failed only): [Response] button
 private struct HTTPRequestDebugRow: View {
     let entry: HTTPRequestDebugEntry
-    let localizationManager: LocalizationManager
     let onSelectErrorPayload: () -> Void
 
+    private var iso8601: DateFormatter {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return f
+    }
+
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 4) {
+            // Line 1: HTTP method + URL
+            HStack(spacing: 4) {
+                Text(entry.method)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
                 Text(entry.url)
                     .font(.caption.monospaced())
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .truncationMode(.middle)
-                HStack(spacing: 6) {
-                    Text(entry.method)
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Text("#\(entry.sequenceNumber)  \(entry.startedAt, format: .dateTime.day(.twoDigits).month(.twoDigits))")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
-                    if let code = entry.statusCode {
-                        Text("\(code)")
-                            .font(.caption2)
-                            .foregroundStyle(code < 400 ? .green : .red)
-                    }
-                    if let duration = entry.duration {
-                        Text(String(format: "%.1fs", duration))
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+            }
+
+            // Line 2: status, ISO8601 timestamp, duration ms
+            HStack(spacing: 8) {
+                if let code = entry.statusCode {
+                    Text("\(code)")
+                        .font(.caption2.monospacedDigit().weight(.semibold))
+                        .foregroundStyle(code < 400 ? .green : .red)
+                } else {
+                    Text("---")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.tertiary)
                 }
-                if let source = entry.source {
-                    Text(source)
-                        .font(.caption2)
+
+                Text(entry.startedAt, formatter: iso8601)
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.secondary)
+
+                if let duration = entry.duration {
+                    Text("\(Int(duration * 1000))ms")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("running…")
+                        .font(.caption2.monospacedDigit())
                         .foregroundStyle(.tertiary)
                 }
             }
-            Spacer()
-            if entry.state == .failed, entry.errorResponseJSON != nil {
-                Button("View Error", action: onSelectErrorPayload)
-                    .font(.caption)
-                    .buttonStyle(.bordered)
+
+            // Line 3: source (originator)
+            if let source = entry.source {
+                Text(source)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+
+            // Line 4: Response button (failed only)
+            if entry.state == .failed {
+                Button("Response", action: onSelectErrorPayload)
+                    .font(.caption.weight(.medium))
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                    .tint(.red)
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 6)
     }
 }
+
+// MARK: - Error detail sheet
 
 private struct HTTPRequestDebugErrorResponseView: View {
     let entry: HTTPRequestDebugEntry
@@ -139,13 +170,72 @@ private struct HTTPRequestDebugErrorResponseView: View {
 
     var body: some View {
         ScrollView {
-            Text(verbatim: entry.errorResponseJSON ?? "")
-                .font(.body.monospaced())
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .textSelection(.enabled)
+            VStack(alignment: .leading, spacing: 16) {
+                // Status code
+                if let code = entry.statusCode {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Status")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text("\(code)")
+                            .font(.title.weight(.bold))
+                            .foregroundStyle(.red)
+                    }
+                }
+
+                // Error message
+                if let errorMessage = entry.errorMessage {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Error")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text(errorMessage)
+                            .font(.body)
+                            .foregroundStyle(.red)
+                    }
+                }
+
+                // Response body
+                if let json = entry.errorResponseJSON {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Response Body")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text(verbatim: json)
+                            .font(.body.monospaced())
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+
+                // URL for context
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("URL")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text(entry.url)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
+
+                // Timestamp
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Timestamp")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text(entry.startedAt, format: .dateTime)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding()
         }
-        .pageTitle(entry.url)
+        .navigationTitle("Response Details")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 ToolbarCloseButton()

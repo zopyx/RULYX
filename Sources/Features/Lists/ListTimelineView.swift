@@ -29,6 +29,7 @@ struct ListTimelineView: View {
     @State private var postToShare: RichFeedEntry?
     @State private var profileToShow: BlueskyActor?
     @StateObject private var likerActions = PostLikerActionsManager()
+    @State private var aiClassifications: [String: [String: Double]] = [:]
 
     init(list: BlueskyList) {
         self.list = list
@@ -183,14 +184,6 @@ struct ListTimelineView: View {
                     ThreadView(postURI: postURI)
                 }
             }
-            .navigationDestination(item: $profileToShow) { actor in
-                BlueskyProfileView(
-                    member: BlueskyListMember(recordURI: "listtimeline:\(actor.did)", actor: actor),
-                    list: nil
-                )
-                .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
-            }
             .task {
                 await loadInitial()
             }
@@ -204,6 +197,9 @@ struct ListTimelineView: View {
                 await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
             }
             .postLikerActions(manager: likerActions)
+            .task(id: viewModel.posts.count) {
+                await classifyVisiblePosts()
+            }
         }
     }
 
@@ -318,6 +314,12 @@ struct ListTimelineView: View {
                         Label(loc("post.translate"), systemImage: "globe")
                     }
                 }
+            }
+
+            if let scores = aiClassifications[entry.post.uri], !scores.isEmpty {
+                AIPostBadge(scores: scores)
+                    .padding(.leading, 12)
+                    .padding(.bottom, 4)
             }
 
             inlineThreadSection(for: entry)
@@ -609,6 +611,20 @@ struct ListTimelineView: View {
         guard let encoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let url = URL(string: "https://translate.google.com/?text=\(encoded)") else { return }
         UIApplication.shared.open(url)
+    }
+
+    private func classifyVisiblePosts() async {
+        let posts = viewModel.posts
+        let uncached = posts.filter { aiClassifications[$0.post.uri] == nil }
+        guard !uncached.isEmpty else { return }
+        let engine = InferenceEngine()
+        var newScores = aiClassifications
+        for entry in uncached {
+            guard let text = entry.post.safeRecord.text, !text.isEmpty else { continue }
+            let scores = engine.classify(text: text)
+            newScores[entry.post.uri] = scores
+        }
+        aiClassifications = newScores
     }
 
     private func shareURL(for entry: RichFeedEntry) -> URL? {

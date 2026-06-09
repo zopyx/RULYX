@@ -1356,6 +1356,29 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches recent posts from the actors in a Bluesky list.
+    func fetchListFeed(listURI: String, cursor: String? = nil, limit: Int = 50, account: AppAccount, appPassword: String?) async throws -> RichFeedResponse {
+        try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            var queryItems = [
+                URLQueryItem(name: "list", value: listURI),
+                URLQueryItem(name: "limit", value: "\(limit)"),
+            ]
+            if let cursor {
+                queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            return try await sendAppViewRequest(
+                path: "app.bsky.feed.getListFeed",
+                method: "GET",
+                queryItems: queryItems,
+                accessToken: authSession.accessJWT,
+                pdsURL: authSession.pdsURL
+            )
+        }
+    }
+
     // MARK: - PLC Audit
 
     /// Fetches the PLC directory audit log for a DID. Used for handle change history.
@@ -1593,15 +1616,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     // MARK: - Blob Upload
 
     /// Uploads binary data (image/video) to the PDS via `com.atproto.repo.uploadBlob`.
-    func uploadBlob(data: Data, mimeType: String, account: AppAccount, appPassword: String?) async throws -> UploadBlobResponse {
+    func uploadBlob(data: Data, mimeType: String, account: AppAccount, appPassword: String?, progress: (@Sendable (Double) -> Void)? = nil) async throws -> UploadBlobResponse {
         try await sessionService.performAuthenticatedRequest(account: account, appPassword: appPassword) { authSession in
             let url = authSession.pdsURL.appendingPathComponent("xrpc/com.atproto.repo.uploadBlob")
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("Bearer \(authSession.accessJWT)", forHTTPHeaderField: "Authorization")
             request.setValue(mimeType, forHTTPHeaderField: "Content-Type")
-            request.httpBody = data
-            let (responseData, _) = try await httpClient.data(for: request, source: "Blob Upload")
+            let (responseData, _) = try await httpClient.upload(for: request, from: data, source: "Blob Upload", progress: progress)
             return try JSONDecoder().decode(UploadBlobResponse.self, from: responseData)
         }
     }

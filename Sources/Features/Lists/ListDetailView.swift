@@ -35,6 +35,7 @@ struct ListDetailView: View {
     @State private var isShowingReportSheet = false
     @State private var isReportingList = false
     @State private var isSearching = false
+    @State private var showAIScreen = false
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - Computed properties
@@ -65,6 +66,18 @@ struct ListDetailView: View {
         rootContent
             .pageTitle(currentList.name)
             .toolbar(content: toolbarContent)
+            .sheet(isPresented: $showAIScreen) {
+                let actors = viewModel.members.map { member in
+                    ScreenableActor(
+                        id: member.actor.did,
+                        displayName: member.actor.displayName ?? member.actor.handle,
+                        handle: member.actor.handle,
+                        description: member.actor.description
+                    )
+                }
+                AIBatchScreenView(actors: actors)
+                    .environmentObject(localizationManager)
+            }
             .sheet(isPresented: $importState.isShowingEditSheet) {
                 if let account = accountStore.activeAccount,
                    let appPassword = accountStore.appPassword(for: account)
@@ -267,6 +280,15 @@ struct ListDetailView: View {
 
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
+        if !viewModel.members.isEmpty {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showAIScreen = true } label: {
+                    Image(systemName: "brain")
+                        .accessibilityLabel(loc("ai.screen.title"))
+                }
+            }
+        }
+
         if isOwnedList {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .destructive) {

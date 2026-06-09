@@ -571,6 +571,37 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         )
     }
 
+    override func fetchListFeed(listURI _: String, cursor: String? = nil, limit: Int = 50, account _: AppAccount, appPassword _: String?) async throws -> RichFeedResponse {
+        try await Task.sleep(for: .milliseconds(120))
+
+        let previewEntries: [RichFeedEntry] = previewActors.enumerated().map { index, actor in
+            RichFeedEntry(
+                post: RichPost(
+                    uri: "at://\(actor.did)/app.bsky.feed.post/list-preview-\(index + 1)",
+                    cid: "preview-list-cid-\(index)",
+                    author: RichAuthor(did: actor.did, handle: actor.handle, displayName: actor.displayName, avatar: nil),
+                    record: RichRecord(text: "List timeline preview post \(index + 1)", createdAt: ISO8601DateFormatter().string(from: Date().addingTimeInterval(-Double(index) * 3600))),
+                    embed: nil,
+                    viewer: nil,
+                    replyCount: index % 3,
+                    repostCount: index,
+                    likeCount: index * 2,
+                    indexedAt: ISO8601DateFormatter().string(from: Date().addingTimeInterval(-Double(index) * 3600))
+                ),
+                reply: nil
+            )
+        }
+
+        let startIndex = Int(cursor ?? "0") ?? 0
+        let endIndex = min(startIndex + max(1, limit), previewEntries.count)
+        let nextCursor = endIndex < previewEntries.count ? String(endIndex) : nil
+
+        return RichFeedResponse(
+            cursor: nextCursor,
+            feed: Array(previewEntries[startIndex ..< endIndex])
+        )
+    }
+
     private func previewMembers(for list: BlueskyList) -> [BlueskyListMember] {
         let now = Date()
         return previewActors.enumerated().map { index, actor in

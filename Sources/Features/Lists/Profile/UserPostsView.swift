@@ -110,7 +110,8 @@ struct UserPostsView: View {
                 videoPreviewURL: $videoPreviewURL,
                 showLikesForURI: $showLikesForURI,
                 accountStore: accountStore,
-                blueskyClient: blueskyClient
+                blueskyClient: blueskyClient,
+                searchAccount: searchAccount
             ))
             .modifier(ComposeSheetsModifier(
                 composeContext: $composeContext,
@@ -126,7 +127,7 @@ struct UserPostsView: View {
             .navigationDestination(for: TimelineRoute.self) { route in
                 switch route {
                 case let .thread(postURI):
-                    ThreadView(postURI: postURI)
+                    ThreadView(postURI: postURI, searchAccount: searchAccount)
                 }
             }
             .navigationDestination(item: $showProfileFor) { actor in
@@ -642,7 +643,7 @@ struct UserPostsView: View {
 
 // MARK: - MediaSheetsModifier
 
-private struct MediaSheetsModifier: ViewModifier {
+struct MediaSheetsModifier: ViewModifier {
     @Binding var selectedPostURI: String?
     @Binding var shareFileURL: URL?
     @Binding var imagePreview: ImagePreviewCollection?
@@ -651,12 +652,13 @@ private struct MediaSheetsModifier: ViewModifier {
 
     let accountStore: AccountStore
     let blueskyClient: LiveBlueskyClient
+    let searchAccount: AppAccount?
 
     func body(content: Content) -> some View {
         content
             .sheet(item: $selectedPostURI) { uri in
                 NavigationStack {
-                    ThreadView(postURI: uri)
+                    ThreadView(postURI: uri, searchAccount: searchAccount)
                         .environmentObject(accountStore)
                         .environmentObject(blueskyClient)
                         .toolbar {
@@ -689,7 +691,7 @@ private struct MediaSheetsModifier: ViewModifier {
 
 // MARK: - ComposeSheetsModifier
 
-private struct ComposeSheetsModifier: ViewModifier {
+struct ComposeSheetsModifier: ViewModifier {
     @Binding var composeContext: ComposeContext?
     @Binding var showNewPostComposer: Bool
     @Binding var editPostEntry: RichFeedEntry?

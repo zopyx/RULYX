@@ -14,6 +14,7 @@ struct iPadListDetailView: View {
     @State private var searchQuery = ""
     @State private var showExport = false
     @State private var showMerge = false
+    @State private var showAIScreen = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,6 +33,12 @@ struct iPadListDetailView: View {
         .pageTitle(list.name)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                if !detailVM.members.isEmpty {
+                    Button { showAIScreen = true } label: {
+                        Image(systemName: "brain")
+                            .accessibilityLabel(loc("ai.screen.title"))
+                    }
+                }
                 Button { showExport = true } label: {
                     Image(systemName: "square.and.arrow.up")
                         .accessibilityLabel(loc("lists.export"))
@@ -41,6 +48,17 @@ struct iPadListDetailView: View {
                         .accessibilityLabel(loc("lists.merge"))
                 }
             }
+        }
+        .sheet(isPresented: $showAIScreen) {
+            AIBatchScreenView(actors: detailVM.members.map { member in
+                ScreenableActor(
+                    id: member.actor.did,
+                    displayName: member.actor.displayName ?? member.actor.handle,
+                    handle: member.actor.handle,
+                    description: member.actor.description
+                )
+            })
+            .environmentObject(localizationManager)
         }
     }
 

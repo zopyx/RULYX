@@ -73,10 +73,14 @@ struct ConversationDetailView: View {
             await chatStore.loadMessages(convoId: conversation.id)
             await chatStore.markRead(convoId: conversation.id, messageId: lastMessageId)
         }
+        .onAppear {
+            chatStore.setChatViewVisible(true, token: "conversationDetail")
+        }
         .onDisappear {
             if chatStore.currentAccountDID != nil {
                 chatStore.setVisibleConversation(nil)
             }
+            chatStore.setChatViewVisible(false, token: "conversationDetail")
         }
         .toolbar {
             ToolbarItem(placement: .principal) {

@@ -278,6 +278,10 @@ struct ConversationListView: View {
             }
             .onAppear {
                 openPendingConversationIfNeeded()
+                chatStore.setChatViewVisible(true, token: "conversationList")
+            }
+            .onDisappear {
+                chatStore.setChatViewVisible(false, token: "conversationList")
             }
             .onChange(of: accountStore.activeAccountID) { _, _ in
                 navPath = []

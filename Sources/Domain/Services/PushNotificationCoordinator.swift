@@ -156,7 +156,7 @@ final class PushNotificationCoordinator: ObservableObject {
             chatStore.setAccount(activeAccount, appPassword: appPassword)
         }
 
-        await chatStore.syncLog()
+        chatStore.signalSync()
 
         if let route = PushNotificationRoute(userInfo: payload) {
             if let conversationID = route.conversationID {

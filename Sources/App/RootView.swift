@@ -138,7 +138,11 @@ struct RootView: View {
             HStack(spacing: 0) {
                 ForEach(tabBarItems) { item in
                     Button {
-                        workspaceStore.selectedTab = item.tab
+                        if workspaceStore.selectedTab == item.tab, item.tab == .moderation {
+                            workspaceStore.returnToModerationRoot()
+                        } else {
+                            workspaceStore.selectedTab = item.tab
+                        }
                     } label: {
                         TabBarItemView(
                             item: item,

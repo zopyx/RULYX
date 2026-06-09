@@ -4,8 +4,14 @@ import SwiftUI
 /// and threaded replies with depth-based indentation and connection lines.
 struct ThreadView: View {
     let postURI: String
+    let searchAccount: AppAccount?
 
     @StateObject private var viewModel = ThreadViewModel()
+
+    init(postURI: String, searchAccount: AppAccount? = nil) {
+        self.postURI = postURI
+        self.searchAccount = searchAccount
+    }
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var blueskyClient: LiveBlueskyClient
     @State private var imagePreview: ImagePreviewCollection?
@@ -126,9 +132,7 @@ struct ThreadView: View {
             }
         }
         .task {
-            guard let account = accountStore.activeAccount,
-                  let appPassword = accountStore.appPassword(for: account)
-            else {
+            guard let (account, appPassword) = readCredentials else {
                 viewModel.handleMissingCredentials()
                 return
             }
@@ -155,11 +159,19 @@ struct ThreadView: View {
     }
 
     private func reloadThread() {
-        guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account) else { return }
+        guard let (account, appPassword) = readCredentials else { return }
         Task {
             await viewModel.loadThread(uri: postURI, account: account, appPassword: appPassword, using: blueskyClient)
         }
+    }
+
+    private var readCredentials: (AppAccount, String)? {
+        if let searchAccount, let password = accountStore.appPassword(for: searchAccount) {
+            return (searchAccount, password)
+        }
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account) else { return nil }
+        return (account, appPassword)
     }
 
     private func extractHandle(from uri: String) -> String {

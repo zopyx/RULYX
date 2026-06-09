@@ -1,5 +1,18 @@
 import Foundation
 
+private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate, Sendable {
+    let onProgress: @Sendable (Double) -> Void
+
+    init(onProgress: @escaping @Sendable (Double) -> Void) {
+        self.onProgress = onProgress
+    }
+
+    func urlSession(_: URLSession, task _: URLSessionTask, didSendBodyData _: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+        guard totalBytesExpectedToSend > 0 else { return }
+        onProgress(Double(totalBytesSent) / Double(totalBytesExpectedToSend))
+    }
+}
+
 private actor InflightManager {
     private var tasks: [String: Task<(Data, HTTPURLResponse), Error>] = [:]
 
@@ -132,6 +145,53 @@ struct HTTPClient {
                 )
             }
             return (fileURL, httpResponse)
+        } catch {
+            await debugStore?.fail(
+                id: entryID ?? UUID(),
+                errorMessage: AppError.userMessage(from: error)
+            )
+            throw error
+        }
+    }
+
+    func upload(
+        for request: URLRequest,
+        from bodyData: Data,
+        source: String? = nil,
+        origin: String? = nil,
+        progress: (@Sendable (Double) -> Void)? = nil,
+        originFileID: String = #fileID,
+        originFunction: String = #function,
+        originLine: Int = #line
+    ) async throws -> (Data, HTTPURLResponse) {
+        var request = request
+        request.setValue(UserAgentProvider.random, forHTTPHeaderField: "User-Agent")
+        let entryID = await debugStore?.begin(
+            request: request,
+            source: source,
+            origin: origin ?? Self.makeOrigin(fileID: originFileID, function: originFunction, line: originLine)
+        )
+        do {
+            let delegate = progress.map { UploadProgressDelegate(onProgress: $0) }
+            let (data, response) = try await session.upload(for: request, from: bodyData, delegate: delegate)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                await debugStore?.fail(
+                    id: entryID ?? UUID(),
+                    errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
+                )
+                throw BlueskyAPIError.invalidResponse
+            }
+            if (200 ..< 300).contains(httpResponse.statusCode) {
+                await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
+            } else {
+                await debugStore?.fail(
+                    id: entryID ?? UUID(),
+                    statusCode: httpResponse.statusCode,
+                    errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
+                    errorResponseJSON: Self.prettyPrintedJSON(from: data)
+                )
+            }
+            return (data, httpResponse)
         } catch {
             await debugStore?.fail(
                 id: entryID ?? UUID(),

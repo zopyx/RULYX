@@ -2,9 +2,8 @@ import Foundation
 
 /// Manages a timeline of all posts by members of a given Bluesky list.
 ///
-/// Loads list members, then fetches each member's recent posts via `getAuthorFeed`,
-/// merges them into a single chronologically-sorted feed, and supports
-/// optimistic like/repost toggles, inline thread expansion, and pagination.
+/// Prefer the server-provided list feed, then falls back to member author feeds
+/// filtered to posts authored by the member being scanned.
 @MainActor
 final class ListTimelineViewModel: ObservableObject {
     let list: BlueskyList
@@ -34,17 +33,19 @@ final class ListTimelineViewModel: ObservableObject {
 
     // MARK: - Private Properties
 
+    private enum SourceMode {
+        case appViewListFeed
+        case memberOwnPosts
+    }
+
+    private var cursor: String?
+    private var sourceMode = SourceMode.appViewListFeed
     private var members: [BlueskyListMember] = []
-    /// Tracks the next cursor per member DID for paginating their author feed.
     private var memberCursors: [String: String] = [:]
-    /// Member DIDs that still have more pages available.
     private var memberHasMore: Set<String> = []
-    /// Index of the next member to fetch an initial page from (during loadMore).
     private var nextMemberIndex = 0
-    /// Maximum number of members to process.
-    private let maxMembers = 100
-    /// Batch size for concurrent member feed fetches.
-    private let batchSize = 5
+    private let initialMemberBatchSize = 20
+    private let memberBatchSize = 10
 
     // MARK: - Init
 
@@ -54,74 +55,61 @@ final class ListTimelineViewModel: ObservableObject {
 
     // MARK: - Loading
 
-    /// Performs the initial load: fetches list members, then their recent posts.
+    /// Performs the initial list-feed load.
     func loadTimeline(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
         errorMessage = nil
+        cursor = nil
+        sourceMode = .appViewListFeed
+        resetFallbackPagination()
         defer {
             isLoading = false
             scanProgressLabel = nil
         }
         do {
             guard !Task.isCancelled else { return }
-            members = try await client.fetchListMembers(list: list, account: account, appPassword: appPassword)
-            members = Array(members.prefix(maxMembers))
-            memberCursors.removeAll()
-            memberHasMore.removeAll()
-            nextMemberIndex = 0
-
-            // Load first 20 members' posts
-            let initialCount = min(20, members.count)
-            let firstBatch = Array(members.prefix(initialCount))
-            nextMemberIndex = initialCount
-
             scanProgressLabel = loc("list.timeline.fetching_posts")
-            let allPosts = try await fetchAuthorPages(for: firstBatch, account: account, appPassword: appPassword, using: client)
-            posts = deduplicateAndSort(allPosts)
-            hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
+            let response = try await client.fetchListFeed(listURI: list.id, cursor: nil, account: account, appPassword: appPassword)
+            posts = response.feed
+            cursor = response.cursor
+            hasMore = response.cursor != nil
+            if posts.isEmpty {
+                await loadMemberOwnPostsFallback(account: account, appPassword: appPassword, using: client)
+            }
         } catch {
             guard !AppError.isCancellation(error) else { return }
-            errorMessage = AppError.userMessage(from: error)
             AppLogger.moderation.error("Failed to load list timeline: \(error.localizedDescription, privacy: .public)")
+            await loadMemberOwnPostsFallback(account: account, appPassword: appPassword, using: client)
         }
     }
 
-    /// Loads the next batch: either next pages from members with remaining cursors,
-    /// or first pages from the next batch of un-fetched members.
+    /// Loads the next page of the server-provided list feed.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoadingMore, hasMore else { return }
         isLoadingMore = true
-        defer { isLoadingMore = false }
+        scanProgressLabel = loc("list.timeline.loading_more")
+        defer {
+            isLoadingMore = false
+            scanProgressLabel = nil
+        }
         do {
             guard !Task.isCancelled else { return }
-
-            var newPosts: [RichFeedEntry] = []
-
-            // Phase 1: fetch next pages from members with remaining cursors
-            let membersWithMore = members.filter { memberHasMore.contains($0.actor.did ?? "") }
-            if !membersWithMore.isEmpty {
-                scanProgressLabel = loc("list.timeline.loading_more")
-                let batch = Array(membersWithMore.prefix(batchSize))
-                newPosts = try await fetchNextPages(for: batch, account: account, appPassword: appPassword, using: client)
+            switch sourceMode {
+            case .appViewListFeed:
+                guard let cursor else {
+                    hasMore = false
+                    return
+                }
+                let response = try await client.fetchListFeed(listURI: list.id, cursor: cursor, account: account, appPassword: appPassword)
+                posts += response.feed
+                self.cursor = response.cursor
+                hasMore = response.cursor != nil
+            case .memberOwnPosts:
+                let newPosts = try await loadMoreMemberOwnPosts(account: account, appPassword: appPassword, using: client)
+                posts = deduplicateAndSort(posts + newPosts)
+                hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
             }
-
-            // Phase 2: fetch first pages from the next batch of members
-            if newPosts.isEmpty, nextMemberIndex < members.count {
-                let remaining = members[nextMemberIndex...]
-                let nextBatch = Array(remaining.prefix(10))
-                nextMemberIndex += nextBatch.count
-
-                scanProgressLabel = loc("list.timeline.fetching_posts")
-                newPosts = try await fetchAuthorPages(for: nextBatch, account: account, appPassword: appPassword, using: client)
-            }
-
-            guard !newPosts.isEmpty else {
-                hasMore = false
-                return
-            }
-            posts = deduplicateAndSort(posts + newPosts)
-            hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
@@ -245,77 +233,86 @@ final class ListTimelineViewModel: ObservableObject {
 
     // MARK: - Private Helpers
 
-    /// Fetches the first page of each member's author feed sequentially.
-    private func fetchAuthorPages(
+    private func loadMemberOwnPostsFallback(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        sourceMode = .memberOwnPosts
+        cursor = nil
+        resetFallbackPagination()
+        errorMessage = nil
+
+        do {
+            members = try await client.fetchListMembers(list: list, account: account, appPassword: appPassword)
+            let firstBatch = Array(members.prefix(initialMemberBatchSize))
+            nextMemberIndex = firstBatch.count
+            scanProgressLabel = loc("list.timeline.fetching_posts")
+            posts = try await deduplicateAndSort(fetchMemberOwnPosts(for: firstBatch, account: account, appPassword: appPassword, using: client))
+            hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
+            while posts.isEmpty, hasMore, !Task.isCancelled {
+                let morePosts = try await loadMoreMemberOwnPosts(account: account, appPassword: appPassword, using: client)
+                posts = deduplicateAndSort(posts + morePosts)
+                hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
+            }
+        } catch {
+            guard !AppError.isCancellation(error) else { return }
+            errorMessage = AppError.userMessage(from: error)
+            AppLogger.moderation.error("Failed to load fallback list timeline: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func loadMoreMemberOwnPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async throws -> [RichFeedEntry] {
+        let membersWithMore = members.filter { memberHasMore.contains($0.actor.did) }
+        if !membersWithMore.isEmpty {
+            return try await fetchMemberOwnPosts(for: Array(membersWithMore.prefix(memberBatchSize)), account: account, appPassword: appPassword, using: client)
+        }
+
+        guard nextMemberIndex < members.count else { return [] }
+        let remaining = members[nextMemberIndex...]
+        let batch = Array(remaining.prefix(memberBatchSize))
+        nextMemberIndex += batch.count
+        return try await fetchMemberOwnPosts(for: batch, account: account, appPassword: appPassword, using: client)
+    }
+
+    private func fetchMemberOwnPosts(
         for members: [BlueskyListMember],
         account: AppAccount,
         appPassword: String,
         using client: LiveBlueskyClient
     ) async throws -> [RichFeedEntry] {
-        var allPosts: [RichFeedEntry] = []
-        let total = members.count
-        var processed = 0
-
+        var result: [RichFeedEntry] = []
         for member in members {
-            guard !Task.isCancelled else { return allPosts }
+            guard !Task.isCancelled else { return result }
             let did = member.actor.did
-            processed += 1
-
-            scanProgressLabel = loc("list.timeline.fetching_posts")
-                .replacingOccurrences(of: "{n}", with: "\(processed)")
-                .replacingOccurrences(of: "{total}", with: "\(total)")
-
-            do {
-                let response = try await client.fetchRichFeed(did: did, cursor: nil, account: account, appPassword: appPassword)
-                allPosts += response.feed
-                if let cursor = response.cursor {
-                    memberCursors[did] = cursor
-                    memberHasMore.insert(did)
-                }
-            } catch {
-                AppLogger.moderation.error("Failed to fetch posts for \(member.actor.handle ?? did): \(error.localizedDescription, privacy: .public)")
+            let response = try await client.fetchRichFeed(did: did, cursor: memberCursors[did], account: account, appPassword: appPassword)
+            result += response.feed.filter { entry in
+                guard let authorDID = entry.post.author?.did else { return false }
+                return authorDID == did
+            }
+            if let cursor = response.cursor {
+                memberCursors[did] = cursor
+                memberHasMore.insert(did)
+            } else {
+                memberCursors.removeValue(forKey: did)
+                memberHasMore.remove(did)
             }
         }
-        return allPosts
-    }
 
-    /// Fetches the next page of posts for members with remaining cursors, sequentially.
-    private func fetchNextPages(
-        for batch: [BlueskyListMember],
-        account: AppAccount,
-        appPassword: String,
-        using client: LiveBlueskyClient
-    ) async throws -> [RichFeedEntry] {
-        var allPosts: [RichFeedEntry] = []
-
-        for member in batch {
-            guard !Task.isCancelled else { return allPosts }
-            let did = member.actor.did
-            guard let cursor = memberCursors[did] else { continue }
-
-            do {
-                let response = try await client.fetchRichFeed(did: did, cursor: cursor, account: account, appPassword: appPassword)
-                allPosts += response.feed
-                if let nextCursor = response.cursor {
-                    memberCursors[did] = nextCursor
-                } else {
-                    memberHasMore.remove(did)
-                }
-            } catch {
-                AppLogger.moderation.error("Failed to fetch more posts for \(member.actor.handle ?? did): \(error.localizedDescription, privacy: .public)")
-            }
-        }
-        return allPosts
+        return result
     }
 
     private func deduplicateAndSort(_ entries: [RichFeedEntry]) -> [RichFeedEntry] {
         var seen = Set<String>()
         let deduped = entries.filter { seen.insert($0.post.uri).inserted }
-        return deduped.sorted { a, b in
-            let dateA = parseDate(a.post.safeRecord.createdAt) ?? .distantPast
-            let dateB = parseDate(b.post.safeRecord.createdAt) ?? .distantPast
-            return dateA > dateB
+        return deduped.sorted { first, second in
+            let firstDate = parseDate(first.post.safeRecord.createdAt) ?? .distantPast
+            let secondDate = parseDate(second.post.safeRecord.createdAt) ?? .distantPast
+            return firstDate > secondDate
         }
+    }
+
+    private func resetFallbackPagination() {
+        members.removeAll()
+        memberCursors.removeAll()
+        memberHasMore.removeAll()
+        nextMemberIndex = 0
     }
 
     private func resetOptimisticState() {

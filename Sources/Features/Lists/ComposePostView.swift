@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 /// Full compose view for creating, replying to, quoting, or editing posts.
-/// Supports text, images (up to 4), GIFs (beta), video, alt text, reply controls
+/// Supports text, images (up to 10), GIFs (beta), video, alt text, reply controls
 /// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
     let account: AppAccount
@@ -25,6 +25,8 @@ struct ComposePostView: View {
     @State private var selectedGIFLinkURL: String?
     @State private var selectedGIFTitle: String = ""
     @State private var isPosting = false
+    @State private var uploadProgress: Double?
+    @State private var uploadSpeed: String?
     @State private var errorMessage: String?
     @State private var textViewRef: UITextView?
     @State private var referencedPost: ThreadPostNode?
@@ -41,7 +43,7 @@ struct ComposePostView: View {
     @State private var pendingImageResize: (() -> Void)?
     @State private var isScaling = false
 
-    private let maxImages = 4
+    private let maxImages = 10
     private let maxImageDimension: CGFloat = 3600
     private let maxImageFileSize = 1_887_437
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -135,10 +137,23 @@ struct ComposePostView: View {
                     Button(loc("actions.cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("compose.post")) {
-                        Task { await post() }
+                    if isPosting {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Button(loc("compose.post")) {
+                            Task { await post() }
+                        }
+                        .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
-                    .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if isPosting, !selectedImages.isEmpty {
+                    uploadProgressBar
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial)
                 }
             }
             .alert(Text(loc: "compose.error"), isPresented: .constant(errorMessage != nil)) {
@@ -570,22 +585,46 @@ struct ComposePostView: View {
 
     private func post() async {
         isPosting = true
-        defer { isPosting = false }
+        uploadProgress = nil
+        uploadSpeed = nil
+        defer {
+            isPosting = false
+            uploadProgress = nil
+            uploadSpeed = nil
+        }
         do {
             let images: [PostImageAttachment]?
             if selectedImages.isEmpty {
                 images = nil
             } else {
+                let totalBytes = selectedImages.reduce(0) { $0 + $1.data.count }
+                let startTime = Date()
                 var result: [PostImageAttachment] = []
                 for (index, image) in selectedImages.enumerated() {
+                    let imageBytes = image.data.count
+                    let startOffset = result.reduce(0) { $0 + $1.blob.size }
                     let blob = try await blueskyClient.uploadBlob(
                         data: image.data,
                         mimeType: image.mimeType,
                         account: account,
-                        appPassword: appPassword
+                        appPassword: appPassword,
+                        progress: { [startOffset, imageBytes, totalBytes, startTime] fraction in
+                            let totalUploaded = Double(startOffset) + Double(imageBytes) * fraction
+                            let overallProgress = totalUploaded / Double(totalBytes)
+                            let elapsed = max(startTime.timeIntervalSinceNow * -1, 0.001)
+                            let bytesPerSec = totalUploaded / elapsed
+                            Task { @MainActor in
+                                self.uploadProgress = overallProgress
+                                self.uploadSpeed = Self.formatSpeed(bytesPerSec)
+                            }
+                        }
                     )
                     let alt = imageAlts[safe: index] ?? ""
                     result.append(PostImageAttachment(blob: blob.blob, alt: alt))
+                    let overallProgress = Double(result.reduce(0) { $0 + $1.blob.size }) / Double(totalBytes)
+                    await MainActor.run {
+                        uploadProgress = overallProgress
+                    }
                 }
                 images = result
             }
@@ -614,6 +653,37 @@ struct ComposePostView: View {
             dismiss()
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    @ViewBuilder
+    private var uploadProgressBar: some View {
+        VStack(spacing: 4) {
+            ProgressView(value: uploadProgress ?? 0, total: 1.0)
+                .progressViewStyle(.linear)
+                .tint(.accentColor)
+            HStack {
+                Text("\(Int((uploadProgress ?? 0) * 100))%")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if let uploadSpeed {
+                    Text(uploadSpeed)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
+            }
+        }
+    }
+
+    private static func formatSpeed(_ bytesPerSecond: Double) -> String {
+        if bytesPerSecond >= 1_000_000 {
+            String(format: "\u{2191} %.1f MB/s", bytesPerSecond / 1_000_000)
+        } else if bytesPerSecond >= 1_000 {
+            String(format: "\u{2191} %.0f KB/s", bytesPerSecond / 1_000)
+        } else {
+            String(format: "\u{2191} %.0f B/s", bytesPerSecond)
         }
     }
 }

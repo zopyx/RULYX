@@ -15,6 +15,7 @@ struct LikesListView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var cursor: String?
+    @State private var showAIScreen = false
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     // MARK: - Body
@@ -89,9 +90,28 @@ struct LikesListView: View {
             }
             .pageTitle(loc("likes.title"))
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if !likes.isEmpty {
+                        Button { showAIScreen = true } label: {
+                            Image(systemName: "brain")
+                                .accessibilityLabel(loc("ai.screen.title"))
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()
                 }
+            }
+            .sheet(isPresented: $showAIScreen) {
+                AIBatchScreenView(actors: likes.map { like in
+                    ScreenableActor(
+                        id: like.actor.did ?? like.actor.handle ?? UUID().uuidString,
+                        displayName: like.actor.displayName ?? like.actor.handle ?? "?",
+                        handle: like.actor.handle ?? "?",
+                        description: nil
+                    )
+                })
+                .environmentObject(localizationManager)
             }
             .task {
                 await loadLikes()

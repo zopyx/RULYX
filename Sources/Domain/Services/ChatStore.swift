@@ -3,11 +3,13 @@ import Foundation
 import UIKit
 import UserNotifications
 
-/// Manages Bluesky direct messaging conversations: loading, sending, polling,
-/// and push-driven incremental sync.
+/// Manages Bluesky direct messaging conversations: loading, sending, event-driven
+/// log processing, and push-driven incremental sync.
 ///
-/// The store uses a polling loop (`startPolling` / `stopPolling`) to listen for
-/// new events via the chat log endpoint. It also supports manual sync via `syncLog()`.
+/// The store uses an event loop that responds to push notifications and
+/// app-lifecycle signals. Polling is adaptive: 5 seconds while a chat view is
+/// visible and 30 seconds otherwise. External actors trigger an immediate sync
+/// via `signalSync()`.
 @MainActor
 final class ChatStore: ObservableObject {
     private struct ChatAccountContext: Equatable {
@@ -47,6 +49,8 @@ final class ChatStore: ObservableObject {
     private var messageCursors: [String: String] = [:]
     /// The polling task for real-time event delivery.
     private var pollingTask: Task<Void, Never>?
+    /// Guards against rapid redundant syncs from push notifications.
+    private var lastSyncDate: Date = .distantPast
     /// The current chat loading context. Any response from an older context is discarded.
     private var activeContext: ChatAccountContext?
     /// The stored account ID for the active chat context.
@@ -61,6 +65,11 @@ final class ChatStore: ObservableObject {
     private(set) var currentAccountDID: String?
     /// The task responsible for dismissing transient status text.
     private var statusDismissTask: Task<Void, Never>?
+    /// Tokens representing currently visible chat UI views (list or detail).
+    /// When non-empty, the event-log poll runs at the fast interval.
+    private var chatVisibleTokens: Set<String> = []
+    /// Current polling interval. Defaults to 30s and switches to 5s while chat is visible.
+    private var currentPollingInterval: UInt64 = 30_000_000_000
 
     // MARK: - Init
 
@@ -145,6 +154,10 @@ final class ChatStore: ObservableObject {
             }
             conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
             convosCursor = result.cursor
+            // Patch any conversations where the local message cache has a newer
+            // message than the server's lastMessage (e.g., just-sent messages
+            // that haven't propagated to the list endpoint yet).
+            patchStaleLastMessages()
             isLoadingConvos = false
         } catch {
             guard isCurrentContext(context) else { return }
@@ -244,6 +257,24 @@ final class ChatStore: ObservableObject {
         current.append(pendingMsg)
         messages[convoId] = current
 
+        // Optimistically update the conversation's lastMessage so the list
+        // preview shows the outgoing text immediately.
+        if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
+            let existing = conversations[idx]
+            conversations[idx] = ChatConversation(
+                id: existing.id,
+                rev: existing.rev,
+                members: existing.members,
+                lastMessage: pendingMsg,
+                muted: existing.muted,
+                status: existing.status,
+                unreadCount: existing.unreadCount,
+                kind: existing.kind,
+                groupInfo: existing.groupInfo
+            )
+            conversations.sort { $0.lastMessageAt > $1.lastMessageAt }
+        }
+
         isSendingMessage = true
         do {
             let result = try await chatService.sendMessage(convoId: convoId, text: text, account: account, appPassword: activeAppPassword)
@@ -264,6 +295,24 @@ final class ChatStore: ObservableObject {
                 updated.append(confirmedMsg)
             }
             messages[convoId] = updated
+
+            // Update the conversation's lastMessage and bump it to the top.
+            if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
+                let existing = conversations[idx]
+                conversations[idx] = ChatConversation(
+                    id: existing.id,
+                    rev: result.rev,
+                    members: existing.members,
+                    lastMessage: confirmedMsg,
+                    muted: existing.muted,
+                    status: existing.status,
+                    unreadCount: existing.unreadCount,
+                    kind: existing.kind,
+                    groupInfo: existing.groupInfo
+                )
+                conversations.sort { $0.lastMessageAt > $1.lastMessageAt }
+            }
+
             isSendingMessage = false
         } catch {
             guard isCurrentContext(context) else { return }
@@ -402,49 +451,161 @@ final class ChatStore: ObservableObject {
         visibleConversationID = convoId
     }
 
-    // MARK: - Push-Driven Incremental Sync
+    /// Triggers an immediate log sync. Called by `PushNotificationCoordinator`
+    /// when a push notification arrives, or by lifecycle handlers when the app
+    /// becomes active.
+    ///
+    /// Rapid calls are debounced: if less than one second has elapsed since the
+    /// last completed sync, the call is skipped.
+    func signalSync() {
+        let now = Date()
+        guard now.timeIntervalSince(lastSyncDate) >= 1.0 else { return }
+        lastSyncDate = now
+        Task { await processLog() }
+    }
 
-    /// Performs a one-shot sync of the chat event log. Updates conversations and messages.
-    /// Called from push notification handling or app foreground.
-    func syncLog() async {
+    // MARK: - Event-Driven Log Processing
+
+    /// Fetches the latest event-log entries from the server and applies them
+    /// as fine-grained local mutations. Falls back to a full conversation-list
+    /// reload only when structural changes (convo added/removed) are detected.
+    private func processLog() async {
         guard let account = activeAccount, let context = activeContext else { return }
         do {
             let (events, newCursor) = try await chatService.getLog(cursor: logCursor, account: account, appPassword: activeAppPassword)
             guard isCurrentContext(context) else { return }
             logCursor = newCursor
-            var hasStructuralEvents = false
-            for event in events {
-                switch event.kind {
-                case let .createMessage(convoId, message):
-                    applyIncomingMessage(message, to: convoId)
-                    if !conversations.contains(where: { $0.id == convoId }) {
-                        hasStructuralEvents = true
-                    }
-                case .beginConvo, .acceptConvo, .leaveConvo, .muteConvo, .unmuteConvo,
-                     .addMember, .removeMember, .readConvo:
-                    hasStructuralEvents = true
-                case .addReaction, .removeReaction, .deleteMessage:
-                    hasStructuralEvents = true
-                }
-            }
-            if hasStructuralEvents {
-                try await Task.sleep(nanoseconds: 300_000_000)
-                let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
-                guard isCurrentContext(context) else { return }
-                conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
-                convosCursor = result.cursor
-            }
+
+            let actions = parseEvents(events)
+            try await applyActions(actions, context: context)
 
             updateAppBadge()
-
-            if let visibleID = visibleConversationID {
-                await refreshMessages(convoId: visibleID)
-            }
         } catch {
             guard isCurrentContext(context) else { return }
             if let urlError = error as? URLError, urlError.code == .cancelled { return }
-            AppLogger.persistence.error("Chat syncLog failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("Chat processLog failed: \(error.localizedDescription, privacy: .public)")
             self.error = error
+        }
+    }
+
+    /// Translates raw `ChatLogEvent` values into a list of `ChatLocalAction`
+    /// mutations. Reactions, deletes, reads, and mutes are mapped to targeted
+    /// actions; structural changes trigger a full conversation-list reload.
+    private func parseEvents(_ events: [ChatLogEvent]) -> [ChatLocalAction] {
+        var actions: [ChatLocalAction] = []
+        for event in events {
+            switch event.kind {
+            case let .createMessage(convoId, message):
+                actions.append(.appendMessage(convoId: convoId, message: message))
+                if !conversations.contains(where: { $0.id == convoId }) {
+                    actions.append(.reloadConvos)
+                }
+            case let .deleteMessage(convoId, deletedMessage):
+                if messages[convoId] != nil {
+                    actions.append(.deleteMessage(convoId: convoId, messageId: deletedMessage.id))
+                }
+            case let .addReaction(convoId, messageId, reaction):
+                if messages[convoId] != nil {
+                    actions.append(.addReaction(convoId: convoId, messageId: messageId, reaction: reaction))
+                }
+            case let .removeReaction(convoId, messageId, reaction):
+                if messages[convoId] != nil {
+                    actions.append(.removeReaction(convoId: convoId, messageId: messageId, reaction: reaction))
+                }
+            case .beginConvo, .acceptConvo, .leaveConvo, .addMember, .removeMember:
+                actions.append(.reloadConvos)
+            case let .muteConvo(convoId):
+                actions.append(.updateMuted(convoId: convoId, muted: true))
+            case let .unmuteConvo(convoId):
+                actions.append(.updateMuted(convoId: convoId, muted: false))
+            case let .readConvo(convoId, _):
+                actions.append(.markRead(convoId: convoId))
+            }
+        }
+        return actions
+    }
+
+    /// Applies a list of `ChatLocalAction` values, performing a full conversation
+    /// list reload if any action requires it. Refreshes messages for the visible
+    /// conversation after all actions are applied.
+    private func applyActions(_ actions: [ChatLocalAction], context: ChatAccountContext) async throws {
+        var needsReload = false
+
+        for action in actions {
+            switch action {
+            case let .appendMessage(convoId, message):
+                applyIncomingMessage(message, to: convoId)
+                if !conversations.contains(where: { $0.id == convoId }) {
+                    needsReload = true
+                }
+
+            case let .deleteMessage(convoId, messageId):
+                if messages[convoId] != nil {
+                    applyDeleteMessage(messageId, in: convoId)
+                }
+
+            case let .addReaction(convoId, messageId, reaction):
+                applyReaction(convoId: convoId, messageId: messageId, reaction: reaction)
+
+            case let .removeReaction(convoId, messageId, reaction):
+                applyRemoveReaction(convoId: convoId, messageId: messageId, reaction: reaction)
+
+            case let .markRead(convoId):
+                if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
+                    let existing = conversations[idx]
+                    conversations[idx] = ChatConversation(
+                        id: existing.id,
+                        rev: existing.rev,
+                        members: existing.members,
+                        lastMessage: existing.lastMessage,
+                        muted: existing.muted,
+                        status: existing.status,
+                        unreadCount: 0,
+                        kind: existing.kind,
+                        groupInfo: existing.groupInfo
+                    )
+                }
+
+            case let .updateMuted(convoId, muted):
+                if let idx = conversations.firstIndex(where: { $0.id == convoId }) {
+                    let existing = conversations[idx]
+                    conversations[idx] = ChatConversation(
+                        id: existing.id,
+                        rev: existing.rev,
+                        members: existing.members,
+                        lastMessage: existing.lastMessage,
+                        muted: muted,
+                        status: existing.status,
+                        unreadCount: existing.unreadCount,
+                        kind: existing.kind,
+                        groupInfo: existing.groupInfo
+                    )
+                }
+
+            case .reloadConvos:
+                needsReload = true
+            }
+        }
+
+        // Always reload the conversation list from the server when events were
+        // processed. This ensures the list view is always in sync with the server,
+        // even though targeted mutations give immediate responsiveness for the
+        // message detail view.
+        if needsReload || !actions.isEmpty {
+            try await Task.sleep(nanoseconds: 500_000_000)
+            guard isCurrentContext(context) else { return }
+            guard let account = activeAccount else { return }
+            let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
+            guard isCurrentContext(context) else { return }
+            conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
+            convosCursor = result.cursor
+            patchStaleLastMessages()
+        }
+
+        // Refresh the visible conversation's messages if we're viewing one.
+        if let visibleID = visibleConversationID {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            await refreshMessages(convoId: visibleID)
         }
     }
 
@@ -452,25 +613,6 @@ final class ChatStore: ObservableObject {
     private func updateAppBadge() {
         let totalUnread = conversations.reduce(0) { $0 + $1.unreadCount }
         Task { try? await UNUserNotificationCenter.current().setBadgeCount(totalUnread) }
-    }
-
-    // MARK: - Polling
-
-    /// Starts a polling loop that checks the chat event log at the given interval.
-    func startPolling(interval: TimeInterval = 3) {
-        stopPolling()
-        pollingTask = Task { [weak self] in
-            while !Task.isCancelled {
-                await self?.pollLog()
-                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
-            }
-        }
-    }
-
-    /// Stops the polling loop.
-    func stopPolling() {
-        pollingTask?.cancel()
-        pollingTask = nil
     }
 
     // MARK: - Private Helpers
@@ -509,6 +651,35 @@ final class ChatStore: ObservableObject {
         activeContext == context
     }
 
+    /// Patches any conversations where the local message cache has a newer
+    /// message than what the server returned as `lastMessage`.
+    ///
+    /// This handles cases where a message has been sent or received and stored
+    /// in `messages[convoId]` but the `listConvos` endpoint hasn't propagated
+    /// the update yet.
+    private func patchStaleLastMessages() {
+        for (index, convo) in conversations.enumerated() {
+            guard let msgs = messages[convo.id], let newest = msgs.last else { continue }
+            let newestDate: Date = switch newest {
+            case let .message(m): m.sentAt
+            case let .deleted(d): d.sentAt
+            case let .system(s): s.sentAt
+            }
+            guard newestDate > convo.lastMessageAt else { continue }
+            conversations[index] = ChatConversation(
+                id: convo.id,
+                rev: convo.rev,
+                members: convo.members,
+                lastMessage: newest,
+                muted: convo.muted,
+                status: convo.status,
+                unreadCount: convo.unreadCount,
+                kind: convo.kind,
+                groupInfo: convo.groupInfo
+            )
+        }
+    }
+
     private func setStatusMessage(_ message: String, autoDismiss: Bool) {
         statusDismissTask?.cancel()
         statusMessage = message
@@ -525,55 +696,42 @@ final class ChatStore: ObservableObject {
 
     /// Polls the chat event log and applies incremental updates.
     /// Rebuilds the conversation list if structural changes are detected.
-    private func pollLog() async {
-        guard let account = activeAccount, let context = activeContext else { return }
-        do {
-            let (events, newCursor) = try await chatService.getLog(cursor: logCursor, account: account, appPassword: activeAppPassword)
-            guard isCurrentContext(context) else { return }
-            logCursor = newCursor
+    /// Applies a message deletion to the local cache.
+    private func applyDeleteMessage(_ messageId: String, in convoId: String) {
+        guard var current = messages[convoId] else { return }
+        current.removeAll { idForMessage($0) == messageId }
+        messages[convoId] = current
+    }
 
-            var needsReload = false
-            for event in events {
-                switch event.kind {
-                case let .createMessage(convoId, message):
-                    applyIncomingMessage(message, to: convoId)
-                    if !conversations.contains(where: { $0.id == convoId }) {
-                        needsReload = true
-                    }
-                case .beginConvo, .acceptConvo, .leaveConvo, .muteConvo, .unmuteConvo:
-                    needsReload = true
-                case let .addReaction(convoId, _, _), let .removeReaction(convoId, _, _):
-                    if messages[convoId] != nil {
-                        needsReload = true
-                    }
-                case let .deleteMessage(convoId, _):
-                    if messages[convoId] != nil {
-                        needsReload = true
-                    }
-                case .readConvo, .addMember, .removeMember:
-                    needsReload = true
-                }
+    /// Applies a reaction addition to a message in the local cache.
+    private func applyReaction(convoId: String, messageId: String, reaction: ChatReaction) {
+        guard var current = messages[convoId] else { return }
+        for (index, kind) in current.enumerated() {
+            guard case var .message(msg) = kind, msg.id == messageId else { continue }
+            var updatedReactions = msg.reactions
+            if !updatedReactions.contains(where: { $0.senderDID == reaction.senderDID && $0.value == reaction.value }) {
+                updatedReactions.append(reaction)
             }
+            msg = ChatMessage(id: msg.id, rev: msg.rev, text: msg.text, senderDID: msg.senderDID, sentAt: msg.sentAt, reactions: updatedReactions)
+            current[index] = .message(msg)
+            messages[convoId] = current
+            return
+        }
+    }
 
-            // Reload the full conversation list if structural changes occurred.
-            if needsReload {
-                try await Task.sleep(nanoseconds: 500_000_000)
-                let result = try await chatService.listConvos(account: account, appPassword: activeAppPassword, status: nil, cursor: nil)
-                guard isCurrentContext(context) else { return }
-                conversations = result.conversations.sorted { $0.lastMessageAt > $1.lastMessageAt }
-                convosCursor = result.cursor
-            }
-
-            // Refresh the visible conversation's messages if we're viewing one.
-            if let visibleID = visibleConversationID {
-                try? await Task.sleep(nanoseconds: 100_000_000)
-                await refreshMessages(convoId: visibleID)
-            }
-        } catch {
-            guard isCurrentContext(context) else { return }
-            if let urlError = error as? URLError, urlError.code == .cancelled { return }
-            AppLogger.persistence.error("Chat pollLog failed: \(error.localizedDescription, privacy: .public)")
-            self.error = error
+    /// Applies a reaction removal from a message in the local cache.
+    private func applyRemoveReaction(convoId: String, messageId: String, reaction: ChatReaction) {
+        guard var current = messages[convoId] else { return }
+        for (index, kind) in current.enumerated() {
+            guard case var .message(msg) = kind, msg.id == messageId else { continue }
+            msg = ChatMessage(
+                id: msg.id, rev: msg.rev, text: msg.text, senderDID: msg.senderDID,
+                sentAt: msg.sentAt,
+                reactions: msg.reactions.filter { $0.senderDID != reaction.senderDID || $0.value != reaction.value }
+            )
+            current[index] = .message(msg)
+            messages[convoId] = current
+            return
         }
     }
 
@@ -647,5 +805,50 @@ final class ChatStore: ObservableObject {
             conversations.append(conversation)
         }
         conversations.sort { $0.lastMessageAt > $1.lastMessageAt }
+    }
+}
+
+// MARK: - Polling
+
+extension ChatStore {
+    /// Starts a polling loop that checks the chat event log. Polling is adaptive:
+    /// 5 seconds while a chat view (list or detail) is visible, 30 seconds otherwise.
+    /// Push-driven `signalSync()` still triggers immediate processing.
+    func startPolling() {
+        stopPolling()
+        pollingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.processLog()
+                guard let self else { return }
+                try? await Task.sleep(nanoseconds: currentPollingInterval)
+            }
+        }
+    }
+
+    /// Registers or unregisters a visible chat UI view (e.g., list or detail).
+    /// When any chat view is visible, polling speeds up to 5 seconds.
+    func setChatViewVisible(_ visible: Bool, token: String) {
+        if visible {
+            chatVisibleTokens.insert(token)
+        } else {
+            chatVisibleTokens.remove(token)
+        }
+        updatePollingInterval()
+    }
+
+    private func updatePollingInterval() {
+        let newInterval: UInt64 = chatVisibleTokens.isEmpty ? 30_000_000_000 : 5_000_000_000
+        guard newInterval != currentPollingInterval else { return }
+        currentPollingInterval = newInterval
+        // Restart the loop so the new interval takes effect immediately.
+        if pollingTask != nil {
+            startPolling()
+        }
+    }
+
+    /// Stops the polling loop.
+    func stopPolling() {
+        pollingTask?.cancel()
+        pollingTask = nil
     }
 }
