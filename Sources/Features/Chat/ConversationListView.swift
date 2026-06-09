@@ -67,6 +67,7 @@ struct ConversationListView: View {
             Group {
                 if chatStore.isLoadingConvos, chatStore.conversations.isEmpty {
                     LoadingPanel(message: loc("chat.loading"))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let chatError = chatStore.error, chatStore.conversations.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")
@@ -83,6 +84,7 @@ struct ConversationListView: View {
                         }
                         .buttonStyle(.bordered)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding()
                 } else if chatStore.conversations.isEmpty {
                     VStack(spacing: 12) {
@@ -98,6 +100,7 @@ struct ConversationListView: View {
                             .multilineTextAlignment(.center)
                         Spacer()
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding()
                 } else {
                     List(selection: $selectedConvos) {

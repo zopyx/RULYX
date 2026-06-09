@@ -18,7 +18,7 @@
       "th",
       "vi"
     ],
-    "total_keys": 1277,
+    "total_keys": 1278,
     "total_languages": 16,
     "untranslated_total": 2708
   },
@@ -12873,6 +12873,69 @@
       "vi": {
         "text": "Allow quoting",
         "untranslated": true
+      }
+    },
+    "compose.alt_edit_title": {
+      "en": "Edit Alt Text",
+      "de": {
+        "text": "Alt-Text bearbeiten",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Modifier le texte alternatif",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Modifica testo alternativo",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "代替テキストを編集",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "编辑替代文本",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Editar texto alternativo",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Editar texto alternativo",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "대체 텍스트 편집",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Редактировать альтернативный текст",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "تحرير النص البديل",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Alt-tekst bewerken",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Edytuj tekst alternatywny",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Alternatif metni düzenle",
+        "untranslated": false
+      },
+      "th": {
+        "text": "แก้ไขข้อความทดแทน",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Chỉnh sửa văn bản thay thế",
+        "untranslated": false
       }
     },
     "compose.alt_placeholder": {
