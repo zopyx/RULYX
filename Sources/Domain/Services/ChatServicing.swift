@@ -87,6 +87,107 @@ protocol ChatServicing {
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     func unmuteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws
 
+    // MARK: - Chat Requests
+
+    /// Accepts an incoming conversation request.
+    /// - Parameters:
+    ///   - convoId: The ID of the conversation request to accept.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func acceptConvo(convoId: String, account: AppAccount, appPassword: String?) async throws
+
+    /// Lists incoming conversation requests (unaccepted conversations).
+    /// - Parameters:
+    ///   - cursor: An optional cursor for paginating through requests.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    /// - Returns: A `PagedConvos` containing request conversations and an optional next cursor.
+    func listConvoRequests(cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedConvos
+
+    /// Checks whether a conversation can be started with the specified members.
+    /// - Parameters:
+    ///   - members: An array of member DIDs to check availability for.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    /// - Returns: `true` if a conversation can be started, `false` otherwise.
+    func getConvoAvailability(members: [String], account: AppAccount, appPassword: String?) async throws -> Bool
+
+    /// Deletes a message for the current user only (removes it from their view).
+    /// - Parameters:
+    ///   - convoId: The conversation ID containing the message.
+    ///   - messageId: The ID of the message to delete.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func deleteMessageForSelf(convoId: String, messageId: String, account: AppAccount, appPassword: String?) async throws
+
+    // MARK: - Group Management
+
+    /// Fetches detailed member information for a group conversation.
+    /// - Parameters:
+    ///   - convoId: The conversation ID to fetch members for.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    /// - Returns: An array of `ChatMemberProfile` for all members.
+    func getConvoMembers(convoId: String, account: AppAccount, appPassword: String?) async throws -> [ChatMemberProfile]
+
+    /// Adds members to a group conversation.
+    /// - Parameters:
+    ///   - convoId: The conversation ID to add members to.
+    ///   - memberDIDs: An array of member DIDs to add.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func addMembers(convoId: String, memberDIDs: [String], account: AppAccount, appPassword: String?) async throws
+
+    /// Removes members from a group conversation.
+    /// - Parameters:
+    ///   - convoId: The conversation ID to remove members from.
+    ///   - memberDIDs: An array of member DIDs to remove.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func removeMembers(convoId: String, memberDIDs: [String], account: AppAccount, appPassword: String?) async throws
+
+    /// Edits a group conversation's metadata (e.g., name).
+    /// - Parameters:
+    ///   - convoId: The conversation ID to edit.
+    ///   - name: The new name for the group, or `nil` to keep the current name.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func editGroup(convoId: String, name: String?, account: AppAccount, appPassword: String?) async throws
+
+    /// Locks a group conversation (prevents new members from being added).
+    /// - Parameters:
+    ///   - convoId: The conversation ID to lock.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func lockConvo(convoId: String, account: AppAccount, appPassword: String?) async throws
+
+    /// Unlocks a previously locked group conversation.
+    /// - Parameters:
+    ///   - convoId: The conversation ID to unlock.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func unlockConvo(convoId: String, account: AppAccount, appPassword: String?) async throws
+
+    // MARK: - Reactions
+
+    /// Adds an emoji reaction to a message.
+    /// - Parameters:
+    ///   - convoId: The conversation ID containing the message.
+    ///   - messageId: The ID of the message to react to.
+    ///   - value: The emoji reaction value (e.g., "👍").
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func addReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws
+
+    /// Removes an emoji reaction from a message.
+    /// - Parameters:
+    ///   - convoId: The conversation ID containing the message.
+    ///   - messageId: The ID of the message to remove the reaction from.
+    ///   - value: The emoji reaction value to remove (e.g., "👍").
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func removeReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws
+
     // MARK: - Log
 
     /// Fetches the chat event log with cursor-based pagination.

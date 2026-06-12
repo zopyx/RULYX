@@ -22,6 +22,12 @@ final class ChatStore: ObservableObject {
     @Published private(set) var conversations: [ChatConversation] = []
     /// Messages keyed by conversation ID. Newest messages are at the end of each array.
     @Published private(set) var messages: [String: [ChatMessageKind]] = [:]
+    /// Pending conversation requests (unaccepted incoming conversations).
+    @Published private(set) var requests: [ChatConversation] = []
+    /// `true` while the request list is loading.
+    @Published private(set) var isLoadingRequests = false
+    /// Number of pending requests (for tab badge).
+    @Published private(set) var requestCount = 0
     /// `true` while the initial conversation list is loading.
     @Published private(set) var isLoadingConvos = false
     /// `true` while messages for a conversation are loading.
@@ -403,7 +409,187 @@ final class ChatStore: ObservableObject {
         try? await chatService.leaveConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
         guard isCurrentContext(context) else { return }
         conversations.removeAll { $0.id == convoId }
+        requests.removeAll { $0.id == convoId }
         messages.removeValue(forKey: convoId)
+    }
+
+    // MARK: - Chat Requests
+
+    /// Loads the first page of incoming conversation requests.
+    func loadRequests() async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        isLoadingRequests = true
+        do {
+            let result = try await chatService.listConvoRequests(cursor: nil, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            requests = result.conversations
+            requestCount = requests.count
+            isLoadingRequests = false
+        } catch {
+            guard isCurrentContext(context) else { return }
+            guard !AppError.isCancellation(error) else {
+                isLoadingRequests = false
+                return
+            }
+            self.error = error
+            isLoadingRequests = false
+        }
+    }
+
+    /// Accepts an incoming conversation request, moving it from requests to conversations.
+    func acceptRequest(convoId: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.acceptConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            // Move from requests to conversations — reload both lists.
+            await loadConvos()
+            await loadRequests()
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Declines an incoming conversation request by leaving it (effectively rejecting).
+    func declineRequest(convoId: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.leaveConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            requests.removeAll { $0.id == convoId }
+            requestCount = requests.count
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Deletes a message for the current user only (removes it from local view).
+    func deleteMessage(convoId: String, messageId: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.deleteMessageForSelf(convoId: convoId, messageId: messageId, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            // Mark as deleted locally.
+            var current = messages[convoId] ?? []
+            if let index = current.firstIndex(where: { idForMessage($0) == messageId }) {
+                let kind = current[index]
+                let sentAt: Date = switch kind {
+                case let .message(m): m.sentAt
+                case let .deleted(d): d.sentAt
+                case let .system(s): s.sentAt
+                }
+                let senderDID: String = switch kind {
+                case let .message(m): m.senderDID
+                case let .deleted(d): d.senderDID
+                case let .system(s): ""
+                }
+                current[index] = .deleted(ChatDeletedMessage(
+                    id: messageId,
+                    rev: "",
+                    senderDID: senderDID,
+                    sentAt: sentAt
+                ))
+                messages[convoId] = current
+            }
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.messageError = error
+        }
+    }
+
+    // MARK: - Group Management
+
+    /// Adds members to a group conversation. Reloads conversation list after success.
+    func addGroupMembers(convoId: String, memberDIDs: [String]) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.addMembers(convoId: convoId, memberDIDs: memberDIDs, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            await loadConvos()
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Removes members from a group conversation. Reloads conversation list after success.
+    func removeGroupMember(convoId: String, memberDID: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.removeMembers(convoId: convoId, memberDIDs: [memberDID], account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            await loadConvos()
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Edits a group conversation's name. Reloads conversation list after success.
+    func editGroupName(convoId: String, name: String?) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.editGroup(convoId: convoId, name: name, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            await loadConvos()
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Locks a group conversation. Reloads conversation list after success.
+    func lockGroup(convoId: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.lockConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            await loadConvos()
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Unlocks a previously locked group conversation. Reloads conversation list after success.
+    func unlockGroup(convoId: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        do {
+            try await chatService.unlockConvo(convoId: convoId, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            await loadConvos()
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    // MARK: - Reactions
+
+    /// Toggles an emoji reaction on a message. Adds the reaction if not present,
+    /// removes it if already added by the current user.
+    func toggleReaction(convoId: String, messageId: String, value: String) async {
+        guard let account = activeAccount, let context = activeContext, let currentDID = currentAccountDID else { return }
+        // Check if the current user already has this reaction.
+        let existingMessages = messages[convoId] ?? []
+        let hasReaction = existingMessages.contains { kind in
+            guard case let .message(msg) = kind, msg.id == messageId else { return false }
+            return msg.reactions.contains { $0.senderDID == currentDID && $0.value == value }
+        }
+
+        do {
+            if hasReaction {
+                try await chatService.removeReaction(convoId: convoId, messageId: messageId, value: value, account: account, appPassword: activeAppPassword)
+            } else {
+                try await chatService.addReaction(convoId: convoId, messageId: messageId, value: value, account: account, appPassword: activeAppPassword)
+            }
+            // The event log will propagate the change — no need to optimistically update.
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.messageError = error
+        }
     }
 
     /// Removes a single message from the local cache by its ID. Used for retry of failed messages.
@@ -424,6 +610,23 @@ final class ChatStore: ObservableObject {
         guard let account = activeAccount, let context = activeContext else { return nil }
         do {
             let conversation = try await chatService.getConvoForMembers(members: [memberDID], account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return nil }
+            upsertConversation(conversation)
+            return conversation
+        } catch {
+            guard isCurrentContext(context) else { return nil }
+            self.error = error
+            return nil
+        }
+    }
+
+    /// Gets or creates a conversation with multiple members (for group creation).
+    /// Falls back to 1:1 for a single member.
+    func getOrCreateConvo(memberDIDs: [String]) async -> ChatConversation? {
+        guard let account = activeAccount, let context = activeContext else { return nil }
+        guard !memberDIDs.isEmpty else { return nil }
+        do {
+            let conversation = try await chatService.getConvoForMembers(members: memberDIDs, account: account, appPassword: activeAppPassword)
             guard isCurrentContext(context) else { return nil }
             upsertConversation(conversation)
             return conversation
@@ -632,6 +835,8 @@ final class ChatStore: ObservableObject {
         statusDismissTask = nil
         statusMessage = nil
         conversations = []
+        requests = []
+        requestCount = 0
         messages = [:]
         convosCursor = nil
         logCursor = nil
@@ -641,6 +846,7 @@ final class ChatStore: ObservableObject {
         error = nil
         messageError = nil
         isLoadingConvos = isLoading
+        isLoadingRequests = false
         isLoadingMessages = false
         isLoadingMoreMessages = false
         isSendingMessage = false

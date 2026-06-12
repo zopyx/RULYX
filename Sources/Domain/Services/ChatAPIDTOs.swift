@@ -541,3 +541,98 @@ struct GetConvoForMembersRequest: Encodable {
 struct GetConvoResponse: Decodable {
     let convo: ConvoViewDTO
 }
+
+// MARK: - Accept Convo
+
+/// Request body for `chat.bsky.convo.acceptConvo`.
+struct AcceptConvoRequest: Encodable {
+    let convoId: String
+}
+
+/// Response from `chat.bsky.convo.acceptConvo`.
+struct AcceptConvoResponse: Decodable {
+    let convo: ConvoViewDTO
+}
+
+// MARK: - List Convo Requests
+
+/// Response from `chat.bsky.convo.listConvoRequests`.
+struct ListConvoRequestsResponse: Decodable {
+    let cursor: String?
+    let convos: [ConvoViewDTO]
+}
+
+// MARK: - Get Convo Availability
+
+/// Request body for `chat.bsky.convo.getConvoAvailability`.
+struct GetConvoAvailabilityRequest: Encodable {
+    let members: [String]
+}
+
+/// Response from `chat.bsky.convo.getConvoAvailability`.
+struct GetConvoAvailabilityResponse: Decodable {
+    let canChat: Bool
+    let convo: ConvoViewDTO?
+}
+
+// MARK: - Delete Message For Self
+
+/// Request body for `chat.bsky.convo.deleteMessageForSelf`.
+struct DeleteMessageForSelfRequest: Encodable {
+    let convoId: String
+    let messageId: String
+}
+
+// MARK: - Group Members
+
+/// Response from `chat.bsky.convo.getConvoMembers`.
+struct GetConvoMembersResponse: Decodable {
+    let cursor: String?
+    let members: [ChatMemberProfileDTO]
+}
+
+/// Request body for `chat.bsky.convo.addMembers`.
+struct AddMembersRequest: Encodable {
+    let convoId: String
+    let members: [String]
+}
+
+/// Request body for `chat.bsky.convo.removeMembers`.
+struct RemoveMembersRequest: Encodable {
+    let convoId: String
+    let members: [String]
+}
+
+/// Request body for `chat.bsky.convo.editGroup`.
+struct EditGroupRequest: Encodable {
+    let convoId: String
+    let name: String?
+}
+
+// MARK: - Lock/Unlock Convo
+
+/// Request body for `chat.bsky.convo.lockConvo`.
+struct LockConvoRequest: Encodable {
+    let convoId: String
+}
+
+/// Request body for `chat.bsky.convo.unlockConvo`.
+struct UnlockConvoRequest: Encodable {
+    let convoId: String
+}
+
+// MARK: - Reactions
+
+/// Request body for `chat.bsky.convo.addReaction`.
+struct AddReactionRequest: Encodable {
+    let convoId: String
+    let messageId: String
+    let value: String
+}
+
+/// Request body for `chat.bsky.convo.removeReaction`.
+struct RemoveReactionRequest: Encodable {
+    let convoId: String
+    let messageId: String
+    let value: String
+}

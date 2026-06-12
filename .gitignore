@@ -9,6 +9,9 @@ xcuserdata/
 crashlog.crash
 feedback.json
 
+# Session artifacts
+.tmp/
+
 # Build artifacts
 build/
 .derived-aifix/

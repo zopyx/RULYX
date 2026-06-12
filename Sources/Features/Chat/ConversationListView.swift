@@ -12,15 +12,17 @@ struct ConversationListView: View {
     @State private var navPath: [ChatConversation] = []
     @State private var editMode: EditMode = .inactive
     @State private var selectedConvos: Set<String> = []
+    @State private var showingRequests = false
 
     // MARK: - Computed properties
 
     /// Conversations filtered by the search text.
     /// Searches member names, group name, last message text, and any loaded message history.
     private var filteredConvos: [ChatConversation] {
-        guard !searchText.isEmpty else { return chatStore.conversations }
+        guard !searchText.isEmpty else { return showingRequests ? chatStore.requests : chatStore.conversations }
         let query = searchText.lowercased()
-        return chatStore.conversations.filter { convo in
+        let source = showingRequests ? chatStore.requests : chatStore.conversations
+        return source.filter { convo in
             // 1. Member display name / handle
             if convo.members.contains(where: { member in
                 member.handle.lowercased().contains(query) ||
@@ -64,82 +66,101 @@ struct ConversationListView: View {
 
     var body: some View {
         NavigationStack(path: $navPath) {
-            Group {
-                if chatStore.isLoadingConvos, chatStore.conversations.isEmpty {
-                    LoadingPanel(message: loc("chat.loading"))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let chatError = chatStore.error, chatStore.conversations.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.orange)
-                        Text(loc: "chat.error.title")
-                            .font(.headline)
-                        Text(chatError.localizedDescription)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        Button(loc("state.error.retry")) {
-                            Task { await chatStore.loadConvos() }
-                        }
-                        .buttonStyle(.bordered)
+            VStack(spacing: 0) {
+                // Inbox / Requests segment picker
+                if chatStore.requestCount > 0 || showingRequests {
+                    Picker(loc("chat.inbox"), selection: $showingRequests) {
+                        Text(loc("chat.inbox")).tag(false)
+                        Text("\(loc("chat.requests.title")) (\(chatStore.requestCount))").tag(true)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                } else if chatStore.conversations.isEmpty {
-                    VStack(spacing: 12) {
-                        Spacer()
-                        Image(systemName: "bubble.left.and.bubble.right")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.tertiary)
-                        Text(loc: "chat.empty.title")
-                            .font(.headline)
-                        Text(loc: "chat.empty.desc")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                } else {
-                    List(selection: $selectedConvos) {
-                        ForEach(filteredConvos) { convo in
-                            NavigationLink(value: convo) {
-                                ConversationRowView(conversation: convo, currentAccountDID: chatStore.currentAccountDID)
-                            }
-                            .swipeActions(edge: .trailing) {
-                                if convo.muted {
-                                    Button {
-                                        Task { await chatStore.unmute(convoId: convo.id) }
-                                    } label: {
-                                        Label(loc("chat.unmute"), systemImage: "bell")
-                                    }
-                                    .tint(.orange)
-                                } else {
-                                    Button {
-                                        Task { await chatStore.mute(convoId: convo.id) }
-                                    } label: {
-                                        Label(loc("chat.mute"), systemImage: "bell.slash")
-                                    }
-                                    .tint(.orange)
-                                }
-                                Button(role: .destructive) {
-                                    Task { await chatStore.leave(convoId: convo.id) }
-                                } label: {
-                                    Label(loc("chat.delete"), systemImage: "trash")
-                                }
-                            }
-                        }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                }
 
-                        if chatStore.conversations.count >= 50 {
-                            ProgressView()
-                                .frame(maxWidth: .infinity)
-                                .task { await chatStore.loadMoreConvos() }
+                Group {
+                    if showingRequests {
+                        requestsView
+                    } else if chatStore.isLoadingConvos, chatStore.conversations.isEmpty {
+                        LoadingPanel(message: loc("chat.loading"))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if let chatError = chatStore.error, chatStore.conversations.isEmpty {
+                        VStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 48))
+                                .foregroundStyle(.orange)
+                            Text(loc: "chat.error.title")
+                                .font(.headline)
+                            Text(chatError.localizedDescription)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                            Button(loc("state.error.retry")) {
+                                Task { await chatStore.loadConvos() }
+                            }
+                            .buttonStyle(.bordered)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding()
+                    } else if !showingRequests, chatStore.conversations.isEmpty {
+                        VStack(spacing: 12) {
+                            Spacer()
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .font(.system(size: 48))
+                                .foregroundStyle(.tertiary)
+                            Text(loc: "chat.empty.title")
+                                .font(.headline)
+                            Text(loc: "chat.empty.desc")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding()
+                    } else {
+                        List(selection: showingRequests ? .constant([]) : $selectedConvos) {
+                            ForEach(filteredConvos) { convo in
+                                if showingRequests {
+                                    requestRow(convo)
+                                } else {
+                                    NavigationLink(value: convo) {
+                                        ConversationRowView(conversation: convo, currentAccountDID: chatStore.currentAccountDID)
+                                    }
+                                    .swipeActions(edge: .trailing) {
+                                        if convo.muted {
+                                            Button {
+                                                Task { await chatStore.unmute(convoId: convo.id) }
+                                            } label: {
+                                                Label(loc("chat.unmute"), systemImage: "bell")
+                                            }
+                                            .tint(.orange)
+                                        } else {
+                                            Button {
+                                                Task { await chatStore.mute(convoId: convo.id) }
+                                            } label: {
+                                                Label(loc("chat.mute"), systemImage: "bell.slash")
+                                            }
+                                            .tint(.orange)
+                                        }
+                                        Button(role: .destructive) {
+                                            Task { await chatStore.leave(convoId: convo.id) }
+                                        } label: {
+                                            Label(loc("chat.delete"), systemImage: "trash")
+                                        }
+                                    }
+                                }
+                            }
+
+                            if !showingRequests, chatStore.conversations.count >= 50 {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity)
+                                    .task { await chatStore.loadMoreConvos() }
+                            }
+                        }
+                        .listStyle(.plain)
+                        .environment(\.editMode, showingRequests ? .constant(.inactive) : $editMode)
                     }
-                    .listStyle(.plain)
-                    .environment(\.editMode, $editMode)
                 }
             }
             .searchable(text: $searchText, prompt: loc("chat.search.placeholder"))
@@ -150,7 +171,7 @@ struct ConversationListView: View {
             }
             .pageTitle(Text(loc: "tab.chat"))
             .toolbar {
-                if !chatStore.conversations.isEmpty {
+                if !chatStore.conversations.isEmpty, !showingRequests {
                     ToolbarItem(placement: .topBarLeading) {
                         if editMode.isEditing {
                             Button(loc("chat.select_all")) {
@@ -272,12 +293,18 @@ struct ConversationListView: View {
             }
             .refreshable {
                 await chatStore.loadConvos()
+                await chatStore.loadRequests()
             }
             .task {
                 openPendingConversationIfNeeded()
                 guard chatStore.conversations.isEmpty, !chatStore.isLoadingConvos, accountStore.activeAccount != nil else { return }
                 let pw = accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
                 await chatStore.rebuildConversations(for: accountStore.activeAccount, appPassword: pw)
+            }
+            .task {
+                // Load requests on first appearance
+                guard chatStore.requests.isEmpty, !chatStore.isLoadingRequests else { return }
+                await chatStore.loadRequests()
             }
             .onAppear {
                 openPendingConversationIfNeeded()
@@ -317,6 +344,67 @@ struct ConversationListView: View {
 
         navPath = [conversation]
         workspaceStore.pendingChatConversationID = nil
+    }
+
+    // MARK: - Requests View
+
+    /// Empty state for requests list.
+    @ViewBuilder
+    private var requestsView: some View {
+        if chatStore.isLoadingRequests {
+            LoadingPanel(message: loc("chat.loading"))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if chatStore.requests.isEmpty {
+            VStack(spacing: 12) {
+                Spacer()
+                Image(systemName: "tray")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.tertiary)
+                Text(loc: "chat.requests.empty")
+                    .font(.headline)
+                Text(loc: "chat.requests.empty.desc")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
+        }
+    }
+
+    /// Row for a conversation request with accept/decline swipe actions.
+    @ViewBuilder
+    private func requestRow(_ convo: ChatConversation) -> some View {
+        ConversationRowView(conversation: convo, currentAccountDID: chatStore.currentAccountDID)
+            .swipeActions(edge: .trailing) {
+                Button(role: .destructive) {
+                    Task { await chatStore.declineRequest(convoId: convo.id) }
+                } label: {
+                    Label(loc("chat.request.decline"), systemImage: "xmark")
+                }
+                .tint(.red)
+            }
+            .swipeActions(edge: .leading) {
+                Button {
+                    Task { await chatStore.acceptRequest(convoId: convo.id) }
+                } label: {
+                    Label(loc("chat.request.accept"), systemImage: "checkmark")
+                }
+                .tint(.green)
+            }
+            .contextMenu {
+                Button {
+                    Task { await chatStore.acceptRequest(convoId: convo.id) }
+                } label: {
+                    Label(loc("chat.request.accept"), systemImage: "checkmark")
+                }
+                Button(role: .destructive) {
+                    Task { await chatStore.declineRequest(convoId: convo.id) }
+                } label: {
+                    Label(loc("chat.request.decline"), systemImage: "xmark")
+                }
+            }
     }
 
     struct ConversationRowView: View {

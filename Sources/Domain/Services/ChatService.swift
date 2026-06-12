@@ -170,6 +170,172 @@ final class ChatService: ChatServicing {
         )
     }
 
+    // MARK: - Chat Requests
+
+    /// Accepts an incoming conversation request.
+    func acceptConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
+        let body = AcceptConvoRequest(convoId: convoId)
+        let _: AcceptConvoResponse = try await chatRequest(
+            path: "chat.bsky.convo.acceptConvo",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Lists incoming conversation requests with cursor pagination.
+    func listConvoRequests(cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedConvos {
+        var queryItems = [URLQueryItem(name: "limit", value: "50")]
+        if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
+
+        let response: ListConvoRequestsResponse = try await chatRequest(
+            path: "chat.bsky.convo.listConvoRequests",
+            method: "GET",
+            queryItems: queryItems,
+            account: account,
+            appPassword: appPassword
+        )
+
+        return PagedConvos(
+            conversations: response.convos.map { $0.toDomain() },
+            cursor: response.cursor
+        )
+    }
+
+    /// Checks whether a conversation can be started with the specified members.
+    func getConvoAvailability(members: [String], account: AppAccount, appPassword: String?) async throws -> Bool {
+        let response: GetConvoAvailabilityResponse = try await chatRequest(
+            path: "chat.bsky.convo.getConvoAvailability",
+            method: "GET",
+            queryItems: members.map { URLQueryItem(name: "members", value: $0) },
+            account: account,
+            appPassword: appPassword
+        )
+        return response.canChat
+    }
+
+    /// Deletes a message for the current user only.
+    func deleteMessageForSelf(convoId: String, messageId: String, account: AppAccount, appPassword: String?) async throws {
+        let body = DeleteMessageForSelfRequest(convoId: convoId, messageId: messageId)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.deleteMessageForSelf",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    // MARK: - Group Management
+
+    /// Fetches detailed member information for a group conversation.
+    func getConvoMembers(convoId: String, account: AppAccount, appPassword: String?) async throws -> [ChatMemberProfile] {
+        let response: GetConvoMembersResponse = try await chatRequest(
+            path: "chat.bsky.convo.getConvoMembers",
+            method: "GET",
+            queryItems: [URLQueryItem(name: "convoId", value: convoId)],
+            account: account,
+            appPassword: appPassword
+        )
+        return response.members.map { $0.toDomain() }
+    }
+
+    /// Adds members to a group conversation.
+    func addMembers(convoId: String, memberDIDs: [String], account: AppAccount, appPassword: String?) async throws {
+        let body = AddMembersRequest(convoId: convoId, members: memberDIDs)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.addMembers",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Removes members from a group conversation.
+    func removeMembers(convoId: String, memberDIDs: [String], account: AppAccount, appPassword: String?) async throws {
+        let body = RemoveMembersRequest(convoId: convoId, members: memberDIDs)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.removeMembers",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Edits a group conversation's name.
+    func editGroup(convoId: String, name: String?, account: AppAccount, appPassword: String?) async throws {
+        let body = EditGroupRequest(convoId: convoId, name: name)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.editGroup",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Locks a group conversation (prevents new members from being added).
+    func lockConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
+        let body = LockConvoRequest(convoId: convoId)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.lockConvo",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Unlocks a previously locked group conversation.
+    func unlockConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
+        let body = UnlockConvoRequest(convoId: convoId)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.unlockConvo",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    // MARK: - Reactions
+
+    /// Adds an emoji reaction to a message.
+    func addReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws {
+        let body = AddReactionRequest(convoId: convoId, messageId: messageId, value: value)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.addReaction",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Removes an emoji reaction from a message.
+    func removeReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws {
+        let body = RemoveReactionRequest(convoId: convoId, messageId: messageId, value: value)
+        let _: EmptyResponse = try await chatRequest(
+            path: "chat.bsky.convo.removeReaction",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
     // MARK: - Log
 
     /// Gets the chat event log (conversation creation, messages, reactions, etc.).

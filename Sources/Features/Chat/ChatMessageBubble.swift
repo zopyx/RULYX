@@ -3,12 +3,21 @@ import SwiftUI
 // MARK: - ChatMessageBubble
 
 /// A single chat message bubble with mention link detection, reactions,
-/// and a tail shape that flips for outgoing vs. incoming messages.
+/// a tail shape that flips for outgoing vs. incoming messages, and a
+/// context menu for reacting, copying, or deleting the message.
 struct ChatMessageBubble: View {
     let message: ChatMessage
     let isOutgoing: Bool
     var onOpenProfile: ((String) -> Void)?
     var onRetry: (() -> Void)?
+    var onDelete: (() -> Void)?
+    var onReact: ((String) -> Void)?
+    var onReactionTap: ((String) -> Void)?
+
+    /// Common emoji reactions shown in the picker.
+    private static let commonReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"]
+
+    @State private var showReactionPicker = false
 
     private var isPending: Bool {
         message.id.hasPrefix("pending-")
@@ -35,10 +44,11 @@ struct ChatMessageBubble: View {
     // MARK: - Body
 
     var body: some View {
-        HStack {
+        HStack(alignment: .bottom) {
             if isOutgoing { Spacer(minLength: 60) }
 
             VStack(alignment: isOutgoing ? .trailing : .leading, spacing: 4) {
+                // Message bubble content
                 Text(mentionAttributedString(from: message.text, isOutgoing: isOutgoing))
                     .font(.body)
                     .fixedSize(horizontal: false, vertical: true)
@@ -50,6 +60,7 @@ struct ChatMessageBubble: View {
                         return .systemAction
                     })
 
+                // Footer: status indicators + timestamp
                 HStack(spacing: 4) {
                     if isPending {
                         Image(systemName: "clock")
@@ -67,26 +78,20 @@ struct ChatMessageBubble: View {
                         }
                     }
 
-                    if !message.reactions.isEmpty {
-                        let grouped = Dictionary(grouping: message.reactions, by: { $0.value })
-                        ForEach(Array(grouped.keys.sorted()), id: \.self) { emoji in
-                            HStack(spacing: 2) {
-                                Text(emoji)
-                                    .font(.caption2)
-                                if grouped[emoji]!.count > 1 {
-                                    Text("\(grouped[emoji]!.count)")
-                                        .font(.system(size: 9, weight: .semibold))
-                                }
-                            }
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background(Capsule().fill(.ultraThinMaterial))
-                        }
-                    }
-
                     Text(timeString)
                         .font(.caption2)
                         .foregroundStyle(isOutgoing ? .white.opacity(0.7) : Color(.tertiaryLabel))
+                }
+
+                // Reactions row (below the bubble, outside the background)
+                if !message.reactions.isEmpty {
+                    let grouped = Dictionary(grouping: message.reactions, by: { $0.value })
+                    HStack(spacing: 4) {
+                        ForEach(Array(grouped.keys.sorted()), id: \.self) { emoji in
+                            reactionPill(emoji: emoji, count: grouped[emoji]!.count)
+                        }
+                    }
+                    .padding(.top, 2)
                 }
             }
             .padding(.horizontal, 12)
@@ -95,10 +100,34 @@ struct ChatMessageBubble: View {
             .opacity(isPending ? 0.6 : 1.0)
             .clipShape(BubbleShape(isOutgoing: isOutgoing))
             .contextMenu {
+                // Reaction picker
+                Menu {
+                    ForEach(Self.commonReactions, id: \.self) { emoji in
+                        Button {
+                            onReact?(emoji)
+                        } label: {
+                            Text(emoji)
+                        }
+                    }
+                } label: {
+                    Label(loc("chat.react"), systemImage: "face.smiling")
+                }
+
+                Divider()
+
                 Button {
                     UIPasteboard.general.string = message.text
                 } label: {
                     Label(loc("post.copy"), systemImage: "doc.on.doc")
+                }
+
+                if let onDelete {
+                    Divider()
+                    Button(role: .destructive) {
+                        onDelete()
+                    } label: {
+                        Label(loc("chat.message.delete"), systemImage: "trash")
+                    }
                 }
             }
 
@@ -106,6 +135,26 @@ struct ChatMessageBubble: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 2)
+    }
+
+    /// A single reaction pill showing the emoji and count (if > 1).
+    private func reactionPill(emoji: String, count: Int) -> some View {
+        Button {
+            onReactionTap?(emoji)
+        } label: {
+            HStack(spacing: 2) {
+                Text(emoji)
+                    .font(.caption2)
+                if count > 1 {
+                    Text("\(count)")
+                        .font(.system(size: 9, weight: .semibold))
+                }
+            }
+            .padding(.horizontal, 5)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(.ultraThinMaterial))
+        }
+        .buttonStyle(.plain)
     }
 
     /// Converts @mentions in the text to tappable links with a custom mention:// scheme.

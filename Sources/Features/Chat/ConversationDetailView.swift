@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - ConversationDetailView
 
 /// Full conversation view with scrollable message list, send bar,
-/// profile navigation, mute/leave actions, and scroll-to-bottom button.
+/// profile navigation, mute/leave actions, group management, and scroll-to-bottom button.
 struct ConversationDetailView: View {
     @EnvironmentObject var chatStore: ChatStore
     @EnvironmentObject private var accountStore: AccountStore
@@ -14,6 +14,7 @@ struct ConversationDetailView: View {
     @State private var showProfile = false
     @State private var mentionProfileHandle: String?
     @State private var showScrollToBottom = false
+    @State private var showGroupInfo = false
     @FocusState private var isFocused: Bool
 
     let conversation: ChatConversation
@@ -104,6 +105,15 @@ struct ConversationDetailView: View {
 
             ToolbarItem(placement: .primaryAction) {
                 Menu {
+                    // Group info (for group conversations)
+                    if conversation.kind == .group {
+                        Button {
+                            showGroupInfo = true
+                        } label: {
+                            Label(loc("chat.group.info"), systemImage: "person.3")
+                        }
+                    }
+
                     if conversation.muted {
                         Button {
                             Task { await chatStore.unmute(convoId: conversation.id) }
@@ -194,6 +204,14 @@ struct ConversationDetailView: View {
                 }
             }
             .interactiveDismissDisabled(false)
+        }
+        .sheet(isPresented: $showGroupInfo) {
+            if conversation.kind == .group {
+                GroupInfoSheet(conversation: conversation)
+                    .environmentObject(chatStore)
+                    .environmentObject(accountStore)
+                    .environmentObject(blueskyClient)
+            }
         }
     }
 
@@ -340,7 +358,14 @@ struct ConversationDetailView: View {
                 onOpenProfile: { handle in
                     mentionProfileHandle = handle
                 },
-                onRetry: msg.rev == "failed" ? { Task { await retrySend(msg) } } : nil
+                onRetry: msg.rev == "failed" ? { Task { await retrySend(msg) } } : nil,
+                onDelete: msg.senderDID == chatStore.currentAccountDID ? { Task { await deleteMessage(msg) } } : nil,
+                onReact: { value in
+                    Task { await chatStore.toggleReaction(convoId: conversation.id, messageId: msg.id, value: value) }
+                },
+                onReactionTap: { value in
+                    Task { await chatStore.toggleReaction(convoId: conversation.id, messageId: msg.id, value: value) }
+                }
             )
         case let .deleted(d):
             deletedMessageView(d)
@@ -408,5 +433,309 @@ struct ConversationDetailView: View {
     /// Retry sending a failed message.
     private func retrySend(_ msg: ChatMessage) async {
         await chatStore.resendFailedMessage(convoId: conversation.id, messageId: msg.id, text: msg.text)
+    }
+
+    /// Delete a message for self.
+    private func deleteMessage(_ msg: ChatMessage) async {
+        await chatStore.deleteMessage(convoId: conversation.id, messageId: msg.id)
+    }
+}
+
+// MARK: - GroupInfoSheet
+
+/// Sheet showing group information with member management, name editing, and lock controls.
+private struct GroupInfoSheet: View {
+    @EnvironmentObject var chatStore: ChatStore
+    @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @Environment(\.dismiss) private var dismiss
+    @State private var showAddMembers = false
+    @State private var editName = false
+    @State private var newName: String = ""
+
+    let conversation: ChatConversation
+
+    private var isLocked: Bool {
+        conversation.groupInfo?.lockStatus == "locked"
+    }
+
+    private var groupMembers: [ChatMemberProfile] {
+        conversation.members
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                // Group name section
+                Section {
+                    HStack {
+                        Text(loc("chat.group.name"))
+                        Spacer()
+                        Text(conversation.groupInfo?.name ?? loc("chat.unnamed"))
+                            .foregroundStyle(.secondary)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        newName = conversation.groupInfo?.name ?? ""
+                        editName = true
+                    }
+                }
+
+                // Lock status
+                Section {
+                    Toggle(isOn: Binding(
+                        get: { isLocked },
+                        set: { newValue in
+                            Task {
+                                if newValue {
+                                    await chatStore.lockGroup(convoId: conversation.id)
+                                } else {
+                                    await chatStore.unlockGroup(convoId: conversation.id)
+                                }
+                            }
+                        }
+                    )) {
+                        Label(isLocked ? loc("chat.group.locked") : loc("chat.group.unlocked"),
+                              systemImage: isLocked ? "lock.fill" : "lock.open")
+                    }
+                } header: {
+                    Text(loc("chat.group.settings"))
+                }
+
+                // Members section
+                Section {
+                    ForEach(groupMembers) { member in
+                        HStack {
+                            if let url = member.avatarURL {
+                                AsyncImage(url: url) { phase in
+                                    switch phase {
+                                    case let .success(image):
+                                        image.resizable().scaledToFill()
+                                    default:
+                                        Image(systemName: "person.circle.fill")
+                                            .resizable()
+                                    }
+                                }
+                                .frame(width: 36, height: 36)
+                                .clipShape(Circle())
+                            } else {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .frame(width: 36, height: 36)
+                                    .foregroundStyle(.tertiary)
+                            }
+
+                            VStack(alignment: .leading) {
+                                Text(member.displayName ?? member.handle)
+                                    .font(.body)
+                                Text("@\(member.handle)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            // Cannot remove self
+                            if member.did != chatStore.currentAccountDID, !isLocked {
+                                Button {
+                                    Task { await chatStore.removeGroupMember(convoId: conversation.id, memberDID: member.did) }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.red)
+                                        .font(.title3)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text(loc("chat.group.members"))
+                        Spacer()
+                        Text("\(groupMembers.count)")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                if !isLocked {
+                    Button {
+                        showAddMembers = true
+                    } label: {
+                        Label(loc("chat.group.add_members"), systemImage: "person.badge.plus")
+                    }
+                }
+            }
+            .pageTitle(loc("chat.group.info"))
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(loc("actions.done")) {
+                        dismiss()
+                    }
+                }
+            }
+            .sheet(isPresented: $showAddMembers) {
+                AddMembersSheet(conversation: conversation)
+                    .environmentObject(chatStore)
+                    .environmentObject(accountStore)
+                    .environmentObject(blueskyClient)
+            }
+            .alert(loc("chat.group.edit_name"), isPresented: $editName) {
+                TextField(loc("chat.new.group_name_placeholder"), text: $newName)
+                Button(loc("actions.save")) {
+                    let name = newName.trimmingCharacters(in: .whitespaces)
+                    if !name.isEmpty {
+                        Task { await chatStore.editGroupName(convoId: conversation.id, name: name) }
+                    }
+                }
+                Button(loc("actions.cancel"), role: .cancel) {}
+            }
+        }
+    }
+}
+
+// MARK: - AddMembersSheet
+
+/// Sheet for adding members to an existing group conversation.
+private struct AddMembersSheet: View {
+    @EnvironmentObject var chatStore: ChatStore
+    @EnvironmentObject var accountStore: AccountStore
+    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @Environment(\.dismiss) private var dismiss
+    @State private var searchQuery = ""
+    @State private var searchResults: [BlueskyActor] = []
+    @State private var isSearching = false
+    @State private var selectedDIDs: Set<String> = []
+
+    let conversation: ChatConversation
+
+    /// Filter out existing members.
+    private var availableResults: [BlueskyActor] {
+        let existingDIDs = Set(conversation.members.map(\.did))
+        return searchResults.filter { !existingDIDs.contains($0.did) }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.secondary)
+                        TextField(loc("chat.new.search_placeholder"), text: $searchQuery)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .onSubmit { Task { await search() } }
+                    }
+                }
+
+                if isSearching {
+                    Section {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                            Spacer()
+                        }
+                    }
+                }
+
+                if !availableResults.isEmpty {
+                    Section {
+                        ForEach(availableResults) { actor in
+                            HStack {
+                                ActorSearchRow(actor: actor, isSelected: selectedDIDs.contains(actor.did))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        if selectedDIDs.contains(actor.did) {
+                                            selectedDIDs.remove(actor.did)
+                                        } else {
+                                            selectedDIDs.insert(actor.did)
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                }
+            }
+            .pageTitle(loc("chat.group.add_members"))
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(loc("actions.cancel")) {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(loc("chat.group.add")) {
+                        Task {
+                            await chatStore.addGroupMembers(
+                                convoId: conversation.id,
+                                memberDIDs: Array(selectedDIDs)
+                            )
+                            dismiss()
+                        }
+                    }
+                    .disabled(selectedDIDs.isEmpty)
+                }
+            }
+        }
+    }
+
+    private func search() async {
+        guard !searchQuery.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        isSearching = true
+        defer { isSearching = false }
+
+        guard let account = accountStore.activeAccount else { return }
+        do {
+            let pw = accountStore.appPassword(for: account)
+            let response = try await blueskyClient.searchActors(query: searchQuery, account: account, appPassword: pw)
+            searchResults = response
+        } catch {
+            searchResults = []
+        }
+    }
+}
+
+// MARK: - Actor Search Row Helper
+
+private struct ActorSearchRow: View {
+    let actor: BlueskyActor
+    let isSelected: Bool
+
+    var body: some View {
+        HStack {
+            if let url = actor.avatarURL {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case let .success(image):
+                        image.resizable().scaledToFill()
+                    default:
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                    }
+                }
+                .frame(width: 40, height: 40)
+                .clipShape(Circle())
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .frame(width: 40, height: 40)
+                    .foregroundStyle(.tertiary)
+            }
+
+            VStack(alignment: .leading) {
+                Text(actor.displayName ?? actor.handle)
+                    .font(.headline)
+                Text("@\(actor.handle)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Color.skyPrimary)
+            }
+        }
     }
 }
