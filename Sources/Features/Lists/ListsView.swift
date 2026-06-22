@@ -31,6 +31,7 @@ struct ListsView: View {
     @State private var showInternalListsHelp = false
     @State private var internalListName = ""
     @State private var internalListColor = InternalListColor.blue
+    @State private var initialLoadDone = false
 
     // MARK: - Body
 
@@ -435,13 +436,11 @@ struct ListsView: View {
                 )
             }
             .task(id: accountStore.activeAccountID) {
-                await loadInitial()
+                await loadInitial(forceRefresh: initialLoadDone)
+                initialLoadDone = true
             }
-            .onChange(of: accountStore.activeAccountID) { _, newValue in
+            .onChange(of: accountStore.activeAccountID) { _, _ in
                 viewModel.reset()
-                if newValue != nil {
-                    Task { await loadInitial() }
-                }
             }
             .navigationDestination(isPresented: $presentationState.showProfile) {
                 if let activeAccount = accountStore.activeAccount {
@@ -535,12 +534,13 @@ struct ListsView: View {
         }
     }
 
-    private func loadInitial() async {
+    private func loadInitial(forceRefresh: Bool = false) async {
         let password = accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
         await viewModel.load(
             for: accountStore.activeAccount,
             appPassword: password,
-            using: blueskyClient
+            using: blueskyClient,
+            isExplicitRefresh: forceRefresh
         )
     }
 

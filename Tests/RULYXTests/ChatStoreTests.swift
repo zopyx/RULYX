@@ -347,4 +347,26 @@ private final class MockChatService: ChatServicing {
         guard let result = logResult else { throw BlueskyAPIError.server("No mock") }
         return try result.get()
     }
+
+    func acceptConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func listConvoRequests(cursor _: String?, account _: AppAccount, appPassword _: String?) async throws -> PagedConvos {
+        throw BlueskyAPIError.server("No mock")
+    }
+
+    func getConvoAvailability(members _: [String], account _: AppAccount, appPassword _: String?) async throws -> Bool {
+        false
+    }
+
+    func deleteMessageForSelf(convoId _: String, messageId _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func getConvoMembers(convoId _: String, account _: AppAccount, appPassword _: String?) async throws -> [ChatMemberProfile] {
+        []
+    }
+
+    func addMembers(convoId _: String, memberDIDs _: [String], account _: AppAccount, appPassword _: String?) async throws {}
+    func removeMembers(convoId _: String, memberDIDs _: [String], account _: AppAccount, appPassword _: String?) async throws {}
+    func editGroup(convoId _: String, name _: String?, account _: AppAccount, appPassword _: String?) async throws {}
+    func lockConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func unlockConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func addReaction(convoId _: String, messageId _: String, value _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func removeReaction(convoId _: String, messageId _: String, value _: String, account _: AppAccount, appPassword _: String?) async throws {}
 }

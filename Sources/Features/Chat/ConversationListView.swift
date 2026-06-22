@@ -354,6 +354,26 @@ struct ConversationListView: View {
         if chatStore.isLoadingRequests {
             LoadingPanel(message: loc("chat.loading"))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let reqError = chatStore.requestsError, chatStore.requests.isEmpty {
+            VStack(spacing: 12) {
+                Spacer()
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: 40))
+                    .foregroundStyle(.orange)
+                Text(loc: "chat.error.title")
+                    .font(.headline)
+                Text(reqError.localizedDescription)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button(loc("state.error.retry")) {
+                    Task { await chatStore.loadRequests() }
+                }
+                .buttonStyle(.bordered)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
         } else if chatStore.requests.isEmpty {
             VStack(spacing: 12) {
                 Spacer()
@@ -374,7 +394,6 @@ struct ConversationListView: View {
     }
 
     /// Row for a conversation request with accept/decline swipe actions.
-    @ViewBuilder
     private func requestRow(_ convo: ChatConversation) -> some View {
         ConversationRowView(conversation: convo, currentAccountDID: chatStore.currentAccountDID)
             .swipeActions(edge: .trailing) {

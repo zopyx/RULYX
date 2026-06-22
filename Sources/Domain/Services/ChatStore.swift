@@ -42,6 +42,8 @@ final class ChatStore: ObservableObject {
     @Published var error: Error?
     /// The last message-level error that occurred.
     @Published var messageError: Error?
+    /// The last request-loading error. Shown inline in the requests section only.
+    @Published var requestsError: Error?
     /// Short user-visible status shown while switching chat accounts.
     @Published var statusMessage: String?
 
@@ -419,6 +421,7 @@ final class ChatStore: ObservableObject {
     func loadRequests() async {
         guard let account = activeAccount, let context = activeContext else { return }
         isLoadingRequests = true
+        requestsError = nil
         do {
             let result = try await chatService.listConvoRequests(cursor: nil, account: account, appPassword: activeAppPassword)
             guard isCurrentContext(context) else { return }
@@ -431,7 +434,7 @@ final class ChatStore: ObservableObject {
                 isLoadingRequests = false
                 return
             }
-            self.error = error
+            requestsError = error
             isLoadingRequests = false
         }
     }
@@ -495,7 +498,7 @@ final class ChatStore: ObservableObject {
             }
         } catch {
             guard isCurrentContext(context) else { return }
-            self.messageError = error
+            messageError = error
         }
     }
 
@@ -588,7 +591,7 @@ final class ChatStore: ObservableObject {
             // The event log will propagate the change — no need to optimistically update.
         } catch {
             guard isCurrentContext(context) else { return }
-            self.messageError = error
+            messageError = error
         }
     }
 
@@ -845,6 +848,7 @@ final class ChatStore: ObservableObject {
         visibleConversationID = nil
         error = nil
         messageError = nil
+        requestsError = nil
         isLoadingConvos = isLoading
         isLoadingRequests = false
         isLoadingMessages = false

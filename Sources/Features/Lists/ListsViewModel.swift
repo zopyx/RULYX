@@ -27,14 +27,16 @@ final class ListsViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Resets all state to initial values.
+    /// Resets all state to initial values. Keeps `isLoading` true so
+    /// the UI immediately shows spinners until the next `load()` completes.
     func reset() {
         listsByKind = [:]
         activeProfile = nil
         blockingCount = nil
         blockedByCount = nil
-        isLoading = false
+        isLoading = true
         isRefreshing = false
+        isFromCache = false
         errorMessage = nil
     }
 
@@ -56,13 +58,22 @@ final class ListsViewModel: ObservableObject {
             activeProfile = nil
             blockingCount = nil
             blockedByCount = nil
+            isLoading = false
             errorMessage = nil
             return
         }
 
         let cacheKey = account.did ?? account.handle
         let hasCache: Bool
-        if let cached = DashboardCache.load(forKey: cacheKey) {
+
+        // Clear blocking/blocked-by counts when explicitly refreshing so
+        // the relationship rows show spinners while new data loads.
+        if isExplicitRefresh {
+            blockingCount = nil
+            blockedByCount = nil
+        }
+
+        if !isExplicitRefresh, let cached = DashboardCache.load(forKey: cacheKey) {
             applyCached(cached)
             isFromCache = true
             hasCache = true
@@ -73,7 +84,7 @@ final class ListsViewModel: ObservableObject {
         // If DashboardCache has nil counts but RelationshipCache has cached
         // actor lists (from a prior detail view visit), derive the count
         // so the numbers persist across view recreation.
-        if blockingCount == nil, let did = account.did {
+        if !isExplicitRefresh, blockingCount == nil, let did = account.did {
             let blockingKey = "blocking_\(did)"
             let blockedByKey = "blockedBy_\(did)"
             let cachedBlocking = RelationshipCache.load(forKey: blockingKey)
@@ -82,7 +93,7 @@ final class ListsViewModel: ObservableObject {
             if !cachedBlockedBy.isEmpty { blockedByCount = cachedBlockedBy.count }
         }
 
-        if !hasCache { isLoading = true }
+        if !hasCache || isExplicitRefresh { isLoading = true }
         if isExplicitRefresh { isRefreshing = true }
         errorMessage = nil
 
