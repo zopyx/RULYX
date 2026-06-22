@@ -53,12 +53,12 @@ struct ConvoKindUnion: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let direct = try? container.decode(DirectConvoDTO.self) {
-            self.direct = direct
-            group = nil
-        } else if let group = try? container.decode(GroupConvoDTO.self) {
+        if let group = try? container.decode(GroupConvoDTO.self), group.name != nil || group.memberCount != nil {
             self.group = group
             direct = nil
+        } else if let direct = try? container.decode(DirectConvoDTO.self) {
+            self.direct = direct
+            group = nil
         } else {
             direct = nil
             group = nil

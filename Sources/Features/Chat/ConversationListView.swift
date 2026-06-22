@@ -499,9 +499,22 @@ struct ConversationListView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(displayName)
-                        .font(.headline)
-                        .lineLimit(1)
+                    HStack(spacing: 6) {
+                        Text(displayName)
+                            .font(.headline)
+                            .lineLimit(1)
+                        if conversation.kind == .group {
+                            HStack(spacing: 3) {
+                                Image(systemName: "person.2.fill")
+                                    .font(.caption2)
+                                if let count = conversation.groupInfo?.memberCount, count > 0 {
+                                    Text("\(count)")
+                                        .font(.caption2)
+                                }
+                            }
+                            .foregroundStyle(.secondary)
+                        }
+                    }
 
                     Text(lastMessagePreview)
                         .font(.subheadline)
