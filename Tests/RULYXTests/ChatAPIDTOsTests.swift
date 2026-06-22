@@ -41,12 +41,14 @@ final class ChatAPIDTOsTests: XCTestCase {
 
     func testGroupConvoDTODecoding() throws {
         let json = Data("""
-        {"name":"Group","memberCount":5,"createdAt":"2024-01-01T00:00:00Z","lockStatus":"unlocked"}
+        {"name":"Group","memberCount":5,"createdAt":"2024-01-01T00:00:00Z","lockStatus":"unlocked","lockStatusModerationOverride":false,"memberLimit":50}
         """.utf8)
         let dto = try JSONDecoder().decode(GroupConvoDTO.self, from: json)
         XCTAssertEqual(dto.name, "Group")
         XCTAssertEqual(dto.memberCount, 5)
         XCTAssertEqual(dto.lockStatus, "unlocked")
+        XCTAssertEqual(dto.memberLimit, 50)
+        XCTAssertFalse(dto.lockStatusModerationOverride)
     }
 
     func testGetMessagesResponseDecoding() throws {

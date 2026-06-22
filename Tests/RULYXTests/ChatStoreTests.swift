@@ -364,7 +364,7 @@ private final class MockChatService: ChatServicing {
 
     func addMembers(convoId _: String, memberDIDs _: [String], account _: AppAccount, appPassword _: String?) async throws {}
     func removeMembers(convoId _: String, memberDIDs _: [String], account _: AppAccount, appPassword _: String?) async throws {}
-    func editGroup(convoId _: String, name _: String?, account _: AppAccount, appPassword _: String?) async throws {}
+    func editGroup(convoId _: String, name _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func lockConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func unlockConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
     func addReaction(convoId _: String, messageId _: String, value _: String, account _: AppAccount, appPassword _: String?) async throws {}

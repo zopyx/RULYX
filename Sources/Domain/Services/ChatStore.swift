@@ -531,7 +531,7 @@ final class ChatStore: ObservableObject {
     }
 
     /// Edits a group conversation's name. Reloads conversation list after success.
-    func editGroupName(convoId: String, name: String?) async {
+    func editGroupName(convoId: String, name: String) async {
         guard let account = activeAccount, let context = activeContext else { return }
         do {
             try await chatService.editGroup(convoId: convoId, name: name, account: account, appPassword: activeAppPassword)

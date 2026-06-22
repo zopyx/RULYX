@@ -72,13 +72,29 @@ struct DirectConvoDTO: Decodable {}
 /// A group conversation with name, member count, and lock status.
 struct GroupConvoDTO: Decodable {
     /// Group display name.
-    let name: String?
+    let name: String
     /// Number of members in the group.
-    let memberCount: Int?
+    let memberCount: Int
     /// ISO 8601 creation date string.
-    let createdAt: String?
+    let createdAt: String
     /// Lock status string (e.g. "unlocked").
-    let lockStatus: String?
+    let lockStatus: String
+    /// Whether lock status was set by moderation.
+    let lockStatusModerationOverride: Bool
+    /// Maximum number of members allowed.
+    let memberLimit: Int
+    /// Optional join link view.
+    let joinLink: JoinLinkViewDTO?
+    /// Number of pending join requests.
+    let joinRequestCount: Int?
+    /// Number of unread join requests.
+    let unreadJoinRequestCount: Int?
+}
+
+/// View of a join link for a group conversation.
+struct JoinLinkViewDTO: Decodable {
+    let url: String?
+    let enabled: Bool
 }
 
 /// Profile information for a chat participant.
@@ -551,7 +567,7 @@ struct AcceptConvoRequest: Encodable {
 
 /// Response from `chat.bsky.convo.acceptConvo`.
 struct AcceptConvoResponse: Decodable {
-    let convo: ConvoViewDTO
+    let rev: String
 }
 
 // MARK: - List Convo Requests
@@ -559,7 +575,7 @@ struct AcceptConvoResponse: Decodable {
 /// Response from `chat.bsky.convo.listConvoRequests`.
 struct ListConvoRequestsResponse: Decodable {
     let cursor: String?
-    let convos: [ConvoViewDTO]
+    let requests: [ConvoViewDTO]
 }
 
 // MARK: - Get Convo Availability
@@ -603,10 +619,10 @@ struct RemoveMembersRequest: Encodable {
     let members: [String]
 }
 
-/// Request body for `chat.bsky.convo.editGroup`.
+/// Request body for `chat.bsky.group.editGroup`.
 struct EditGroupRequest: Encodable {
     let convoId: String
-    let name: String?
+    let name: String
 }
 
 // MARK: - Lock/Unlock Convo

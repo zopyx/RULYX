@@ -152,7 +152,7 @@ protocol ChatServicing {
     ///   - name: The new name for the group, or `nil` to keep the current name.
     ///   - account: The account to authenticate with.
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
-    func editGroup(convoId: String, name: String?, account: AppAccount, appPassword: String?) async throws
+    func editGroup(convoId: String, name: String, account: AppAccount, appPassword: String?) async throws
 
     /// Locks a group conversation (prevents new members from being added).
     /// - Parameters:

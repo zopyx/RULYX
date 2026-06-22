@@ -73,6 +73,22 @@ struct ChatGroupInfo: Hashable, Equatable {
     let createdAt: Date
     /// The lock status of the group (e.g., "locked", "unlocked").
     let lockStatus: String
+    /// Whether lock status was set by moderation.
+    let lockStatusModerationOverride: Bool
+    /// Maximum number of members allowed.
+    let memberLimit: Int
+    /// Optional join link info.
+    let joinLink: ChatJoinLink?
+    /// Number of pending join requests.
+    let joinRequestCount: Int?
+    /// Number of unread join requests.
+    let unreadJoinRequestCount: Int?
+}
+
+/// Join link metadata for a group conversation.
+struct ChatJoinLink: Hashable, Equatable {
+    let url: String?
+    let enabled: Bool
 }
 
 /// Represents a participant in a chat conversation.

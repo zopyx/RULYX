@@ -199,7 +199,7 @@ final class ChatService: ChatServicing {
         )
 
         return PagedConvos(
-            conversations: response.convos.map { $0.toDomain() },
+            conversations: response.requests.map { $0.toDomain() },
             cursor: response.cursor
         )
     }
@@ -246,8 +246,8 @@ final class ChatService: ChatServicing {
     /// Adds members to a group conversation.
     func addMembers(convoId: String, memberDIDs: [String], account: AppAccount, appPassword: String?) async throws {
         let body = AddMembersRequest(convoId: convoId, members: memberDIDs)
-        let _: EmptyResponse = try await chatRequest(
-            path: "chat.bsky.convo.addMembers",
+        let _: GetConvoResponse = try await chatRequest(
+            path: "chat.bsky.group.addMembers",
             method: "POST",
             queryItems: [],
             body: body,
@@ -259,8 +259,8 @@ final class ChatService: ChatServicing {
     /// Removes members from a group conversation.
     func removeMembers(convoId: String, memberDIDs: [String], account: AppAccount, appPassword: String?) async throws {
         let body = RemoveMembersRequest(convoId: convoId, members: memberDIDs)
-        let _: EmptyResponse = try await chatRequest(
-            path: "chat.bsky.convo.removeMembers",
+        let _: GetConvoResponse = try await chatRequest(
+            path: "chat.bsky.group.removeMembers",
             method: "POST",
             queryItems: [],
             body: body,
@@ -270,10 +270,10 @@ final class ChatService: ChatServicing {
     }
 
     /// Edits a group conversation's name.
-    func editGroup(convoId: String, name: String?, account: AppAccount, appPassword: String?) async throws {
+    func editGroup(convoId: String, name: String, account: AppAccount, appPassword: String?) async throws {
         let body = EditGroupRequest(convoId: convoId, name: name)
-        let _: EmptyResponse = try await chatRequest(
-            path: "chat.bsky.convo.editGroup",
+        let _: GetConvoResponse = try await chatRequest(
+            path: "chat.bsky.group.editGroup",
             method: "POST",
             queryItems: [],
             body: body,
@@ -285,7 +285,7 @@ final class ChatService: ChatServicing {
     /// Locks a group conversation (prevents new members from being added).
     func lockConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
         let body = LockConvoRequest(convoId: convoId)
-        let _: EmptyResponse = try await chatRequest(
+        let _: GetConvoResponse = try await chatRequest(
             path: "chat.bsky.convo.lockConvo",
             method: "POST",
             queryItems: [],
@@ -298,7 +298,7 @@ final class ChatService: ChatServicing {
     /// Unlocks a previously locked group conversation.
     func unlockConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {
         let body = UnlockConvoRequest(convoId: convoId)
-        let _: EmptyResponse = try await chatRequest(
+        let _: GetConvoResponse = try await chatRequest(
             path: "chat.bsky.convo.unlockConvo",
             method: "POST",
             queryItems: [],
@@ -438,10 +438,15 @@ private extension ConvoViewDTO {
         let memberProfiles = members.map { $0.toDomain() }
         let groupInfo: ChatGroupInfo? = if let group = kind?.group {
             ChatGroupInfo(
-                name: group.name ?? "",
-                memberCount: group.memberCount ?? 0,
-                createdAt: parseDate(group.createdAt ?? "") ?? .now,
-                lockStatus: group.lockStatus ?? "unlocked"
+                name: group.name,
+                memberCount: group.memberCount,
+                createdAt: parseDate(group.createdAt) ?? .now,
+                lockStatus: group.lockStatus,
+                lockStatusModerationOverride: group.lockStatusModerationOverride,
+                memberLimit: group.memberLimit,
+                joinLink: group.joinLink.map { ChatJoinLink(url: $0.url, enabled: $0.enabled) },
+                joinRequestCount: group.joinRequestCount,
+                unreadJoinRequestCount: group.unreadJoinRequestCount
             )
         } else {
             nil
