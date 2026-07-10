@@ -94,6 +94,7 @@ struct DirectRepliesView: View {
                 ForEach(viewModel.entries, id: \.post.uri) { entry in
                     let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
                     let entryCallbacks = PostRowCallbacks(
+                        onTapThread: { selectedPostURI = entry.post.uri },
                         onTapImage: { index in
                             let allImages = entry.post.embed?.images ?? []
                             let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
