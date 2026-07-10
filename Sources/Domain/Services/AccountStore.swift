@@ -353,6 +353,11 @@ final class AccountStore: ObservableObject {
                     updatedAccounts[index].avatarURL = profile.avatarURL
                     didChange = true
                 }
+                // Always invalidate cached avatar so AsyncImage re-fetches
+                // (Bluesky may reuse the same CDN URL after avatar changes)
+                if let url = updatedAccounts[index].avatarURL {
+                    URLCache.shared.removeCachedResponse(for: URLRequest(url: url))
+                }
                 if updatedAccounts[index].did != profile.did {
                     updatedAccounts[index].did = profile.did
                     didChange = true

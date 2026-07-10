@@ -58,12 +58,8 @@ struct BlueskyActorRow<Extra: View>: View {
 
     @ViewBuilder
     private var avatarView: some View {
-        if let avatarURL = actor.avatarURL {
-            AsyncImage(url: avatarURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
+        if actor.avatarURL != nil {
+            FreshAvatarImage(url: actor.avatarURL) {
                 avatarPlaceholder
             }
             .frame(width: avatarSize, height: avatarSize)

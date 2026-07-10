@@ -112,12 +112,8 @@ struct AccountRowView: View {
 
     @ViewBuilder
     private var avatarView: some View {
-        if let avatarURL = account.avatarURL {
-            AsyncImage(url: avatarURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
+        if account.avatarURL != nil {
+            FreshAvatarImage(url: account.avatarURL) {
                 avatarPlaceholder
             }
             .frame(width: avatarSize, height: avatarSize)

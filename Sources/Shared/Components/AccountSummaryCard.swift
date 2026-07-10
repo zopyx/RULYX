@@ -51,12 +51,8 @@ struct AccountSummaryCard: View {
 
     @ViewBuilder
     private var avatarView: some View {
-        if let avatarURL {
-            AsyncImage(url: avatarURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
+        if avatarURL != nil {
+            FreshAvatarImage(url: avatarURL) {
                 avatarPlaceholder
             }
             .frame(width: avatarSize, height: avatarSize)

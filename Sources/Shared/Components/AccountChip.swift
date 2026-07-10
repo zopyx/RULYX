@@ -43,12 +43,8 @@ struct AccountChip: View {
 
     @ViewBuilder
     private var avatarView: some View {
-        if let avatarURL = avatarURL ?? account.avatarURL {
-            AsyncImage(url: avatarURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
+        if avatarURL ?? account.avatarURL != nil {
+            FreshAvatarImage(url: avatarURL ?? account.avatarURL) {
                 avatarPlaceholder
             }
             .frame(width: avatarSize, height: avatarSize)
