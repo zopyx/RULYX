@@ -176,7 +176,7 @@ struct DirectRepliesView: View {
         .pageTitle(Text(loc: "directreplies.title"))
         .sheet(item: $selectedPostURI) { uri in
             NavigationStack {
-                ThreadView(postURI: uri)
+                ThreadView(postURI: uri, searchAccount: searchAccount)
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
                     .toolbar {

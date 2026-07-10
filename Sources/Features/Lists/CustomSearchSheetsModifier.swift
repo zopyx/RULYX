@@ -12,12 +12,13 @@ struct SearchSheetsModifier: ViewModifier {
     @Binding var showProfileFor: BlueskyActor?
     var accountStore: AccountStore
     var blueskyClient: LiveBlueskyClient
+    var searchAccount: AppAccount?
 
     func body(content: Content) -> some View {
         content
             .sheet(item: $selectedPostURI) { uri in
                 NavigationStack {
-                    ThreadView(postURI: uri)
+                    ThreadView(postURI: uri, searchAccount: searchAccount)
                         .environmentObject(accountStore)
                         .environmentObject(blueskyClient)
                         .toolbar {

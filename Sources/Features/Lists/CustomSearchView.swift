@@ -37,7 +37,8 @@ struct CustomSearchView: View {
                 showLikesForURI: $showLikesForURI,
                 showProfileFor: $showProfileFor,
                 accountStore: accountStore,
-                blueskyClient: blueskyClient
+                blueskyClient: blueskyClient,
+                searchAccount: searchAccount
             ))
             .task {
                 if !hasAppeared {
