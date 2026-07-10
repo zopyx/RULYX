@@ -1,0 +1,36 @@
+{
+  "library": "Bluesky Chat API",
+  "package": "chat.bsky.*",
+  "fetched": "2026-06-12T14:00:00Z",
+  "sources": [
+    "AT Protocol Lexicon Schemas (GitHub: bluesky-social/atproto)",
+    "docs.bsky.app (Official Bluesky API Docs)"
+  ],
+  "files": [
+    {
+      "filename": "endpoints-overview.md",
+      "topic": "Complete Endpoint Inventory",
+      "description": "Full list of all chat.bsky.* endpoints across convo, group, moderation, actor, and embed namespaces"
+    },
+    {
+      "filename": "data-models.md",
+      "topic": "Data Models & Types",
+      "description": "Complete type definitions for convoView, messageView, systemMessageView, reactionView, profileViewBasic, joinLinkView, and all related types"
+    },
+    {
+      "filename": "chat-requests-and-group-chat.md",
+      "topic": "Chat Requests & Group Chat",
+      "description": "Detailed explanation of the request/accept flow, group chat lifecycle, join links, system messages, reactions, and all group management operations"
+    },
+    {
+      "filename": "authentication-and-streaming.md",
+      "topic": "Authentication, Pagination & Event Log",
+      "description": "Service proxying architecture, auth patterns, pagination, real-time event log (getLog), read state management, muting, and export/deletion"
+    },
+    {
+      "filename": "summary-comparison.md",
+      "topic": "Summary & Key Comparisons",
+      "description": "Comparison tables: requests vs accepted, direct vs group, message types, endpoint category groupings, and key URLs"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-06-12T18:30:00Z",
+  "libraries": {
+    "bluesky-chat": {
+      "files": [
+        {
+          "filename": "overview-and-authentication.md",
+          "topic": "Chat API overview, auth, architecture",
+          "tech_stack": "AT Protocol",
+          "fetched": "2026-06-12T18:30:00Z",
+          "source": "AT Protocol Lexicons (GitHub)"
+        },
+        {
+          "filename": "chat-requests.md",
+          "topic": "Chat requests system (list, accept, decline)",
+          "tech_stack": "AT Protocol",
+          "fetched": "2026-06-12T18:30:00Z",
+          "source": "AT Protocol Lexicons (GitHub)"
+        },
+        {
+          "filename": "group-chats.md",
+          "topic": "Group chat creation, management, join links",
+          "tech_stack": "AT Protocol",
+          "fetched": "2026-06-12T18:30:00Z",
+          "source": "AT Protocol Lexicons (GitHub)"
+        },
+        {
+          "filename": "convo-operations.md",
+          "topic": "Core conversation operations (send, list, read)"
+        },
+        {
+          "filename": "summary-and-implementation-notes.md",
+          "topic": "Summary, implementation notes for Swift/iOS"
+        },
+        {
+          "filename": "chat-conversations-inbox.md",
+          "topic": "Flat list of all ~55 endpoint files"
+        }
+      ],
+      "source": "AT Protocol Lexicons (GitHub)"
+    }
+  }
+}

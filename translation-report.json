@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1278,
+    "total_keys": 1297,
     "total_languages": 16,
-    "untranslated_total": 2708
+    "untranslated_total": 2993
   },
   "keys": {
     "account.active": {
@@ -9975,6 +9975,510 @@
       "vi": {
         "text": "Rulyx",
         "untranslated": false
+      }
+    },
+    "autoblock.notification.body": {
+      "en": "Blocked {count} accounts that were blocking you.",
+      "de": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocked {count} accounts that were blocking you.",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.body_lists": {
+      "en": "Blocked {count} accounts and added to {lists}.",
+      "de": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocked {count} accounts and added to {lists}.",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.body_lists_partial": {
+      "en": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+      "de": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocked {blocked} accounts ({failed} failed), added to {lists}.",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.body_partial": {
+      "en": "Blocked {blocked} accounts ({failed} failed).",
+      "de": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocked {blocked} accounts ({failed} failed).",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.title": {
+      "en": "Auto Block Back",
+      "de": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.title_lists": {
+      "en": "Auto Block Back",
+      "de": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.title_lists_partial": {
+      "en": "Auto Block Back",
+      "de": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      }
+    },
+    "autoblock.notification.title_partial": {
+      "en": "Auto Block Back",
+      "de": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Auto Block Back",
+        "untranslated": true
       }
     },
     "biometric.auth_reason": {
@@ -66551,6 +67055,258 @@
         "untranslated": false
       }
     },
+    "rel.add_all_to_list": {
+      "en": "Add all to a list",
+      "de": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Add all to a list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Add all to a list",
+        "untranslated": true
+      }
+    },
+    "rel.add_all_to_list.hint": {
+      "en": "Adds all blocked-by accounts to a moderation or curation list",
+      "de": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Adds all blocked-by accounts to a moderation or curation list",
+        "untranslated": true
+      }
+    },
+    "rel.add_to_curation_list": {
+      "en": "Add to curation list",
+      "de": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Add to curation list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Add to curation list",
+        "untranslated": true
+      }
+    },
+    "rel.add_to_internal_list": {
+      "en": "Add to internal list",
+      "de": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Add to internal list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Add to internal list",
+        "untranslated": true
+      }
+    },
     "rel.add_to_list": {
       "en": "Add to List",
       "de": {
@@ -66675,6 +67431,69 @@
       "vi": {
         "text": "Thêm tài khoản này vào một trong các danh sách kiểm duyệt của bạn",
         "untranslated": false
+      }
+    },
+    "rel.add_to_moderation_list": {
+      "en": "Add to moderation list",
+      "de": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Add to moderation list",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Add to moderation list",
+        "untranslated": true
       }
     },
     "rel.added_to_list.hint": {
@@ -66864,6 +67683,69 @@
       "vi": {
         "text": "Chặn tài khoản này tương tác với bạn",
         "untranslated": false
+      }
+    },
+    "rel.block_all_back": {
+      "en": "Block all back",
+      "de": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Block all back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Block all back",
+        "untranslated": true
       }
     },
     "rel.block_confirm": {
@@ -72662,6 +73544,258 @@
         "untranslated": false
       }
     },
+    "settings.autoblock": {
+      "en": "Auto Block Back",
+      "de": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Auto Block Back",
+        "untranslated": true
+      }
+    },
+    "settings.autoblock.footer": {
+      "en": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+      "de": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "When enabled, RULYX automatically blocks accounts that have blocked you. Runs on app launch and periodically in the background.",
+        "untranslated": true
+      }
+    },
+    "settings.autoblock.hint": {
+      "en": "Automatically blocks back accounts that block you",
+      "de": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Automatically blocks back accounts that block you",
+        "untranslated": true
+      }
+    },
+    "settings.autoblock.lists": {
+      "en": "Auto-Add to Lists",
+      "de": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Auto-Add to Lists",
+        "untranslated": true
+      }
+    },
     "settings.beta_features": {
       "en": "Show Beta Features",
       "de": {
@@ -74172,6 +75306,69 @@
       "vi": {
         "text": "Thay đổi ngôn ngữ hiển thị cho toàn bộ ứng dụng",
         "untranslated": false
+      }
+    },
+    "settings.moderation": {
+      "en": "Moderation",
+      "de": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Moderation",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Moderation",
+        "untranslated": true
       }
     },
     "settings.preferences": {
