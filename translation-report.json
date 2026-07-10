@@ -18,7 +18,7 @@
       "th",
       "vi"
     ],
-    "total_keys": 1297,
+    "total_keys": 1333,
     "total_languages": 16,
     "untranslated_total": 2993
   },
@@ -13001,6 +13001,69 @@
         "untranslated": true
       }
     },
+    "command_palette.title": {
+      "en": "Commands",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "common.progress.hint": {
       "en": "{title}: {completedCount} of {totalCount} complete",
       "de": {
@@ -13628,6 +13691,132 @@
       },
       "vi": {
         "text": "Số ký tự",
+        "untranslated": false
+      }
+    },
+    "compose.description": {
+      "en": "Description",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "compose.dm_warning": {
+      "en": "This will be sent as a direct message.",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -14261,6 +14450,69 @@
         "untranslated": false
       }
     },
+    "compose.link_preview": {
+      "en": "Link preview",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "compose.placeholder": {
       "en": "What's on your mind?",
       "de": {
@@ -14384,6 +14636,69 @@
       },
       "vi": {
         "text": "Đăng",
+        "untranslated": false
+      }
+    },
+    "compose.post_gate.quoting_disabled": {
+      "en": "Quoting turned off",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -14573,6 +14888,69 @@
       },
       "vi": {
         "text": "Xóa hình ảnh",
+        "untranslated": false
+      }
+    },
+    "compose.remove_link_preview": {
+      "en": "Remove link preview",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -15143,6 +15521,69 @@
         "untranslated": false
       }
     },
+    "compose.send_dm": {
+      "en": "Send via DM",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "compose.strikethrough": {
       "en": "Strikethrough",
       "de": {
@@ -15206,6 +15647,69 @@
         "untranslated": false
       }
     },
+    "compose.suggested_crop": {
+      "en": "Suggested crop",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "compose.text_section": {
       "en": "Text",
       "de": {
@@ -15266,6 +15770,195 @@
       },
       "vi": {
         "text": "Văn bản",
+        "untranslated": false
+      }
+    },
+    "compose.thread_gate.everyone": {
+      "en": "Everyone can reply",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "compose.thread_gate.following": {
+      "en": "Only accounts I follow",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "compose.thread_gate.mention": {
+      "en": "Only mentioned accounts",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -25538,6 +26231,69 @@
         "untranslated": false
       }
     },
+    "list.compare.add_second_list": {
+      "en": "Add second list",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "list.compare.bucket_only_current": {
       "en": "Only in this list",
       "de": {
@@ -26168,6 +26924,69 @@
         "untranslated": false
       }
     },
+    "list.compare.count": {
+      "en": "{c1} vs {c2}",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "list.compare.deselect_actor.label": {
       "en": "Deselect {handle}",
       "de": {
@@ -26228,6 +27047,69 @@
       },
       "vi": {
         "text": "Bỏ chọn {handle}",
+        "untranslated": false
+      }
+    },
+    "list.compare.difference": {
+      "en": "Difference",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -27113,6 +27995,132 @@
         "untranslated": false
       }
     },
+    "list.compare.in_both": {
+      "en": "In both",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "list.compare.intersection": {
+      "en": "Intersection",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "list.compare.loading": {
       "en": "Loading your other lists…",
       "de": {
@@ -27554,6 +28562,132 @@
         "untranslated": false
       }
     },
+    "list.compare.only_in_first": {
+      "en": "Only in first",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "list.compare.only_in_second": {
+      "en": "Only in second",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
     "list.compare.only_other": {
       "en": "Only in {name}: {count}",
       "de": {
@@ -27803,6 +28937,69 @@
       },
       "vi": {
         "text": "比较对象 (VI)",
+        "untranslated": false
+      }
+    },
+    "list.compare.section_title": {
+      "en": "Comparison",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -28685,6 +29882,132 @@
       },
       "vi": {
         "text": "列表名称 (VI)",
+        "untranslated": false
+      }
+    },
+    "list.create.placeholder_description": {
+      "en": "Description (optional)",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "list.create.placeholder_name": {
+      "en": "List name",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -32654,6 +33977,69 @@
       },
       "vi": {
         "text": "Xuất tất cả sang ODS",
+        "untranslated": false
+      }
+    },
+    "list.filter.muted": {
+      "en": "Show muted",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -42104,6 +43490,69 @@
       },
       "vi": {
         "text": "Timeline (VI)",
+        "untranslated": false
+      }
+    },
+    "list.update.error": {
+      "en": "Failed to update list",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
@@ -56847,6 +58296,762 @@
       "vi": {
         "text": "Messaging is not available — you both follow each other.",
         "untranslated": true
+      }
+    },
+    "profile.edit.avatar.change": {
+      "en": "Change Photo",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.avatar.label": {
+      "en": "Avatar",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.avatar.remove": {
+      "en": "Remove Photo",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.banner.change": {
+      "en": "Change Photo",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.banner.label": {
+      "en": "Banner Image",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.banner.remove": {
+      "en": "Remove Photo",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.display_name": {
+      "en": "Display Name",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.error": {
+      "en": "Could not save profile",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.save": {
+      "en": "Save",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.saving": {
+      "en": "Saving profile...",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.text_fields": {
+      "en": "Profile Info",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
+      }
+    },
+    "profile.edit.title": {
+      "en": "Edit Profile",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
+        "untranslated": false
       }
     },
     "profile.edit_note": {
@@ -72848,6 +75053,69 @@
       },
       "vi": {
         "text": "值 (VI)",
+        "untranslated": false
+      }
+    },
+    "search.placeholder": {
+      "en": "Search by DID, handle or display name",
+      "de": {
+        "text": "",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "",
+        "untranslated": false
+      },
+      "it": {
+        "text": "",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "",
+        "untranslated": false
+      },
+      "es": {
+        "text": "",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "",
+        "untranslated": false
+      },
+      "th": {
+        "text": "",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "",
         "untranslated": false
       }
     },
