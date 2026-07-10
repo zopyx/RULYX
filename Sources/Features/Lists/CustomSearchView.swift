@@ -358,7 +358,8 @@ struct CustomSearchView: View {
                 likerActions.postToReport = entry
             },
             onBlockAuthor: authorCB.onBlock,
-            onAddAuthorToList: authorCB.onAddToList
+            onAddAuthorToList: authorCB.onAddToList,
+            onTapThread: { selectedPostURI = entry.post.uri }
         )
     }
 

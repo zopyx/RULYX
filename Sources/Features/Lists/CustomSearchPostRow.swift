@@ -21,6 +21,7 @@ struct CustomSearchPostRow: View {
     var onReportPost: (() -> Void)?
     var onBlockAuthor: (() -> Void)?
     var onAddAuthorToList: ((BlueskyList) -> Void)?
+    var onTapThread: (() -> Void)?
 
     // MARK: - Body
 
@@ -29,6 +30,7 @@ struct CustomSearchPostRow: View {
             entry: entry,
             style: .full,
             callbacks: PostRowCallbacks(
+                onTapThread: onTapThread,
                 onTapImage: { index in
                     let urls = (entry.post.embed?.images ?? []).compactMap { $0.fullsize.flatMap(URL.init) }
                     guard index < urls.count else { return }
