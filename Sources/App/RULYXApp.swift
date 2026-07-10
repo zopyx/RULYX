@@ -204,7 +204,10 @@ struct RULYXApp: App {
                             deps.pushNotificationCoordinator.start()
                             deps.chatStore.startPolling()
                             deps.chatStore.signalSync()
-                            Task { await deps.autoBlockBackService.performAutoBlockBack() }
+                            Task {
+                                await deps.autoBlockBackService.performAutoBlockBack()
+                                await deps.accountStore.refreshAccountProfiles(using: deps.blueskyClient)
+                            }
                         }
                     }
 
