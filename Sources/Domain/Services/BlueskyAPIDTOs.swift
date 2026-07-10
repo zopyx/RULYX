@@ -241,11 +241,11 @@ struct CreateGenericRecordRequest<Record: Encodable>: Encodable {
 }
 
 /// Request body for updating a record via `com.atproto.repo.putRecord`.
-struct PutRecordRequest: Encodable {
+struct PutRecordRequest<Record: Encodable>: Encodable {
     let repo: String
     let collection: String
     let rkey: String
-    let record: ListRecord
+    let record: Record
 }
 
 /// The record value for a list item (member) in a list.
@@ -1056,7 +1056,7 @@ struct UploadBlobResponse: Decodable {
 }
 
 /// A blob that has been uploaded to the PDS.
-struct UploadedBlob: Decodable {
+struct UploadedBlob: Decodable, Encodable {
     let ref: BlobRef
     let mimeType: String
     let size: Int
@@ -1077,6 +1077,55 @@ struct BlobRef: Decodable, Encodable {
     enum CodingKeys: String, CodingKey {
         case link = "$link"
     }
+}
+
+// MARK: - Profile Record
+
+/// The record value for an actor profile (`app.bsky.actor.profile`).
+/// Used with `com.atproto.repo.putRecord` to update display name, description,
+/// avatar, and banner.
+struct ProfileRecord: Encodable {
+    let type = "app.bsky.actor.profile"
+    let displayName: String?
+    let description: String?
+    let avatar: UploadedBlob?
+    let banner: UploadedBlob?
+    let createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case displayName
+        case description
+        case avatar
+        case banner
+        case createdAt
+    }
+}
+
+/// Decodable version of the profile record value, used when fetching the
+/// current profile via `com.atproto.repo.getRecord` so existing blob refs
+/// can be preserved during an edit.
+struct ProfileRecordValue: Decodable {
+    let displayName: String?
+    let description: String?
+    let avatar: UploadedBlob?
+    let banner: UploadedBlob?
+    let createdAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case displayName
+        case description
+        case avatar
+        case banner
+        case createdAt
+    }
+}
+
+/// Response wrapper for `com.atproto.repo.getRecord`.
+struct GetProfileRecordResponse: Decodable {
+    let uri: String
+    let cid: String
+    let value: ProfileRecordValue
 }
 
 /// The full record for a feed post (`app.bsky.feed.post`).

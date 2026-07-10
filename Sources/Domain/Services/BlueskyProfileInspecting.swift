@@ -150,4 +150,15 @@ protocol BlueskyProfileInspecting {
     ///   - account: The account to authenticate with.
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     func reportAccount(did targetDID: String, selectedReason: ModerationReportReasonType?, reason: String?, account: AppAccount, appPassword: String?) async throws
+
+    // MARK: - Profile Update
+
+    /// Writes a complete profile record for the authenticated account.
+    /// The caller must upload new avatar/banner blobs via `uploadBlob` first
+    /// and merge with the current record to preserve unchanged fields.
+    /// - Parameters:
+    ///   - record: The complete `ProfileRecord` to write.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func putProfileRecord(_ record: ProfileRecord, account: AppAccount, appPassword: String?) async throws
 }

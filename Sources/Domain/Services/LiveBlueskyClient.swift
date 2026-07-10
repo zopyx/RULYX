@@ -1628,6 +1628,65 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    // MARK: - Profile Update
+
+    /// Fetches the raw profile record for the authenticated account via
+    /// `com.atproto.repo.getRecord`. Returns the record value including
+    /// current blob refs for avatar/banner so they can be preserved during edits.
+    /// Returns `nil` if the record does not exist (e.g. fresh account).
+    func fetchMyProfileRecord(account: AppAccount, appPassword: String?) async throws -> ProfileRecordValue? {
+        do {
+            let response: GetProfileRecordResponse = try await sessionService.performAuthenticatedRequest(
+                account: account,
+                appPassword: appPassword
+            ) { authSession in
+                try await requestExecutor.send(
+                    path: "com.atproto.repo.getRecord",
+                    method: "GET",
+                    queryItems: [
+                        URLQueryItem(name: "repo", value: authSession.did),
+                        URLQueryItem(name: "collection", value: "app.bsky.actor.profile"),
+                        URLQueryItem(name: "rkey", value: "self"),
+                    ],
+                    accessToken: authSession.accessJWT,
+                    hostURL: authSession.pdsURL
+                )
+            }
+            return response.value
+        } catch let error as BlueskyAPIError {
+            if case .server = error { return nil }
+            throw error
+        } catch {
+            return nil
+        }
+    }
+
+    /// Writes a complete profile record via `com.atproto.repo.putRecord`.
+    /// The caller is responsible for uploading new avatar/banner blobs first
+    /// and merging with the current record to preserve unchanged fields.
+    func putProfileRecord(_ record: ProfileRecord, account: AppAccount, appPassword: String?) async throws {
+        let _: CreateRecordResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = PutRecordRequest(
+                repo: authSession.did,
+                collection: "app.bsky.actor.profile",
+                rkey: "self",
+                record: record
+            )
+
+            return try await requestExecutor.send(
+                path: "com.atproto.repo.putRecord",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+    }
+
     // MARK: - Post Creation
 
     /// Creates a new post with optional images, video, reply context, quote, thread gate, and quote-gate.

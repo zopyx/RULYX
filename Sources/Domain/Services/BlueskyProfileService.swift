@@ -552,4 +552,30 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             appPassword: appPassword
         )
     }
+
+    // MARK: - Profile Update
+
+    /// Writes a complete profile record via `com.atproto.repo.putRecord`.
+    func putProfileRecord(_ record: ProfileRecord, account: AppAccount, appPassword: String?) async throws {
+        let _: CreateRecordResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = PutRecordRequest(
+                repo: authSession.did,
+                collection: "app.bsky.actor.profile",
+                rkey: "self",
+                record: record
+            )
+
+            return try await requestExecutor.send(
+                path: "com.atproto.repo.putRecord",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+    }
 }

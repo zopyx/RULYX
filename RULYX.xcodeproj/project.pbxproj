@@ -169,6 +169,7 @@
 		79DC8865B65E060924692E1A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE27B69BC0BBFEAA05CBC8A7 /* RootView.swift */; };
 		7B0F186C83A1DC8EACEA1E21 /* iCloudAccountSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E37F4F541F373F2F2BF7B6C /* iCloudAccountSync.swift */; };
 		7B70E6E18BBF83A7538DE471 /* iPadTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 405328E0247CBC69C6619EA5 /* iPadTimelineView.swift */; };
+		7B7FD28244B1175DC48321B4 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B45AD11A4879F8DA138A285 /* ProfileEditView.swift */; };
 		7BBF6E9791C4A4C33ABB1847 /* String+Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7456B9D94B6D84B141CE52 /* String+Localization.swift */; };
 		7CD08E3F34D51589A0197719 /* BlueskyProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */; };
 		7D43C0D79E3C31EB93C6326B /* ViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9528F0C053027D36B0AA7372 /* ViewModelTests.swift */; };
@@ -402,6 +403,7 @@
 		47C2C402E101343A45557AE3 /* TrendDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendDetectionView.swift; sourceTree = "<group>"; };
 		485F3E2B88C1AA4948B1E95E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4B0790B88A741A86D5889E6E /* SearchToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchToken.swift; sourceTree = "<group>"; };
+		4B45AD11A4879F8DA138A285 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		4C3EF754BC5D4E5AF172EDE6 /* iPadCommandPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadCommandPalette.swift; sourceTree = "<group>"; };
 		4C9DE7E1AD3BF125CE54B4B8 /* ModerationSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModerationSplitView.swift; sourceTree = "<group>"; };
 		4CCB252A8C35FED1D6EA1C08 /* Color+RULYX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+RULYX.swift"; sourceTree = "<group>"; };
@@ -716,6 +718,7 @@
 				BF0135FBE082A7D62EDC74AE /* AccountRowView.swift */,
 				52B7DD20B3AC717E85BF2EBB /* AccountTabView.swift */,
 				8A10A0C5F5FA51FB7BDB61C5 /* AddAccountView.swift */,
+				4B45AD11A4879F8DA138A285 /* ProfileEditView.swift */,
 			);
 			path = Accounts;
 			sourceTree = "<group>";
@@ -1515,6 +1518,7 @@
 				4947D378E90137FEDD2A77DA /* PostTextContent.swift in Sources */,
 				7494D3901E58124A5B07FA37 /* PreviewAIService.swift in Sources */,
 				E284C411AED1A1C4890061D4 /* PreviewBlueskyClient.swift in Sources */,
+				7B7FD28244B1175DC48321B4 /* ProfileEditView.swift in Sources */,
 				574E7B89AFEA877046E57551 /* ProfileInspectorView.swift in Sources */,
 				E9BDA7C614C5E061BB6DFC38 /* ProfileInspectorViewModel.swift in Sources */,
 				77B419800F8C2FC4F163DD8A /* ProfileMembershipModels.swift in Sources */,

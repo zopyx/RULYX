@@ -144,4 +144,8 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
     ) async throws {
         try await Task.sleep(for: .milliseconds(150))
     }
+
+    func putProfileRecord(_: ProfileRecord, account _: AppAccount, appPassword _: String?) async throws {
+        try await Task.sleep(for: .milliseconds(120))
+    }
 }

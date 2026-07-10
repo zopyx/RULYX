@@ -148,7 +148,7 @@ final class AutoBlockBackService: ObservableObject {
     func scheduleBackgroundTask() {
         guard isEnabled else { return }
         let request = BGAppRefreshTaskRequest(identifier: Self.taskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60) // 5 minutes
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 30 * 60) // 30 minutes
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {

@@ -63,6 +63,7 @@ struct BlueskyProfileView: View {
     @State private var newInternalListName = ""
     @State private var newInternalListColor = InternalListColor.blue
     @State private var showBlockingListsPanel = false
+    @State private var showProfileEditor = false
 
     // MARK: - Computed properties
 
@@ -425,6 +426,15 @@ struct BlueskyProfileView: View {
                 }
             }
         }
+        .sheet(isPresented: $showProfileEditor) {
+            if let account = accountStore.activeAccount,
+               let password = accountStore.appPassword(for: account)
+            {
+                ProfileEditView(account: account, appPassword: password)
+                    .environmentObject(accountStore)
+                    .environmentObject(blueskyClient)
+            }
+        }
         .confirmationDialog(
             loc("profile.create_list_confirm.title"),
             isPresented: Binding(
@@ -464,30 +474,100 @@ struct BlueskyProfileView: View {
         List {
             if let profile = viewModel.profile {
                 Section {
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack(spacing: 14) {
-                            profileAvatar(for: profile)
+                    VStack(alignment: .leading, spacing: 0) {
+                        if let bannerURL = profile.bannerURL {
+                            // Banner with avatar overlapping bottom-left
+                            ZStack(alignment: .bottomLeading) {
+                                profileBanner(url: bannerURL)
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(profile.title)
-                                    .appFont(.heading)
-                                Text(profile.handle)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                                // Avatar overlapping bottom of banner (half on banner, half below)
+                                profileAvatar(for: profile)
+                                    .offset(y: 36)
+                                    .padding(.leading, 16)
                             }
-                        }
 
-                        if let description = profile.description, !description.isEmpty {
-                            Text(description)
-                                .appFont(.body)
-                        }
+                            // Info below banner+avatar (offset for overlapping avatar)
+                            VStack(alignment: .leading, spacing: 16) {
+                                HStack(spacing: 14) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(profile.title)
+                                            .appFont(.heading)
+                                        Text(profile.handle)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
 
-                        if !isOwnProfile, let state = profile.viewerState {
-                            relationshipBadges(state: state, blockingListNames: viewModel.combinedBlockingNames)
+                                if let description = profile.description, !description.isEmpty {
+                                    Text(description)
+                                        .appFont(.body)
+                                }
+
+                                if !isOwnProfile, let state = profile.viewerState {
+                                    relationshipBadges(state: state, blockingListNames: viewModel.combinedBlockingNames)
+                                }
+
+                                if isOwnProfile {
+                                    Button {
+                                        showProfileEditor = true
+                                    } label: {
+                                        HStack {
+                                            Spacer()
+                                            Text(loc("profile.edit.title"))
+                                            Spacer()
+                                        }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .controlSize(.small)
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 12)
+                            .padding(.top, 36)
+                        } else {
+                            // No banner: inline avatar layout
+                            VStack(alignment: .leading, spacing: 16) {
+                                HStack(spacing: 14) {
+                                    profileAvatar(for: profile)
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(profile.title)
+                                            .appFont(.heading)
+                                        Text(profile.handle)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+
+                                if let description = profile.description, !description.isEmpty {
+                                    Text(description)
+                                        .appFont(.body)
+                                }
+
+                                if !isOwnProfile, let state = profile.viewerState {
+                                    relationshipBadges(state: state, blockingListNames: viewModel.combinedBlockingNames)
+                                }
+
+                                if isOwnProfile {
+                                    Button {
+                                        showProfileEditor = true
+                                    } label: {
+                                        HStack {
+                                            Spacer()
+                                            Text(loc("profile.edit.title"))
+                                            Spacer()
+                                        }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .controlSize(.small)
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 12)
                         }
                     }
-                    .padding(.vertical, 6)
                 }
+                .listRowInsets(EdgeInsets())
 
                 Section {
                     NavigationLink {
@@ -1398,6 +1478,37 @@ struct BlueskyProfileView: View {
                 footer: "Evidence screenshot attached below if provided."
             )
         )
+    }
+
+
+    private func profileBanner(url: URL) -> some View {
+        Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: 200)
+            .overlay(
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case let .success(image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .failure:
+                        Rectangle()
+                            .fill(Color(.systemGray5))
+                    case .empty:
+                        Rectangle()
+                            .fill(Color(.systemGray5))
+                            .overlay {
+                                ProgressView()
+                                    .tint(.secondary)
+                            }
+                    @unknown default:
+                        Rectangle()
+                            .fill(Color(.systemGray5))
+                    }
+                }
+            )
+            .clipped()
     }
 
     private func profileAvatar(for profile: BlueskyProfile) -> some View {

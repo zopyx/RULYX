@@ -92,8 +92,24 @@ struct iPadProfileInspector: View {
     private func profileCard(_ inspection: ProfileInspection) -> some View {
         let profile = inspection.profile
         let viewer = profile.viewerState
-        return VStack(spacing: 12) {
-            HStack(spacing: 16) {
+        return VStack(spacing: 0) {
+            // Banner image
+            if let bannerURL = profile.bannerURL {
+                AsyncImage(url: bannerURL) { phase in
+                    switch phase {
+                    case let .success(image):
+                        image.resizable().scaledToFill()
+                    default:
+                        Color(.systemGray5)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 180)
+                .clipped()
+            }
+
+            VStack(spacing: 12) {
+                HStack(spacing: 16) {
                 AsyncImage(url: profile.avatarURL) { phase in
                     switch phase {
                     case let .success(image):
@@ -141,6 +157,7 @@ struct iPadProfileInspector: View {
                     await profileVM.toggleFollow(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: blueskyClient)
                 }
             }
+        }
         }
         .padding()
     }
