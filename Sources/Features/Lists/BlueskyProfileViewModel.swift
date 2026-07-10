@@ -124,6 +124,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         isFetchingOwnedLists = true
         do {
             ownedLists = try await client.fetchActorLists(actor: did, account: account, appPassword: appPassword)
+                .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         } catch {
             AppLogger.moderation.error("Owned lists fetch failed: \(error.localizedDescription, privacy: .public)")
             ownedLists = []
@@ -137,6 +138,7 @@ final class BlueskyProfileViewModel: ObservableObject {
         isFetchingSubscribedLists = true
         do {
             subscribedLists = try await client.fetchSubscribedModerationLists(account: account, appPassword: appPassword)
+                .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 
             if let targetDID, let lists = subscribedLists {
                 let moderationSubs = lists.filter { $0.kind == .moderation }
@@ -201,9 +203,14 @@ final class BlueskyProfileViewModel: ObservableObject {
         inspection?.profile
     }
 
-    /// List memberships from the current inspection.
+    /// List memberships from the current inspection, sorted alphabetically by name within each kind group.
     var listMemberships: [ProfileListMembership] {
-        inspection?.listMemberships ?? []
+        (inspection?.listMemberships ?? []).sorted { lhs, rhs in
+            if lhs.kind != rhs.kind {
+                return lhs.kind.sortOrder < rhs.kind.sortOrder
+            }
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
     }
 
     // MARK: - Profile Loading

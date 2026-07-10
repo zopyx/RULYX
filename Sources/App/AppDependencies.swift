@@ -54,6 +54,7 @@ final class AppDependencies: ObservableObject {
     let clearskyHeartbeat: ClearskyHeartbeatService
     let internalListStore: InternalListStore
     let aiService: LiveAIService
+    let autoBlockBackService: AutoBlockBackService
 
     // MARK: - Init
 
@@ -82,6 +83,11 @@ final class AppDependencies: ObservableObject {
         chatStore = ChatStore(chatService: ChatService(requestExecutor: requestExecutor, sessionService: sessionService))
         internalListStore = InternalListStore()
         aiService = LiveAIService()
+        autoBlockBackService = AutoBlockBackService(
+            blueskyClient: blueskyClient,
+            accountStore: accountStore,
+            internalListStore: internalListStore
+        )
         pushNotificationCoordinator = PushNotificationCoordinator(
             pushService: BlueskyPushNotificationService(requestExecutor: requestExecutor, sessionService: sessionService),
             accountStore: accountStore,

@@ -19,9 +19,14 @@ struct SettingsView: View {
     @EnvironmentObject private var appLockManager: AppLockManager
     @EnvironmentObject private var httpRequestDebugStore: HTTPRequestDebugStore
     @EnvironmentObject private var aiService: LiveAIService
+    @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var internalListStore: InternalListStore
 
     /// UserDefaults key `"debugMode"`: enables debug tools (HTTP request debug view, etc.).
     @AppStorage("debugMode") private var debugMode = false
+
+    /// UserDefaults key `"autoBlockBackEnabled"`: automatically blocks back accounts that block the user.
+    @AppStorage("autoBlockBackEnabled") private var autoBlockBackEnabled = true
 
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"`.
@@ -85,6 +90,35 @@ struct SettingsView: View {
                     .accessibilityHint(loc: "settings.language.hint")
                 } header: {
                     Text(localizationManager.localized("settings.preferences"))
+                }
+
+                Section {
+                    Toggle(isOn: $autoBlockBackEnabled) {
+                        Label {
+                            Text(loc("settings.autoblock"))
+                        } icon: {
+                            Image(systemName: "shield.checkered")
+                        }
+                    }
+                    .accessibilityHint(loc("settings.autoblock.hint"))
+
+                    NavigationLink {
+                        AutoBlockListPickerView()
+                            .environmentObject(blueskyClient)
+                            .environmentObject(accountStore)
+                            .environmentObject(internalListStore)
+                            .environmentObject(localizationManager)
+                    } label: {
+                        Label {
+                            Text(loc("settings.autoblock.lists"))
+                        } icon: {
+                            Image(systemName: "list.bullet.clipboard")
+                        }
+                    }
+                } header: {
+                    Text(loc("settings.moderation"))
+                } footer: {
+                    Text(loc("settings.autoblock.footer"))
                 }
 
                 // MARK: Security Section (Biometrics)
@@ -243,4 +277,7 @@ struct SettingsView: View {
         .environmentObject(LocalizationManager.shared)
         .environmentObject(AppLockManager.shared)
         .environmentObject(HTTPRequestDebugStore.shared)
+        .environmentObject(LiveAIService())
+        .environmentObject(AccountStore(preview: true))
+        .environmentObject(InternalListStore())
 }

@@ -37,6 +37,7 @@ struct RelationshipsView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var blueskyClient: LiveBlueskyClient
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var internalListStore: InternalListStore
     @AppStorage("debugMode") private var debugMode = false
     @State private var actors: [BlueskyActor] = []
     @State private var isLoading = true
@@ -53,6 +54,19 @@ struct RelationshipsView: View {
     @State private var exportProgressMessage: String?
     @State private var exportProgressFraction: Double?
     @State private var clearskyTotal: Int?
+    @State private var availableTargetLists: [BlueskyList] = []
+    @State private var batchOperationConfig: BatchOperationConfig?
+
+    // Block-all-back state
+    @State private var isBlockingBack = false
+    @State private var blockBackCompleted = 0
+    @State private var blockBackTotal = 0
+    @State private var blockBackSuccessCount = 0
+    @State private var blockBackFailureCount = 0
+    @State private var showBlockBackConfirm1 = false
+    @State private var showBlockBackConfirm2 = false
+    @State private var unblockedBlockersCount: Int?
+    @State private var showBlockBackAllClear = false
 
     /// Filters actors by handle or display name matching the search query.
     private var filteredActors: [BlueskyActor] {
@@ -189,6 +203,9 @@ struct RelationshipsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 16) {
+                    if !actors.isEmpty, mode == .blockedBy {
+                        bulkAddToListsMenu
+                    }
                     if !actors.isEmpty {
                         Menu {
                             Button {
@@ -278,6 +295,34 @@ struct RelationshipsView: View {
 
             Text(loc: "rel.block_message")
         }
+        .alert(Text(loc: "profile.block_back.confirm.first.title"), isPresented: $showBlockBackConfirm1) {
+            Button(loc("actions.cancel"), role: .cancel) {}
+            Button(loc("profile.block_back.action")) {
+                showBlockBackConfirm2 = true
+            }
+        } message: {
+            if let count = unblockedBlockersCount {
+                Text(loc("profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
+            }
+        }
+        .alert(Text(loc: "profile.block_back.confirm.second.title"), isPresented: $showBlockBackConfirm2) {
+            Button(loc("actions.cancel"), role: .cancel) {}
+            Button(loc("profile.block_back.action"), role: .destructive) {
+                if let account = accountStore.activeAccount,
+                   let appPassword = accountStore.appPassword(for: account) {
+                    Task {
+                        await blockBack(account: account, appPassword: appPassword)
+                    }
+                }
+            }
+        } message: {
+            if let count = unblockedBlockersCount {
+                Text(loc("profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
+            }
+        }
+        .alert(loc("profile.block_back.all_clear"), isPresented: $showBlockBackAllClear) {
+            Button(loc("actions.ok"), role: .cancel) {}
+        }
         .sheet(isPresented: $isShowingListPicker) {
             if let actor = selectedActorForList,
                let account = accountStore.activeAccount,
@@ -293,9 +338,227 @@ struct RelationshipsView: View {
                 ShareSheet(activityItems: [url])
             }
         }
+        .sheet(item: $batchOperationConfig) { config in
+            BatchOperationProgressView(config: config)
+                .environmentObject(blueskyClient)
+                .environmentObject(localizationManager)
+        }
+        .task {
+            await loadAvailableTargetLists()
+        }
     }
 
     // MARK: - Helpers
+
+    /// Moderation lists available as add-all targets.
+    private var moderationTargetLists: [BlueskyList] {
+        availableTargetLists.filter { $0.kind == .moderation }
+    }
+
+    /// Internal lists available as add-all targets.
+    private var internalTargetLists: [BlueskyList] {
+        availableTargetLists.filter { $0.kind == .internal }
+    }
+
+    /// Regular lists available as add-all targets.
+    private var regularTargetLists: [BlueskyList] {
+        availableTargetLists.filter { $0.kind == .regular }
+    }
+
+    /// Menu button to add all blocked-by actors to a moderation/curation/internal list.
+    private var bulkAddToListsMenu: some View {
+        Menu {
+            if !moderationTargetLists.isEmpty {
+                Menu {
+                    ForEach(moderationTargetLists) { list in
+                        Button {
+                            handleAddAllBlockers(to: list)
+                        } label: {
+                            Label(list.name, systemImage: list.kind.symbolName)
+                        }
+                    }
+                } label: {
+                    Text(loc: "rel.add_to_moderation_list")
+                }
+            }
+            if !internalTargetLists.isEmpty {
+                Menu {
+                    ForEach(internalTargetLists) { list in
+                        Button {
+                            handleAddAllBlockers(to: list)
+                        } label: {
+                            Label(list.name, systemImage: list.kind.symbolName)
+                        }
+                    }
+                } label: {
+                    Text(loc: "rel.add_to_internal_list")
+                }
+            }
+            if !regularTargetLists.isEmpty {
+                Menu {
+                    ForEach(regularTargetLists) { list in
+                        Button {
+                            handleAddAllBlockers(to: list)
+                        } label: {
+                            Label(list.name, systemImage: list.kind.symbolName)
+                        }
+                    }
+                } label: {
+                    Text(loc: "rel.add_to_curation_list")
+                }
+            }
+            if !moderationTargetLists.isEmpty || !internalTargetLists.isEmpty || !regularTargetLists.isEmpty {
+                Divider()
+            }
+            Button {
+                Task { await handleBlockAllBack() }
+            } label: {
+                Label(loc("rel.block_all_back"), systemImage: "hand.raised.slash.fill")
+            }
+            .disabled(isBlockingBack)
+            if availableTargetLists.isEmpty {
+                Button {
+                    Task { await loadAvailableTargetLists() }
+                } label: {
+                    Label(loc("rel.loading_lists"), systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(true)
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
+        .accessibilityLabel(loc("rel.add_all_to_list"))
+        .accessibilityHint(loc("rel.add_all_to_list.hint"))
+    }
+
+    /// Handles adding all currently loaded actors to the selected list.
+    /// Internal lists get direct member additions; external lists use the batch progress UI.
+    private func handleAddAllBlockers(to list: BlueskyList) {
+        let targets = actors.map { actor in
+            PendingLikerTarget(did: actor.did, handle: actor.handle)
+        }
+        guard !targets.isEmpty else { return }
+
+        if list.kind == .internal {
+            for target in targets {
+                internalListStore.addMember(
+                    did: target.did,
+                    handle: target.handle ?? target.did,
+                    to: internalListStore.listID(from: list.id)
+                )
+            }
+        } else {
+            guard let account = accountStore.activeAccount,
+                  let appPassword = accountStore.appPassword(for: account) else { return }
+            batchOperationConfig = BatchOperationConfig(
+                targets: targets,
+                mode: .addToList(list: list, account: account, appPassword: appPassword)
+            )
+        }
+    }
+
+    /// Fetches the count of unblocked blockers and presents the first confirmation dialog.
+    private func handleBlockAllBack() async {
+        guard let account = accountStore.activeAccount else { return }
+        do {
+            let count = try await blueskyClient.fetchUnblockedBlockersCount(for: account)
+            unblockedBlockersCount = count
+            guard count > 0 else {
+                showBlockBackAllClear = true
+                return
+            }
+            showBlockBackConfirm1 = true
+        } catch {
+            AppLogger.moderation.error("Failed to fetch unblocked blockers count: \\(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Executes the block-back operation: fetches unblocked blocker actors and blocks each in batches.
+    private func blockBack(account: AppAccount, appPassword: String) async {
+        isBlockingBack = true
+        blockBackCompleted = 0
+        blockBackTotal = 0
+        blockBackSuccessCount = 0
+        blockBackFailureCount = 0
+
+        do {
+            let toBlock = try await blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
+
+            guard !toBlock.isEmpty else {
+                isBlockingBack = false
+                return
+            }
+
+            blockBackTotal = toBlock.count
+            let batchSize = 5
+
+            for batchStart in stride(from: 0, to: blockBackTotal, by: batchSize) {
+                let batchEnd = min(batchStart + batchSize, blockBackTotal)
+                let batch = toBlock[batchStart ..< batchEnd]
+
+                await withTaskGroup(of: Bool.self) { group in
+                    for actor in batch {
+                        group.addTask {
+                            do {
+                                try await blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
+                                return true
+                            } catch {
+                                AppLogger.moderation.error("Block back failed for \\(actor.handle, privacy: .public): \\(error.localizedDescription, privacy: .public)")
+                                return false
+                            }
+                        }
+                    }
+                    for await success in group {
+                        blockBackCompleted += 1
+                        if success {
+                            blockBackSuccessCount += 1
+                        } else {
+                            blockBackFailureCount += 1
+                        }
+                    }
+                }
+
+                if batchEnd < blockBackTotal {
+                    try await Task.sleep(for: .milliseconds(300))
+                }
+            }
+        } catch {
+            AppLogger.moderation.error("Block back failed: \\(error.localizedDescription, privacy: .public)")
+        }
+
+        isBlockingBack = false
+    }
+
+    /// Loads the user's moderation, internal, and regular lists for the bulk add-all menu.
+    private func loadAvailableTargetLists() async {
+        var lists: [BlueskyList] = []
+        if let account = accountStore.activeAccount,
+           let appPassword = accountStore.appPassword(for: account)
+        {
+            do {
+                lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+            } catch {
+                AppLogger.moderation.error("Failed to load available target lists: \\(error.localizedDescription, privacy: .public)")
+            }
+        }
+        let internalLists = internalListStore.lists.map { internalList in
+            BlueskyList(
+                id: "internal:\\(internalList.id.uuidString)",
+                name: internalList.name,
+                description: "Internal",
+                memberCount: internalList.memberCount,
+                kind: .internal,
+                cid: nil
+            )
+        }
+        lists.append(contentsOf: internalLists)
+        availableTargetLists = lists.sorted { lhs, rhs in
+            if lhs.kind != rhs.kind {
+                return lhs.kind.sortOrder < rhs.kind.sortOrder
+            }
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
+    }
 
     /// Formats a blocked date as relative (< 30 days) or abbreviated.
     private func blockedDateDisplay(_ date: Date) -> String {

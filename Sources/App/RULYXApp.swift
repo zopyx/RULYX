@@ -82,6 +82,7 @@ struct RULYXApp: App {
                     .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(deps.internalListStore)
                     .environmentObject(deps.aiService)
+                    .environmentObject(deps.autoBlockBackService)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
 
@@ -190,11 +191,12 @@ struct RULYXApp: App {
                             appLockManager.appDidEnterBackground()
                             deps.clearskyHeartbeat.stop()
                             deps.chatStore.stopPolling()
+                            deps.autoBlockBackService.scheduleBackgroundTask()
                         }
                     }
                     // On becoming active: attempts biometric unlock, resumes the Clearsky
                     // heartbeat, re-registers push notifications, resumes chat polling,
-                    // and triggers an immediate log sync.
+                    // triggers an immediate log sync, and performs auto-block-back check.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                         DispatchQueue.main.async {
                             appLockManager.appDidBecomeActive()
@@ -202,6 +204,7 @@ struct RULYXApp: App {
                             deps.pushNotificationCoordinator.start()
                             deps.chatStore.startPolling()
                             deps.chatStore.signalSync()
+                            Task { await deps.autoBlockBackService.performAutoBlockBack() }
                         }
                     }
 
