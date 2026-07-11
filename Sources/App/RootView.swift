@@ -154,6 +154,7 @@ struct RootView: View {
                     .buttonStyle(.plain)
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
+                    .accessibilityIdentifier("tab-\(item.tab.rawValue)")
                 }
 
                 Button {
@@ -179,6 +180,7 @@ struct RootView: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
+                .accessibilityIdentifier("tab-accounts")
             }
             .padding(.horizontal, 4)
             .padding(.top, 6)
