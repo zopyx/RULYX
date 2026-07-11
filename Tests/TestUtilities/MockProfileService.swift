@@ -3,8 +3,9 @@ import Foundation
 
 /// Mock implementation of BlueskyProfileInspecting for unit testing.
 /// All methods return default values or pre-configured results via handler closures.
+/// Uses class semantics so handlers can be overridden after VM construction.
 @MainActor
-struct MockProfileService: BlueskyProfileInspecting {
+final class MockProfileService: BlueskyProfileInspecting {
     var searchActorsHandler: @Sendable (String, AppAccount, String?) async throws -> [BlueskyActor] = { _, _, _ in [] }
     var searchActorsPageHandler: @Sendable (String, String?, AppAccount, String?) async throws -> PagedActorSearch = { _, _, _, _ in PagedActorSearch(actors: [], cursor: nil) }
     var fetchProfileHandler: @Sendable (String, AppAccount, String?) async throws -> BlueskyProfile = { did, _, _ in

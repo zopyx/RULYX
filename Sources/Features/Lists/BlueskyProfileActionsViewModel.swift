@@ -38,6 +38,10 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
 
     // MARK: - Init
 
+    /// Duration to display the result summary after block-back completes.
+    /// Configurable for fast unit testing.
+    var resultDisplayDuration: TimeInterval = 4.0
+
     init(
         profileService: BlueskyProfileInspecting,
         clearskyService: BlueskyClearSkyServicing,
@@ -201,7 +205,7 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
         blockBackCurrentHandle = nil
         await fetchBlockCounts(isOwnProfile: true)
 
-        try? await Task.sleep(for: .seconds(4))
+        try? await Task.sleep(for: .seconds(resultDisplayDuration))
         showBlockBackResult = false
         isBlockingBack = false
     }

@@ -2,8 +2,9 @@
 import Foundation
 
 /// Mock implementation of BlueskyListServicing for unit testing.
+/// Uses class semantics so handlers can be overridden after VM construction.
 @MainActor
-struct MockListService: BlueskyListServicing {
+final class MockListService: BlueskyListServicing {
     var fetchListsHandler: @Sendable (AppAccount, String?) async throws -> [BlueskyList] = { _, _ in [] }
     var fetchListHandler: @Sendable (String, AppAccount, String?) async throws -> BlueskyList? = { _, _, _ in nil }
     var fetchListMembersHandler: @Sendable (BlueskyList, AppAccount, String?) async throws -> [BlueskyListMember] = { _, _, _ in [] }

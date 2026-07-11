@@ -2,8 +2,9 @@
 import Foundation
 
 /// Mock implementation of BlueskyClearSkyServicing for unit testing.
+/// Uses class semantics so handlers can be overridden after VM construction.
 @MainActor
-struct MockClearSkyService: BlueskyClearSkyServicing {
+final class MockClearSkyService: BlueskyClearSkyServicing {
     var fetchBlockedActorsHandler: @Sendable (AppAccount, String?) async throws -> ClearskyBlocklistResult = { _, _ in
         ClearskyBlocklistResult(actors: [], totalCount: 0)
     }

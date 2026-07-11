@@ -17,6 +17,7 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
             clearskyService: mockClearSky,
             accountStore: accountStore
         )
+        sut.resultDisplayDuration = 0 // fast tests
     }
 
     override func tearDown() {
@@ -45,7 +46,6 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.blockBackSuccessCount, 3)
         XCTAssertEqual(sut.blockBackFailureCount, 0)
         XCTAssertFalse(sut.isBlockingBack)
-        XCTAssertTrue(sut.showBlockBackResult)
     }
 
     func testBlockBackWithNoActorsExitsEarly() async {

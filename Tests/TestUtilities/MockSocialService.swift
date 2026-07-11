@@ -2,8 +2,9 @@
 import Foundation
 
 /// Mock implementation of BlueskySocialServicing for unit testing.
+/// Uses class semantics so handlers can be overridden after VM construction.
 @MainActor
-struct MockSocialService: BlueskySocialServicing {
+final class MockSocialService: BlueskySocialServicing {
     var createLikeHandler: @Sendable (String, String, AppAccount, String?) async throws -> CreateRecordResponse = { _, _, _, _ in
         CreateRecordResponse(uri: "at://mock/like/1", cid: "mock-cid")
     }
