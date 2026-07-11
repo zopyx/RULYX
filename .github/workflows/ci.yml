@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main, refactor/*]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SwiftFormat
+        run: brew install swiftformat swiftlint
+      - name: Run lint
+        run: make lint
+
+  translations:
+    name: Translation Validation
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate translations
+        run: make translations-validate-ci
+
+  build-and-test:
+    name: Build & Test
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build
+        run: |
+          xcodebuild -project RULYX.xcodeproj -scheme RULYX \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
+            build CODE_SIGNING_ALLOWED=NO
+
+      - name: Run unit tests
+        run: |
+          xcodebuild -project RULYX.xcodeproj -scheme RULYX \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
+            -only-testing:RULYXTests \
+            test CODE_SIGNING_ALLOWED=NO
+
+      - name: Collect coverage
+        run: |
+          xcrun xccov view --report \
+            ~/Library/Developer/Xcode/DerivedData/RULYX-*/Logs/Test/*.xcresult \
+            --json > coverage.json 2>/dev/null || true
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.json
