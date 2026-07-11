@@ -5,13 +5,13 @@ import Foundation
 @MainActor
 struct MockSocialService: BlueskySocialServicing {
     var createLikeHandler: @Sendable (String, String, AppAccount, String?) async throws -> CreateRecordResponse = { _, _, _, _ in
-        CreateRecordResponse(uri: "at://mock/like/1", cid: "mock-cid", rkey: "1")
+        CreateRecordResponse(uri: "at://mock/like/1", cid: "mock-cid")
     }
     var createRepostHandler: @Sendable (String, String, AppAccount, String?) async throws -> CreateRecordResponse = { _, _, _, _ in
-        CreateRecordResponse(uri: "at://mock/repost/1", cid: "mock-cid", rkey: "1")
+        CreateRecordResponse(uri: "at://mock/repost/1", cid: "mock-cid")
     }
     var fetchLikesHandler: @Sendable (String, String?, AppAccount, String?) async throws -> GetLikesResponse = { _, _, _, _ in
-        GetLikesResponse(uri: "at://mock/post/1", cid: nil, cursor: nil, likes: [])
+        GetLikesResponse(cursor: nil, likes: [])
     }
     var blockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unblockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
