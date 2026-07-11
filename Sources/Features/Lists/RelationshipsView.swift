@@ -63,6 +63,8 @@ struct RelationshipsView: View {
     @State private var blockBackTotal = 0
     @State private var blockBackSuccessCount = 0
     @State private var blockBackFailureCount = 0
+    @State private var blockBackCurrentHandle: String?
+    @State private var showBlockBackResult = false
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
     @State private var unblockedBlockersCount: Int?
@@ -197,6 +199,85 @@ struct RelationshipsView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                .overlay(alignment: .bottom) {
+                    if isBlockingBack, blockBackTotal > 0 {
+                        VStack(spacing: 6) {
+                            ProgressView(value: Double(blockBackCompleted), total: Double(blockBackTotal))
+                                .progressViewStyle(.linear)
+                                .tint(blockBackFailureCount > 0 ? Color.orange : Color.skyPrimary)
+                            HStack {
+                                Text(
+                                    loc("profile.block_back.progress")
+                                        .replacingOccurrences(of: "{completed}", with: "\(blockBackCompleted)")
+                                        .replacingOccurrences(of: "{total}", with: "\(blockBackTotal)")
+                                )
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                Spacer()
+                            }
+                            HStack(spacing: 12) {
+                                Label("\(blockBackSuccessCount)", systemImage: "checkmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.green)
+                                if blockBackFailureCount > 0 {
+                                    Label("\(blockBackFailureCount)", systemImage: "xmark.circle.fill")
+                                        .font(.caption)
+                                        .foregroundStyle(.red)
+                                }
+                                Spacer()
+                            }
+                            if let handle = blockBackCurrentHandle {
+                                HStack(spacing: 4) {
+                                    ProgressView()
+                                        .scaleEffect(0.5)
+                                    Text(
+                                        loc("profile.block_back.progress.current")
+                                            .replacingOccurrences(of: "{handle}", with: handle)
+                                    )
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                    Spacer()
+                                }
+                                .transition(.opacity)
+                            }
+                        }
+                        .padding(12)
+                        .background(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding()
+                        .animation(.default.speed(1.5), value: blockBackCurrentHandle)
+                    } else if isBlockingBack {
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                            Text(loc("profile.block_back.preparing"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(12)
+                        .background(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding()
+                    } else if showBlockBackResult {
+                        HStack(spacing: 8) {
+                            if blockBackFailureCount == 0 {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(.green)
+                            } else {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.orange)
+                            }
+                            Text(blockBackResultSummary)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(12)
+                        .background(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding()
+                        .transition(.opacity)
+                    }
+                }
             }
         }
         .pageTitle("\(modeLocalized) (\(clearskyTotal ?? actors.count))")
@@ -480,6 +561,11 @@ struct RelationshipsView: View {
         blockBackTotal = 0
         blockBackSuccessCount = 0
         blockBackFailureCount = 0
+        blockBackCurrentHandle = nil
+        showBlockBackResult = false
+
+        // Yield to let SwiftUI render the spinner before we set blockBackTotal
+        await Task.yield()
 
         do {
             let toBlock = try await blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
@@ -496,19 +582,20 @@ struct RelationshipsView: View {
                 let batchEnd = min(batchStart + batchSize, blockBackTotal)
                 let batch = toBlock[batchStart ..< batchEnd]
 
-                await withTaskGroup(of: Bool.self) { group in
+                await withTaskGroup(of: (Bool, String).self) { group in
                     for actor in batch {
                         group.addTask {
                             do {
                                 try await blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
-                                return true
+                                return (true, actor.handle)
                             } catch {
-                                AppLogger.moderation.error("Block back failed for \\(actor.handle, privacy: .public): \\(error.localizedDescription, privacy: .public)")
-                                return false
+                                AppLogger.moderation.error("Block back failed for \(actor.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                                return (false, actor.handle)
                             }
                         }
                     }
-                    for await success in group {
+                    for await (success, handle) in group {
+                        blockBackCurrentHandle = handle
                         blockBackCompleted += 1
                         if success {
                             blockBackSuccessCount += 1
@@ -523,10 +610,28 @@ struct RelationshipsView: View {
                 }
             }
         } catch {
-            AppLogger.moderation.error("Block back failed: \\(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Block back failed: \(error.localizedDescription, privacy: .public)")
         }
 
+        showBlockBackResult = true
+        blockBackCurrentHandle = nil
+
+        // Keep the result visible briefly
+        try? await Task.sleep(for: .seconds(4))
+        showBlockBackResult = false
         isBlockingBack = false
+    }
+
+    /// A localized summary of the block-back operation result.
+    private var blockBackResultSummary: String {
+        if blockBackFailureCount == 0 {
+            loc("profile.block_back.result_success")
+                .replacingOccurrences(of: "{count}", with: "\(blockBackSuccessCount)")
+        } else {
+            loc("profile.block_back.result")
+                .replacingOccurrences(of: "{success}", with: "\(blockBackSuccessCount)")
+                .replacingOccurrences(of: "{fail}", with: "\(blockBackFailureCount)")
+        }
     }
 
     /// Loads the user's moderation, internal, and regular lists for the bulk add-all menu.

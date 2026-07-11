@@ -284,12 +284,6 @@
   "dashboard.top_moderated": "Top Moderated Accounts (한국어)",
   "dashboard.total_ops": "Total Operations (한국어)",
   "debug.diagnostics": "진단",
-  "debug.http.ai.analyze": "Analyze Failed Requests",
-  "debug.http.ai.analyzing": "Analyzing failures...",
-  "debug.http.ai.download_hint": "Download a text generation model in Settings > AI Models",
-  "debug.http.ai.no_failures": "No failed requests to analyze",
-  "debug.http.ai.no_model": "No AI model available",
-  "debug.http.ai.title": "AI Analysis",
   "debug.http.clear": "로그 지우기",
   "debug.http.close": "닫기",
   "debug.http.empty": "아직 기록된 요청이 없습니다.",
@@ -927,6 +921,7 @@
   "profile.block_back.confirm.second.title": "확실합니까?",
   "profile.block_back.loading": "블록 정보 로드 중…",
   "profile.block_back.none_blocking": "당신을 차단하는 계정이 없습니다.",
+  "profile.block_back.preparing": "준비 중…",
   "profile.block_back.preview.blocks_me": "Blocks me",
   "profile.block_back.preview.count": "{count} account(s) that block you but are not blocked back",
   "profile.block_back.preview.empty": "No accounts to block back",
@@ -1359,5 +1354,7 @@
   "usersearch.no_results": "사용자를 찾을 수 없습니다.",
   "usersearch.no_results_desc": "다른 이름이나 핸들을 사용해 보세요.",
   "usersearch.placeholder": "이름, 핸들 또는 설명...",
-  "usersearch.title": "사용자 검색"
+  "usersearch.title": "사용자 검색",
+  "profile.block_back.preview.loading": "Gathering block information…",
+  "profile.block_back.progress.current": "Blocking @{handle}…"
 }

@@ -47,7 +47,6 @@ private enum DebugViewTab: String, CaseIterable, Identifiable {
 struct HTTPRequestDebugView: View {
     @EnvironmentObject private var debugStore: HTTPRequestDebugStore
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @EnvironmentObject private var aiService: LiveAIService
     @Environment(\.dismiss) private var dismiss
     @State private var selectedFilter: HTTPRequestDebugFilter = .succeeded
     @State private var selectedErrorEntry: HTTPRequestDebugEntry?
@@ -75,7 +74,6 @@ struct HTTPRequestDebugView: View {
                 HTTPDebugStatsView()
                     .environmentObject(debugStore)
                     .environmentObject(localizationManager)
-                    .environmentObject(aiService)
             }
         }
         .navigationTitle(localizationManager.localized("debug.http.title"))

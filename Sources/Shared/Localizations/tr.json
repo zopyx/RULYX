@@ -284,12 +284,6 @@
   "dashboard.top_moderated": "Top Moderated Accounts (TR)",
   "dashboard.total_ops": "Total Operations (TR)",
   "debug.diagnostics": "Tanılama",
-  "debug.http.ai.analyze": "Analyze Failed Requests",
-  "debug.http.ai.analyzing": "Analyzing failures...",
-  "debug.http.ai.download_hint": "Download a text generation model in Settings > AI Models",
-  "debug.http.ai.no_failures": "No failed requests to analyze",
-  "debug.http.ai.no_model": "No AI model available",
-  "debug.http.ai.title": "AI Analysis",
   "debug.http.clear": "Günlüğü Temizle",
   "debug.http.close": "Kapat",
   "debug.http.empty": "Henüz hiçbir istek kaydedilmedi.",
@@ -927,6 +921,7 @@
   "profile.block_back.confirm.second.title": "Emin misin?",
   "profile.block_back.loading": "Blok bilgileri yükleniyor…",
   "profile.block_back.none_blocking": "Hiçbir hesap sizi engellemiyor.",
+  "profile.block_back.preparing": "Hazırlanıyor…",
   "profile.block_back.preview.blocks_me": "Blocks me",
   "profile.block_back.preview.count": "{count} account(s) that block you but are not blocked back",
   "profile.block_back.preview.empty": "No accounts to block back",
@@ -1359,5 +1354,7 @@
   "usersearch.no_results": "Kullanıcı bulunamadı",
   "usersearch.no_results_desc": "Farklı bir ad veya tanıtıcı deneyin",
   "usersearch.placeholder": "Ad, kullanıcı adı veya açıklama...",
-  "usersearch.title": "Kullanıcıları Ara"
+  "usersearch.title": "Kullanıcıları Ara",
+  "profile.block_back.preview.loading": "Gathering block information…",
+  "profile.block_back.progress.current": "Blocking @{handle}…"
 }

@@ -233,7 +233,6 @@ struct SettingsView: View {
                     HTTPRequestDebugView()
                         .environmentObject(httpRequestDebugStore)
                         .environmentObject(localizationManager)
-                        .environmentObject(aiService)
                 }
             }
 

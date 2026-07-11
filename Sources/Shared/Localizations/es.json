@@ -284,12 +284,6 @@
   "dashboard.top_moderated": "[es] Top moderierte Accounts",
   "dashboard.total_ops": "Total Operaciones",
   "debug.diagnostics": "Diagnóstico",
-  "debug.http.ai.analyze": "Analyze Failed Requests",
-  "debug.http.ai.analyzing": "Analyzing failures...",
-  "debug.http.ai.download_hint": "Download a text generation model in Settings > AI Models",
-  "debug.http.ai.no_failures": "No failed requests to analyze",
-  "debug.http.ai.no_model": "No AI model available",
-  "debug.http.ai.title": "AI Analysis",
   "debug.http.clear": "Borrar registro",
   "debug.http.close": "Cerrar",
   "debug.http.empty": "Aún no se han registrado solicitudes.",
@@ -927,6 +921,7 @@
   "profile.block_back.confirm.second.title": "¿Está seguro?",
   "profile.block_back.loading": "Cargando información del bloque...",
   "profile.block_back.none_blocking": "Ninguna cuenta te está bloqueando.",
+  "profile.block_back.preparing": "Preparando…",
   "profile.block_back.preview.blocks_me": "Blocks me",
   "profile.block_back.preview.count": "{count} account(s) that block you but are not blocked back",
   "profile.block_back.preview.empty": "No accounts to block back",
@@ -1359,5 +1354,7 @@
   "usersearch.no_results": "No se encontraron usuarios",
   "usersearch.no_results_desc": "Pruebe con un nombre o identificador diferente",
   "usersearch.placeholder": "Nombre, identificador o descripción...",
-  "usersearch.title": "Buscar usuarios"
+  "usersearch.title": "Buscar usuarios",
+  "profile.block_back.preview.loading": "Gathering block information…",
+  "profile.block_back.progress.current": "Blocking @{handle}…"
 }

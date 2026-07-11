@@ -13,7 +13,6 @@ import SwiftUI
 struct HTTPDebugStatsView: View {
     @EnvironmentObject private var debugStore: HTTPRequestDebugStore
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @EnvironmentObject private var aiService: LiveAIService
     @Environment(\.dismiss) private var dismiss
 
     /// Which CSV variant to share.
@@ -21,16 +20,6 @@ struct HTTPDebugStatsView: View {
     @State private var exportURL: URL?
     /// Selected time granularity for the timeline chart.
     @State private var granularity: HTTPDebugStatsGranularity = .fiveMinutes
-    /// Selected model ID for AI analysis.
-    @State private var aiModelID: String = ""
-    /// Whether AI analysis is running.
-    @State private var isAnalyzing = false
-    /// The AI analysis result text.
-    @State private var aiResult: String = ""
-    /// Error from AI analysis.
-    @State private var aiError: String?
-    /// Available model catalog.
-    @State private var catalogModels: [ModelBundle] = []
 
     private enum ExportScope: String, CaseIterable, Identifiable {
         case full, buckets, sources
@@ -292,104 +281,11 @@ struct HTTPDebugStatsView: View {
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal)
-
-                // MARK: AI Analysis
-
-                VStack(spacing: 12) {
-                    Text(loc("debug.http.ai.title"))
-                        .font(.headline)
-
-                    let generatorModels = catalogModels.filter { $0.role == .textGenerator }
-                    let readyModels = generatorModels.filter { aiService.downloadStates[$0.id] == .ready }
-
-                    if readyModels.isEmpty {
-                        VStack(spacing: 6) {
-                            Label(loc("debug.http.ai.no_model"), systemImage: "brain")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                            if !generatorModels.isEmpty {
-                                Text(loc("debug.http.ai.download_hint"))
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
-                        .padding(.vertical, 8)
-                    } else {
-                        if aiResult.isEmpty && !isAnalyzing {
-                            Button {
-                                runAIAnalysis(using: readyModels)
-                            } label: {
-                                Label(loc("debug.http.ai.analyze"), systemImage: "sparkle.magnifyingglass")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .disabled(isAnalyzing)
-                        }
-
-                        if isAnalyzing {
-                            HStack(spacing: 10) {
-                                ProgressView()
-                                    .scaleEffect(0.8)
-                                Text(loc("debug.http.ai.analyzing"))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.vertical, 8)
-                        }
-
-                        if !aiResult.isEmpty {
-                            ScrollView {
-                                Text(aiResult)
-                                    .font(.caption.monospaced())
-                                    .textSelection(.enabled)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(12)
-                            }
-                            .frame(maxHeight: 250)
-                            .background(Color(.systemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color(.separator), lineWidth: 0.5)
-                            )
-
-                            HStack(spacing: 12) {
-                                Button(loc("debug.http.ai.analyze")) {
-                                    aiResult = ""
-                                    aiError = nil
-                                    runAIAnalysis(using: readyModels)
-                                }
-                                .buttonStyle(.bordered)
-                                .disabled(isAnalyzing)
-
-                                Button(loc("debug.http.clear"), role: .destructive) {
-                                    aiResult = ""
-                                    aiError = nil
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                    }
-
-                    if let error = aiError {
-                        Label(error, systemImage: "exclamationmark.triangle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                    }
-                }
-                .padding(.vertical)
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal)
-
-                Spacer(minLength: 40)
             }
             .padding(.vertical)
+            Spacer(minLength: 40)
         }
         .background(Color(.systemGroupedBackground))
-        .task {
-            catalogModels = await aiService.catalog
-        }
     }
 
     // MARK: - Axis marks for granularity
@@ -472,51 +368,6 @@ struct HTTPDebugStatsView: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color(.separator), lineWidth: 0.5)
         )
-    }
-    // MARK: - AI Analysis
-
-    private func runAIAnalysis(using models: [ModelBundle]) {
-        guard let model = models.first else {
-            aiError = loc("debug.http.ai.no_model")
-            return
-        }
-        isAnalyzing = true
-        aiResult = ""
-        aiError = nil
-
-        // Collect failed entries
-        let failed = debugStore.entries.filter { $0.state == .failed }
-        guard !failed.isEmpty else {
-            aiResult = loc("debug.http.ai.no_failures")
-            isAnalyzing = false
-            return
-        }
-
-        // Format prompt
-        let header = "Analyze the following failed HTTP requests and detect patterns (common status codes, error types, endpoints). Describe what's failing and suggest possible causes:\n\n"
-        let rows = failed.prefix(50).map { entry in
-            let time = entry.startedAt.formatted(date: .numeric, time: .shortened)
-            let source = entry.source ?? "?"
-            let code = entry.statusCode.map(String.init) ?? "?"
-            let err = entry.errorMessage ?? "?"
-            return "  [\(time)] \(source) \(entry.method) \(entry.url) → \(code) \"\(err)\""
-        }.joined(separator: "\n")
-        let tail = failed.count > 50 ? "\n\n... and \(failed.count - 50) more failures." : ""
-        let prompt = header + rows + tail
-
-        Task {
-            var accumulated = ""
-            do {
-                let stream = aiService.complete(prompt: prompt, using: model.id)
-                for try await token in stream {
-                    accumulated += token
-                    aiResult = accumulated
-                }
-            } catch {
-                aiError = error.localizedDescription
-            }
-            isAnalyzing = false
-        }
     }
 }
 

@@ -284,12 +284,6 @@
   "dashboard.top_moderated": "Top Moderated Accounts (TH)",
   "dashboard.total_ops": "Total Operations (TH)",
   "debug.diagnostics": "การวินิจฉัย",
-  "debug.http.ai.analyze": "Analyze Failed Requests",
-  "debug.http.ai.analyzing": "Analyzing failures...",
-  "debug.http.ai.download_hint": "Download a text generation model in Settings > AI Models",
-  "debug.http.ai.no_failures": "No failed requests to analyze",
-  "debug.http.ai.no_model": "No AI model available",
-  "debug.http.ai.title": "AI Analysis",
   "debug.http.clear": "ล้างบันทึก",
   "debug.http.close": "ปิด",
   "debug.http.empty": "ยังไม่มีการบันทึกคำขอ",
@@ -927,6 +921,7 @@
   "profile.block_back.confirm.second.title": "คุณแน่ใจเหรอ?",
   "profile.block_back.loading": "กำลังโหลดข้อมูลบล็อก...",
   "profile.block_back.none_blocking": "ไม่มีบัญชีใดปิดกั้นคุณ",
+  "profile.block_back.preparing": "กำลังเตรียม…",
   "profile.block_back.preview.blocks_me": "Blocks me",
   "profile.block_back.preview.count": "{count} account(s) that block you but are not blocked back",
   "profile.block_back.preview.empty": "No accounts to block back",
@@ -1359,5 +1354,7 @@
   "usersearch.no_results": "ไม่พบผู้ใช้",
   "usersearch.no_results_desc": "ลองใช้ชื่อหรือชื่อเรียกอื่น",
   "usersearch.placeholder": "ชื่อ ที่จับ หรือคำอธิบาย...",
-  "usersearch.title": "ค้นหาผู้ใช้"
+  "usersearch.title": "ค้นหาผู้ใช้",
+  "profile.block_back.preview.loading": "Gathering block information…",
+  "profile.block_back.progress.current": "Blocking @{handle}…"
 }

@@ -284,12 +284,6 @@
   "dashboard.top_moderated": "Top moderierte Accounts (NL)",
   "dashboard.total_ops": "Gesamtoperationen (NL)",
   "debug.diagnostics": "Diagnostiek",
-  "debug.http.ai.analyze": "Analyze Failed Requests",
-  "debug.http.ai.analyzing": "Analyzing failures...",
-  "debug.http.ai.download_hint": "Download a text generation model in Settings > AI Models",
-  "debug.http.ai.no_failures": "No failed requests to analyze",
-  "debug.http.ai.no_model": "No AI model available",
-  "debug.http.ai.title": "AI Analysis",
   "debug.http.clear": "Logboek wissen",
   "debug.http.close": "Sluiten",
   "debug.http.empty": "Nog geen verzoeken geregistreerd.",
@@ -927,6 +921,7 @@
   "profile.block_back.confirm.second.title": "Weet je het zeker?",
   "profile.block_back.loading": "Blokinformatie laden…",
   "profile.block_back.none_blocking": "Er zijn geen accounts die je blokkeren.",
+  "profile.block_back.preparing": "Voorbereiden…",
   "profile.block_back.preview.blocks_me": "Blocks me",
   "profile.block_back.preview.count": "{count} account(s) that block you but are not blocked back",
   "profile.block_back.preview.empty": "No accounts to block back",
@@ -1359,5 +1354,7 @@
   "usersearch.no_results": "Geen gebruikers gevonden",
   "usersearch.no_results_desc": "Probeer een andere naam of gebruikersnaam",
   "usersearch.placeholder": "Naam, handvat of beschrijving...",
-  "usersearch.title": "Zoek gebruikers"
+  "usersearch.title": "Zoek gebruikers",
+  "profile.block_back.preview.loading": "Gathering block information…",
+  "profile.block_back.progress.current": "Blocking @{handle}…"
 }
