@@ -301,11 +301,13 @@
 		EC878F5396662EFD785AD019 /* ActivityLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A496F6B4F8249E96607630D /* ActivityLogView.swift */; };
 		ED2BC7DFEDDBA28C5A7238E5 /* LoadableStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DA9DA73813F661EB4F6BD6 /* LoadableStateTests.swift */; };
 		ED2D2F4B8CCBB2882FD94DC0 /* BlueskyListMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC9A5632CEB61E2631C4FD9 /* BlueskyListMember.swift */; };
+		EF2202507248EAD72CEAC0DB /* ArchitectureEnforcementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB55CC1C36F923726C8AE96 /* ArchitectureEnforcementTests.swift */; };
 		EF97B37336D02228772939AA /* LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711DCF22B063A86DE35A6B6C /* LocalizationManager.swift */; };
 		F00D2CE8A347BD81931B72E7 /* BlueskyListServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBE749A4442A2FAD4D7772 /* BlueskyListServiceTests.swift */; };
 		F0116C1832035706745C347D /* iPadKeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FF654D6CFEB23F9D0B6444 /* iPadKeyboardShortcuts.swift */; };
 		F0DD8B53FB468D3E5BA59847 /* ar.json in Resources */ = {isa = PBXBuildFile; fileRef = 170D404BA0FC06DE2F6DE84C /* ar.json */; };
 		F13354C74B9FEE701AA77B22 /* ListDetailComparisonSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133BF498387B5471ADCE0108 /* ListDetailComparisonSection.swift */; };
+		F1E163FD2256C427EFBB080B /* ComposePostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E16A25CDA87E85EB1EA57F8 /* ComposePostViewModel.swift */; };
 		F5C8BE322132EACAE5281E84 /* MockBlueskyListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9B25891A18B43575A12AEF /* MockBlueskyListService.swift */; };
 		F6A4FE2A95BDCEDE1D8E8D65 /* ListDetailViewModel+Bulk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D367C2ED538342B8A0E555 /* ListDetailViewModel+Bulk.swift */; };
 		F779CA470E42CDE03028B86D /* PushNotificationRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82878D19E2603A1619CD7C70 /* PushNotificationRoute.swift */; };
@@ -370,6 +372,7 @@
 		1D6074E85CF3C29BB4A21262 /* MediaBrowserViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaBrowserViewModelTests.swift; sourceTree = "<group>"; };
 		1D626301509B540236FD40A6 /* InternalListStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalListStore.swift; sourceTree = "<group>"; };
 		1DDFE0E01DAC6F7CED3829BE /* ListTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTimelineView.swift; sourceTree = "<group>"; };
+		1FB55CC1C36F923726C8AE96 /* ArchitectureEnforcementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchitectureEnforcementTests.swift; sourceTree = "<group>"; };
 		21101CBB5C669FA99A2EB0AF /* NotificationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModelTests.swift; sourceTree = "<group>"; };
 		21B48B320E9BD7BCDF8F5C39 /* ChatLocalAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLocalAction.swift; sourceTree = "<group>"; };
 		21C0E880D68C8BB1AD361910 /* RULYX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RULYX.entitlements; sourceTree = "<group>"; };
@@ -518,6 +521,7 @@
 		8C6580FDFEE12BF203E463AC /* ServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceTests.swift; sourceTree = "<group>"; };
 		8CD4F7B93B1E43DEBED9DEAD /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		8D418CEB548F2449C21DC18C /* iPadProfileInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadProfileInspector.swift; sourceTree = "<group>"; };
+		8E16A25CDA87E85EB1EA57F8 /* ComposePostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposePostViewModel.swift; sourceTree = "<group>"; };
 		8EB23243B6248BE1FD15F9CB /* PostLikerActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostLikerActionsManager.swift; sourceTree = "<group>"; };
 		8EC9A5632CEB61E2631C4FD9 /* BlueskyListMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyListMember.swift; sourceTree = "<group>"; };
 		8F0BA6022AFBB8DA0AAEF45F /* BlueskyPostServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyPostServicing.swift; sourceTree = "<group>"; };
@@ -702,6 +706,7 @@
 				B9F8024F2606E01EAC5C0AF3 /* ActionQueueStoreTests.swift */,
 				D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */,
 				D4F6D1DF0921A11BEE1A9854 /* AppLockManagerTimeoutTests.swift */,
+				1FB55CC1C36F923726C8AE96 /* ArchitectureEnforcementTests.swift */,
 				BD3C1DD3F3BB3D87F33F4615 /* BlueskyAPIDTOsTests.swift */,
 				5FBBE749A4442A2FAD4D7772 /* BlueskyListServiceTests.swift */,
 				6C3A1037F26DBBCB58FD4674 /* BlueskyProfileActionsViewModelTests.swift */,
@@ -1130,6 +1135,7 @@
 				D03565B0099D360D74C734FD /* BlueskyProfileViewModel.swift */,
 				17BA3ED2DF94DACF5746B95F /* ClearskyListsView.swift */,
 				86166E0222749AEA301E8157 /* ComposePostView.swift */,
+				8E16A25CDA87E85EB1EA57F8 /* ComposePostViewModel.swift */,
 				7D899078C3044DE289DD4E0C /* CustomSearchPostRow.swift */,
 				A2F5B46CC2309C80FF475C61 /* CustomSearchSheetsModifier.swift */,
 				28D4561994799AE58C89450A /* CustomSearchView.swift */,
@@ -1391,6 +1397,7 @@
 				D82407480CC64963EB48674F /* ActionQueueStoreTests.swift in Sources */,
 				680E3BB4754FCFB8FAEB3436 /* AppErrorTests.swift in Sources */,
 				2A87E42386B541FFA4D364B8 /* AppLockManagerTimeoutTests.swift in Sources */,
+				EF2202507248EAD72CEAC0DB /* ArchitectureEnforcementTests.swift in Sources */,
 				250FF75DC49FBBA5927742A2 /* BlueskyAPIDTOsTests.swift in Sources */,
 				F00D2CE8A347BD81931B72E7 /* BlueskyListServiceTests.swift in Sources */,
 				6CE509BD1D1CB94B5F20C43E /* BlueskyProfileActionsViewModelTests.swift in Sources */,
@@ -1520,6 +1527,7 @@
 				9D3E4EF9ADB2BEC5CB0179B0 /* Color+RULYX.swift in Sources */,
 				22A4A150E9859AA06A459020 /* ComposeContext.swift in Sources */,
 				7DFCF1F602BA762E14337448 /* ComposePostView.swift in Sources */,
+				F1E163FD2256C427EFBB080B /* ComposePostViewModel.swift in Sources */,
 				E1E43579C3E2B9AFEBD5D769 /* ConversationDetailView.swift in Sources */,
 				BC76BF1B09E270F8E2C82297 /* ConversationListView.swift in Sources */,
 				FB9268034A8F2AB22D0E509F /* CustomSearchPostRow.swift in Sources */,
