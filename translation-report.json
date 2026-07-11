@@ -20,7 +20,7 @@
     ],
     "total_keys": 1333,
     "total_languages": 16,
-    "untranslated_total": 3173
+    "untranslated_total": 3518
   },
   "keys": {
     "account.active": {
@@ -13004,64 +13004,64 @@
     "command_palette.title": {
       "en": "Commands",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Commands",
+        "untranslated": true
       }
     },
     "common.progress.hint": {
@@ -13697,127 +13697,127 @@
     "compose.description": {
       "en": "Description",
       "de": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "fr": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "it": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "ja": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "zh": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "es": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "pt": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "ko": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "ru": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "ar": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "nl": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "pl": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "tr": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "th": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       },
       "vi": {
-        "text": "",
+        "text": "Description",
         "untranslated": false
       }
     },
     "compose.dm_warning": {
       "en": "This will be sent as a direct message.",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "This will be sent as a direct message.",
+        "untranslated": true
       }
     },
     "compose.error": {
@@ -14453,64 +14453,64 @@
     "compose.link_preview": {
       "en": "Link preview",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Link preview",
+        "untranslated": true
       }
     },
     "compose.placeholder": {
@@ -14642,64 +14642,64 @@
     "compose.post_gate.quoting_disabled": {
       "en": "Quoting turned off",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Quoting turned off",
+        "untranslated": true
       }
     },
     "compose.quote_title": {
@@ -14894,64 +14894,64 @@
     "compose.remove_link_preview": {
       "en": "Remove link preview",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Remove link preview",
+        "untranslated": true
       }
     },
     "compose.reply_controls": {
@@ -15524,64 +15524,64 @@
     "compose.send_dm": {
       "en": "Send via DM",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Send via DM",
+        "untranslated": true
       }
     },
     "compose.strikethrough": {
@@ -15650,64 +15650,64 @@
     "compose.suggested_crop": {
       "en": "Suggested crop",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Suggested crop",
+        "untranslated": true
       }
     },
     "compose.text_section": {
@@ -15776,190 +15776,190 @@
     "compose.thread_gate.everyone": {
       "en": "Everyone can reply",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Everyone can reply",
+        "untranslated": true
       }
     },
     "compose.thread_gate.following": {
       "en": "Only accounts I follow",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Only accounts I follow",
+        "untranslated": true
       }
     },
     "compose.thread_gate.mention": {
       "en": "Only mentioned accounts",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Only mentioned accounts",
+        "untranslated": true
       }
     },
     "compose.title": {
@@ -26234,64 +26234,64 @@
     "list.compare.add_second_list": {
       "en": "Add second list",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Add second list",
+        "untranslated": true
       }
     },
     "list.compare.bucket_only_current": {
@@ -26927,64 +26927,64 @@
     "list.compare.count": {
       "en": "{c1} vs {c2}",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "{c1} vs {c2}",
+        "untranslated": true
       }
     },
     "list.compare.deselect_actor.label": {
@@ -27053,64 +27053,64 @@
     "list.compare.difference": {
       "en": "Difference",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Difference",
+        "untranslated": true
       }
     },
     "list.compare.export_csv": {
@@ -27998,127 +27998,127 @@
     "list.compare.in_both": {
       "en": "In both",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "In both",
+        "untranslated": true
       }
     },
     "list.compare.intersection": {
       "en": "Intersection",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Intersection",
+        "untranslated": true
       }
     },
     "list.compare.loading": {
@@ -28565,127 +28565,127 @@
     "list.compare.only_in_first": {
       "en": "Only in first",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in first",
+        "untranslated": true
       }
     },
     "list.compare.only_in_second": {
       "en": "Only in second",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Only in second",
+        "untranslated": true
       }
     },
     "list.compare.only_other": {
@@ -28943,64 +28943,64 @@
     "list.compare.section_title": {
       "en": "Comparison",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Comparison",
+        "untranslated": true
       }
     },
     "list.compare.select_actor.label": {
@@ -29888,127 +29888,127 @@
     "list.create.placeholder_description": {
       "en": "Description (optional)",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Description (optional)",
+        "untranslated": true
       }
     },
     "list.create.placeholder_name": {
       "en": "List name",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "List name",
+        "untranslated": true
       }
     },
     "list.create.title": {
@@ -33983,64 +33983,64 @@
     "list.filter.muted": {
       "en": "Show muted",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Show muted",
+        "untranslated": true
       }
     },
     "list.import.cancel": {
@@ -43496,64 +43496,64 @@
     "list.update.error": {
       "en": "Failed to update list",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Failed to update list",
+        "untranslated": true
       }
     },
     "list_templates.create.hint": {
@@ -75059,64 +75059,64 @@
     "search.placeholder": {
       "en": "Search by DID, handle or display name",
       "de": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "fr": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "it": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "ja": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "zh": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "es": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "pt": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "ko": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "ru": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "ar": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "nl": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "pl": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "tr": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "th": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       },
       "vi": {
-        "text": "",
-        "untranslated": false
+        "text": "Search by DID, handle or display name",
+        "untranslated": true
       }
     },
     "settings.ai": {

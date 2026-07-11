@@ -25,20 +25,75 @@ enum HTTPRequestDebugFilter: String, CaseIterable, Identifiable {
     }
 }
 
+/// Tab selection for the debug view.
+private enum DebugViewTab: String, CaseIterable, Identifiable {
+    case list
+    case stats
+    var id: String {
+        rawValue
+    }
+
+    var localizationKey: String {
+        switch self {
+        case .list: "debug.http.tab.list"
+        case .stats: "debug.http.tab.stats"
+        }
+    }
+}
+
 /// A debug view that displays logged HTTP requests, their status codes,
-/// durations, and error response bodies. Supports filtering by succeeded/failed.
+/// durations, and error response bodies, plus a stats dashboard.
+/// Supports switching between a chronological list and a stats dashboard.
 struct HTTPRequestDebugView: View {
     @EnvironmentObject private var debugStore: HTTPRequestDebugStore
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var aiService: LiveAIService
     @Environment(\.dismiss) private var dismiss
     @State private var selectedFilter: HTTPRequestDebugFilter = .succeeded
     @State private var selectedErrorEntry: HTTPRequestDebugEntry?
+    @State private var selectedTab: DebugViewTab = .list
 
     private var filteredEntries: [HTTPRequestDebugEntry] {
         debugStore.entries.filter { selectedFilter.matches($0) }
     }
 
     var body: some View {
+        VStack(spacing: 0) {
+            // Tab picker
+            Picker("", selection: $selectedTab) {
+                ForEach(DebugViewTab.allCases) { tab in
+                    Text(localizationManager.localized(tab.localizationKey)).tag(tab)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .padding(.top, 8)
+
+            if selectedTab == .list {
+                listContent
+            } else {
+                HTTPDebugStatsView()
+                    .environmentObject(debugStore)
+                    .environmentObject(localizationManager)
+                    .environmentObject(aiService)
+            }
+        }
+        .navigationTitle(localizationManager.localized("debug.http.title"))
+        .sheet(item: $selectedErrorEntry) { entry in
+            NavigationStack {
+                HTTPRequestDebugErrorResponseView(entry: entry)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                ToolbarCloseButton()
+            }
+        }
+    }
+
+    // MARK: - List content (extracted from original body)
+
+    private var listContent: some View {
         VStack(spacing: 0) {
             Picker("Filter", selection: $selectedFilter) {
                 ForEach(HTTPRequestDebugFilter.allCases) { filter in
@@ -66,17 +121,6 @@ struct HTTPRequestDebugView: View {
                         )
                     }
                 }
-            }
-        }
-        .navigationTitle(localizationManager.localized("debug.http.title"))
-        .sheet(item: $selectedErrorEntry) { entry in
-            NavigationStack {
-                HTTPRequestDebugErrorResponseView(entry: entry)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                ToolbarCloseButton()
             }
         }
     }
