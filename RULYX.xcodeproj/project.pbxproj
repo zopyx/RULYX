@@ -50,6 +50,7 @@
 		21FBFB7E2EDF01FA3D9CA0B1 /* DirectionalSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F9ACE422B7A3A392487CBA6 /* DirectionalSymbol.swift */; };
 		2222EA258AA0A67311A6B395 /* nl.json in Resources */ = {isa = PBXBuildFile; fileRef = 64E0E9C888D2514617D3E9C0 /* nl.json */; };
 		22A4A150E9859AA06A459020 /* ComposeContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6FDB05B05B579AA328BF56 /* ComposeContext.swift */; };
+		231E3F803FEAF55455960654 /* HTTPRequestDebugStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F6BF1B58BC5CD685E5EAD9 /* HTTPRequestDebugStoreTests.swift */; };
 		23E168529534A0F98C8FE234 /* AccountStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6571FE9481793C96679D91 /* AccountStoreTests.swift */; };
 		2437CAA488C1815E9265C741 /* CustomSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D4561994799AE58C89450A /* CustomSearchView.swift */; };
 		24488F154C53147D5126ED66 /* ReplyComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692C913A711E686C56BD6A7 /* ReplyComposerView.swift */; };
@@ -170,6 +171,7 @@
 		72BEB32B4554149F6E05FAD4 /* ChaosIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BA150A4357766F221CA9D8 /* ChaosIntegrationTests.swift */; };
 		72EA1BB49CFCC686C2D3C572 /* ListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE9A3DB3795A38B8300D38 /* ListsView.swift */; };
 		7375A90D72482CB7420940A4 /* zh.json in Resources */ = {isa = PBXBuildFile; fileRef = 25A3D9D7D1C417EE9C245AFC /* zh.json */; };
+		73F063284821C37DD14EA2F0 /* BlueskyServiceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A7D8AA839352A53D230DA4 /* BlueskyServiceContainer.swift */; };
 		747F69785535C00DE735B82B /* FeedTimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72120E2FE66B0CBAB1969A4 /* FeedTimelineViewModel.swift */; };
 		7494D3901E58124A5B07FA37 /* PreviewAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEFE8A4F1D92CA3AFBB9EF4 /* PreviewAIService.swift */; };
 		759DDE5B61E608B3D29EA981 /* PostActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34FE99FFB565AAA3ACE5A96D /* PostActionBar.swift */; };
@@ -250,8 +252,10 @@
 		BCF895948F6A06560CB6E95D /* PageTitleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38E33392E147CCE40701D6B6 /* PageTitleModifier.swift */; };
 		BDC3DF6F1B30A99EDB60D233 /* CustomSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BC1B1C6F11B6ECB47B7C38 /* CustomSearchViewModel.swift */; };
 		BFD705D630672378B4B6EB39 /* ThreadCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA160C2458AEF6F8362BDB8C /* ThreadCacheService.swift */; };
+		C325BEFD2761FF7A0304AA8A /* MockServicesStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A00B9D2A4422A21CA5AA6FE /* MockServicesStubs.swift */; };
 		C4F19EFE40D63950CE3C7C0E /* ListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 741E2169946E95FC95D9281A /* ListDetailView.swift */; };
 		C58EBE66DA3EB174DC1681F3 /* ListsView+Export.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4214910379FF69F2EC530EF /* ListsView+Export.swift */; };
+		C6835C774CF91450ABC548A6 /* BlueskyServiceContainer+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5747B0FBFA9E6BB24A907A /* BlueskyServiceContainer+Mock.swift */; };
 		C9B6583F87B221546ED26059 /* AIModelManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB05777BA063DDA7CD3518F /* AIModelManagementView.swift */; };
 		CB294FA1201E62383542BE8E /* FeedTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BE169952D43B0D6F3941A5 /* FeedTimelineView.swift */; };
 		CB8463BEB64EF9484278166C /* ja.json in Resources */ = {isa = PBXBuildFile; fileRef = 83B3F04F6B6A8D971735B290 /* ja.json */; };
@@ -377,6 +381,7 @@
 		28D4561994799AE58C89450A /* CustomSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSearchView.swift; sourceTree = "<group>"; };
 		29F2D78D06982FBC0B5F945D /* URLBlueskyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLBlueskyTests.swift; sourceTree = "<group>"; };
 		29FAFCD1F150B6EDC814E753 /* RULYXApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RULYXApp.swift; sourceTree = "<group>"; };
+		2A00B9D2A4422A21CA5AA6FE /* MockServicesStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServicesStubs.swift; sourceTree = "<group>"; };
 		2AF9BA969D52386356D4AD1C /* TimelineTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineTab.swift; sourceTree = "<group>"; };
 		2B9CD38C1749428954E70CBB /* WorkspacePreferencesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacePreferencesStore.swift; sourceTree = "<group>"; };
 		2C5537EAD685E5FC4A1B3551 /* ReportGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportGeneratorView.swift; sourceTree = "<group>"; };
@@ -449,6 +454,7 @@
 		61A24BB8EF6B643CD053E356 /* PostRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRowView.swift; sourceTree = "<group>"; };
 		6410F5E8B465A4948FA8CE8D /* BlueskyProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfile.swift; sourceTree = "<group>"; };
 		64E0E9C888D2514617D3E9C0 /* nl.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = nl.json; sourceTree = "<group>"; };
+		64F6BF1B58BC5CD685E5EAD9 /* HTTPRequestDebugStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequestDebugStoreTests.swift; sourceTree = "<group>"; };
 		6578B3A3E0D7B991826A37B9 /* ProfileInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInspectorView.swift; sourceTree = "<group>"; };
 		678D0031FC923D1451B284B2 /* GIFServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFServiceTests.swift; sourceTree = "<group>"; };
 		67BAF95DBA686753FF29171E /* RULYXUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RULYXUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -575,6 +581,7 @@
 		BCCD30322305917D698AC804 /* pl.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pl.json; sourceTree = "<group>"; };
 		BD3C1DD3F3BB3D87F33F4615 /* BlueskyAPIDTOsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPIDTOsTests.swift; sourceTree = "<group>"; };
 		BDB53510EA9B66B893EE1021 /* BlueskyFeedServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyFeedServicing.swift; sourceTree = "<group>"; };
+		BE5747B0FBFA9E6BB24A907A /* BlueskyServiceContainer+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlueskyServiceContainer+Mock.swift"; sourceTree = "<group>"; };
 		BF0135FBE082A7D62EDC74AE /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		BF78B4DDF8BD53DBFB6CD7DC /* InfrastructureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfrastructureServiceTests.swift; sourceTree = "<group>"; };
 		C191635343E81BCF211C8A2E /* ConversationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationDetailView.swift; sourceTree = "<group>"; };
@@ -632,6 +639,7 @@
 		F010F2C9C680C67B981B4056 /* BlueskyMediaServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyMediaServicing.swift; sourceTree = "<group>"; };
 		F28D489A23353FE7D98E312B /* ActionPresetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionPresetsView.swift; sourceTree = "<group>"; };
 		F4D7F5145B9830E215B77DB3 /* HTTPRequestDebugStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequestDebugStore.swift; sourceTree = "<group>"; };
+		F5A7D8AA839352A53D230DA4 /* BlueskyServiceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyServiceContainer.swift; sourceTree = "<group>"; };
 		F5F2B32F67505F907D71DF45 /* ListDetailSnapshotSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailSnapshotSection.swift; sourceTree = "<group>"; };
 		F61A6EAC9955CEDB8DC9D24F /* iPadNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadNotificationsView.swift; sourceTree = "<group>"; };
 		F72120E2FE66B0CBAB1969A4 /* FeedTimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedTimelineViewModel.swift; sourceTree = "<group>"; };
@@ -701,6 +709,7 @@
 				9D190E910C369BA689CA28DA /* ClearskyHeartbeatServiceTests.swift */,
 				6F5D16EA42B34C5B2C92680D /* FeedTimelineViewModelTests.swift */,
 				678D0031FC923D1451B284B2 /* GIFServiceTests.swift */,
+				64F6BF1B58BC5CD685E5EAD9 /* HTTPRequestDebugStoreTests.swift */,
 				BF78B4DDF8BD53DBFB6CD7DC /* InfrastructureServiceTests.swift */,
 				9A61C8FB4BEB328068D6640D /* KeychainServiceTests.swift */,
 				94BB725A8F6B3EFC048C931E /* ListBatchControllerTests.swift */,
@@ -1014,10 +1023,12 @@
 		DCE392E1E78EECEB996E3B40 /* TestUtilities */ = {
 			isa = PBXGroup;
 			children = (
+				BE5747B0FBFA9E6BB24A907A /* BlueskyServiceContainer+Mock.swift */,
 				AAB4588D6F0EF8BC613297A2 /* MockAccountStore.swift */,
 				6A1FD266CC2B518115D5012C /* MockClearSkyService.swift */,
 				5311D291F3EA560A387AEF73 /* MockListService.swift */,
 				FF0457C2D4340131F652E6D1 /* MockProfileService.swift */,
+				2A00B9D2A4422A21CA5AA6FE /* MockServicesStubs.swift */,
 				4DD87362DBC7956DE7CBD5F4 /* MockSocialService.swift */,
 			);
 			path = TestUtilities;
@@ -1070,6 +1081,7 @@
 				B131B0D0C00FB51A153387EE /* BlueskyProfileService.swift */,
 				0DE7D4286217501809628B69 /* BlueskyPushNotificationService.swift */,
 				327BF295946A77C571BA7DAB /* BlueskyRequestExecutor.swift */,
+				F5A7D8AA839352A53D230DA4 /* BlueskyServiceContainer.swift */,
 				B2AC0D09E873DD0CF1C2AC34 /* BlueskySession.swift */,
 				D9247E08E5551755A2ED991A /* BlueskySessionService.swift */,
 				38504B3CEACB3AFD61DBC65C /* ChatAPIDTOs.swift */,
@@ -1377,6 +1389,7 @@
 				6CE509BD1D1CB94B5F20C43E /* BlueskyProfileActionsViewModelTests.swift in Sources */,
 				9271F790F11CEF080D051AFC /* BlueskyProfileServiceTests.swift in Sources */,
 				461D51E50BD429BE7DC457EB /* BlueskyRequestExecutorTests.swift in Sources */,
+				C6835C774CF91450ABC548A6 /* BlueskyServiceContainer+Mock.swift in Sources */,
 				886DEA0334FF68AFAB2002F5 /* BlueskySessionService401RetryTests.swift in Sources */,
 				72BEB32B4554149F6E05FAD4 /* ChaosIntegrationTests.swift in Sources */,
 				3B1BCF1190BD90AB38ECFF21 /* ChatAPIDTOsTests.swift in Sources */,
@@ -1384,6 +1397,7 @@
 				551D3F996C88CB63CC914C99 /* ClearskyHeartbeatServiceTests.swift in Sources */,
 				635D2FE45B4C7D1F764FCEB9 /* FeedTimelineViewModelTests.swift in Sources */,
 				3AA4EB7D6AEA40C61F242B9D /* GIFServiceTests.swift in Sources */,
+				231E3F803FEAF55455960654 /* HTTPRequestDebugStoreTests.swift in Sources */,
 				E06BCE10E79FB2583810EA42 /* InfrastructureServiceTests.swift in Sources */,
 				795BDA662D4EBD493BC98450 /* KeychainServiceTests.swift in Sources */,
 				A04CEF8CDF966612714CA05C /* ListBatchControllerTests.swift in Sources */,
@@ -1402,6 +1416,7 @@
 				FC9E6ADF72A43BB2601DF950 /* MockClearSkyService.swift in Sources */,
 				394469699AC39AE036FDAAC9 /* MockListService.swift in Sources */,
 				4D3080D4A51C368937FB3A3A /* MockProfileService.swift in Sources */,
+				C325BEFD2761FF7A0304AA8A /* MockServicesStubs.swift in Sources */,
 				283F10F9FB476BCFA12CBE4B /* MockSocialService.swift in Sources */,
 				B8141545B4110EE6A55DC4E5 /* MockURLProtocol.swift in Sources */,
 				5386C33152EAF5D1A2248DCB /* ModelTests.swift in Sources */,
@@ -1476,6 +1491,7 @@
 				7CD08E3F34D51589A0197719 /* BlueskyProfileViewModel.swift in Sources */,
 				4D1D2B15E70093CFF623E5D9 /* BlueskyPushNotificationService.swift in Sources */,
 				80CB84BD5DFC10B76E494D87 /* BlueskyRequestExecutor.swift in Sources */,
+				73F063284821C37DD14EA2F0 /* BlueskyServiceContainer.swift in Sources */,
 				ABF23418A43340A1212E7CF8 /* BlueskySession.swift in Sources */,
 				16B010003DAF27457AB23FD8 /* BlueskySessionService.swift in Sources */,
 				E41A87C6318319C8DDE63508 /* BlueskySocialServicing.swift in Sources */,

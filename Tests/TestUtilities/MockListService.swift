@@ -64,4 +64,23 @@ final class MockListService: BlueskyListServicing {
     func reportList(_ list: BlueskyList, selectedReason: ModerationReportReasonType?, reason: String?, account: AppAccount, appPassword: String?) async throws {
         try await reportListTypedHandler(list, selectedReason, reason, account, appPassword)
     }
+
+    func fetchActorLists(actor _: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
+        try await fetchLists(for: account, appPassword: appPassword)
+    }
+
+    func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor) {
+        guard let list = try await fetchList(uri: uri, account: account, appPassword: appPassword) else {
+            throw BlueskyAPIError.invalidResponse
+        }
+        return (list, BlueskyActor(did: "did:plc:creator", handle: "creator.bsky.social"))
+    }
+
+    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] { [] }
+
+    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool { false }
+
+    func subscribeToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func unsubscribeFromModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
 }
