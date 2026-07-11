@@ -186,7 +186,8 @@ final class BlueskySessionService: BlueskySessionServicing {
                    case .pdsUnreachable = apiError {
                     throw error
                 }
-                // All other errors: fall through to retry
+                // All other errors: re-throw immediately, no retry
+                throw error
             }
         }
 

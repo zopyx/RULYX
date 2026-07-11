@@ -150,14 +150,25 @@ final class LiveBlueskyClientTests: XCTestCase {
             }
 
             if url.contains("getProfiles") {
-                let json = """
-                {"profiles": [
-                    {"did": "did:plc:shared", "handle": "shared.bsky.social"},
-                    {"did": "did:plc:only-blocked", "handle": "only-blocked.bsky.social"},
-                    {"did": "did:plc:only-blocked-by", "handle": "only-blocked-by.bsky.social"}
-                ]}
-                """.data(using: .utf8)!
-                return (response, json)
+                // Only return the profiles whose DIDs are actually requested in the URL.
+                // The implementation should only request the unblocked-blocker DIDs after subtraction.
+                let json: String
+                if url.contains("actors=did:plc:only-blocked-by&")
+                    || url.hasSuffix("actors=did:plc:only-blocked-by")
+                {
+                    json = """
+                    {"profiles": [{"did": "did:plc:only-blocked-by", "handle": "only-blocked-by.bsky.social"}]}
+                    """
+                } else {
+                    json = """
+                    {"profiles": [
+                        {"did": "did:plc:shared", "handle": "shared.bsky.social"},
+                        {"did": "did:plc:only-blocked", "handle": "only-blocked.bsky.social"},
+                        {"did": "did:plc:only-blocked-by", "handle": "only-blocked-by.bsky.social"}
+                    ]}
+                    """
+                }
+                return (response, json.data(using: .utf8)!)
             }
 
             throw BlueskyAPIError.invalidURL
@@ -207,12 +218,19 @@ final class LiveBlueskyClientTests: XCTestCase {
             }
 
             if url.contains("getProfiles") {
-                var profiles = (0 ..< 100).map { index in
-                    #"{"did":"did:plc:shared\#(index)","handle":"shared\#(index).bsky.social"}"#
+                // After subtraction, only did:plc:block-only should remain.
+                // Return only the profiles whose DIDs are actually requested.
+                let json: Data
+                if url.contains("did:plc:block-only"), !url.contains("did:plc:shared"), !url.contains("did:plc:blocker-only") {
+                    json = #"{"profiles":[{"did":"did:plc:block-only","handle":"block-only.bsky.social"}]}"#.data(using: .utf8)!
+                } else {
+                    var profiles = (0 ..< 100).map { index in
+                        #"{"did":"did:plc:shared\#(index)","handle":"shared\#(index).bsky.social"}"#
+                    }
+                    profiles.append(#"{"did":"did:plc:block-only","handle":"block-only.bsky.social"}"#)
+                    profiles.append(#"{"did":"did:plc:blocker-only","handle":"blocker-only.bsky.social"}"#)
+                    json = #"{"profiles":[\#(profiles.joined(separator: ","))]}"#.data(using: .utf8)!
                 }
-                profiles.append(#"{"did":"did:plc:block-only","handle":"block-only.bsky.social"}"#)
-                profiles.append(#"{"did":"did:plc:blocker-only","handle":"blocker-only.bsky.social"}"#)
-                let json = #"{"profiles":[\#(profiles.joined(separator: ","))]}"#.data(using: .utf8)!
                 return (response, json)
             }
 
@@ -337,8 +355,29 @@ final class LiveBlueskyClientTests: XCTestCase {
             XCTAssertEqual(request.url?.path, "/xrpc/app.bsky.graph.muteActorList")
             XCTAssertEqual(request.httpMethod, "POST")
 
-            let body = try XCTUnwrap(request.httpBody)
-            let payload = try JSONDecoder().decode(ListReferenceRequest.self, from: body)
+            let bodyData: Data
+            if let httpBody = request.httpBody {
+                bodyData = httpBody
+            } else if let stream = request.httpBodyStream {
+                stream.open()
+                defer { stream.close() }
+                var data = Data()
+                while stream.hasBytesAvailable {
+                    var buffer = [UInt8](repeating: 0, count: 1024)
+                    let read = stream.read(&buffer, maxLength: buffer.count)
+                    if read > 0 {
+                        data.append(buffer, count: read)
+                    } else {
+                        break
+                    }
+                }
+                bodyData = data
+            } else {
+                XCTFail("Expected request body (neither httpBody nor httpBodyStream)")
+                let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                return (response, Data("{}".utf8))
+            }
+            let payload = try JSONDecoder().decode(ListReferenceRequest.self, from: bodyData)
             XCTAssertEqual(payload.list, expectedURI)
 
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
@@ -355,8 +394,29 @@ final class LiveBlueskyClientTests: XCTestCase {
             XCTAssertEqual(request.url?.path, "/xrpc/app.bsky.graph.unmuteActorList")
             XCTAssertEqual(request.httpMethod, "POST")
 
-            let body = try XCTUnwrap(request.httpBody)
-            let payload = try JSONDecoder().decode(ListReferenceRequest.self, from: body)
+            let bodyData: Data
+            if let httpBody = request.httpBody {
+                bodyData = httpBody
+            } else if let stream = request.httpBodyStream {
+                stream.open()
+                defer { stream.close() }
+                var data = Data()
+                while stream.hasBytesAvailable {
+                    var buffer = [UInt8](repeating: 0, count: 1024)
+                    let read = stream.read(&buffer, maxLength: buffer.count)
+                    if read > 0 {
+                        data.append(buffer, count: read)
+                    } else {
+                        break
+                    }
+                }
+                bodyData = data
+            } else {
+                XCTFail("Expected request body (neither httpBody nor httpBodyStream)")
+                let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                return (response, Data("{}".utf8))
+            }
+            let payload = try JSONDecoder().decode(ListReferenceRequest.self, from: bodyData)
             XCTAssertEqual(payload.list, expectedURI)
 
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
