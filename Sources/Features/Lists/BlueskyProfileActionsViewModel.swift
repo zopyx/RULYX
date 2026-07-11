@@ -7,9 +7,9 @@ import SwiftUI
 final class BlueskyProfileActionsViewModel: ObservableObject {
     // MARK: - Dependencies
 
-    private let profileService: BlueskyProfileInspecting
-    let clearskyService: BlueskyClearSkyServicing
-    let accountStore: AccountStore
+    private var profileService: BlueskyProfileInspecting
+    private var clearskyService: BlueskyClearSkyServicing
+    private var accountStore: AccountStore
     let clearskyHeartbeat: ClearskyHeartbeatService
 
     // MARK: - Block Counts
@@ -52,6 +52,17 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
         self.clearskyService = clearskyService
         self.accountStore = accountStore
         self.clearskyHeartbeat = clearskyHeartbeat
+    }
+
+    /// Reconfigure with new services for transition-period wiring.
+    func reconfigure(
+        profileService: BlueskyProfileInspecting,
+        clearskyService: BlueskyClearSkyServicing,
+        accountStore: AccountStore
+    ) {
+        self.profileService = profileService
+        self.clearskyService = clearskyService
+        self.accountStore = accountStore
     }
 
     /// Convenience initializer using the live client (for transition period).
