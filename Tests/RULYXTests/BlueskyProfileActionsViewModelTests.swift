@@ -6,16 +6,16 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
     var sut: BlueskyProfileActionsViewModel!
     var mockProfile: MockProfileService!
     var mockClearSky: MockClearSkyService!
-    var accountStore: AccountStore!
+    var mockAccount: MockAccountStore!
 
     override func setUp() async throws {
         mockProfile = MockProfileService()
         mockClearSky = MockClearSkyService()
-        accountStore = AccountStore(preview: true)
+        mockAccount = MockAccountStore()
         sut = BlueskyProfileActionsViewModel(
             profileService: mockProfile,
             clearskyService: mockClearSky,
-            accountStore: accountStore
+            accountStore: mockAccount
         )
         sut.resultDisplayDuration = 0 // fast tests
     }
@@ -24,7 +24,7 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
         sut = nil
         mockProfile = nil
         mockClearSky = nil
-        accountStore = nil
+        mockAccount = nil
     }
 
     // MARK: - Block Back

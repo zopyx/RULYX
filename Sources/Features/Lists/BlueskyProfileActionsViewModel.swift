@@ -9,7 +9,7 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
 
     private var profileService: BlueskyProfileInspecting
     private var clearskyService: BlueskyClearSkyServicing
-    private var accountStore: AccountStore
+    private var accountStore: AccountStoreProtocol
     let clearskyHeartbeat: ClearskyHeartbeatService
 
     // MARK: - Block Counts
@@ -45,7 +45,7 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
     init(
         profileService: BlueskyProfileInspecting,
         clearskyService: BlueskyClearSkyServicing,
-        accountStore: AccountStore,
+        accountStore: AccountStoreProtocol,
         clearskyHeartbeat: ClearskyHeartbeatService = .shared
     ) {
         self.profileService = profileService
@@ -58,7 +58,7 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
     func reconfigure(
         profileService: BlueskyProfileInspecting,
         clearskyService: BlueskyClearSkyServicing,
-        accountStore: AccountStore
+        accountStore: AccountStoreProtocol
     ) {
         self.profileService = profileService
         self.clearskyService = clearskyService
