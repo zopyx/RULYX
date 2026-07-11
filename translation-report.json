@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1361,
+    "total_keys": 1358,
     "total_languages": 16,
-    "untranslated_total": 3906
+    "untranslated_total": 3846
   },
   "keys": {
     "account.active": {
@@ -17976,384 +17976,6 @@
       "vi": {
         "text": "Chẩn đoán",
         "untranslated": false
-      }
-    },
-    "debug.http.ai.analyze": {
-      "en": "Analyze Failed Requests",
-      "de": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "fr": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "it": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "ja": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "zh": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "es": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "pt": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "ko": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "ru": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "ar": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "nl": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "pl": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "tr": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "th": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      },
-      "vi": {
-        "text": "Analyze Failed Requests",
-        "untranslated": true
-      }
-    },
-    "debug.http.ai.analyzing": {
-      "en": "Analyzing failures...",
-      "de": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "fr": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "it": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "ja": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "zh": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "es": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "pt": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "ko": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "ru": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "ar": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "nl": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "pl": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "tr": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "th": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      },
-      "vi": {
-        "text": "Analyzing failures...",
-        "untranslated": true
-      }
-    },
-    "debug.http.ai.download_hint": {
-      "en": "Download a text generation model in Settings > AI Models",
-      "de": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "fr": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "it": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "ja": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "zh": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "es": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "pt": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "ko": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "ru": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "ar": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "nl": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "pl": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "tr": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "th": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      },
-      "vi": {
-        "text": "Download a text generation model in Settings > AI Models",
-        "untranslated": true
-      }
-    },
-    "debug.http.ai.no_failures": {
-      "en": "No failed requests to analyze",
-      "de": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "fr": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "it": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "ja": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "zh": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "es": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "pt": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "ko": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "ru": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "ar": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "nl": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "pl": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "tr": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "th": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      },
-      "vi": {
-        "text": "No failed requests to analyze",
-        "untranslated": true
-      }
-    },
-    "debug.http.ai.no_model": {
-      "en": "No AI model available",
-      "de": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "fr": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "it": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "ja": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "zh": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "es": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "pt": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "ko": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "ru": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "ar": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "nl": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "pl": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "tr": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "th": {
-        "text": "No AI model available",
-        "untranslated": true
-      },
-      "vi": {
-        "text": "No AI model available",
-        "untranslated": true
-      }
-    },
-    "debug.http.ai.title": {
-      "en": "AI Analysis",
-      "de": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "fr": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "it": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "ja": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "zh": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "es": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "pt": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "ko": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "ru": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "ar": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "nl": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "pl": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "tr": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "th": {
-        "text": "AI Analysis",
-        "untranslated": true
-      },
-      "vi": {
-        "text": "AI Analysis",
-        "untranslated": true
       }
     },
     "debug.http.clear": {
@@ -58487,6 +58109,69 @@
         "untranslated": false
       }
     },
+    "profile.block_back.preparing": {
+      "en": "Preparing…",
+      "de": {
+        "text": "Vorbereiten…",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Préparation…",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Preparazione…",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "準備中…",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "准备中…",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Preparando…",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Preparando…",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "준비 중…",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Подготовка…",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "جارٍ التحضير…",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Voorbereiden…",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Przygotowanie…",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Hazırlanıyor…",
+        "untranslated": false
+      },
+      "th": {
+        "text": "กำลังเตรียม…",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Đang chuẩn bị…",
+        "untranslated": false
+      }
+    },
     "profile.block_back.preview.blocks_me": {
       "en": "Blocks me",
       "de": {
@@ -58673,6 +58358,69 @@
       },
       "vi": {
         "text": "No accounts to block back",
+        "untranslated": true
+      }
+    },
+    "profile.block_back.preview.loading": {
+      "en": "Gathering block information…",
+      "de": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Gathering block information…",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Gathering block information…",
         "untranslated": true
       }
     },
@@ -58863,6 +58611,69 @@
       "vi": {
         "text": "Chặn lại {completed}/{total}…",
         "untranslated": false
+      }
+    },
+    "profile.block_back.progress.current": {
+      "en": "Blocking @{handle}…",
+      "de": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Blocking @{handle}…",
+        "untranslated": true
       }
     },
     "profile.block_back.result": {
