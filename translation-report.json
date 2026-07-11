@@ -18,9 +18,9 @@
       "th",
       "vi"
     ],
-    "total_keys": 1333,
+    "total_keys": 1361,
     "total_languages": 16,
-    "untranslated_total": 3518
+    "untranslated_total": 3906
   },
   "keys": {
     "account.active": {
@@ -17978,6 +17978,384 @@
         "untranslated": false
       }
     },
+    "debug.http.ai.analyze": {
+      "en": "Analyze Failed Requests",
+      "de": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Analyze Failed Requests",
+        "untranslated": true
+      }
+    },
+    "debug.http.ai.analyzing": {
+      "en": "Analyzing failures...",
+      "de": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Analyzing failures...",
+        "untranslated": true
+      }
+    },
+    "debug.http.ai.download_hint": {
+      "en": "Download a text generation model in Settings > AI Models",
+      "de": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Download a text generation model in Settings > AI Models",
+        "untranslated": true
+      }
+    },
+    "debug.http.ai.no_failures": {
+      "en": "No failed requests to analyze",
+      "de": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No failed requests to analyze",
+        "untranslated": true
+      }
+    },
+    "debug.http.ai.no_model": {
+      "en": "No AI model available",
+      "de": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "it": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "es": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "th": {
+        "text": "No AI model available",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "No AI model available",
+        "untranslated": true
+      }
+    },
+    "debug.http.ai.title": {
+      "en": "AI Analysis",
+      "de": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "it": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "es": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "th": {
+        "text": "AI Analysis",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "AI Analysis",
+        "untranslated": true
+      }
+    },
     "debug.http.clear": {
       "en": "Clear Log",
       "de": {
@@ -18354,6 +18732,1392 @@
       "vi": {
         "text": "Thành công",
         "untranslated": false
+      }
+    },
+    "debug.http.stats.by_source": {
+      "en": "By Source",
+      "de": {
+        "text": "Nach Quelle",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "it": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "es": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "th": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "By Source",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.error_rate": {
+      "en": "Error Rate",
+      "de": {
+        "text": "Fehlerrate",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Error Rate",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Error Rate",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.export": {
+      "en": "Share CSV",
+      "de": {
+        "text": "CSV teilen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Share CSV",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Share CSV",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.export.buckets": {
+      "en": "Time Buckets",
+      "de": {
+        "text": "Zeitfenster",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Time Buckets",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Time Buckets",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.export.full": {
+      "en": "Full",
+      "de": {
+        "text": "Alle",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Full",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Full",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.export.sources": {
+      "en": "By Source",
+      "de": {
+        "text": "Nach Quelle",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "it": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "es": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "th": {
+        "text": "By Source",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "By Source",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.export_hint": {
+      "en": "Download a CSV file with the raw request data for external analysis.",
+      "de": {
+        "text": "CSV-Datei mit den Rohdaten zur externen Analyse herunterladen.",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Download a CSV file with the raw request data for external analysis.",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.export_title": {
+      "en": "Export CSV",
+      "de": {
+        "text": "CSV exportieren",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Export CSV",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Export CSV",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.failed": {
+      "en": "Failed",
+      "de": {
+        "text": "Fehlgeschlagen",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Failed",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Failed",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.granularity.5min": {
+      "en": "5 min",
+      "de": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "it": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "es": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "th": {
+        "text": "5 min",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "5 min",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.granularity.day": {
+      "en": "Day",
+      "de": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Day",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Day",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.granularity.hour": {
+      "en": "Hour",
+      "de": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Hour",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Hour",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.granularity.minute": {
+      "en": "Minute",
+      "de": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "fr": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Minute",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Minute",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.running": {
+      "en": "Running",
+      "de": {
+        "text": "Aktiv",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Running",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Running",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.source": {
+      "en": "Source",
+      "de": {
+        "text": "Quelle",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Source",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Source",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.source_table": {
+      "en": "Source Breakdown",
+      "de": {
+        "text": "Quellen-Aufschlüsselung",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Source Breakdown",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.succeeded": {
+      "en": "Succeeded",
+      "de": {
+        "text": "Erfolgreich",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Succeeded",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Succeeded",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.timeline": {
+      "en": "Timeline (24h)",
+      "de": {
+        "text": "Zeitverlauf (24h)",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Timeline (24h)",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.title": {
+      "en": "HTTP Stats",
+      "de": {
+        "text": "HTTP-Statistik",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "it": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "es": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "th": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "HTTP Stats",
+        "untranslated": true
+      }
+    },
+    "debug.http.stats.total": {
+      "en": "Total",
+      "de": {
+        "text": "Gesamt",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "it": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "ja": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "zh": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "es": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "pt": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "ko": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "ru": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "ar": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "nl": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "pl": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "tr": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "th": {
+        "text": "Total",
+        "untranslated": false
+      },
+      "vi": {
+        "text": "Total",
+        "untranslated": false
+      }
+    },
+    "debug.http.tab.list": {
+      "en": "List",
+      "de": {
+        "text": "Liste",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "List",
+        "untranslated": true
+      },
+      "it": {
+        "text": "List",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "List",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "List",
+        "untranslated": true
+      },
+      "es": {
+        "text": "List",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "List",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "List",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "List",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "List",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "List",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "List",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "List",
+        "untranslated": true
+      },
+      "th": {
+        "text": "List",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "List",
+        "untranslated": true
+      }
+    },
+    "debug.http.tab.stats": {
+      "en": "Stats",
+      "de": {
+        "text": "Statistik",
+        "untranslated": false
+      },
+      "fr": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "it": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "ja": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "zh": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "es": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "pt": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "ko": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "ru": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "ar": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "nl": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "pl": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "tr": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "th": {
+        "text": "Stats",
+        "untranslated": true
+      },
+      "vi": {
+        "text": "Stats",
+        "untranslated": true
       }
     },
     "debug.http.title": {

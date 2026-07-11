@@ -65,6 +65,8 @@ struct AppError: LocalizedError, Equatable {
                 return AppError(category: .authentication, message: apiError.localizedDescription)
             case .server:
                 return AppError(category: .server, message: apiError.localizedDescription)
+            case .pdsUnreachable:
+                return AppError(category: .network, message: apiError.localizedDescription)
             }
         }
 

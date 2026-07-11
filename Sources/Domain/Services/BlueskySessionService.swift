@@ -82,14 +82,29 @@ final class BlueskySessionService: BlueskySessionServicing {
         } else {
             try await authenticationURL(forHandle: handle)
         }
-        let response: CreateSessionResponse = try await requestExecutor.send(
-            path: "com.atproto.server.createSession",
-            method: "POST",
-            queryItems: [],
-            body: requestBody,
-            accessToken: nil,
-            hostURL: authURL
-        )
+        let response: CreateSessionResponse
+        do {
+            response = try await requestExecutor.send(
+                path: "com.atproto.server.createSession",
+                method: "POST",
+                queryItems: [],
+                body: requestBody,
+                accessToken: nil,
+                hostURL: authURL
+            )
+        } catch let BlueskyAPIError.server(message) where message.contains("404") || message.contains("not found") {
+            throw BlueskyAPIError.pdsUnreachable(authURL.host ?? "unknown")
+        } catch let BlueskyAPIError.invalidResponse {
+            // createSession returning 404 with no parseable body → PDS unreachable
+            throw BlueskyAPIError.pdsUnreachable(authURL.host ?? "unknown")
+        } catch let error as URLError {
+            if error.code == .cannotFindHost || error.code == .cannotConnectToHost ||
+               error.code == .dnsLookupFailed || error.code == .timedOut ||
+               error.code == .networkConnectionLost {
+                throw BlueskyAPIError.pdsUnreachable(authURL.host ?? "unknown")
+            }
+            throw error
+        }
 
         let pdsURL = try await resolvedPDSURL(
             from: response.didDoc,
@@ -165,6 +180,13 @@ final class BlueskySessionService: BlueskySessionServicing {
                 )
                 let delay = pow(2.0, Double(attempt)) * Double.random(in: 0.8 ..< 1.2)
                 try? await Task.sleep(for: .seconds(delay))
+            } catch let error {
+                // Don't retry PDS connectivity errors
+                if let apiError = error as? BlueskyAPIError,
+                   case .pdsUnreachable = apiError {
+                    throw error
+                }
+                // All other errors: fall through to retry
             }
         }
 

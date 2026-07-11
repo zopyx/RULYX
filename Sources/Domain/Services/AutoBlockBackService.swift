@@ -1,6 +1,6 @@
 import BackgroundTasks
-import UserNotifications
 import SwiftUI
+import UserNotifications
 
 // MARK: - AutoBlockBackService
 
@@ -115,8 +115,13 @@ final class AutoBlockBackService: ObservableObject {
                     }
                 } catch {
                     failed += 1
+                    let errorDesc = error.localizedDescription
+                    // Log the full error chain for diagnostics
+                    let nsError = error as NSError
+                    let underlyingErrors = nsError.underlyingErrors.map(\.localizedDescription).joined(separator: "; ")
+                    let detail = underlyingErrors.isEmpty ? "" : " [underlying: \(underlyingErrors)]"
                     AppLogger.moderation.error(
-                        "Auto-block-back failed for \(actor.handle, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                        "Auto-block-back failed for \(actor.handle, privacy: .public): \(errorDesc, privacy: .public)\(detail, privacy: .public)"
                     )
                 }
             }
@@ -137,6 +142,15 @@ final class AutoBlockBackService: ObservableObject {
                     listNames: listNames
                 )
             }
+        } catch let BlueskyAPIError.pdsUnreachable(host) {
+            AppLogger.moderation.error(
+                "Auto-block-back skipped: active account PDS (\(host)) is unreachable."
+            )
+            lastResult = Result(
+                blockedCount: 0, failedCount: 0,
+                addedToListCount: 0, listNames: [],
+                timestamp: .now
+            )
         } catch {
             AppLogger.moderation.error(
                 "Auto-block-back fetch failed: \(error.localizedDescription, privacy: .public)"
@@ -240,7 +254,7 @@ final class AutoBlockBackService: ObservableObject {
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
         guard settings.authorizationStatus == .authorized ||
-              settings.authorizationStatus == .provisional else { return }
+            settings.authorizationStatus == .provisional else { return }
 
         let content = UNMutableNotificationContent()
 

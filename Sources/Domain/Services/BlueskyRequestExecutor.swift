@@ -120,16 +120,23 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
                 }
                 throw BlueskyAPIError.server(errorPayload.message ?? errorCode)
             }
+            let bodyPreview = String(decoding: data.prefix(500), as: UTF8.self)
+            AppLogger.moderation.error(
+                "BlueskyRequestExecutor got HTTP \(httpResponse.statusCode) for \(method) xrpc/\(path): \(bodyPreview, privacy: .public)"
+            )
             throw BlueskyAPIError.invalidResponse
         }
 
         AppLogger.performance.debug("\(method, privacy: .public) \(path, privacy: .public) took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s (\(httpResponse.statusCode))")
 
         do {
-            let decodedData = data.isEmpty ? Data("{}".utf8) : data
+            let decodedData = data.isEmpty ? Data("{ }".utf8) : data
             return try JSONDecoder().decode(Response.self, from: decodedData)
         } catch {
-            AppLogger.performance.debug("Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            let bodyPreview = String(decoding: data.prefix(500), as: UTF8.self)
+            AppLogger.performance.debug(
+                "Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public). Body: \(bodyPreview, privacy: .public)"
+            )
             throw BlueskyAPIError.invalidResponse
         }
     }

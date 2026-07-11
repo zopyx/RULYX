@@ -18,6 +18,8 @@ enum BlueskyAPIError: LocalizedError {
     case deactivated(String)
     /// A generic server-side error (includes server message).
     case server(String)
+    /// The account's PDS is unreachable (DNS failure, connection refused, or 404).
+    case pdsUnreachable(String)
 
     var errorDescription: String? {
         switch self {
@@ -37,6 +39,8 @@ enum BlueskyAPIError: LocalizedError {
             "This account has been deactivated: \(message)"
         case let .server(message):
             "Bluesky returned an error: \(message)"
+        case let .pdsUnreachable(host):
+            "PDS \(host) is not reachable. Check account configuration."
         }
     }
 }
