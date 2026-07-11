@@ -99,6 +99,26 @@ final class MockBlueskyListService: BlueskyListServicing {
         try await Task.sleep(for: .milliseconds(100))
     }
 
+    func fetchActorLists(actor _: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
+        try await fetchLists(for: account, appPassword: appPassword)
+    }
+
+    func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor) {
+        guard let list = try await fetchList(uri: uri, account: account, appPassword: appPassword) else {
+            throw BlueskyAPIError.invalidResponse
+        }
+        let creator = BlueskyActor(did: "did:plc:creator", handle: "creator.bsky.social")
+        return (list, creator)
+    }
+
+    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] { [] }
+
+    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool { false }
+
+    func subscribeToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func unsubscribeFromModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
+
     private func previewMembers(for list: BlueskyList) -> [BlueskyListMember] {
         let now = Date()
         return Self.previewActors.enumerated().map { index, actor in
