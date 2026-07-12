@@ -10,21 +10,21 @@ final class ListsViewModel: ObservableObject {
     // MARK: - Properties
 
     /// All moderation lists grouped by their kind (moderation, reference, etc.).
-    private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
+    @Published private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     /// Profile of the currently active account.
-    private(set) var activeProfile: BlueskyProfile?
+    @Published private(set) var activeProfile: BlueskyProfile?
     /// Number of accounts this user is blocking.
-    private(set) var blockingCount: Int?
+    @Published private(set) var blockingCount: Int?
     /// Number of accounts blocking this user.
-    private(set) var blockedByCount: Int?
+    @Published private(set) var blockedByCount: Int?
     /// True while the initial load is in progress (no cache).
-    private(set) var isLoading = false
+    @Published private(set) var isLoading = false
     /// True while a manual refresh is in progress.
-    private(set) var isRefreshing = false
+    @Published private(set) var isRefreshing = false
     /// True when the displayed data was loaded from cache.
-    private(set) var isFromCache = false
+    @Published private(set) var isFromCache = false
     /// User-facing error message.
-    var errorMessage: String?
+    @Published var errorMessage: String?
 
     // MARK: - Public Methods
 
@@ -157,6 +157,23 @@ final class ListsViewModel: ObservableObject {
         updated[updatedList.kind] = lists
         listsByKind = updated
         persistCache(forKey: didCacheKey ?? "")
+    }
+
+    /// Updates the dashboard relationship count from a completed relationship-list load.
+    func updateRelationshipCount(_ mode: RelationshipMode, count: Int, for account: AppAccount?) {
+        switch mode {
+        case .blocking:
+            blockingCount = count
+        case .blockedBy:
+            blockedByCount = count
+        case .followers, .following:
+            return
+        }
+
+        let cacheKey = account?.did ?? account?.handle ?? didCacheKey
+        if let cacheKey {
+            persistCache(forKey: cacheKey)
+        }
     }
 
     // MARK: - Private Properties

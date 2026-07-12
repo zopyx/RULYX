@@ -75,6 +75,14 @@ final class ListsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.blockingCount, 2)
     }
 
+    func testUpdateRelationshipCountUpdatesBlockedByCount() {
+        let account = makeAccount()
+
+        viewModel.updateRelationshipCount(.blockedBy, count: 42, for: account)
+
+        XCTAssertEqual(viewModel.blockedByCount, 42)
+    }
+
     func testLoadHandlesBlockingFetchError() async {
         client.shouldFailBlocking = true
         let account = makeAccount()

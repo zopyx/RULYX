@@ -100,8 +100,8 @@ struct ListsView: View {
                                 } label: {
                                     relationshipRow(
                                         label: loc("lists.blocked_by"),
-                                        count: viewModel.blockedByCount,
-                                        isLoading: viewModel.blockedByCount == nil && (viewModel.isLoading || viewModel.isRefreshing)
+                                        count: viewModel.isRefreshing ? nil : viewModel.blockedByCount,
+                                        isLoading: viewModel.blockedByCount == nil && viewModel.isLoading && !viewModel.isRefreshing
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -464,14 +464,22 @@ struct ListsView: View {
                     .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlocking) {
-                RelationshipsView(mode: .blocking, initialCount: viewModel.blockingCount)
-                    .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
+                RelationshipsView(
+                    mode: .blocking,
+                    initialCount: viewModel.blockingCount,
+                    onCountUpdate: updateRelationshipCount
+                )
+                .environmentObject(accountStore)
+                .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlockedBy) {
-                RelationshipsView(mode: .blockedBy, initialCount: viewModel.blockedByCount)
-                    .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
+                RelationshipsView(
+                    mode: .blockedBy,
+                    initialCount: viewModel.blockedByCount,
+                    onCountUpdate: updateRelationshipCount
+                )
+                .environmentObject(accountStore)
+                .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showMentionsSearch) {
                 if let activeAccount = accountStore.activeAccount {
@@ -552,6 +560,10 @@ struct ListsView: View {
             using: container.blueskyClient,
             isExplicitRefresh: true
         )
+    }
+
+    private func updateRelationshipCount(_ mode: RelationshipMode, _ count: Int) {
+        viewModel.updateRelationshipCount(mode, count: count, for: accountStore.activeAccount)
     }
 
     private func relationshipRow(label: String, count: Int?, isLoading: Bool = false) -> some View {

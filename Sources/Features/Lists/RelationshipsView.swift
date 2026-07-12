@@ -33,6 +33,7 @@ enum RelationshipMode: String, CaseIterable {
 struct RelationshipsView: View {
     let mode: RelationshipMode
     let initialCount: Int?
+    var onCountUpdate: ((RelationshipMode, Int) -> Void)?
     var profileDID: String?
     var profileHandle: String?
     @EnvironmentObject private var accountStore: AccountStore
@@ -290,7 +291,7 @@ struct RelationshipsView: View {
         .pageTitle(
             isRefreshing
                 ? modeLocalized
-                : "\\(modeLocalized) (\\(clearskyTotal ?? actors.count))"
+                : "\(modeLocalized) (\(clearskyTotal ?? actors.count))"
         )
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
@@ -302,7 +303,7 @@ struct RelationshipsView: View {
                         ProgressView()
                             .scaleEffect(0.8)
                     } else {
-                        Text("(\\(clearskyTotal ?? actors.count))")
+                        Text(verbatim: "(\(clearskyTotal ?? actors.count))")
                             .foregroundStyle(.secondary)
                             .font(.subheadline)
                     }
@@ -800,10 +801,12 @@ struct RelationshipsView: View {
                 let r = try await container.clearsky.fetchBlockedActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
+                onCountUpdate?(mode, r.totalCount)
             case .blockedBy:
                 let r = try await container.clearsky.fetchBlockedByActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
+                onCountUpdate?(mode, r.totalCount)
             }
             if mode == .blocking || mode == .blockedBy {
                 actors = result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
