@@ -292,6 +292,23 @@ struct RelationshipsView: View {
                 ? modeLocalized
                 : "\\(modeLocalized) (\\(clearskyTotal ?? actors.count))"
         )
+        .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 6) {
+                    Text(modeLocalized)
+                        .font(.headline)
+                    if isRefreshing {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Text("(\\(clearskyTotal ?? actors.count))")
+                            .foregroundStyle(.secondary)
+                            .font(.subheadline)
+                    }
+                }
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 16) {
