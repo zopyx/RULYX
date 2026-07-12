@@ -9,7 +9,7 @@ final class RULYXUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["--uitesting", "-UITestSkipOnboarding"]
+        app.launchArguments = ["--uitesting"]
         #if targetEnvironment(simulator)
         app.launchArguments += ["-AppleLanguages", "(en)"]
         app.launchArguments += ["-AppleLocale", "en_US"]

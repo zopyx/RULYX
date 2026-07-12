@@ -66,15 +66,13 @@ final class AppDependencies: ObservableObject {
     init() {
         let isUITesting = CommandLine.arguments.contains("--uitesting")
         if isUITesting {
-            // When -UITestSkipOnboarding is passed, skip onboarding.
-            // Without it, onboarding flow is available for testing.
-            if CommandLine.arguments.contains("-UITestSkipOnboarding") {
-                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-            }
+            // Default: skip onboarding in UI tests for faster test execution.
             // -UITestFreshOnboarding explicitly resets the flag so the
-            // onboarding sheet is guaranteed to appear in tests.
+            // onboarding sheet appears for onboarding-specific tests.
             if CommandLine.arguments.contains("-UITestFreshOnboarding") {
                 UserDefaults.standard.removeObject(forKey: "hasSeenOnboarding")
+            } else {
+                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
             }
             UserDefaults.standard.set("en", forKey: "selectedLanguage")
 
