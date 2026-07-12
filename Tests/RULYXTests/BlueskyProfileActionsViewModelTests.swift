@@ -231,14 +231,11 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
     func testBlockBackCancellation() async {
         // Given: blockActor hangs so we can observe mid-flight state
         let didStart = expectation(description: "blockBack started blocking")
-        final class ContinuationBox: @unchecked Sendable {
-            var value: CheckedContinuation<Void, any Error>?
-        }
-        let box = ContinuationBox()
+        var continuation: CheckedContinuation<Void, any Error>?
         mockProfile.blockActorHandler = { _, _, _ in
             didStart.fulfill()
             try await withCheckedThrowingContinuation { cont in
-                box.value = cont
+                continuation = cont
             }
         }
 
@@ -251,7 +248,7 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
 
         // When: task is cancelled and the hang is released
         task.cancel()
-        box.value?.resume(throwing: CancellationError())
+        continuation?.resume()
 
         _ = await task.value
 
