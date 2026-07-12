@@ -980,7 +980,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Fetches ALL pages from a ClearSky paginated endpoint.
     /// Page 1 is fetched first; if it has 100 entries, remaining pages
-    /// up to page 50 are fetched IN PARALLEL via TaskGroup.
+    /// are fetched in mini-batches of 5 via TaskGroup (parallel within batch).
+    /// Once a page returns < 100 entries, remaining batches are skipped.
     /// On cancellation or errors, returns whatever was collected so far.
     private func fetchClearskyEntries(actorDID: String, endpoint: String) async throws -> [ClearskyBlocklistEntry] {
         // Step 1: fetch page 1 synchronously — determines if more pages exist
@@ -988,27 +989,43 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         guard page1.count >= 100 else { return page1 }
 
         var allEntries = page1
+        let batchSize = 3
         var page = 2
 
-        // Step 2: fetch remaining pages in parallel (up to 50 pages max)
-        try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
-            let maxPages = 50
-            while page <= maxPages {
-                let p = page
-                group.addTask { [self] in
-                    let entries = try? await self.fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)
-                    return (p, entries ?? [])
+        // Step 2: fetch remaining pages in mini-batches (parallel within batch)
+        while page <= 50 {
+            try Task.checkCancellation()
+
+            let batchStart = page
+            let batchEnd = min(page + batchSize - 1, 50)
+            var batchResults: [(Int, [ClearskyBlocklistEntry])] = []
+
+            try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
+                for p in batchStart ... batchEnd {
+                    group.addTask { [self] in
+                        let entries = (try? await self.fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)) ?? []
+                        return (p, entries)
+                    }
                 }
-                page += 1
+
+                for try await (p, entries) in group {
+                    batchResults.append((p, entries))
+                }
             }
 
-            for try await (_, entries) in group {
+            // Process batch results, sorted by page number
+            var foundLast = false
+            for (p, entries) in batchResults.sorted(by: { $0.0 < $1.0 }) {
                 allEntries.append(contentsOf: entries)
                 if entries.count < 100 {
-                    // Found the last page — cancel remaining tasks
-                    group.cancelAll()
+                    AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(p) (\(entries.count) entries)")
+                    foundLast = true
+                    break
                 }
             }
+            if foundLast { break }
+
+            page = batchEnd + 1
         }
 
         return allEntries
