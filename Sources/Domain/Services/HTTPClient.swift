@@ -55,15 +55,18 @@ private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @u
               SecTrustGetTrustResult(serverTrust, &secResult) == errSecSuccess,
               secResult == .proceed || secResult == .unspecified
         else {
+            AppLogger.http.error("Pinning: \(challenge.protectionSpace.host) → TLS evaluation failed (result: \(secResult.rawValue))")
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
 
         // Check each certificate in the chain against the pinned hashes.
         let certificateCount = SecTrustGetCertificateCount(serverTrust)
+        var checkedHashes: [String] = []
         for index in 0 ..< certificateCount {
             guard let certificate = SecTrustGetCertificateAtIndex(serverTrust, index) else { continue }
             let publicKeyHash = Self.sha256PublicKeyHash(for: certificate)
+            checkedHashes.append(publicKeyHash)
             if pinnedHashes.contains(publicKeyHash) {
                 completionHandler(.useCredential, URLCredential(trust: serverTrust))
                 return
@@ -71,6 +74,7 @@ private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @u
         }
 
         // No matching pin found — reject the connection.
+        AppLogger.http.error("Pinning: \(challenge.protectionSpace.host) → no match (checked: \(checkedHashes.joined(separator: ", ")))")
         completionHandler(.cancelAuthenticationChallenge, nil)
     }
 
@@ -159,12 +163,18 @@ struct HTTPClient {
     /// Default pinned certificate hashes for known RULYX API endpoints.
     /// These are SHA-256 hashes of the raw public key bytes
     /// (SecKeyCopyExternalRepresentation), NOT SPKI hashes.
+    /// Generated from iOS runtime — use Pinning: logs to verify.
     static let defaultPinnedHashes: Set<String> = [
-        "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",  // bsky.social (PDS / AppView)
-        "MApRt+9acjCK+IF5k8gl+ctdzD8WN2Oy5pknAnXnIY0=",  // public.api.bsky.app (profile batch, stats, posts)
-        "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",  // api.clearsky.app (moderation lists)
-        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",  // public.api.clearsky.services (blocklist, get-did)
-        "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",  // plc.directory (PLC audit log)
+        // bsky.social (PDS / AppView)
+        "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",
+        // public.api.bsky.app (profile batch, stats, posts) — leaf cert
+        "g5TwoFJudhMvvGmccUw3nojpZxR2H1nG93LLQ6LExzM=",
+        // api.clearsky.app (moderation lists)
+        "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",
+        // public.api.clearsky.services (blocklist, get-did)
+        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
+        // plc.directory (PLC audit log)
+        "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",
     ]
 
     private static let inflightManager = InflightManager()
