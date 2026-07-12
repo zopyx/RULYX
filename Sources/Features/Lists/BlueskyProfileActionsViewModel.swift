@@ -85,24 +85,30 @@ final class BlueskyProfileActionsViewModel {
         }
         guard let account = accountStore.activeAccount else { return }
 
+        // Clear all numbers and show spinner
+        blockingCount = nil
+        blockedByCount = nil
+        unblockedBlockersCount = nil
         isFetchingBlockCounts = true
-        defer { isFetchingBlockCounts = false }
+
+        // Fetch all three in parallel
+        async let blocking = clearskyService.fetchBlockingCount(for: account)
+        async let blockedBy = clearskyService.fetchBlockedByCount(for: account)
+        async let unblocked = clearskyService.fetchUnblockedBlockersCount(for: account)
 
         do {
-            blockingCount = try await clearskyService.fetchBlockingCount(for: account)
+            let (b, bb, ub) = try await (blocking, blockedBy, unblocked)
+            blockingCount = b
+            blockedByCount = bb
+            unblockedBlockersCount = ub
         } catch {
-            blockingCount = nil
+            // Individual failures keep partial results as nil
+            if let b = try? await blocking { blockingCount = b }
+            if let bb = try? await blockedBy { blockedByCount = bb }
+            if let ub = try? await unblocked { unblockedBlockersCount = ub }
         }
-        do {
-            blockedByCount = try await clearskyService.fetchBlockedByCount(for: account)
-        } catch {
-            blockedByCount = nil
-        }
-        do {
-            unblockedBlockersCount = try await clearskyService.fetchUnblockedBlockersCount(for: account)
-        } catch {
-            unblockedBlockersCount = nil
-        }
+
+        isFetchingBlockCounts = false
     }
 
     // MARK: - Block Back Preview
