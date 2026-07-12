@@ -3,6 +3,9 @@ import Foundation
 // MARK: - ListBatchProgressState
 
 /// Observable state for tracking batch operation progress and cancellation.
+/// @unchecked Sendable: ObservableObject classes cannot be Sendable in Swift 6
+/// because their objectWillChange publisher is not Sendable-conforming.
+/// All mutable state is @MainActor-protected.
 @MainActor
 final class ListBatchProgressState: ObservableObject, @unchecked Sendable {
     @Published var isPerformingBulkAction = false

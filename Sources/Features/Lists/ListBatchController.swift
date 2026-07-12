@@ -109,6 +109,8 @@ final class ListBatchController {
 }
 
 /// Wraps a Sendable closure for use with TaskGroup.
+/// @unchecked Sendable: closures captured in structs cannot be verified
+/// as Sendable by the compiler. The closure is only ever called on @MainActor.
 private struct ActionBox: @unchecked Sendable {
     let action: (BlueskyActor) async throws -> Void
 }
