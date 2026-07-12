@@ -8,7 +8,7 @@ struct DirectRepliesView: View {
     let handle: String
     let displayName: String
 
-    @StateObject private var viewModel: DirectRepliesViewModel
+    @State private var viewModel: DirectRepliesViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -33,7 +33,7 @@ struct DirectRepliesView: View {
         self.did = did
         self.handle = handle
         self.displayName = displayName
-        _viewModel = StateObject(wrappedValue: DirectRepliesViewModel(did: did))
+        _viewModel = State(wrappedValue: DirectRepliesViewModel(did: did))
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager

@@ -1,3 +1,4 @@
+import Observation
 import SwiftUI
 
 /// Main timeline feed view — renders the active account's following feed
@@ -5,7 +6,7 @@ import SwiftUI
 /// actions, post interactions (mute, block, report, translate, share),
 /// and a "new posts" banner.
 struct FeedTimelineView: View {
-    @ObservedObject var viewModel: FeedTimelineViewModel
+    var viewModel: FeedTimelineViewModel
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper

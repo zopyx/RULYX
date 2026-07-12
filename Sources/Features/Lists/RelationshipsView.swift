@@ -1,3 +1,4 @@
+import Observation
 import SwiftUI
 
 // MARK: - RelationshipMode
@@ -58,7 +59,7 @@ struct RelationshipsView: View {
     @State private var batchOperationConfig: BatchOperationConfig?
 
     // Block-all-back state — uses shared VM
-    @StateObject private var actionsVM = BlueskyProfileActionsViewModel(
+    @State private var actionsVM = BlueskyProfileActionsViewModel(
         profileService: LiveBlueskyClient(),
         clearskyService: LiveBlueskyClient(),
         accountStore: AccountStore()

@@ -1,23 +1,25 @@
 import Foundation
+import Observation
 
 /// Searches for posts mentioning a specific user by searching for their handle with the `mentions` parameter.
 ///
 /// Uses `searchPosts(q: "@handle", mentions: did)` to find posts that mention the given user,
 /// supporting pagination via cursor and pull-to-refresh with cursor preservation.
 @MainActor
-final class MentionsSearchViewModel: ObservableObject {
+@Observable
+final class MentionsSearchViewModel {
     // MARK: - Properties
 
     /// Posts that mention the user, sorted newest-first.
-    @Published private(set) var entries: [RichFeedEntry] = []
+    private(set) var entries: [RichFeedEntry] = []
     /// True while the initial load is in progress.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while loading the next page.
-    @Published private(set) var isLoadingMore = false
+    private(set) var isLoadingMore = false
     /// False when no more search pages are available.
-    @Published private(set) var hasMore = true
+    private(set) var hasMore = true
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     // MARK: - Private Properties
 

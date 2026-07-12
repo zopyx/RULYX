@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import Observation
 
 /// Searches Bluesky posts and users with three tabs: Top, Newest, and Users.
 ///
@@ -7,7 +8,8 @@ import Foundation
 /// persisted in UserDefaults (up to 10 recent queries), and concurrent
 /// search via `searchAll()`.
 @MainActor
-final class CustomSearchViewModel: ObservableObject {
+@Observable
+final class CustomSearchViewModel {
     // MARK: - Types
 
     /// The three search result tabs.
@@ -20,29 +22,29 @@ final class CustomSearchViewModel: ObservableObject {
     // MARK: - Properties
 
     /// The search query text.
-    @Published var query = ""
+    var query = ""
     /// Top-rated search results.
-    @Published private(set) var topEntries: [RichFeedEntry] = []
+    private(set) var topEntries: [RichFeedEntry] = []
     /// Newest search results.
-    @Published private(set) var newestEntries: [RichFeedEntry] = []
+    private(set) var newestEntries: [RichFeedEntry] = []
     /// Actor (user) search results.
-    @Published private(set) var users: [BlueskyActor] = []
+    private(set) var users: [BlueskyActor] = []
     /// True while loading the Top tab.
-    @Published private(set) var isLoadingTop = false
+    private(set) var isLoadingTop = false
     /// True while loading the Newest tab.
-    @Published private(set) var isLoadingNewest = false
+    private(set) var isLoadingNewest = false
     /// True while loading more Top results.
-    @Published private(set) var isLoadingMoreTop = false
+    private(set) var isLoadingMoreTop = false
     /// True while loading more Newest results.
-    @Published private(set) var isLoadingMoreNewest = false
+    private(set) var isLoadingMoreNewest = false
     /// True while loading Users tab.
-    @Published private(set) var isLoadingUsers = false
+    private(set) var isLoadingUsers = false
     /// False when no more Top pages are available.
-    @Published private(set) var hasMoreTop = true
+    private(set) var hasMoreTop = true
     /// False when no more Newest pages are available.
-    @Published private(set) var hasMoreNewest = true
+    private(set) var hasMoreNewest = true
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     // MARK: - Private Properties
 
@@ -56,7 +58,7 @@ final class CustomSearchViewModel: ObservableObject {
     private let maxHistory = 10
 
     /// Recent search queries, newest first.
-    @Published private(set) var searchHistory: [String] = []
+    private(set) var searchHistory: [String] = []
 
     // MARK: - Init
 

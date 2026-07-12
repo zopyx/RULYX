@@ -8,7 +8,7 @@ struct MediaBrowserView: View {
     let did: String
     let handle: String
 
-    @StateObject private var viewModel: MediaBrowserViewModel
+    @State private var viewModel: MediaBrowserViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @Environment(\.dismiss) private var dismiss
@@ -23,7 +23,7 @@ struct MediaBrowserView: View {
     init(did: String, handle: String) {
         self.did = did
         self.handle = handle
-        _viewModel = StateObject(wrappedValue: MediaBrowserViewModel(did: did))
+        _viewModel = State(wrappedValue: MediaBrowserViewModel(did: did))
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager

@@ -6,7 +6,7 @@ import SwiftUI
 /// (single, bulk-selected, or "nuclear" delete-all) for a given account.
 struct ManagePostsView: View {
     let did: String
-    @StateObject private var viewModel: ManagePostsViewModel
+    @State private var viewModel: ManagePostsViewModel
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -14,7 +14,7 @@ struct ManagePostsView: View {
 
     init(did: String) {
         self.did = did
-        _viewModel = StateObject(wrappedValue: ManagePostsViewModel(did: did))
+        _viewModel = State(wrappedValue: ManagePostsViewModel(did: did))
     }
 
     // MARK: - Body

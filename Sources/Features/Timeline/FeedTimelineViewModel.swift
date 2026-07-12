@@ -1,11 +1,13 @@
 import Foundation
+import Observation
 
 /// Manages the main timeline feed with polling, pagination, optimistic likes/reposts, inline thread expansion, and analytics.
 ///
 /// State machine: `.initialLoading → .loadingMore → .loaded | .exhausted | .failed | .loadMoreFailed | .refreshing | .empty`
 /// Supports periodic polling for new post count, optimistic interaction toggles, and account/feed switching.
 @MainActor
-final class FeedTimelineViewModel: ObservableObject {
+@Observable
+final class FeedTimelineViewModel {
     // MARK: - Properties
 
     /// Store of muted words used to filter visible entries.
@@ -15,11 +17,11 @@ final class FeedTimelineViewModel: ObservableObject {
     /// Store for recording engagement analytics.
     let analytics: AnalyticsStore
     /// All loaded timeline entries, unfiltered. Use `visibleEntries` for display.
-    @Published private(set) var entries: [RichFeedEntry] = []
+    private(set) var entries: [RichFeedEntry] = []
     /// Current state of the timeline loading lifecycle.
-    @Published private(set) var state: TimelineState = .initialLoading
+    private(set) var state: TimelineState = .initialLoading
     /// Number of new posts discovered since the last refresh (via polling).
-    @Published var newPostCount = 0
+    var newPostCount = 0
 
     // MARK: - Init
 
@@ -90,21 +92,21 @@ final class FeedTimelineViewModel: ObservableObject {
     // MARK: - Optimistic Interactions / Inline Threads
 
     /// Stores optimistic like state per post URI.
-    @Published private var optimisticLikes: [String: Bool] = [:]
+    private var optimisticLikes: [String: Bool] = [:]
     /// Stores optimistic repost state per post URI.
-    @Published private var optimisticReposts: [String: Bool] = [:]
+    private var optimisticReposts: [String: Bool] = [:]
     /// Stores the record URI for a like that was created optimistically.
-    @Published private var optimisticLikeURIs: [String: String] = [:]
+    private var optimisticLikeURIs: [String: String] = [:]
     /// Stores the record URI for a repost that was created optimistically.
-    @Published private var optimisticRepostURIs: [String: String] = [:]
+    private var optimisticRepostURIs: [String: String] = [:]
     /// Stores optimistic like counts per post URI.
-    @Published private var optimisticLikeCounts: [String: Int] = [:]
+    private var optimisticLikeCounts: [String: Int] = [:]
     /// Stores optimistic repost counts per post URI.
-    @Published private var optimisticRepostCounts: [String: Int] = [:]
+    private var optimisticRepostCounts: [String: Int] = [:]
     /// Set of post URIs with their inline thread expanded.
-    @Published var expandedThreadURIs: Set<String> = []
+    var expandedThreadURIs: Set<String> = []
     /// Cached inline thread nodes for expanded posts.
-    @Published var inlineThreads: [String: ThreadNode] = [:]
+    var inlineThreads: [String: ThreadNode] = [:]
 
     /// Toggles the inline thread expansion for a post URI.
     /// Uses `ThreadCacheService` to cache fetched threads.

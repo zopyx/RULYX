@@ -1,3 +1,4 @@
+import Observation
 import SwiftUI
 
 // MARK: - ProfileInspectorView
@@ -7,7 +8,7 @@ struct ProfileInspectorView: View {
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @StateObject private var viewModel = ProfileInspectorViewModel()
+    @State private var viewModel = ProfileInspectorViewModel()
     @State private var isShowingAccountManagement = false
     @State private var reportEvidenceText = ""
     @State private var selectedReportReason = ModerationReportReasonType.simplifiedDefault

@@ -1,3 +1,4 @@
+import Observation
 import SwiftUI
 import UIKit
 
@@ -5,7 +6,7 @@ import UIKit
 /// Supports searching by keyword with tabs for Top / Newest / Users results,
 /// with post interaction actions (like, reply, repost, block likers, etc.).
 struct CustomSearchView: View {
-    @StateObject private var viewModel = CustomSearchViewModel()
+    @State private var viewModel = CustomSearchViewModel()
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @Environment(\.dismiss) private var dismiss

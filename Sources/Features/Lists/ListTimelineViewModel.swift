@@ -1,35 +1,37 @@
 import Foundation
+import Observation
 
 /// Manages a timeline of all posts by members of a given Bluesky list.
 ///
 /// Prefer the server-provided list feed, then falls back to member author feeds
 /// filtered to posts authored by the member being scanned.
 @MainActor
-final class ListTimelineViewModel: ObservableObject {
+@Observable
+final class ListTimelineViewModel {
     let list: BlueskyList
 
     // MARK: - Published State
 
-    @Published private(set) var posts: [RichFeedEntry] = []
-    @Published private(set) var isLoading = false
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var hasMore = true
-    @Published var errorMessage: String?
-    @Published private(set) var scanProgressLabel: String?
+    private(set) var posts: [RichFeedEntry] = []
+    private(set) var isLoading = false
+    private(set) var isLoadingMore = false
+    private(set) var hasMore = true
+    var errorMessage: String?
+    private(set) var scanProgressLabel: String?
 
     // MARK: - Optimistic Interactions
 
-    @Published private var optimisticLikes: [String: Bool] = [:]
-    @Published private var optimisticReposts: [String: Bool] = [:]
-    @Published private var optimisticLikeURIs: [String: String] = [:]
-    @Published private var optimisticRepostURIs: [String: String] = [:]
-    @Published private var optimisticLikeCounts: [String: Int] = [:]
-    @Published private var optimisticRepostCounts: [String: Int] = [:]
+    private var optimisticLikes: [String: Bool] = [:]
+    private var optimisticReposts: [String: Bool] = [:]
+    private var optimisticLikeURIs: [String: String] = [:]
+    private var optimisticRepostURIs: [String: String] = [:]
+    private var optimisticLikeCounts: [String: Int] = [:]
+    private var optimisticRepostCounts: [String: Int] = [:]
 
     // MARK: - Inline Threads
 
-    @Published var expandedThreadURIs: Set<String> = []
-    @Published var inlineThreads: [String: ThreadNode] = [:]
+    var expandedThreadURIs: Set<String> = []
+    var inlineThreads: [String: ThreadNode] = [:]
 
     // MARK: - Private Properties
 

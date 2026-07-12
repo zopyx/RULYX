@@ -1,23 +1,25 @@
 import Foundation
+import Observation
 
 /// ViewModel that scans the user's recent feed posts and their threads to
 /// collect direct replies from other accounts.
 @MainActor
-final class DirectRepliesViewModel: ObservableObject {
+@Observable
+final class DirectRepliesViewModel {
     // MARK: - Properties
 
     /// All discovered replies to the user's posts, deduplicated and sorted newest-first.
-    @Published private(set) var entries: [RichFeedEntry] = []
+    private(set) var entries: [RichFeedEntry] = []
     /// True while the initial load is in progress.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while loading more replies.
-    @Published private(set) var isLoadingMore = false
+    private(set) var isLoadingMore = false
     /// False when no more user posts are available to scan.
-    @Published private(set) var hasMore = true
+    private(set) var hasMore = true
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
     /// Localized progress label shown during scanning.
-    @Published private(set) var progressLabel: String?
+    private(set) var progressLabel: String?
 
     // MARK: - Private Properties
 

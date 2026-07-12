@@ -1,10 +1,12 @@
 import Foundation
 import SwiftUI
+import Observation
 
 /// View model for BlueskyProfileView's block-back and moderation action logic.
 /// Extracted from the view body to enable isolated unit testing with mock services.
 @MainActor
-final class BlueskyProfileActionsViewModel: ObservableObject {
+@Observable
+final class BlueskyProfileActionsViewModel {
     // MARK: - Dependencies
 
     private var profileService: BlueskyProfileInspecting
@@ -14,27 +16,27 @@ final class BlueskyProfileActionsViewModel: ObservableObject {
 
     // MARK: - Block Counts
 
-    @Published var blockingCount: Int?
-    @Published var blockedByCount: Int?
-    @Published var unblockedBlockersCount: Int?
-    @Published var isFetchingBlockCounts = false
+    var blockingCount: Int?
+    var blockedByCount: Int?
+    var unblockedBlockersCount: Int?
+    var isFetchingBlockCounts = false
 
     // MARK: - Block Back State
 
-    @Published var isBlockingBack = false
-    @Published var blockBackCompleted = 0
-    @Published var blockBackTotal = 0
-    @Published var blockBackSuccessCount = 0
-    @Published var blockBackFailureCount = 0
-    @Published var blockBackError: String?
-    @Published var blockBackCurrentHandle: String?
-    @Published var showBlockBackResult = false
+    var isBlockingBack = false
+    var blockBackCompleted = 0
+    var blockBackTotal = 0
+    var blockBackSuccessCount = 0
+    var blockBackFailureCount = 0
+    var blockBackError: String?
+    var blockBackCurrentHandle: String?
+    var showBlockBackResult = false
 
     // MARK: - Block Back Preview
 
-    @Published var showBlockBackPreview = false
-    @Published var blockPreviewActors: [BlueskyActor] = []
-    @Published var isFetchingBlockPreview = false
+    var showBlockBackPreview = false
+    var blockPreviewActors: [BlueskyActor] = []
+    var isFetchingBlockPreview = false
 
     // MARK: - Init
 

@@ -8,7 +8,7 @@ struct MentionsSearchView: View {
     let handle: String
     let displayName: String
 
-    @StateObject private var viewModel: MentionsSearchViewModel
+    @State private var viewModel: MentionsSearchViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -33,7 +33,7 @@ struct MentionsSearchView: View {
         self.did = did
         self.handle = handle
         self.displayName = displayName
-        _viewModel = StateObject(wrappedValue: MentionsSearchViewModel(did: did, handle: handle))
+        _viewModel = State(wrappedValue: MentionsSearchViewModel(did: did, handle: handle))
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager

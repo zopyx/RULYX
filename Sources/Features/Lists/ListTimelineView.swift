@@ -8,7 +8,7 @@ import SwiftUI
 struct ListTimelineView: View {
     let list: BlueskyList
 
-    @StateObject private var viewModel: ListTimelineViewModel
+    @State private var viewModel: ListTimelineViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -33,7 +33,7 @@ struct ListTimelineView: View {
 
     init(list: BlueskyList) {
         self.list = list
-        _viewModel = StateObject(wrappedValue: ListTimelineViewModel(list: list))
+        _viewModel = State(wrappedValue: ListTimelineViewModel(list: list))
     }
 
     // MARK: - Body

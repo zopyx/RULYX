@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// A notification with an optional resolved related post.
 struct NotificationEntry: Identifiable {
@@ -16,15 +17,16 @@ struct NotificationEntry: Identifiable {
 /// State machine: `.initialLoading → .loadingMore → .loaded | .exhausted | .failed | .loadMoreFailed | .refreshing | .empty`
 /// Each notification is enriched with its related post (if applicable) by batch-fetching post data.
 @MainActor
-final class NotificationViewModel: ObservableObject {
+@Observable
+final class NotificationViewModel {
     // MARK: - Properties
 
     /// Loaded notifications, newest first.
-    @Published private(set) var entries: [NotificationEntry] = []
+    private(set) var entries: [NotificationEntry] = []
     /// Current state of the notification loading lifecycle.
-    @Published private(set) var state: TimelineState = .initialLoading
+    private(set) var state: TimelineState = .initialLoading
     /// Number of unread notifications.
-    @Published private(set) var unreadCount = 0
+    private(set) var unreadCount = 0
 
     // MARK: - Private Properties
 

@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// Searches for Bluesky profiles and inspects them with full moderation context.
 ///
@@ -6,21 +7,22 @@ import Foundation
 /// - **Inspect**: Looks up a single handle/DID and returns a full `ProfileInspection`.
 /// - **Search**: Type-ahead actor search with client-side filtering and stale-query cancellation.
 @MainActor
-final class ProfileInspectorViewModel: ObservableObject {
+@Observable
+final class ProfileInspectorViewModel {
     // MARK: - Properties
 
     /// The user's query text (handle, DID, or name fragment).
-    @Published var query = ""
+    var query = ""
     /// Type-ahead search results (actors matching the query).
-    @Published private(set) var searchResults: [BlueskyActor] = []
+    private(set) var searchResults: [BlueskyActor] = []
     /// Full profile inspection result after an `inspect` call.
-    @Published private(set) var inspection: ProfileInspection?
+    private(set) var inspection: ProfileInspection?
     /// True while a profile inspection is loading.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while a type-ahead search is in progress.
-    @Published private(set) var isSearching = false
+    private(set) var isSearching = false
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     /// The current search token used to discard stale responses.
     private var searchToken: SearchToken?

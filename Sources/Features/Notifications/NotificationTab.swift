@@ -1,3 +1,4 @@
+import Observation
 import SwiftUI
 
 // MARK: - NotificationTab
@@ -5,7 +6,7 @@ import SwiftUI
 struct NotificationTab: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
-    @StateObject private var viewModel = NotificationViewModel()
+    @State private var viewModel = NotificationViewModel()
     @State private var selectedActor: BlueskyActor?
     @State private var navigationPath = NavigationPath()
     @EnvironmentObject private var localizationManager: LocalizationManager

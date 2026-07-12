@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// Manages the full lifecycle of a user's posts — loading, filtering, bulk selection, and deletion.
 ///
@@ -6,41 +7,42 @@ import Foundation
 /// multi-select bulk delete, and a "nuclear" delete-all-pages mode. All mutations are
 /// optimistic (post removed from UI before network confirmation).
 @MainActor
-final class ManagePostsViewModel: ObservableObject {
+@Observable
+final class ManagePostsViewModel {
     // MARK: - Properties
 
     /// All loaded posts, unsorted. Display via `sortedFilteredPosts`.
-    @Published private(set) var posts: [RichFeedEntry] = []
+    private(set) var posts: [RichFeedEntry] = []
     /// True while the initial load is in progress.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while loading the next page of posts.
-    @Published private(set) var isLoadingMore = false
+    private(set) var isLoadingMore = false
     /// False when the server has no more pages to return.
-    @Published private(set) var hasMore = true
+    private(set) var hasMore = true
     /// True while a bulk-delete operation is executing.
-    @Published private(set) var isDeleting = false
+    private(set) var isDeleting = false
     /// Tracks (completed, total) during bulk deletion for progress UI.
-    @Published private(set) var deleteProgress: (current: Int, total: Int)?
+    private(set) var deleteProgress: (current: Int, total: Int)?
     /// Set on any network error; cleared on next load attempt.
-    @Published var errorMessage: String?
+    var errorMessage: String?
     /// Filter text for client-side post body search.
-    @Published var searchText = ""
+    var searchText = ""
     /// Inclusive start date for filtering posts.
-    @Published var fromDate: Date?
+    var fromDate: Date?
     /// Inclusive end date for filtering posts.
-    @Published var toDate: Date?
+    var toDate: Date?
     /// Convenience date-range preset (overrides `fromDate`/`toDate` when set).
-    @Published var relativeDateFilter: RelativeDateOption?
+    var relativeDateFilter: RelativeDateOption?
     /// True when multi-select mode is active.
-    @Published var isSelecting = false
+    var isSelecting = false
     /// Set of post URIs selected for bulk operations.
-    @Published var selectedURIs: Set<String> = []
+    var selectedURIs: Set<String> = []
     /// Entry awaiting single-delete confirmation dialog.
-    @Published var pendingDeleteEntry: RichFeedEntry?
+    var pendingDeleteEntry: RichFeedEntry?
     /// True when the bulk-delete confirmation sheet is presented.
-    @Published var showBulkConfirm = false
+    var showBulkConfirm = false
     /// Escalation level for nuclear delete: 0→1→2→3→4→confirmed.
-    @Published var nuclearDeleteLevel = 0
+    var nuclearDeleteLevel = 0
 
     /// Predefined relative date ranges for quick filtering.
     enum RelativeDateOption: String, CaseIterable {

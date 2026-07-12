@@ -1,3 +1,4 @@
+import Observation
 import SwiftUI
 
 // MARK: - TimelineTab
@@ -8,7 +9,7 @@ struct TimelineTab: View {
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject var mutedWordsStore: MutedWordsStore
     @EnvironmentObject var analyticsStore: AnalyticsStore
-    @StateObject private var viewModel = FeedTimelineViewModel()
+    @State private var viewModel = FeedTimelineViewModel()
     @State private var navigationPath = NavigationPath()
 
     // MARK: - Body

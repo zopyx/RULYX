@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// Result of looking up a single profile handle/DID/URL.
 struct ProfileLookupResult: Identifiable {
@@ -18,17 +19,18 @@ struct ProfileLookupResult: Identifiable {
 /// - `https://bsky.app/profile/handle.bsky.social`
 /// - Comma, semicolon, or whitespace separated lists.
 @MainActor
-final class BulkProfileLookupViewModel: ObservableObject {
+@Observable
+final class BulkProfileLookupViewModel {
     // MARK: - Properties
 
     /// Raw multi-line text input from the user.
-    @Published var rawInput = ""
+    var rawInput = ""
     /// Array of lookup results, one per parsed identifier.
-    @Published private(set) var results: [ProfileLookupResult] = []
+    private(set) var results: [ProfileLookupResult] = []
     /// True while any lookups are in progress.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     // MARK: - Public Methods
 
