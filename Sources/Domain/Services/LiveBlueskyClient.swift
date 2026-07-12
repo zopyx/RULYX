@@ -978,63 +978,71 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return Set(entries.map(\.did))
     }
 
-    /// Paginates through all pages of a ClearSky endpoint.
-    /// Stops early if a page returns fewer than 100 entries (last page).
-    /// On cancellation, returns already-collected entries instead of throwing.
+    /// Fetches ALL pages from a ClearSky paginated endpoint.
+    /// Page 1 is fetched first; if it has 100 entries, remaining pages
+    /// up to page 50 are fetched IN PARALLEL via TaskGroup.
+    /// On cancellation or errors, returns whatever was collected so far.
     private func fetchClearskyEntries(actorDID: String, endpoint: String) async throws -> [ClearskyBlocklistEntry] {
-        var allEntries: [ClearskyBlocklistEntry] = []
-        var page = 1
-        repeat {
-            // Check for cancellation before each page to avoid partial-loss
-            if Task.isCancelled { return allEntries }
+        // Step 1: fetch page 1 synchronously — determines if more pages exist
+        let page1 = try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: 1)
+        guard page1.count >= 100 else { return page1 }
 
-            let urlString = page == 1
-                ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
-                : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
-            guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
-            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
+        var allEntries = page1
+        var page = 2
 
-            let data: Data
-            let httpResponse: HTTPURLResponse
-            do {
-                (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
-            } catch is CancellationError {
-                AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page) cancelled — returning \(allEntries.count) entries so far")
-                return allEntries
-            } catch {
-                // Network error on later pages: keep what we have
-                if !allEntries.isEmpty {
-                    AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) failed after \(allEntries.count) entries: \(error.localizedDescription, privacy: .public)")
-                    return allEntries
+        // Step 2: fetch remaining pages in parallel (up to 50 pages max)
+        try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
+            let maxPages = 50
+            while page <= maxPages {
+                let p = page
+                group.addTask { [self] in
+                    let entries = try? await self.fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)
+                    return (p, entries ?? [])
                 }
-                throw error
+                page += 1
             }
 
-            guard (200 ..< 300).contains(httpResponse.statusCode) else {
-                let body = String(data: data, encoding: .utf8) ?? "empty"
-                AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) → HTTP \(httpResponse.statusCode): \(body, privacy: .public)")
-                if !allEntries.isEmpty { return allEntries }
-                return []
-            }
-            guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
-                let body = String(data: data, encoding: .utf8) ?? "empty"
-                if let error = try? JSONDecoder().decode(ClearskyAPIErrorResponse.self, from: data) {
-                    AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) → \(error.errorType ?? "unknown"): \(error.message ?? body, privacy: .public)")
-                } else {
-                    AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) → decode failed: \(body.prefix(200), privacy: .public)")
+            for try await (_, entries) in group {
+                allEntries.append(contentsOf: entries)
+                if entries.count < 100 {
+                    // Found the last page — cancel remaining tasks
+                    group.cancelAll()
                 }
-                if !allEntries.isEmpty { return allEntries }
-                return []
             }
-            let entries = decoded.data.blocklist ?? []
-            allEntries.append(contentsOf: entries)
-            AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page): \(entries.count) entries (total: \(allEntries.count))")
-            // If fewer than 100 entries, this was the last page.
-            if entries.count < 100 { break }
-            page += 1
-        } while true
+        }
+
         return allEntries
+    }
+
+    /// Fetches a single page from ClearSky. Returns the parsed entries or
+    /// an empty array if the page doesn't exist (non-2xx / decode failure).
+    private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry] {
+        if Task.isCancelled { return [] }
+        let urlString = page == 1
+            ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
+            : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
+        guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, httpResponse): (Data, HTTPURLResponse)
+        do {
+            (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
+        } catch is CancellationError {
+            return []
+        }
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
+            AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → HTTP \(httpResponse.statusCode)")
+            return []
+        }
+        guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
+            let body = (try? String(data: data, encoding: .utf8)) ?? "empty"
+            AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → decode failed: \(body.prefix(200))")
+            return []
+        }
+        let entries = decoded.data.blocklist ?? []
+        AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page): \(entries.count) entries")
+        return entries
     }
 
     /// Fetches actors that block the account but are not blocked back.
