@@ -1322,10 +1322,11 @@ struct BlueskyProfileView: View {
                     dataPassword: dataAppPassword ?? appPassword,
                     using: container.blueskyClient
                 )
-                // Also refresh block counts
-                if wasOwnProfile {
-                    await actionsVM?.fetchBlockCounts(isOwnProfile: true)
-                }
+            }
+            // Fetch block counts in the refreshable's own actor context,
+            // not inside runLoad's @Sendable closure (avoids capture issues).
+            if wasOwnProfile {
+                await actionsVM?.fetchBlockCounts(isOwnProfile: true)
             }
         }
         .task {
@@ -1350,7 +1351,8 @@ struct BlueskyProfileView: View {
         }
         .task(id: viewModel.profile?.did) {
             searchAccount = preferredSearchAccount
-            // Lazy-init actionsVM with real environment objects
+            // Lazy-init actionsVM with real environment objects.
+            // No appPassword needed — ClearSky calls are unauthenticated.
             let vm = actionsVM ?? {
                 let v = BlueskyProfileActionsViewModel(
                     profileService: container.blueskyClient,

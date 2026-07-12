@@ -287,7 +287,11 @@ struct RelationshipsView: View {
                 }
             }
         }
-        .pageTitle("\(modeLocalized) (\(clearskyTotal ?? actors.count))")
+        .pageTitle(
+            isRefreshing
+                ? modeLocalized
+                : "\\(modeLocalized) (\\(clearskyTotal ?? actors.count))"
+        )
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 16) {
@@ -735,6 +739,7 @@ struct RelationshipsView: View {
         let appPassword = accountStore.appPassword(for: account)
 
         actors = []
+        clearskyTotal = nil
         errorMessage = nil
 
         let cached: [BlueskyActor] = if let key = cacheKey {
@@ -757,6 +762,8 @@ struct RelationshipsView: View {
     private func refresh() async {
         guard let account = accountStore.activeAccount else { return }
         let appPassword = accountStore.appPassword(for: account)
+        // Clear count so title shows loading state
+        clearskyTotal = nil
         isRefreshing = true
         await fetchFromAPI(account: account, appPassword: appPassword)
         isRefreshing = false
