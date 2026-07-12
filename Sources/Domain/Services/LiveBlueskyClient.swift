@@ -1096,10 +1096,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             return ClearskyBlocklistResult(actors: [], totalCount: 0)
         }
 
-        // If profile resolution fails entirely, still return a partial result with the total count.
-        guard let actors = try? await resolveProfiles(dids: Array(allDIDs).sorted()) else {
-            return ClearskyBlocklistResult(actors: [], totalCount: allDIDs.count)
-        }
+        // Use best-effort resolution — one failed batch shouldn't kill the entire result.
+        let actors = await resolveProfilesBestEffort(dids: Array(allDIDs).sorted())
         var result = actors
         for i in result.indices {
             if let dateStr = blockedDates[result[i].did] {
@@ -1144,26 +1142,6 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     // MARK: - DID Resolution & PLC Audit
 
     /// Resolves profiles for an array of DIDs in parallel batches of 25.
-    /// Throws on the first batch failure.
-    private func resolveProfiles(dids: [String]) async throws -> [BlueskyActor] {
-        try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
-            var offset = 0
-            while offset < dids.count {
-                let chunk = dids[offset ..< min(offset + 25, dids.count)]
-                offset += 25
-                group.addTask { [httpClient] in
-                    try await Self.fetchProfileBatch(identifiers: Array(chunk), httpClient: httpClient)
-                }
-            }
-            var actors: [BlueskyActor] = []
-            for try await batch in group {
-                actors.append(contentsOf: batch)
-            }
-            return actors
-        }
-    }
-
-    /// Fetches profiles for an array of identifiers via the instance method (will be used by other parts of the app).
     func fetchProfileBatch(identifiers: [String]) async throws -> [BlueskyActor] {
         try await Self.fetchProfileBatch(identifiers: identifiers, httpClient: httpClient)
     }
