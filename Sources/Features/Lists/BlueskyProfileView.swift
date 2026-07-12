@@ -1312,6 +1312,7 @@ struct BlueskyProfileView: View {
         }
         .listStyle(.insetGrouped)
         .refreshable {
+            let wasOwnProfile = isOwnProfile
             await runLoad {
                 await viewModel.load(
                     did: member.actor.did,
@@ -1321,6 +1322,10 @@ struct BlueskyProfileView: View {
                     dataPassword: dataAppPassword ?? appPassword,
                     using: container.blueskyClient
                 )
+                // Also refresh block counts
+                if wasOwnProfile {
+                    await actionsVM?.fetchBlockCounts(isOwnProfile: true)
+                }
             }
         }
         .task {
