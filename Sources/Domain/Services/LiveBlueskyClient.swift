@@ -988,9 +988,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
                 : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
             guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
-            var request = URLRequest(url: url)
+            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
             request.setValue("application/json", forHTTPHeaderField: "Accept")
-            request.timeoutInterval = 30
             let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 let body = String(data: data, encoding: .utf8) ?? "empty"
@@ -1118,9 +1117,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 : "https://api.clearsky.app/csky/api/v1/get-list/\(handle)/\(page)"
             AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(urlString, privacy: .public)")
             guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
-            var request = URLRequest(url: url)
+            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
             request.setValue("application/json", forHTTPHeaderField: "Accept")
-            request.timeoutInterval = 30
             let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists")
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 if page == 1 {
