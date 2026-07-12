@@ -19,11 +19,7 @@ struct BlueskyProfileView: View {
     @EnvironmentObject var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = BlueskyProfileViewModel()
-    @State private var actionsVM = BlueskyProfileActionsViewModel(
-        profileService: LiveBlueskyClient(),
-        clearskyService: LiveBlueskyClient(),
-        accountStore: AccountStore()
-    )
+    @State private var actionsVM: BlueskyProfileActionsViewModel? = nil
 
     // MARK: - Properties
 
@@ -1072,7 +1068,7 @@ struct BlueskyProfileView: View {
                     Section {
                         if !clearskyHeartbeat.isClearskyAvailable {
                             ClearskyBanner()
-                        } else if actionsVM.isFetchingBlockCounts {
+                        } else if actionsVM?.isFetchingBlockCounts ?? false {
                             HStack {
                                 ProgressView()
                                     .scaleEffect(0.7)
@@ -1080,15 +1076,15 @@ struct BlueskyProfileView: View {
                                     .foregroundStyle(.secondary)
                             }
                         } else {
-                            LabeledContent("profile.block_back.blocking", value: BlueskyProfileActionsViewModel.countText(actionsVM.blockingCount))
-                            LabeledContent("profile.block_back.blocked_by", value: BlueskyProfileActionsViewModel.countText(actionsVM.blockedByCount))
+                            LabeledContent("profile.block_back.blocking", value: BlueskyProfileActionsViewModel.countText(actionsVM?.blockingCount))
+                            LabeledContent("profile.block_back.blocked_by", value: BlueskyProfileActionsViewModel.countText(actionsVM?.blockedByCount))
 
                             Button {
-                                Task { await actionsVM.fetchBlockPreview() }
+                                Task { await actionsVM?.fetchBlockPreview() ?? () }
                             } label: {
                                 HStack {
-                                    LabeledContent("profile.block_back.unblocked", value: BlueskyProfileActionsViewModel.countText(actionsVM.unblockedBlockersCount))
-                                    if actionsVM.blockBackPreviewAvailable {
+                                    LabeledContent("profile.block_back.unblocked", value: BlueskyProfileActionsViewModel.countText(actionsVM?.unblockedBlockersCount))
+                                    if actionsVM?.blockBackPreviewAvailable ?? false {
                                         Image(systemName: "chevron.right")
                                             .flipsForRightToLeftLayoutDirection(true)
                                             .appFont(.subheading)
@@ -1097,35 +1093,35 @@ struct BlueskyProfileView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .disabled(!actionsVM.blockBackPreviewAvailable)
+                            .disabled(!(actionsVM?.blockBackPreviewAvailable ?? false))
 
-                            if actionsVM.isBlockingBack, actionsVM.blockBackTotal > 0 {
+                            if actionsVM?.isBlockingBack ?? false, actionsVM?.blockBackTotal ?? 0 > 0 {
                                 VStack(spacing: 8) {
-                                    ProgressView(value: Double(actionsVM.blockBackCompleted), total: Double(actionsVM.blockBackTotal))
+                                    ProgressView(value: Double(actionsVM?.blockBackCompleted ?? 0), total: Double(actionsVM?.blockBackTotal ?? 0))
                                         .progressViewStyle(.linear)
-                                        .tint(actionsVM.blockBackFailureCount > 0 ? Color.orange : Color.skyPrimary)
+                                        .tint(actionsVM?.blockBackFailureCount ?? 0 > 0 ? Color.orange : Color.skyPrimary)
                                     HStack {
                                         Text(
                                             loc("profile.block_back.progress")
-                                                .replacingOccurrences(of: "{completed}", with: "\(actionsVM.blockBackCompleted)")
-                                                .replacingOccurrences(of: "{total}", with: "\(actionsVM.blockBackTotal)")
+                                                .replacingOccurrences(of: "{completed}", with: "\(actionsVM?.blockBackCompleted ?? 0)")
+                                                .replacingOccurrences(of: "{total}", with: "\(actionsVM?.blockBackTotal ?? 0)")
                                         )
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                         Spacer()
                                     }
                                     HStack(spacing: 12) {
-                                        Label("\(actionsVM.blockBackSuccessCount)", systemImage: "checkmark.circle.fill")
+                                        Label("\(actionsVM?.blockBackSuccessCount ?? 0)", systemImage: "checkmark.circle.fill")
                                             .font(.caption)
                                             .foregroundStyle(.green)
-                                        if actionsVM.blockBackFailureCount > 0 {
-                                            Label("\(actionsVM.blockBackFailureCount)", systemImage: "xmark.circle.fill")
+                                        if actionsVM?.blockBackFailureCount ?? 0 > 0 {
+                                            Label("\(actionsVM?.blockBackFailureCount ?? 0)", systemImage: "xmark.circle.fill")
                                                 .font(.caption)
                                                 .foregroundStyle(.red)
                                         }
                                         Spacer()
                                     }
-                                    if let handle = actionsVM.blockBackCurrentHandle {
+                                    if let handle = actionsVM?.blockBackCurrentHandle {
                                         HStack(spacing: 4) {
                                             ProgressView()
                                                 .scaleEffect(0.5)
@@ -1141,8 +1137,8 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                                 .padding(.vertical, 4)
-                                .animation(.default.speed(1.5), value: actionsVM.blockBackCurrentHandle)
-                            } else if actionsVM.isBlockingBack {
+                                .animation(.default.speed(1.5), value: actionsVM?.blockBackCurrentHandle)
+                            } else if actionsVM?.isBlockingBack ?? false {
                                 HStack(spacing: 8) {
                                     ProgressView()
                                         .scaleEffect(0.7)
@@ -1151,22 +1147,22 @@ struct BlueskyProfileView: View {
                                         .foregroundStyle(.secondary)
                                 }
                                 .padding(.vertical, 4)
-                            } else if actionsVM.showBlockBackResult {
+                            } else if actionsVM?.showBlockBackResult ?? false {
                                 HStack(spacing: 8) {
-                                    if actionsVM.blockBackFailureCount == 0 {
+                                    if actionsVM?.blockBackFailureCount ?? 0 == 0 {
                                         Image(systemName: "checkmark.circle.fill")
                                             .foregroundStyle(.green)
                                     } else {
                                         Image(systemName: "exclamationmark.triangle.fill")
                                             .foregroundStyle(.orange)
                                     }
-                                    Text(actionsVM.blockBackResultSummary)
+                                    Text(actionsVM?.blockBackResultSummary ?? "")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                                 .padding(.vertical, 4)
-                            } else if let blockedBy = actionsVM.blockedByCount,
-                                      let unblocked = actionsVM.unblockedBlockersCount
+                            } else if let blockedBy = actionsVM?.blockedByCount,
+                                      let unblocked = actionsVM?.unblockedBlockersCount
                             {
                                 if blockedBy == 0 {
                                     Label(loc("profile.block_back.none_blocking"), systemImage: "checkmark.circle.fill")
@@ -1178,7 +1174,7 @@ struct BlueskyProfileView: View {
                             }
                         }
 
-                        if let error = actionsVM.blockBackError {
+                        if let error = actionsVM?.blockBackError {
                             Text(error)
                                 .font(.caption)
                                 .foregroundStyle(.red)
@@ -1327,7 +1323,18 @@ struct BlueskyProfileView: View {
         }
         .task(id: viewModel.profile?.did) {
             searchAccount = preferredSearchAccount
-            async let blocks = actionsVM.fetchBlockCounts(isOwnProfile: isOwnProfile)
+            // Lazy-init actionsVM with real environment objects
+            let vm = actionsVM ?? {
+                let v = BlueskyProfileActionsViewModel(
+                    profileService: container.blueskyClient,
+                    clearskyService: container.blueskyClient,
+                    accountStore: accountStore,
+                    clearskyHeartbeat: clearskyHeartbeat
+                )
+                actionsVM = v
+                return v
+            }()
+            async let blocks = vm.fetchBlockCounts(isOwnProfile: isOwnProfile)
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
                 async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: container.blueskyClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
@@ -1344,9 +1351,9 @@ struct BlueskyProfileView: View {
         }
         .onChange(of: clearskyHeartbeat.isClearskyAvailable) { _, isAvailable in
             if !isAvailable {
-                actionsVM.resetBlockBackCounts()
+                actionsVM?.resetBlockBackCounts()
             } else if isOwnProfile {
-                Task { await actionsVM.fetchBlockCounts(isOwnProfile: isOwnProfile) }
+                Task { await actionsVM?.fetchBlockCounts(isOwnProfile: isOwnProfile) }
             }
         }
         .alert(Text(loc: "profile.block_back.confirm.first.title"), isPresented: $showBlockBackConfirm1) {
@@ -1355,7 +1362,7 @@ struct BlueskyProfileView: View {
                 showBlockBackConfirm2 = true
             }
         } message: {
-            if let count = actionsVM.unblockedBlockersCount {
+            if let count = actionsVM?.unblockedBlockersCount {
                 Text(loc("profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -1363,18 +1370,18 @@ struct BlueskyProfileView: View {
             Button(loc("actions.cancel"), role: .cancel) {}
             Button(loc("profile.block_back.action"), role: .destructive) {
                 Task {
-                    let actors = actionsVM.blockPreviewActors
-                    await actionsVM.blockBack(actors: actors)
+                    let actors = actionsVM?.blockPreviewActors ?? []
+                    await actionsVM?.blockBack(actors: actors)
                 }
             }
         } message: {
-            if let count = actionsVM.unblockedBlockersCount {
+            if let count = actionsVM?.unblockedBlockersCount {
                 Text(loc("profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
         .sheet(isPresented: Binding(
-            get: { actionsVM.showBlockBackPreview },
-            set: { actionsVM.showBlockBackPreview = $0 }
+            get: { actionsVM?.showBlockBackPreview ?? false },
+            set: { if actionsVM != nil { actionsVM!.showBlockBackPreview = $0 } }
         )) {
             blockBackPreviewSheet
         }
@@ -1390,7 +1397,7 @@ struct BlueskyProfileView: View {
 
     @ViewBuilder
     private var blockBackPreviewContent: some View {
-        if actionsVM.isFetchingBlockPreview {
+        if actionsVM?.isFetchingBlockPreview ?? false {
             List {
                 VStack(spacing: 16) {
                     Spacer()
@@ -1414,7 +1421,7 @@ struct BlueskyProfileView: View {
                     ToolbarCloseButton()
                 }
             }
-        } else if actionsVM.blockPreviewActors.isEmpty {
+        } else if (actionsVM?.blockPreviewActors ?? []).isEmpty {
             List {
                 Text(loc("profile.block_back.preview.empty"))
                     .foregroundStyle(.secondary)
@@ -1435,13 +1442,13 @@ struct BlueskyProfileView: View {
     private var blockBackPreviewList: some View {
         List {
             Section {
-                ForEach(actionsVM.blockPreviewActors) { actor in
+                ForEach(actionsVM?.blockPreviewActors ?? []) { actor in
                     blockBackPreviewRow(actor: actor)
                 }
             } header: {
                 Text(
                     loc("profile.block_back.preview.count")
-                        .replacingOccurrences(of: "{count}", with: "\(actionsVM.blockPreviewActors.count)")
+                        .replacingOccurrences(of: "{count}", with: "\\((actionsVM?.blockPreviewActors ?? []).count)")
                 )
             }
         }
@@ -1454,10 +1461,10 @@ struct BlueskyProfileView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button(loc("profile.block_back.action")) {
-                    actionsVM.showBlockBackPreview = false
+                    if actionsVM != nil { actionsVM!.showBlockBackPreview = false }
                     showBlockBackConfirm1 = true
                 }
-                .disabled(actionsVM.blockPreviewActors.isEmpty)
+                .disabled((actionsVM?.blockPreviewActors ?? []).isEmpty)
             }
         }
     }
@@ -1505,7 +1512,7 @@ struct BlueskyProfileView: View {
     // MARK: - Helpers
 
     private func wireActionsVM() {
-        actionsVM.reconfigure(
+        actionsVM?.reconfigure(
             profileService: container.blueskyClient,
             clearskyService: container.blueskyClient,
             accountStore: accountStore
