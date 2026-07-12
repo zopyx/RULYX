@@ -196,7 +196,7 @@ struct ListDetailView: View {
                     {
                         Task {
                             do {
-                                try await container.blueskyClient.deleteList(
+                                try await container.list.deleteList(
                                     list: currentList,
                                     account: account,
                                     appPassword: appPassword
@@ -575,7 +575,7 @@ struct ListDetailView: View {
         exportProgressMessage = "Processing..."
         let members: [BlueskyListMember]
         do {
-            members = try await container.blueskyClient.fetchListMembers(list: currentList, account: account, appPassword: appPassword)
+            members = try await container.list.fetchListMembers(list: currentList, account: account, appPassword: appPassword)
         } catch {
             viewModel.errorMessage = AppError.userMessage(from: error)
             isExporting = false
@@ -738,7 +738,7 @@ struct ListDetailView: View {
         defer { isReportingList = false }
 
         do {
-            try await container.blueskyClient.reportList(
+            try await container.moderation.reportList(
                 currentList,
                 selectedReason: selectedReportReason,
                 reason: reportEvidenceText.nilIfBlank,

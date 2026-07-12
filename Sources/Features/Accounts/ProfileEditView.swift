@@ -314,7 +314,7 @@ struct ProfileEditView: View {
 
         // Try to get description from a fresh profile fetch
         do {
-            let profile = try await container.blueskyClient.fetchProfile(
+            let profile = try await container.profile.fetchProfile(
                 did: account.did ?? account.handle,
                 account: account,
                 appPassword: appPassword
@@ -366,11 +366,12 @@ struct ProfileEditView: View {
             // 1. Upload new avatar if changed
             var avatarBlob: UploadedBlob?
             if let data = avatarImageData {
-                let response = try await container.blueskyClient.uploadBlob(
+                let response = try await container.media.uploadBlob(
                     data: data,
                     mimeType: "image/jpeg",
                     account: account,
-                    appPassword: appPassword
+                    appPassword: appPassword,
+                    progress: nil
                 )
                 avatarBlob = response.blob
             } else if removeAvatar {
@@ -382,11 +383,12 @@ struct ProfileEditView: View {
             // 2. Upload new banner if changed
             var bannerBlob: UploadedBlob?
             if let data = bannerImageData {
-                let response = try await container.blueskyClient.uploadBlob(
+                let response = try await container.media.uploadBlob(
                     data: data,
                     mimeType: "image/jpeg",
                     account: account,
-                    appPassword: appPassword
+                    appPassword: appPassword,
+                    progress: nil
                 )
                 bannerBlob = response.blob
             } else if removeBanner {
@@ -405,7 +407,7 @@ struct ProfileEditView: View {
             )
 
             // 4. Write the record
-            try await container.blueskyClient.putProfileRecord(record, account: account, appPassword: appPassword)
+            try await container.profile.putProfileRecord(record, account: account, appPassword: appPassword)
 
             // 5. Refresh account store profile data
             await accountStore.refreshAccountProfiles(using: container.blueskyClient)

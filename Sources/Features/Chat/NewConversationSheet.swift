@@ -78,7 +78,7 @@ struct NewConversationSheet: View {
         guard let account = accountStore.activeAccount else { return }
         do {
             let pw = accountStore.appPassword(for: account)
-            let response = try await container.blueskyClient.searchActors(query: searchQuery, account: account, appPassword: pw)
+            let response = try await container.profile.searchActors(query: searchQuery, account: account, appPassword: pw)
             searchResults = response
         } catch {
             searchResults = []

@@ -365,7 +365,7 @@ struct RelationshipsView: View {
                       let appPassword = accountStore.appPassword(for: account) else { return }
                 Task {
                     do {
-                        try await container.blueskyClient.blockActor(
+                        try await container.social.blockActor(
                             did: actor.did,
                             account: account,
                             appPassword: appPassword
@@ -582,7 +582,7 @@ struct RelationshipsView: View {
            let appPassword = accountStore.appPassword(for: account)
         {
             do {
-                lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
+                lists = try await container.list.fetchLists(for: account, appPassword: appPassword)
             } catch {
                 AppLogger.moderation.error("Failed to load available target lists: \\(error.localizedDescription, privacy: .public)")
             }
@@ -768,15 +768,15 @@ struct RelationshipsView: View {
             let result: [BlueskyActor]
             switch mode {
             case .followers:
-                result = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+                result = try await container.profile.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             case .following:
-                result = try await container.blueskyClient.fetchFollowing(actor: did, account: account, appPassword: appPassword)
+                result = try await container.profile.fetchFollowing(actor: did, account: account, appPassword: appPassword)
             case .blocking:
-                let r = try await container.blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
+                let r = try await container.clearsky.fetchBlockedActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
             case .blockedBy:
-                let r = try await container.blueskyClient.fetchBlockedByActors(account: account, appPassword: appPassword)
+                let r = try await container.clearsky.fetchBlockedByActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
             }

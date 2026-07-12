@@ -467,7 +467,7 @@ struct ProfileInspectorView: View {
         defer { isSubmittingReport = false }
 
         do {
-            try await container.blueskyClient.reportAccount(
+            try await container.profile.reportAccount(
                 did: did,
                 selectedReason: selectedReportReason,
                 reason: reportEvidenceText.nilIfBlank,

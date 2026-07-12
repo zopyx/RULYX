@@ -365,7 +365,7 @@ struct DirectRepliesView: View {
             var allLikes: [LikeItem] = []
             var cursor: String?
             repeat {
-                let response = try await container.blueskyClient.fetchLikes(uri: postURI, cursor: cursor, account: account, appPassword: appPassword)
+                let response = try await container.social.fetchLikes(uri: postURI, cursor: cursor, account: account, appPassword: appPassword)
                 allLikes += response.likes
                 cursor = response.cursor
             } while cursor != nil
@@ -430,7 +430,7 @@ struct DirectRepliesView: View {
         }
         var lists: [BlueskyList] = []
         do {
-            lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
+            lists = try await container.list.fetchLists(for: account, appPassword: appPassword)
                 .sorted { lhs, rhs in
                     if lhs.kind != rhs.kind {
                         return lhs.kind.sortOrder < rhs.kind.sortOrder

@@ -124,10 +124,10 @@ struct NetworkGraphView: View {
         statusMessage = nil
 
         do {
-            async let aFol = container.blueskyClient.fetchFollowers(actor: a.did, account: account, appPassword: appPassword)
-            async let aFing = container.blueskyClient.fetchFollowing(actor: a.did, account: account, appPassword: appPassword)
-            async let bFol = container.blueskyClient.fetchFollowers(actor: b.did, account: account, appPassword: appPassword)
-            async let bFing = container.blueskyClient.fetchFollowing(actor: b.did, account: account, appPassword: appPassword)
+            async let aFol = container.profile.fetchFollowers(actor: a.did, account: account, appPassword: appPassword)
+            async let aFing = container.profile.fetchFollowing(actor: a.did, account: account, appPassword: appPassword)
+            async let bFol = container.profile.fetchFollowers(actor: b.did, account: account, appPassword: appPassword)
+            async let bFing = container.profile.fetchFollowing(actor: b.did, account: account, appPassword: appPassword)
             let (af, afg, bf, bfg) = try await (aFol, aFing, bFol, bFing)
             aFollowers = Set(af.map(\.did))
             aFollowing = Set(afg.map(\.did))

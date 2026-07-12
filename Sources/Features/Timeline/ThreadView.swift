@@ -414,9 +414,9 @@ struct ThreadView: View {
         Task {
             do {
                 if let threadPost, threadPost.isLikedByMe, let likeURI = threadPost.myLikeURI {
-                    _ = try await container.blueskyClient.deleteRecord(recordURI: likeURI, account: account, appPassword: appPassword)
+                    _ = try await container.post.deleteRecord(recordURI: likeURI, account: account, appPassword: appPassword)
                 } else {
-                    _ = try await container.blueskyClient.createLike(uri: uri, cid: cid, account: account, appPassword: appPassword)
+                    _ = try await container.social.createLike(uri: uri, cid: cid, account: account, appPassword: appPassword)
                 }
                 reloadThread()
             } catch {
@@ -433,9 +433,9 @@ struct ThreadView: View {
         Task {
             do {
                 if let threadPost, threadPost.isRepostedByMe, let repostURI = threadPost.myRepostURI {
-                    _ = try await container.blueskyClient.deleteRecord(recordURI: repostURI, account: account, appPassword: appPassword)
+                    _ = try await container.post.deleteRecord(recordURI: repostURI, account: account, appPassword: appPassword)
                 } else {
-                    _ = try await container.blueskyClient.createRepost(uri: uri, cid: cid, account: account, appPassword: appPassword)
+                    _ = try await container.social.createRepost(uri: uri, cid: cid, account: account, appPassword: appPassword)
                 }
                 reloadThread()
             } catch {

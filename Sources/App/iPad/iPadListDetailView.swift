@@ -226,7 +226,7 @@ struct iPadListDetailView: View {
             Divider()
             Button(loc("context.block_actor"), role: .destructive) {
                 Task {
-                    try? await container.blueskyClient.blockActor(
+                    try? await container.social.blockActor(
                         did: member.actor.did,
                         account: accountStore.activeAccount!,
                         appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }

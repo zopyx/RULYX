@@ -1659,9 +1659,9 @@ struct BlueskyProfileView: View {
         }
         isFetchingBlockCounts = true
         do {
-            async let b = container.blueskyClient.fetchBlockedByCount(for: account)
-            async let k = container.blueskyClient.fetchBlockingCount(for: account)
-            async let u = container.blueskyClient.fetchUnblockedBlockersCount(for: account)
+            async let b = container.clearsky.fetchBlockedByCount(for: account)
+            async let k = container.clearsky.fetchBlockingCount(for: account)
+            async let u = container.clearsky.fetchUnblockedBlockersCount(for: account)
             (blockedByCount, blockingCount, unblockedBlockersCount) = try await (b, k, u)
         } catch {
             AppLogger.moderation.error("Failed to fetch block counts: \(error.localizedDescription, privacy: .public)")
@@ -1676,7 +1676,7 @@ struct BlueskyProfileView: View {
         isFetchingBlockPreview = true
         showBlockBackPreview = true
         do {
-            blockPreviewActors = try await container.blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
+            blockPreviewActors = try await container.clearsky.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
         } catch {
             blockPreviewActors = []
             AppLogger.moderation.error("Failed to fetch block preview: \(error.localizedDescription, privacy: .public)")
@@ -1705,7 +1705,7 @@ struct BlueskyProfileView: View {
             if let actors {
                 toBlock = actors
             } else {
-                toBlock = try await container.blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
+                toBlock = try await container.clearsky.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
             }
         } catch {
             blockBackError = error.localizedDescription
@@ -1729,7 +1729,7 @@ struct BlueskyProfileView: View {
                 for actor in batch {
                     group.addTask {
                         do {
-                            try await container.blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
+                            try await container.social.blockActor(did: actor.did, account: account, appPassword: appPassword)
                             return (true, actor.handle)
                         } catch {
                             AppLogger.moderation.error("Block back failed for \(actor.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")

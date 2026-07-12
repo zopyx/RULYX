@@ -263,7 +263,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button(localizationManager.localized("settings.clear_cache"), role: .destructive) {
-                    container.blueskyClient.clearCache()
+                    container.auth.clearCache()
                     cacheStatusMessage = loc("settings.cache_cleared")
                 }
                 Button(localizationManager.localized("settings.cancel"), role: .cancel) {}

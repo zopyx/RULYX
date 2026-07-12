@@ -46,14 +46,14 @@ extension ListDetailView {
                         Task {
                             do {
                                 if isSubscribed {
-                                    try await container.blueskyClient.unsubscribeFromModerationList(
+                                    try await container.list.unsubscribeFromModerationList(
                                         currentList.id,
                                         account: account,
                                         appPassword: appPassword
                                     )
                                     isSubscribed = false
                                 } else {
-                                    try await container.blueskyClient.subscribeToModerationList(
+                                    try await container.list.subscribeToModerationList(
                                         currentList.id,
                                         account: account,
                                         appPassword: appPassword

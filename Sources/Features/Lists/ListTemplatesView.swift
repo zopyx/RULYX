@@ -60,7 +60,7 @@ struct ListTemplatesView: View {
         isCreating = true
         Task {
             do {
-                let list = try await container.blueskyClient.createList(name: template.name, description: template.description, kind: template.kind, account: account, appPassword: appPassword)
+                let list = try await container.list.createList(name: template.name, description: template.description, kind: template.kind, account: account, appPassword: appPassword)
                 onListCreated(list)
                 dismiss()
             } catch {}

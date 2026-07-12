@@ -287,7 +287,7 @@ struct BatchOperationProgressView: View {
     private func runBlock(account: AppAccount, appPassword: String) async {
         let blockedDIDs: Set<String>
         do {
-            let blockedResult = try await container.blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
+            let blockedResult = try await container.clearsky.fetchBlockedActors(account: account, appPassword: appPassword)
             blockedDIDs = Set(blockedResult.actors.map(\.did))
         } catch {
             blockedDIDs = []
@@ -317,7 +317,7 @@ struct BatchOperationProgressView: View {
         for target in toProcess {
             currentHandle = displayHandle(for: target)
             do {
-                try await container.blueskyClient.blockActor(did: target.did, account: account, appPassword: appPassword)
+                try await container.social.blockActor(did: target.did, account: account, appPassword: appPassword)
                 completedCount += 1
             } catch {
                 failedCount += 1
@@ -334,7 +334,7 @@ struct BatchOperationProgressView: View {
     private func runAddToList(list: BlueskyList, account: AppAccount, appPassword: String) async {
         let memberDIDs: Set<String>
         do {
-            let members = try await container.blueskyClient.fetchListMembers(list: list, account: account, appPassword: appPassword)
+            let members = try await container.list.fetchListMembers(list: list, account: account, appPassword: appPassword)
             memberDIDs = Set(members.map(\.actor.did))
         } catch {
             memberDIDs = []
@@ -364,7 +364,7 @@ struct BatchOperationProgressView: View {
         for target in toProcess {
             currentHandle = displayHandle(for: target)
             do {
-                _ = try await container.blueskyClient.addActor(did: target.did, to: list, account: account, appPassword: appPassword)
+                _ = try await container.list.addActor(did: target.did, to: list, account: account, appPassword: appPassword)
                 completedCount += 1
             } catch {
                 failedCount += 1

@@ -56,7 +56,7 @@ struct TrendDetectionView: View {
         let did = account.did ?? account.handle
 
         do {
-            let followers = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+            let followers = try await container.profile.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             for actor in followers {
                 var reasons: [String] = []
                 if actor.isNew { reasons.append(loc("trend.new_account")) }

@@ -338,7 +338,7 @@ struct ListsView: View {
                     {
                         Task {
                             do {
-                                let newList = try await container.blueskyClient.createList(
+                                let newList = try await container.list.createList(
                                     name: name,
                                     description: description,
                                     kind: kind,

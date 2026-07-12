@@ -121,7 +121,7 @@ extension ListDetailView {
         }
 
         do {
-            isSubscribedToModerationList = try await container.blueskyClient.isSubscribedToModerationList(
+            isSubscribedToModerationList = try await container.list.isSubscribedToModerationList(
                 currentList.id,
                 account: account,
                 appPassword: appPassword

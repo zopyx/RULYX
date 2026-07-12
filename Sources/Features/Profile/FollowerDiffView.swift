@@ -87,7 +87,7 @@ struct FollowerDiffView: View {
         previousFollowers = RelationshipCache.load(forKey: cacheKey)
 
         do {
-            followers = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+            followers = try await container.profile.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             RelationshipCache.save(followers, forKey: cacheKey)
             statusMessage = previousFollowers.isEmpty ? loc("follower_diff.baseline") : nil
         } catch {

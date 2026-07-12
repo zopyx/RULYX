@@ -566,7 +566,7 @@ struct FeedTimelineView: View {
         viewModel.removeEntry(uri: entryURI)
         postToDelete = nil
         do {
-            _ = try await container.blueskyClient.deleteRecord(recordURI: entryURI, account: account, appPassword: appPassword)
+            _ = try await container.post.deleteRecord(recordURI: entryURI, account: account, appPassword: appPassword)
         } catch {
             if let removedIndex {
                 viewModel.insertEntry(entry, at: removedIndex)
@@ -634,7 +634,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account),
               let did else { return }
         do {
-            try await container.blueskyClient.muteActor(did: did, account: account, appPassword: appPassword)
+            try await container.social.muteActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Muted @\(handle, privacy: .public)")
         } catch {
             AppLogger.moderation.error("Failed to mute @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -646,7 +646,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account),
               let did else { return }
         do {
-            try await container.blueskyClient.blockActor(did: did, account: account, appPassword: appPassword)
+            try await container.social.blockActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Blocked @\(handle, privacy: .public)")
         } catch {
             AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")

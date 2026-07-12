@@ -436,7 +436,7 @@ struct CustomSearchView: View {
             return
         }
         do {
-            availableTargetLists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
+            availableTargetLists = try await container.list.fetchLists(for: account, appPassword: appPassword)
                 .sorted { lhs, rhs in
                     if lhs.kind != rhs.kind {
                         return lhs.kind.sortOrder < rhs.kind.sortOrder
