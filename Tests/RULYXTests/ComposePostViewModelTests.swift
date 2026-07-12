@@ -95,6 +95,94 @@ final class ComposePostViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isPosting)
     }
 
+    // MARK: Error-Path Tests
+
+    /// When mediaService.uploadBlob throws, the error should be surfaced as errorMessage.
+    func testPostWithImageUploadFailure() async {
+        let failingMedia = FailingUploadMediaService()
+        viewModel = ComposePostViewModel(
+            postService: postService,
+            mediaService: failingMedia,
+            listService: listService,
+            account: account,
+            appPassword: "test-password"
+        )
+        viewModel.selectedImages = [(createTinyJPEG(), "image/jpeg")]
+        viewModel.postText = "Upload should fail"
+
+        await viewModel.post()
+
+        XCTAssertNotNil(viewModel.errorMessage, "Should surface error when image upload fails")
+        XCTAssertFalse(viewModel.isPosting)
+    }
+
+    /// When postService.createPost throws, the error should be surfaced as errorMessage.
+    func testPostWithCreatePostFailure() async {
+        let failingPost = FailingCreatePostService()
+        viewModel = ComposePostViewModel(
+            postService: failingPost,
+            mediaService: mediaService,
+            listService: listService,
+            account: account,
+            appPassword: "test-password"
+        )
+        viewModel.postText = "Create should fail"
+
+        await viewModel.post()
+
+        XCTAssertNotNil(viewModel.errorMessage, "Should surface error when createPost fails")
+        XCTAssertFalse(viewModel.isPosting)
+    }
+
+    /// When deleteRecord throws during an edit, the post should still complete
+    /// because deleteRecord is wrapped in `try?` (it's best-effort cleanup).
+    func testEditPostDeleteRecordFailure() async {
+        let failingDelete = FailingDeleteRecordService()
+        viewModel = ComposePostViewModel(
+            postService: failingDelete,
+            mediaService: mediaService,
+            listService: listService,
+            account: account,
+            appPassword: "test-password"
+        )
+        viewModel.editPost = makeEditEntry()
+        viewModel.postText = "Edited text"
+
+        var didComplete = false
+        viewModel.onComplete = { didComplete = true }
+
+        await viewModel.post()
+
+        XCTAssertTrue(didComplete, "Post should complete even when deleteRecord fails")
+        XCTAssertNil(viewModel.errorMessage, "Should not surface error for failed deleteRecord (try?)")
+        XCTAssertFalse(viewModel.isPosting)
+    }
+
+    /// When fetchPostThread throws, loadReferencedPost should log but not crash.
+    func testLoadReferencedPostFailure() async {
+        // Default MockPostService.fetchPostThread already throws BlueskyAPIError.invalidResponse
+        viewModel.replyTo = (
+            parentURI: "at://did:plc:other/app.bsky.feed.post/1",
+            parentCID: "cid-1",
+            rootURI: "at://did:plc:other/app.bsky.feed.post/1",
+            rootCID: "cid-1"
+        )
+
+        await viewModel.loadReferencedPost()
+
+        XCTAssertNil(viewModel.referencedPost, "referencedPost should remain nil after fetch failure")
+    }
+
+    /// When fetchLists throws, loadUserLists should log but not crash,
+    /// and userLists should stay empty.
+    func testLoadUserListsFailure() async {
+        listService.fetchListsHandler = { _, _ in throw BlueskyAPIError.invalidResponse }
+
+        await viewModel.loadUserLists()
+
+        XCTAssertTrue(viewModel.userLists.isEmpty, "userLists should be empty after fetch failure")
+    }
+
     // MARK: - GIF Handling
 
     func testHandleGIFSelectionSetsPreview() async {
@@ -229,5 +317,109 @@ final class ComposePostViewModelTests: XCTestCase {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image!.jpegData(compressionQuality: 1.0)!
+    }
+}
+
+// MARK: - Failing Mocks for Error-Path Tests
+
+/// BlueskyMediaServicing that throws on uploadBlob.
+@MainActor
+private final class FailingUploadMediaService: BlueskyMediaServicing {
+    func uploadBlob(
+        data: Data,
+        mimeType: String,
+        account: AppAccount,
+        appPassword: String?,
+        progress: (@Sendable (Double) -> Void)?
+    ) async throws -> UploadBlobResponse {
+        throw BlueskyAPIError.invalidResponse
+    }
+}
+
+/// BlueskyPostServicing that throws on createPost; all other methods succeed.
+@MainActor
+private final class FailingCreatePostService: BlueskyPostServicing {
+    func fetchPostThread(uri: String, depth: Int?, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
+        throw BlueskyAPIError.invalidResponse
+    }
+    func createPost(
+        text: String,
+        images: [PostImageAttachment]?,
+        video: PostVideoAttachment?,
+        external: PostExternalAttachment?,
+        replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
+        quote: (uri: String, cid: String)?,
+        threadGate: ThreadGateRule?,
+        allowQuoting: Bool,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> CreateRecordResponse {
+        throw BlueskyAPIError.invalidResponse
+    }
+    func createThreadGate(postURI: String, rules: [ThreadGateRule], account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+        CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
+    }
+    func createPostGate(postURI: String, account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+        CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
+    }
+    func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {
+        EmptyResponse()
+    }
+    func fetchPosts(uris: [String]) async throws -> [RichPost] { [] }
+    func searchPosts(
+        q: String,
+        mentions: String?,
+        sort: String?,
+        cursor: String?,
+        limit: Int,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> SearchPostsResponse {
+        SearchPostsResponse(cursor: nil, hitsTotal: 0, posts: [])
+    }
+}
+
+/// BlueskyPostServicing that throws on deleteRecord; createPost succeeds.
+/// Used to verify that a failed deleteRecord (which uses `try?`) does not
+/// prevent the post from completing.
+@MainActor
+private final class FailingDeleteRecordService: BlueskyPostServicing {
+    func fetchPostThread(uri: String, depth: Int?, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
+        throw BlueskyAPIError.invalidResponse
+    }
+    func createPost(
+        text: String,
+        images: [PostImageAttachment]?,
+        video: PostVideoAttachment?,
+        external: PostExternalAttachment?,
+        replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
+        quote: (uri: String, cid: String)?,
+        threadGate: ThreadGateRule?,
+        allowQuoting: Bool,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> CreateRecordResponse {
+        CreateRecordResponse(uri: "at://mock/post", cid: "cid")
+    }
+    func createThreadGate(postURI: String, rules: [ThreadGateRule], account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+        CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
+    }
+    func createPostGate(postURI: String, account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+        CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
+    }
+    func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {
+        throw BlueskyAPIError.invalidResponse
+    }
+    func fetchPosts(uris: [String]) async throws -> [RichPost] { [] }
+    func searchPosts(
+        q: String,
+        mentions: String?,
+        sort: String?,
+        cursor: String?,
+        limit: Int,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> SearchPostsResponse {
+        SearchPostsResponse(cursor: nil, hitsTotal: 0, posts: [])
     }
 }

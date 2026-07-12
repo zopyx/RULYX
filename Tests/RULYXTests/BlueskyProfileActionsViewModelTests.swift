@@ -183,4 +183,97 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
         XCTAssertTrue(summary.contains("3"))
         XCTAssertTrue(summary.contains("2"))
     }
+
+    // MARK: - State Matrix: Block Counts
+
+    func testFetchBlockCountsWhenProfileIsOwn() async {
+        // Given: service returns specific counts for own profile
+        mockClearSky.fetchBlockingCountHandler = { _ in 25 }
+        mockClearSky.fetchBlockedByCountHandler = { _ in 15 }
+
+        // When
+        await sut.fetchBlockCounts(isOwnProfile: true)
+
+        // Then: both blocking and blocked-by counts are populated
+        XCTAssertEqual(sut.blockingCount, 25)
+        XCTAssertEqual(sut.blockedByCount, 15)
+        XCTAssertFalse(sut.isFetchingBlockCounts)
+    }
+
+    func testFetchBlockCountsWhenProfileIsNotOwn() async {
+        // Given: counts are preset (simulating a prior own-profile view)
+        sut.blockedByCount = 42
+        sut.blockingCount = 100
+
+        // When: fetching for another user's profile
+        await sut.fetchBlockCounts(isOwnProfile: false)
+
+        // Then: blockedByCount is cleared (not relevant for other profiles)
+        XCTAssertNil(sut.blockedByCount)
+        XCTAssertNil(sut.blockingCount)
+    }
+
+    // MARK: - State Matrix: Block Back
+
+    func testBlockBackWithNoBlockers() async {
+        // Given: clearsky returns an empty blocker list
+        mockClearSky.fetchUnblockedBlockerActorsHandler = { _, _ in [] }
+
+        // When: blockBack is invoked without pre-resolved actors
+        await sut.blockBack()
+
+        // Then: exits early with zero blocks performed
+        XCTAssertFalse(sut.isBlockingBack)
+        XCTAssertEqual(sut.blockBackTotal, 0)
+        XCTAssertEqual(sut.blockBackCompleted, 0)
+    }
+
+    func testBlockBackCancellation() async {
+        // Given: blockActor hangs so we can observe mid-flight state
+        let didStart = expectation(description: "blockBack started blocking")
+        final class ContinuationBox: @unchecked Sendable {
+            var value: CheckedContinuation<Void, any Error>?
+        }
+        let box = ContinuationBox()
+        mockProfile.blockActorHandler = { _, _, _ in
+            didStart.fulfill()
+            try await withCheckedThrowingContinuation { cont in
+                box.value = cont
+            }
+        }
+
+        let task = Task {
+            await sut.blockBack(actors: [makeActor()])
+        }
+
+        await fulfillment(of: [didStart])
+        XCTAssertTrue(sut.isBlockingBack, "isBlockingBack should be true while blocking")
+
+        // When: task is cancelled and the hang is released
+        task.cancel()
+        box.value?.resume(throwing: CancellationError())
+
+        _ = await task.value
+
+        // Then: state is reset after the operation completes
+        XCTAssertFalse(sut.isBlockingBack, "isBlockingBack should be false after cancellation")
+    }
+
+    // MARK: - State Matrix: Block Preview
+
+    func testFetchBlockPreviewWithFailures() async {
+        // Given: clearsky API returns an error
+        mockClearSky.fetchUnblockedBlockerActorsHandler = { _, _ in
+            throw BlueskyAPIError.server("Service unavailable")
+        }
+
+        // When
+        await sut.fetchBlockPreview()
+
+        // Then: error is captured and preview is not shown
+        XCTAssertNotNil(sut.blockBackError)
+        XCTAssertFalse(sut.isFetchingBlockPreview)
+        XCTAssertFalse(sut.showBlockBackPreview)
+        XCTAssertTrue(sut.blockPreviewActors.isEmpty)
+    }
 }
