@@ -78,6 +78,8 @@ final class BlueskyProfileActionsViewModel {
 
     // MARK: - Block Counts
 
+    /// Fetches blocking/blocked-by/unblocked counts from ClearSky.
+    /// Three states: idle (nil → "-"), loading (spinner), loaded (numbers).
     func fetchBlockCounts(isOwnProfile: Bool) async {
         guard isOwnProfile else {
             resetBlockBackCounts()
@@ -85,13 +87,13 @@ final class BlueskyProfileActionsViewModel {
         }
         guard let account = accountStore.activeAccount else { return }
 
-        // Clear all numbers and show spinner
+        // State 1 → 2: clear numbers, show spinner
         blockingCount = nil
         blockedByCount = nil
         unblockedBlockersCount = nil
         isFetchingBlockCounts = true
 
-        // Fetch all three in parallel
+        // State 2 → 3: fetch in parallel, set all at once
         async let blocking = clearskyService.fetchBlockingCount(for: account)
         async let blockedBy = clearskyService.fetchBlockedByCount(for: account)
         async let unblocked = clearskyService.fetchUnblockedBlockersCount(for: account)
@@ -102,7 +104,6 @@ final class BlueskyProfileActionsViewModel {
             blockedByCount = bb
             unblockedBlockersCount = ub
         } catch {
-            // Individual failures keep partial results as nil
             if let b = try? await blocking { blockingCount = b }
             if let bb = try? await blockedBy { blockedByCount = bb }
             if let ub = try? await unblocked { unblockedBlockersCount = ub }
