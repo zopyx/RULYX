@@ -199,7 +199,8 @@ struct HTTPClient {
             self.session = session
         } else {
             let delegate = CertificatePinningDelegate(pinnedHashes: pinnedHashes)
-            let config = session.configuration
+            let config = URLSessionConfiguration.ephemeral
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
             self.session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
         }
     }
