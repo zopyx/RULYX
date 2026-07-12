@@ -45,6 +45,7 @@ struct HTTPRequestDebugEntry: Identifiable {
 
 /// In-memory store of HTTP request debug entries, with automatic URL sanitization
 /// (redacts Klipy API keys and JWT tokens). Entries older than 3 hours are purged.
+/// @unchecked Sendable: ObservableObject with @MainActor-isolated mutable state via @Published.
 final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     static let shared = HTTPRequestDebugStore()
 

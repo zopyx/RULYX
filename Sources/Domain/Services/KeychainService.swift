@@ -38,6 +38,7 @@ protocol KeychainServicing: Sendable {
     func delete(service: String, account: String) throws
 }
 
+/// @unchecked Sendable: wraps Security framework C APIs which are not Sendable-annotated.
 final class KeychainService: KeychainServicing, @unchecked Sendable {
     func save(_ value: String, service: String, account: String) throws {
         let data = Data(value.utf8)

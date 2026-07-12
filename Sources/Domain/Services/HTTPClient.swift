@@ -1,4 +1,7 @@
+import CryptoKit
 import Foundation
+
+// MARK: - UploadProgressDelegate
 
 private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate, Sendable {
     let onProgress: @Sendable (Double) -> Void
@@ -12,6 +15,119 @@ private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate, Se
         onProgress(Double(totalBytesSent) / Double(totalBytesExpectedToSend))
     }
 }
+
+// MARK: - CertificatePinningDelegate
+
+/// Validates server certificates against pinned SHA-256 public key hashes.
+/// When no pins are configured, all connections are allowed (development mode).
+///
+/// Use `CertificatePinningDelegate.pinHashes(for:keyCount:)` to generate
+/// pin hashes from PEM-encoded certificate data.
+///
+/// - Important: Pinning is opt-in. Pass an empty set or omit `pinnedHashes`
+///   to disable pinning and allow all connections.
+private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
+    /// @unchecked Sendable: NSObject-based URLSession delegate; thread-safety
+    /// is guaranteed by URLSession's serial delegate queue.
+    private let pinnedHashes: Set<String>
+
+    init(pinnedHashes: Set<String>) {
+        self.pinnedHashes = pinnedHashes
+    }
+
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
+                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+              let serverTrust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        // If no pins are configured, allow all (development mode).
+        guard !pinnedHashes.isEmpty else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        // Enforce TLS 1.2+ by requiring at least a valid certificate chain.
+        var secResult = SecTrustResultType.invalid
+        guard SecTrustEvaluateWithError(serverTrust, nil),
+              SecTrustGetTrustResult(serverTrust, &secResult) == errSecSuccess,
+              secResult == .proceed || secResult == .unspecified
+        else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+
+        // Check each certificate in the chain against the pinned hashes.
+        let certificateCount = SecTrustGetCertificateCount(serverTrust)
+        for index in 0 ..< certificateCount {
+            guard let certificate = SecTrustGetCertificateAtIndex(serverTrust, index) else { continue }
+            let publicKeyHash = Self.sha256PublicKeyHash(for: certificate)
+            if pinnedHashes.contains(publicKeyHash) {
+                completionHandler(.useCredential, URLCredential(trust: serverTrust))
+                return
+            }
+        }
+
+        // No matching pin found — reject the connection.
+        completionHandler(.cancelAuthenticationChallenge, nil)
+    }
+
+    // MARK: - Public Key Hashing
+
+    /// Compute the SHA-256 hash of a certificate's public key (SPKI).
+    private static func sha256PublicKeyHash(for certificate: SecCertificate) -> String {
+        guard let publicKey = SecCertificateCopyKey(certificate) else { return "" }
+
+        var error: Unmanaged<CFError>?
+        guard let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) as Data? else {
+            return ""
+        }
+
+        return Data(SHA256.hash(data: publicKeyData)).base64EncodedString()
+    }
+
+    // MARK: - Pin Generation Utility
+
+    /// Generate SHA-256 pin hashes from PEM-encoded certificate data.
+    ///
+    /// - Parameters:
+    ///   - pemData: Raw PEM-encoded certificate data (one or more certificates).
+    ///   - keyCount: Number of certificates to extract (default: all).
+    /// - Returns: Set of base64-encoded SHA-256 public key hashes suitable for `pinnedHashes`.
+    static func pinHashes(from pemData: Data, keyCount: Int = Int.max) -> Set<String> {
+        var hashes = Set<String>()
+        guard let pemString = String(data: pemData, encoding: .utf8) ?? String(data: pemData, encoding: .ascii) else {
+            return hashes
+        }
+        var remaining = pemString[...]
+        var extracted = 0
+
+        while extracted < keyCount, let range = remaining.range(of: "-----BEGIN CERTIFICATE-----") {
+            remaining = remaining[range.lowerBound...]
+            guard let endRange = remaining.range(of: "-----END CERTIFICATE-----") else { break }
+
+            let certBlock = String(remaining[..<endRange.upperBound])
+            remaining = remaining[endRange.upperBound...]
+
+            // Decode base64 body (skip the header/footer lines).
+            let lines = certBlock.components(separatedBy: .newlines)
+            let base64Body = lines.dropFirst().dropLast().joined()
+
+            guard let certData = Data(base64Encoded: base64Body),
+                  let certificate = SecCertificateCreateWithData(nil, certData as CFData)
+            else { continue }
+
+            hashes.insert(sha256PublicKeyHash(for: certificate))
+            extracted += 1
+        }
+
+        return hashes
+    }
+}
+
+// MARK: - InflightManager
 
 private actor InflightManager {
     private var tasks: [String: Task<(Data, HTTPURLResponse), Error>] = [:]
@@ -27,14 +143,44 @@ private actor InflightManager {
     }
 }
 
+// MARK: - HTTPClient
+
 struct HTTPClient {
     private let session: URLSession
     private let debugStore: HTTPRequestDebugStore?
+
+    /// SHA-256 hashes of expected certificate public keys for certificate pinning.
+    /// When empty (the default), certificate pinning is disabled and all TLS connections are allowed.
+    ///
+    /// - Note: Use `CertificatePinningDelegate.pinHashes(from:keyCount:)` to generate
+    ///   hashes from PEM-encoded certificate data.
+    private let pinnedHashes: Set<String>
+
     private static let inflightManager = InflightManager()
 
-    init(session: URLSession = .shared, debugStore: HTTPRequestDebugStore? = HTTPRequestDebugStore.shared) {
-        self.session = session
+    /// Creates an HTTP client with optional certificate pinning and debug store logging.
+    ///
+    /// - Parameters:
+    ///   - session: The `URLSession` to use for requests. When `pinnedHashes` is non-empty,
+    ///     this session is ignored and a new session is created with the pinning delegate.
+    ///   - debugStore: Optional debug store for tracking HTTP request lifecycle.
+    ///   - pinnedHashes: SHA-256 hashes of expected certificate public keys.
+    ///     Leave empty to disable certificate pinning.
+    init(
+        session: URLSession = .shared,
+        debugStore: HTTPRequestDebugStore? = HTTPRequestDebugStore.shared,
+        pinnedHashes: Set<String> = []
+    ) {
         self.debugStore = debugStore
+        self.pinnedHashes = pinnedHashes
+
+        if pinnedHashes.isEmpty {
+            self.session = session
+        } else {
+            let delegate = CertificatePinningDelegate(pinnedHashes: pinnedHashes)
+            let config = session.configuration
+            self.session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
+        }
     }
 
     /// Deduplicates in-flight network requests by method + URL.

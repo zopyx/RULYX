@@ -435,6 +435,7 @@ actor MediaDownloadService {
 }
 
 private enum VideoRemuxer {
+    /// @unchecked Sendable: private inner class used as task-local storage for URLSession delegate callbacks.
     private final class Context: @unchecked Sendable {
         let reader: AVAssetReader
         let writer: AVAssetWriter
