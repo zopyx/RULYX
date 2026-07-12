@@ -27,7 +27,7 @@ struct UserPostsView: View {
 
     @StateObject private var viewModel: UserPostsViewModel
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -110,7 +110,7 @@ struct UserPostsView: View {
                 videoPreviewURL: $videoPreviewURL,
                 showLikesForURI: $showLikesForURI,
                 accountStore: accountStore,
-                blueskyClient: blueskyClient,
+                blueskyClient: container.blueskyClient,
                 searchAccount: searchAccount
             ))
             .modifier(ComposeSheetsModifier(
@@ -121,7 +121,7 @@ struct UserPostsView: View {
                 postToShare: $postToShare,
                 postToDelete: $postToDelete,
                 accountStore: accountStore,
-                blueskyClient: blueskyClient,
+                blueskyClient: container.blueskyClient,
                 refresh: refresh
             ))
             .navigationDestination(for: TimelineRoute.self) { route in
@@ -136,7 +136,7 @@ struct UserPostsView: View {
                     list: nil
                 )
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
             .task {
                 await loadInitial()
@@ -148,7 +148,7 @@ struct UserPostsView: View {
             .task {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+                await likerActions.loadAvailableTargetLists(using: container.blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
             }
             .postLikerActions(manager: likerActions)
         }
@@ -296,7 +296,7 @@ struct UserPostsView: View {
     }
 
     private func postRowCallbacks(for entry: RichFeedEntry) -> PostRowCallbacks {
-        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
         return PostRowCallbacks(
             onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
             onTapImage: { index in
@@ -324,7 +324,7 @@ struct UserPostsView: View {
             onBlockAllLikers: {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword)
             },
             onAddAllLikersToList: { list in
                 guard let fetchAccount = accountStore.activeAccount,
@@ -332,7 +332,7 @@ struct UserPostsView: View {
                       let activeAccount = accountStore.activeAccount,
                       let activePassword = accountStore.appPassword(for: activeAccount) else { return }
                 likerActions.handleAddAllLikersToList(
-                    postURI: entry.post.uri, list: list, using: blueskyClient,
+                    postURI: entry.post.uri, list: list, using: container.blueskyClient,
                     fetchAccount: fetchAccount, fetchPassword: fetchPassword,
                     activeAccount: activeAccount, activePassword: activePassword,
                     internalListStore: internalListStore
@@ -385,7 +385,7 @@ struct UserPostsView: View {
                     Task {
                         guard let account = accountStore.activeAccount,
                               let appPassword = accountStore.appPassword(for: account) else { return }
-                        await viewModel.toggleInlineThread(uri: uri, account: account, appPassword: appPassword, using: blueskyClient)
+                        await viewModel.toggleInlineThread(uri: uri, account: account, appPassword: appPassword, using: container.blueskyClient)
                     }
                 } label: {
                     HStack(spacing: 6) {
@@ -541,7 +541,7 @@ struct UserPostsView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         Task {
-            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient)
         }
     }
 
@@ -549,7 +549,7 @@ struct UserPostsView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         Task {
-            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient)
         }
     }
 
@@ -572,7 +572,7 @@ struct UserPostsView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         initialLoadTask?.cancel()
         let task = Task {
-            await viewModel.loadPosts(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.loadPosts(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         initialLoadTask = task
         await task.value
@@ -584,7 +584,7 @@ struct UserPostsView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMorePosts(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.loadMorePosts(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         loadMoreTask = task
         await task.value
@@ -595,7 +595,7 @@ struct UserPostsView: View {
     private func refresh() async {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
     }
 
     private func isOwnPost(_ entry: RichFeedEntry) -> Bool {
@@ -614,7 +614,7 @@ struct UserPostsView: View {
               let appPassword = accountStore.appPassword(for: account),
               let did else { return }
         do {
-            try await blueskyClient.muteActor(did: did, account: account, appPassword: appPassword)
+            try await container.blueskyClient.muteActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Muted @\(handle, privacy: .public)")
         } catch {
             AppLogger.moderation.error("Failed to mute @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -626,7 +626,7 @@ struct UserPostsView: View {
               let appPassword = accountStore.appPassword(for: account),
               let did else { return }
         do {
-            try await blueskyClient.blockActor(did: did, account: account, appPassword: appPassword)
+            try await container.blueskyClient.blockActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Blocked @\(handle, privacy: .public)")
         } catch {
             AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")

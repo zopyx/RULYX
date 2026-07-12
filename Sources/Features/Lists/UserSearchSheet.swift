@@ -7,7 +7,7 @@ import SwiftUI
 struct UserSearchSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     @State private var searchQuery = ""
@@ -41,7 +41,7 @@ struct UserSearchSheet: View {
                             list: nil
                         )
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                     } label: {
                         BlueskyActorRow(actor: actor)
                     }
@@ -87,7 +87,7 @@ struct UserSearchSheet: View {
 
         isSearching = true
         do {
-            results = try await blueskyClient.searchActorsFull(query: trimmed, account: account, appPassword: appPassword)
+            results = try await container.blueskyClient.searchActorsFull(query: trimmed, account: account, appPassword: appPassword)
         } catch {
             results = []
         }
