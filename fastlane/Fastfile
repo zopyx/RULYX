@@ -1,19 +1,24 @@
 default_platform(:ios)
 
 platform :ios do
+  desc "Capture and resize all screenshots"
   lane :screenshots do
     capture_screenshots(
       output_directory: "./screenshots",
       clear_previous_screenshots: true,
       stop_after_first_error: false,
       only_testing: [
-        "RULYXUITests/ScreenshotTests/testCaptureAllTabs"
+        "RULYXUITests/ScreenshotTests/testCaptureAllTabs",
+        "RULYXUITests/ScreenshotTests/testCaptureModerationTab",
+        "RULYXUITests/ScreenshotTests/testCaptureSettingsTab",
+        "RULYXUITests/ScreenshotTests/testCaptureAccountsTab",
+        "RULYXUITests/ScreenshotTests/testCaptureInfoTab",
       ]
     )
-
     resize_screenshots
   end
 
+  desc "Resize screenshots to 1260x2736 for App Store"
   lane :resize_screenshots do
     target_width = 1260
     target_height = 2736
@@ -29,5 +34,28 @@ platform :ios do
       sh "sips -z #{target_height} #{target_width} \"#{file}\" --out \"#{out}\""
       UI.success "Resized: #{file} → #{out} (#{target_width}x#{target_height})"
     end
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    build_app(
+      scheme: "RULYX",
+      export_method: "app-store",
+      skip_profile_detection: false,
+    )
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      notify_external_testers: false,
+    )
+  end
+
+  desc "Run unit tests"
+  lane :test do
+    run_tests(
+      scheme: "RULYX",
+      devices: ["iPhone 16 Pro Max"],
+      only_testing: ["RULYXTests"],
+      code_coverage: true,
+    )
   end
 end
