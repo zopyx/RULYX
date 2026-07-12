@@ -157,13 +157,14 @@ struct HTTPClient {
     private let pinnedHashes: Set<String>
 
     /// Default pinned certificate hashes for known RULYX API endpoints.
-    /// - `bsky.social`: Bluesky PDS / AppView
-    /// - `api.clearsky.app`: ClearSky moderation list API
-    /// - `public.api.clearsky.services`: ClearSky blocklist / single-blocklist API
+    /// These are SHA-256 hashes of the raw public key bytes
+    /// (SecKeyCopyExternalRepresentation), NOT SPKI hashes.
     static let defaultPinnedHashes: Set<String> = [
-        "Va6hs2tSCkc4CWC91P6Bga2S05J/R2R+Tp4WPAv7Hlc=",  // bsky.social
-        "QNiF2u+4j3KEEjVqkg0NURIcIBEZYwHuiUo83b0eTPY=",  // api.clearsky.app
-        "NBhLcAnw8zIiFwyip+klozKdSHH6RjfecjLVC4ILUE4=",  // public.api.clearsky.services
+        "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",  // bsky.social (PDS / AppView)
+        "MApRt+9acjCK+IF5k8gl+ctdzD8WN2Oy5pknAnXnIY0=",  // public.api.bsky.app (profile batch, stats, posts)
+        "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",  // api.clearsky.app (moderation lists)
+        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",  // public.api.clearsky.services (blocklist, get-did)
+        "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",  // plc.directory (PLC audit log)
     ]
 
     private static let inflightManager = InflightManager()
