@@ -19,7 +19,7 @@ extension ListDetailView {
         let syncSnapshot: () -> Void
 
         @EnvironmentObject var accountStore: AccountStore
-        @EnvironmentObject var blueskyClient: LiveBlueskyClient
+        @EnvironmentObject var container: BlueskyServiceContainerWrapper
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
         @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -78,7 +78,7 @@ extension ListDetailView {
                                     to: currentList,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                                 syncSnapshot()
                             }
@@ -97,7 +97,7 @@ extension ListDetailView {
                                 await viewModel.loadMoreSearchResults(
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                             }
                         }
@@ -112,7 +112,7 @@ extension ListDetailView {
                                     query: searchQuery,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                             }
                         }
@@ -157,7 +157,7 @@ extension ListDetailView {
                             to: currentList,
                             account: account,
                             appPassword: appPassword,
-                            using: blueskyClient
+                            using: container.blueskyClient
                         )
                         syncSnapshot()
                     }

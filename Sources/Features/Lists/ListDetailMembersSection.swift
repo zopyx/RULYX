@@ -15,7 +15,7 @@ extension ListDetailView {
         let syncSnapshot: () -> Void
 
         @EnvironmentObject var accountStore: AccountStore
-        @EnvironmentObject var blueskyClient: LiveBlueskyClient
+        @EnvironmentObject var container: BlueskyServiceContainerWrapper
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
         @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -65,7 +65,7 @@ extension ListDetailView {
                                 for: currentList,
                                 account: account,
                                 appPassword: appPassword,
-                                using: blueskyClient
+                                using: container.blueskyClient
                             )
                         }
                     }
@@ -93,7 +93,7 @@ extension ListDetailView {
                                         member: member,
                                         account: account,
                                         appPassword: appPassword,
-                                        using: blueskyClient
+                                        using: container.blueskyClient
                                     )
                                     syncSnapshot()
                                 }
@@ -119,7 +119,7 @@ extension ListDetailView {
                                     list: currentList,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                             }
                         }

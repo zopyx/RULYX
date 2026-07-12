@@ -4,7 +4,7 @@ import SwiftUI
 /// showing mutual followers, mutual following, and whether each follows the other.
 struct NetworkGraphView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var accountA: BlueskyActor?
     @State private var accountB: BlueskyActor?
@@ -43,7 +43,7 @@ struct NetworkGraphView: View {
                 SearchField(query: $searchQueryA, results: $searchResultsA, onSelect: { actor in
                     accountA = actor
                     searchQueryA = actor.handle
-                }, accountStore: accountStore, blueskyClient: blueskyClient)
+                }, accountStore: accountStore, blueskyClient: container.blueskyClient)
                 if let a = accountA {
                     Label(a.handle, systemImage: "person.fill")
                 }
@@ -55,7 +55,7 @@ struct NetworkGraphView: View {
                 SearchField(query: $searchQueryB, results: $searchResultsB, onSelect: { actor in
                     accountB = actor
                     searchQueryB = actor.handle
-                }, accountStore: accountStore, blueskyClient: blueskyClient)
+                }, accountStore: accountStore, blueskyClient: container.blueskyClient)
                 if let b = accountB {
                     Label(b.handle, systemImage: "person.fill")
                 }
@@ -124,10 +124,10 @@ struct NetworkGraphView: View {
         statusMessage = nil
 
         do {
-            async let aFol = blueskyClient.fetchFollowers(actor: a.did, account: account, appPassword: appPassword)
-            async let aFing = blueskyClient.fetchFollowing(actor: a.did, account: account, appPassword: appPassword)
-            async let bFol = blueskyClient.fetchFollowers(actor: b.did, account: account, appPassword: appPassword)
-            async let bFing = blueskyClient.fetchFollowing(actor: b.did, account: account, appPassword: appPassword)
+            async let aFol = container.blueskyClient.fetchFollowers(actor: a.did, account: account, appPassword: appPassword)
+            async let aFing = container.blueskyClient.fetchFollowing(actor: a.did, account: account, appPassword: appPassword)
+            async let bFol = container.blueskyClient.fetchFollowers(actor: b.did, account: account, appPassword: appPassword)
+            async let bFing = container.blueskyClient.fetchFollowing(actor: b.did, account: account, appPassword: appPassword)
             let (af, afg, bf, bfg) = try await (aFol, aFing, bFol, bFing)
             aFollowers = Set(af.map(\.did))
             aFollowing = Set(afg.map(\.did))

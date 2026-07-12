@@ -20,7 +20,7 @@ struct RootView: View {
     // MARK: - Properties
 
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var mutedWordsStore: MutedWordsStore
@@ -82,7 +82,7 @@ struct RootView: View {
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
         Task {
-            await accountStore.switchAccount(to: account, using: blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.blueskyClient)
             workspaceStore.returnToModerationRoot()
             generator.selectionChanged()
         }
@@ -94,7 +94,7 @@ struct RootView: View {
         if horizontalSizeClass == .regular {
             iPadRootView()
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
                 .environmentObject(mutedWordsStore)
@@ -154,6 +154,7 @@ struct RootView: View {
                     .buttonStyle(.plain)
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
+                    .accessibilityIdentifier("tab-\(item.tab.rawValue)")
                 }
 
                 Button {
@@ -179,6 +180,7 @@ struct RootView: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
+                .accessibilityIdentifier("tab-accounts")
             }
             .padding(.horizontal, 4)
             .padding(.top, 6)
@@ -192,7 +194,7 @@ struct RootView: View {
             AccountSwitcherTabSheet(
                 accountStore: accountStore,
                 workspaceStore: workspaceStore,
-                blueskyClient: blueskyClient,
+                blueskyClient: container.blueskyClient,
                 onSwitch: switchAccount
             )
         }

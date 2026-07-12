@@ -5,7 +5,7 @@ import SwiftUI
 /// Multi-select list picker for configuring which lists automatically receive
 /// newly blocked-back actors. Selection is persisted via `@AppStorage`.
 struct AutoBlockListPickerView: View {
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var internalListStore: InternalListStore
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -130,7 +130,7 @@ struct AutoBlockListPickerView: View {
         if let account = accountStore.activeAccount,
            let appPassword = accountStore.appPassword(for: account) {
             do {
-                lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+                lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
             } catch {
                 AppLogger.moderation.error("Failed to load lists for auto-block picker: \(error.localizedDescription, privacy: .public)")
             }

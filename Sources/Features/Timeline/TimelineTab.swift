@@ -4,7 +4,7 @@ import SwiftUI
 
 struct TimelineTab: View {
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject var mutedWordsStore: MutedWordsStore
     @EnvironmentObject var analyticsStore: AnalyticsStore
@@ -17,7 +17,7 @@ struct TimelineTab: View {
         NavigationStack(path: $navigationPath) {
             FeedTimelineView(viewModel: viewModel, navigationPath: $navigationPath)
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(mutedWordsStore)
                 .environmentObject(analyticsStore)
@@ -26,7 +26,7 @@ struct TimelineTab: View {
                     case let .thread(postURI):
                         ThreadView(postURI: postURI)
                             .environmentObject(accountStore)
-                            .environmentObject(blueskyClient)
+                            .environmentObject(container.blueskyClient)
                             .environmentObject(workspaceStore)
                             .environmentObject(mutedWordsStore)
                             .environmentObject(analyticsStore)

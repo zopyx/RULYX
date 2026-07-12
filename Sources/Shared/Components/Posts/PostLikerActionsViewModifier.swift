@@ -16,7 +16,7 @@ struct PostLikerActionsViewModifier: ViewModifier {
     /// The manager driving liker actions state.
     @ObservedObject var manager: PostLikerActionsManager
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var aiService: LiveAIService
     @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -46,13 +46,13 @@ struct PostLikerActionsViewModifier: ViewModifier {
                     onSubmit: {
                         guard let account = accountStore.activeAccount,
                               let appPassword = accountStore.appPassword(for: account) else { return }
-                        Task { await manager.submitPostReport(using: blueskyClient, account: account, appPassword: appPassword) }
+                        Task { await manager.submitPostReport(using: container.blueskyClient, account: account, appPassword: appPassword) }
                     }
                 )
             }
             .sheet(item: $manager.batchOperationConfig) { config in
                 BatchOperationProgressView(config: config)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .alert(
                 loc("post.block_likers.confirm_title")

@@ -7,7 +7,7 @@ import SwiftUI
 struct ConversationDetailView: View {
     @EnvironmentObject var chatStore: ChatStore
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var messageText = ""
@@ -149,7 +149,7 @@ struct ConversationDetailView: View {
                         list: nil
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
                     .environmentObject(workspaceStore)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
@@ -180,7 +180,7 @@ struct ConversationDetailView: View {
                     list: nil
                 )
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {

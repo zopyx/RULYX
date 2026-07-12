@@ -15,7 +15,7 @@ struct AccountQuickSwitcherSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var switchingAccountID: AppAccount.ID?
 
@@ -82,7 +82,7 @@ struct AccountQuickSwitcherSheet: View {
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
         Task { @MainActor in
-            await accountStore.switchAccount(to: account, using: blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.blueskyClient)
             workspaceStore.returnToModerationRoot()
             generator.selectionChanged()
             switchingAccountID = nil

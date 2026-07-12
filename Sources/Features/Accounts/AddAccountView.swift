@@ -24,7 +24,7 @@ enum ProviderOption: String, CaseIterable, Identifiable {
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     @State private var handle = ""
@@ -116,10 +116,10 @@ struct AddAccountView: View {
                                     appPassword: appPassword,
                                     authFactorToken: authFactorToken,
                                     entrywayURL: entrywayURL,
-                                    client: blueskyClient
+                                    client: container.blueskyClient
                                 )
                                 if success {
-                                    await accountStore.refreshAccountProfiles(using: blueskyClient)
+                                    await accountStore.refreshAccountProfiles(using: container.blueskyClient)
                                     dismiss()
                                 }
                             }
@@ -137,11 +137,11 @@ struct AddAccountView: View {
                                     handle: handle,
                                     appPassword: appPassword,
                                     entrywayURL: entrywayURL,
-                                    client: blueskyClient
+                                    client: container.blueskyClient
                                 )
                                 switch result {
                                 case .success:
-                                    await accountStore.refreshAccountProfiles(using: blueskyClient)
+                                    await accountStore.refreshAccountProfiles(using: container.blueskyClient)
                                     dismiss()
                                 case .needsAuthFactorToken:
                                     needsAuthFactorToken = true

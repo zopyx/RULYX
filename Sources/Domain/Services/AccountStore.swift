@@ -9,7 +9,7 @@ import Foundation
 /// - Syncs accounts via iCloud (`iCloudAccountSync`).
 /// - Reacts to account deactivation/reactivation notifications.
 @MainActor
-final class AccountStore: ObservableObject {
+final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// All saved accounts. The first account in the array is the most recently added.
     /// Persisted to UserDefaults as encoded JSON under `"bluesky.savedAccounts"`.
     @Published private(set) var accounts: [AppAccount] = []

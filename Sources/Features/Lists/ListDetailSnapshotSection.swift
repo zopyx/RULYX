@@ -14,7 +14,7 @@ extension ListDetailView {
         let selectedSnapshotComparison: ListMembershipSnapshotSummary?
 
         @EnvironmentObject var accountStore: AccountStore
-        @EnvironmentObject var blueskyClient: LiveBlueskyClient
+        @EnvironmentObject var container: BlueskyServiceContainerWrapper
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
 
         // MARK: - Body

@@ -4,7 +4,7 @@ struct iPadListDetailView: View {
     let list: BlueskyList
 
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var navState: iPadNavigationState
@@ -27,7 +27,7 @@ struct iPadListDetailView: View {
                 for: list,
                 account: accountStore.activeAccount!,
                 appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "",
-                using: blueskyClient
+                using: container.blueskyClient
             )
         }
         .pageTitle(list.name)
@@ -155,7 +155,7 @@ struct iPadListDetailView: View {
                                             list: list,
                                             account: accountStore.activeAccount!,
                                             appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "",
-                                            using: blueskyClient
+                                            using: container.blueskyClient
                                         )
                                     }
                                 }
@@ -226,7 +226,7 @@ struct iPadListDetailView: View {
             Divider()
             Button(loc("context.block_actor"), role: .destructive) {
                 Task {
-                    try? await blueskyClient.blockActor(
+                    try? await container.blueskyClient.blockActor(
                         did: member.actor.did,
                         account: accountStore.activeAccount!,
                         appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }

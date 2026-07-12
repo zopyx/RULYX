@@ -37,7 +37,11 @@ protocol ChatServicesProtocol: AnyObject {
 /// used throughout the app. Injected into the SwiftUI environment via `@EnvironmentObject`.
 ///
 /// Initialization branches on launch arguments:
-/// - `--uitesting`: Skips onboarding and sets English language for UI tests.
+/// - `--uitesting`: Enables English language, preview accounts, and mock services.
+///   Onboarding is controlled by sub-flags:
+///   - `-UITestSkipOnboarding` (with `--uitesting`): Skips onboarding.
+///   - `-UITestFreshOnboarding` (with `--uitesting`): Resets onboarding flag.
+///   - `-showBetaFeatures` (with `--uitesting`): Enables beta feature flags.
 /// - `--test-account`: Uses `LiveBlueskyClient` + real `AccountStore` for screenshot tests.
 /// - Default (no flags): Normal app launch with live services.
 @MainActor
@@ -55,14 +59,27 @@ final class AppDependencies: ObservableObject {
     let internalListStore: InternalListStore
     let aiService: LiveAIService
     let autoBlockBackService: AutoBlockBackService
+    let serviceContainer: BlueskyServiceContainerWrapper
 
     // MARK: - Init
 
     init() {
         let isUITesting = CommandLine.arguments.contains("--uitesting")
         if isUITesting {
-            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            // Default: skip onboarding in UI tests for faster test execution.
+            // -UITestFreshOnboarding explicitly resets the flag so the
+            // onboarding sheet appears for onboarding-specific tests.
+            if CommandLine.arguments.contains("-UITestFreshOnboarding") {
+                UserDefaults.standard.removeObject(forKey: "hasSeenOnboarding")
+            } else {
+                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            }
             UserDefaults.standard.set("en", forKey: "selectedLanguage")
+
+            // -showBetaFeatures enables beta feature flags for testing.
+            if CommandLine.arguments.contains("-showBetaFeatures") {
+                UserDefaults.standard.set(true, forKey: "showBetaFeatures")
+            }
         }
 
         let requestExecutor = BlueskyRequestExecutor()
@@ -94,6 +111,7 @@ final class AppDependencies: ObservableObject {
             workspaceStore: workspaceStore,
             chatStore: chatStore
         )
+        serviceContainer = BlueskyServiceContainerWrapper(liveClient: blueskyClient, accountStore: accountStore)
     }
 }
 

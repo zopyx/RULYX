@@ -4,7 +4,7 @@ import Foundation
 /// Implementations handle API calls to the AT Protocol for searching, fetching,
 /// blocking, muting, following, unfollowing, and reporting actors.
 @MainActor
-protocol BlueskyProfileInspecting {
+protocol BlueskyProfileInspecting: Sendable {
     // MARK: - Actor Search
 
     /// Searches for actors matching the given query string.

@@ -10,7 +10,7 @@ struct MediaBrowserView: View {
 
     @StateObject private var viewModel: MediaBrowserViewModel
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingFolderPicker = false // Folder picker for download destination
     @State private var selectedDownloadFolder: URL?
@@ -357,7 +357,7 @@ struct MediaBrowserView: View {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         let task = Task {
-            await viewModel.load(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.load(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         initialLoadTask = task
         await task.value
@@ -368,7 +368,7 @@ struct MediaBrowserView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMore(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         loadMoreTask = task
         await task.value

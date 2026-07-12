@@ -353,4 +353,25 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             )
         }
     }
+
+    // MARK: - Actor Lists & Subscriptions (stubs)
+
+    func fetchActorLists(actor _: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
+        try await fetchLists(for: account, appPassword: appPassword)
+    }
+
+    func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor) {
+        guard let list = try await fetchList(uri: uri, account: account, appPassword: appPassword) else {
+            throw BlueskyAPIError.invalidResponse
+        }
+        throw BlueskyAPIError.invalidResponse // creator resolution not implemented separately
+    }
+
+    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] { [] }
+
+    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool { false }
+
+    func subscribeToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func unsubscribeFromModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
 }

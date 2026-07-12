@@ -104,4 +104,24 @@ protocol BlueskyListServicing {
     ///   - account: The account to authenticate with.
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     func reportList(_ list: BlueskyList, selectedReason: ModerationReportReasonType?, reason: String?, account: AppAccount, appPassword: String?) async throws
+
+    // MARK: - Actor Lists & Subscriptions
+
+    /// Fetches all lists the given actor is a member of.
+    func fetchActorLists(actor: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList]
+
+    /// Fetches full list details including the creator.
+    func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor)
+
+    /// Fetches the user's subscribed moderation lists.
+    func fetchSubscribedModerationLists(account: AppAccount, appPassword: String?) async throws -> [SubscribedListInfo]
+
+    /// Checks if the user is subscribed to a given moderation list.
+    func isSubscribedToModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws -> Bool
+
+    /// Subscribes to a moderation list.
+    func subscribeToModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws
+
+    /// Unsubscribes from a moderation list.
+    func unsubscribeFromModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws
 }

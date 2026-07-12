@@ -18,7 +18,7 @@ extension ListDetailView {
 
         @State private var showComparisonHelp = false
         @EnvironmentObject var accountStore: AccountStore
-        @EnvironmentObject var blueskyClient: LiveBlueskyClient
+        @EnvironmentObject var container: BlueskyServiceContainerWrapper
         @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
 
         /// Returns the localization key for a given comparison bucket.
@@ -60,7 +60,7 @@ extension ListDetailView {
                                     otherList: comparisonList,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                             }
                         }
@@ -79,7 +79,7 @@ extension ListDetailView {
                                     move: false,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                             }
                         }
@@ -98,7 +98,7 @@ extension ListDetailView {
                                     move: true,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                             }
                         }
@@ -117,7 +117,7 @@ extension ListDetailView {
                                     move: true,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: blueskyClient
+                                    using: container.blueskyClient
                                 )
                                 syncSnapshot()
                             }
@@ -211,7 +211,7 @@ extension ListDetailView {
                             to: currentList,
                             account: account,
                             appPassword: appPassword,
-                            using: blueskyClient
+                            using: container.blueskyClient
                         )
                         syncSnapshot()
                     }

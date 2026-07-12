@@ -4,7 +4,7 @@ import SwiftUI
 
 struct ProfileInspectorView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var viewModel = ProfileInspectorViewModel()
@@ -39,7 +39,7 @@ struct ProfileInspectorView: View {
                                         actor: actor,
                                         account: accountStore.activeAccount,
                                         appPassword: activePassword,
-                                        using: blueskyClient
+                                        using: container.blueskyClient
                                     )
                                 }
                             } label: {
@@ -57,7 +57,7 @@ struct ProfileInspectorView: View {
                             await viewModel.inspect(
                                 account: accountStore.activeAccount,
                                 appPassword: activePassword,
-                                using: blueskyClient
+                                using: container.blueskyClient
                             )
                         }
                     } label: {
@@ -109,7 +109,7 @@ struct ProfileInspectorView: View {
                             await viewModel.search(
                                 account: accountStore.activeAccount,
                                 appPassword: activePassword,
-                                using: blueskyClient
+                                using: container.blueskyClient
                             )
                         }
                     }
@@ -341,7 +341,7 @@ struct ProfileInspectorView: View {
             .toolbar {
                 accountSwitcherToolbar(
                     accountStore: accountStore,
-                    blueskyClient: blueskyClient,
+                    blueskyClient: container.blueskyClient,
                     workspaceStore: workspaceStore,
                     localizationManager: localizationManager,
                     onManageAccounts: openAccountManagement
@@ -350,7 +350,7 @@ struct ProfileInspectorView: View {
             .sheet(isPresented: $isShowingAccountManagement) {
                 AccountSwitcherSheet(isPresented: $isShowingAccountManagement)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .sheet(isPresented: $isShowingReportSheet) {
                 if let inspection = viewModel.inspection,
@@ -394,14 +394,14 @@ struct ProfileInspectorView: View {
                 await viewModel.search(
                     account: accountStore.activeAccount,
                     appPassword: activePassword,
-                    using: blueskyClient
+                    using: container.blueskyClient
                 )
             }
             .refreshable {
                 await viewModel.search(
                     account: accountStore.activeAccount,
                     appPassword: activePassword,
-                    using: blueskyClient
+                    using: container.blueskyClient
                 )
             }
             .onChange(of: viewModel.query) { _, newValue in
@@ -467,7 +467,7 @@ struct ProfileInspectorView: View {
         defer { isSubmittingReport = false }
 
         do {
-            try await blueskyClient.reportAccount(
+            try await container.blueskyClient.reportAccount(
                 did: did,
                 selectedReason: selectedReportReason,
                 reason: reportEvidenceText.nilIfBlank,

@@ -123,7 +123,7 @@ final class BlueskyListTests: XCTestCase {
     }
 
     func testKindAllCases() {
-        XCTAssertEqual(BlueskyList.Kind.allCases, [.moderation, .regular])
+        XCTAssertEqual(BlueskyList.Kind.allCases, [.moderation, .internal, .regular])
     }
 
     func testCodableRoundTrip() throws {

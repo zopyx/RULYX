@@ -6,6 +6,13 @@ struct ClearskyBlocklistResult {
     let totalCount: Int
 }
 
+/// Response type for the `app.bsky.feed.searchPosts` endpoint.
+struct SearchPostsResponse: Decodable {
+    let cursor: String?
+    let hitsTotal: Int?
+    let posts: [RichPost]
+}
+
 /// Primary API client for Bluesky network operations. Provides authenticated access to
 /// all major AT Protocol lexicons used by the app: lists, profiles, feeds, posts,
 /// notifications, chat, moderation reports, and ClearSky integration.
@@ -14,7 +21,7 @@ struct ClearskyBlocklistResult {
 ///
 /// This class is marked `@MainActor` and all state mutations happen on the main actor.
 @MainActor
-class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting {
+class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting, BlueskyAuthServicing, BlueskyFeedServicing, BlueskyPostServicing, BlueskySocialServicing, BlueskyModerationServicing, BlueskyClearSkyServicing, BlueskyNotificationServicing, BlueskyIdentityServicing, BlueskyMediaServicing {
     /// The AT Protocol service DID for the Bluesky App View proxy.
     private static let bskyAppViewServiceDID = "did:web:api.bsky.app#bsky_appview"
     /// The default base URL for the Bluesky PDS.
@@ -1987,13 +1994,6 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     // MARK: - Search Posts
-
-    /// Internal response type for the `app.bsky.feed.searchPosts` endpoint.
-    struct SearchPostsResponse: Decodable {
-        let cursor: String?
-        let hitsTotal: Int?
-        let posts: [RichPost]
-    }
 
     /// Searches posts using the `app.bsky.feed.searchPosts` endpoint.
     func searchPosts(q: String, mentions: String? = nil, sort: String? = nil, cursor: String? = nil, limit: Int = 25, account: AppAccount, appPassword: String?) async throws -> SearchPostsResponse {

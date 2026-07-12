@@ -4,7 +4,7 @@ import SwiftUI
 /// suspicious patterns) and lists them for review.
 struct TrendDetectionView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var flaggedAccounts: [(BlueskyActor, String)] = [] // (actor, reason)
     @State private var isLoading = false
@@ -28,7 +28,7 @@ struct TrendDetectionView: View {
                 NavigationLink {
                     BlueskyProfileView(member: BlueskyListMember(recordURI: "trend:\(actor.did)", actor: actor), list: nil)
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(actor.title).font(.headline)
@@ -56,7 +56,7 @@ struct TrendDetectionView: View {
         let did = account.did ?? account.handle
 
         do {
-            let followers = try await blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+            let followers = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             for actor in followers {
                 var reasons: [String] = []
                 if actor.isNew { reasons.append(loc("trend.new_account")) }

@@ -13,7 +13,7 @@ extension ListDetailView {
         let account: AppAccount
         let appPassword: String
 
-        @EnvironmentObject var blueskyClient: LiveBlueskyClient
+        @EnvironmentObject var container: BlueskyServiceContainerWrapper
         @EnvironmentObject private var localizationManager: LocalizationManager
 
         // MARK: - Body
@@ -46,14 +46,14 @@ extension ListDetailView {
                         Task {
                             do {
                                 if isSubscribed {
-                                    try await blueskyClient.unsubscribeFromModerationList(
+                                    try await container.blueskyClient.unsubscribeFromModerationList(
                                         currentList.id,
                                         account: account,
                                         appPassword: appPassword
                                     )
                                     isSubscribed = false
                                 } else {
-                                    try await blueskyClient.subscribeToModerationList(
+                                    try await container.blueskyClient.subscribeToModerationList(
                                         currentList.id,
                                         account: account,
                                         appPassword: appPassword

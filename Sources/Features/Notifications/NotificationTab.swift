@@ -4,7 +4,7 @@ import SwiftUI
 
 struct NotificationTab: View {
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @StateObject private var viewModel = NotificationViewModel()
     @State private var selectedActor: BlueskyActor?
     @State private var navigationPath = NavigationPath()
@@ -45,7 +45,7 @@ struct NotificationTab: View {
                 case let .thread(postURI):
                     ThreadView(postURI: postURI)
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                         .environmentObject(workspaceStore)
                         .environmentObject(mutedWordsStore)
                         .environmentObject(analyticsStore)
@@ -72,8 +72,8 @@ struct NotificationTab: View {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account)
             else { return }
-            await viewModel.load(account: account, appPassword: appPassword, using: blueskyClient)
-            await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.load(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: container.blueskyClient)
             await loadTargetLists(account: account, appPassword: appPassword)
         }
         .onChange(of: accountStore.activeAccount?.did) { _, _ in
@@ -97,8 +97,8 @@ struct NotificationTab: View {
                             navigationPath.append(TimelineRoute.thread(postURI: uri))
                         }
                     },
-                    onBlockAuthor: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore).onBlock,
-                    onAddAuthorToList: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore).onAddToList,
+                    onBlockAuthor: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore).onBlock,
+                    onAddAuthorToList: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore).onAddToList,
                     availableTargetLists: availableTargetLists
                 )
                 .onAppear {
@@ -151,7 +151,7 @@ struct NotificationTab: View {
     private func loadTargetLists(account: AppAccount, appPassword: String) async {
         var lists: [BlueskyList] = []
         do {
-            lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+            lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
         } catch {
             AppLogger.moderation.error("Failed to load target lists: \(error.localizedDescription, privacy: .public)")
         }
@@ -179,9 +179,9 @@ struct NotificationTab: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
         else { return }
-        await viewModel.markAllRead(account: account, appPassword: appPassword, using: blueskyClient)
-        await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
-        await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: blueskyClient)
+        await viewModel.markAllRead(account: account, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: container.blueskyClient)
     }
 
     /// Triggers pagination load of older notifications.
@@ -189,6 +189,6 @@ struct NotificationTab: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
         else { return }
-        Task { await viewModel.loadMore(account: account, appPassword: appPassword, using: blueskyClient) }
+        Task { await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient) }
     }
 }

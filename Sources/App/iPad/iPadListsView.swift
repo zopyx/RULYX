@@ -2,7 +2,7 @@ import SwiftUI
 
 struct iPadListsView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var navState: iPadNavigationState
@@ -25,7 +25,7 @@ struct iPadListsView: View {
             await viewModel.load(
                 for: accountStore.activeAccount,
                 appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
-                using: blueskyClient
+                using: container.blueskyClient
             )
         }
     }
@@ -96,7 +96,7 @@ struct iPadListsView: View {
                 navState.selectedList = list
             })
             .environmentObject(accountStore)
-            .environmentObject(blueskyClient)
+            .environmentObject(container.blueskyClient)
             .environmentObject(workspaceStore)
             .environmentObject(localizationManager)
         }

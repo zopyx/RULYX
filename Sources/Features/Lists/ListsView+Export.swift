@@ -124,7 +124,7 @@ extension ListsView {
         exportProgressMessage = "Processing..."
         let members: [BlueskyListMember]
         do {
-            members = try await blueskyClient.fetchListMembers(list: list, account: account, appPassword: appPassword)
+            members = try await container.blueskyClient.fetchListMembers(list: list, account: account, appPassword: appPassword)
         } catch {
             isExporting = false
             exportProgressMessage = nil

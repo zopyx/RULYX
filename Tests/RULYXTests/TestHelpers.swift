@@ -160,4 +160,36 @@ extension XCTestCase {
             pdsURL: URL(string: "https://bsky.social")!
         )
     }
+
+    /// Repeatedly evaluates `condition` until it returns `true` or `timeout`
+    /// seconds elapse. Useful for testing async @Published state transitions.
+    func waitForCondition(
+        timeout: TimeInterval = 3.0,
+        interval: TimeInterval = 0.05,
+        _ condition: @escaping () -> Bool,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let start = Date()
+        while !condition() {
+            guard Date().timeIntervalSince(start) < timeout else {
+                XCTFail("Timed out waiting for condition after \(timeout)s", file: file, line: line)
+                return
+            }
+            RunLoop.current.run(until: Date(timeIntervalSinceNow: interval))
+        }
+    }
+
+    /// Awaits a condition asynchronously, yielding between checks.
+    func waitForConditionAsync(
+        timeout: TimeInterval = 3.0,
+        interval: TimeInterval = 0.05,
+        _ condition: @escaping @MainActor () -> Bool
+    ) async {
+        let start = Date()
+        while await !condition() {
+            guard Date().timeIntervalSince(start) < timeout else { return }
+            try? await Task.sleep(for: .seconds(interval))
+        }
+    }
 }

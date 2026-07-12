@@ -8,7 +8,7 @@ struct ManagePostsView: View {
     let did: String
     @StateObject private var viewModel: ManagePostsViewModel
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
 
@@ -85,7 +85,7 @@ struct ManagePostsView: View {
                     Task {
                         guard let account = accountStore.activeAccount,
                               let password = accountStore.appPassword(for: account) else { return }
-                        await viewModel.deletePost(entry, account: account, appPassword: password, using: blueskyClient)
+                        await viewModel.deletePost(entry, account: account, appPassword: password, using: container.blueskyClient)
                     }
                 }
                 Button(loc("actions.cancel"), role: .cancel) {}
@@ -105,7 +105,7 @@ struct ManagePostsView: View {
                     Task {
                         guard let account = accountStore.activeAccount,
                               let password = accountStore.appPassword(for: account) else { return }
-                        await viewModel.deleteSelectedPosts(account: account, appPassword: password, using: blueskyClient)
+                        await viewModel.deleteSelectedPosts(account: account, appPassword: password, using: container.blueskyClient)
                     }
                 }
                 Button(loc("actions.cancel"), role: .cancel) {}
@@ -159,7 +159,7 @@ struct ManagePostsView: View {
                     Task {
                         guard let account = accountStore.activeAccount,
                               let password = accountStore.appPassword(for: account) else { return }
-                        await viewModel.deleteAllPosts(account: account, appPassword: password, using: blueskyClient)
+                        await viewModel.deleteAllPosts(account: account, appPassword: password, using: container.blueskyClient)
                     }
                 }
                 Button(loc("actions.cancel"), role: .cancel) {
@@ -176,7 +176,7 @@ struct ManagePostsView: View {
             .task {
                 guard let account = accountStore.activeAccount,
                       let password = accountStore.appPassword(for: account) else { return }
-                await viewModel.loadPosts(account: account, appPassword: password, using: blueskyClient)
+                await viewModel.loadPosts(account: account, appPassword: password, using: container.blueskyClient)
             }
         }
     }
@@ -240,7 +240,7 @@ struct ManagePostsView: View {
                 loadMore: {
                     guard let account = accountStore.activeAccount,
                           let password = accountStore.appPassword(for: account) else { return }
-                    await viewModel.loadMore(account: account, appPassword: password, using: blueskyClient)
+                    await viewModel.loadMore(account: account, appPassword: password, using: container.blueskyClient)
                 }
             )
 
@@ -266,7 +266,7 @@ struct ManagePostsView: View {
         .refreshable {
             guard let account = accountStore.activeAccount,
                   let password = accountStore.appPassword(for: account) else { return }
-            await viewModel.refresh(account: account, appPassword: password, using: blueskyClient)
+            await viewModel.refresh(account: account, appPassword: password, using: container.blueskyClient)
         }
         .environment(\.editMode, .constant(viewModel.isSelecting ? .active : .inactive))
     }
@@ -411,7 +411,7 @@ struct ManagePostsView: View {
                     }
                 }
             }
-            let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+            let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
             return PostRowView(
                 entry: entry,
                 style: .compact,

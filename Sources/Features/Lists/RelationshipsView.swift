@@ -35,7 +35,7 @@ struct RelationshipsView: View {
     var profileDID: String?
     var profileHandle: String?
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @AppStorage("debugMode") private var debugMode = false
@@ -57,17 +57,23 @@ struct RelationshipsView: View {
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var batchOperationConfig: BatchOperationConfig?
 
-    // Block-all-back state
-    @State private var isBlockingBack = false
-    @State private var blockBackCompleted = 0
-    @State private var blockBackTotal = 0
-    @State private var blockBackSuccessCount = 0
-    @State private var blockBackFailureCount = 0
-    @State private var blockBackCurrentHandle: String?
-    @State private var showBlockBackResult = false
+    // Block-all-back state — uses shared VM
+    @StateObject private var actionsVM = BlueskyProfileActionsViewModel(
+        profileService: LiveBlueskyClient(),
+        clearskyService: LiveBlueskyClient(),
+        accountStore: AccountStore()
+    )
+
+    private func wireActionsVM() {
+        actionsVM.reconfigure(
+            profileService: container.blueskyClient,
+            clearskyService: container.blueskyClient,
+            accountStore: accountStore
+        )
+        actionsVM.resultDisplayDuration = 0 // fast transition in list view
+    }
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
-    @State private var unblockedBlockersCount: Int?
     @State private var showBlockBackAllClear = false
 
     /// Filters actors by handle or display name matching the search query.
@@ -200,33 +206,33 @@ struct RelationshipsView: View {
                 }
                 .listStyle(.insetGrouped)
                 .overlay(alignment: .bottom) {
-                    if isBlockingBack, blockBackTotal > 0 {
+                    if actionsVM.isBlockingBack, actionsVM.blockBackTotal > 0 {
                         VStack(spacing: 6) {
-                            ProgressView(value: Double(blockBackCompleted), total: Double(blockBackTotal))
+                            ProgressView(value: Double(actionsVM.blockBackCompleted), total: Double(actionsVM.blockBackTotal))
                                 .progressViewStyle(.linear)
-                                .tint(blockBackFailureCount > 0 ? Color.orange : Color.skyPrimary)
+                                .tint(actionsVM.blockBackFailureCount > 0 ? Color.orange : Color.skyPrimary)
                             HStack {
                                 Text(
                                     loc("profile.block_back.progress")
-                                        .replacingOccurrences(of: "{completed}", with: "\(blockBackCompleted)")
-                                        .replacingOccurrences(of: "{total}", with: "\(blockBackTotal)")
+                                        .replacingOccurrences(of: "{completed}", with: "\(actionsVM.blockBackCompleted)")
+                                        .replacingOccurrences(of: "{total}", with: "\(actionsVM.blockBackTotal)")
                                 )
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 Spacer()
                             }
                             HStack(spacing: 12) {
-                                Label("\(blockBackSuccessCount)", systemImage: "checkmark.circle.fill")
+                                Label("\(actionsVM.blockBackSuccessCount)", systemImage: "checkmark.circle.fill")
                                     .font(.caption)
                                     .foregroundStyle(.green)
-                                if blockBackFailureCount > 0 {
-                                    Label("\(blockBackFailureCount)", systemImage: "xmark.circle.fill")
+                                if actionsVM.blockBackFailureCount > 0 {
+                                    Label("\(actionsVM.blockBackFailureCount)", systemImage: "xmark.circle.fill")
                                         .font(.caption)
                                         .foregroundStyle(.red)
                                 }
                                 Spacer()
                             }
-                            if let handle = blockBackCurrentHandle {
+                            if let handle = actionsVM.blockBackCurrentHandle {
                                 HStack(spacing: 4) {
                                     ProgressView()
                                         .scaleEffect(0.5)
@@ -245,8 +251,8 @@ struct RelationshipsView: View {
                         .background(.regularMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding()
-                        .animation(.default.speed(1.5), value: blockBackCurrentHandle)
-                    } else if isBlockingBack {
+                        .animation(.default.speed(1.5), value: actionsVM.blockBackCurrentHandle)
+                    } else if actionsVM.isBlockingBack {
                         HStack(spacing: 8) {
                             ProgressView()
                                 .scaleEffect(0.7)
@@ -258,9 +264,9 @@ struct RelationshipsView: View {
                         .background(.regularMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding()
-                    } else if showBlockBackResult {
+                    } else if actionsVM.showBlockBackResult {
                         HStack(spacing: 8) {
-                            if blockBackFailureCount == 0 {
+                            if actionsVM.blockBackFailureCount == 0 {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundStyle(.green)
                             } else {
@@ -359,7 +365,7 @@ struct RelationshipsView: View {
                       let appPassword = accountStore.appPassword(for: account) else { return }
                 Task {
                     do {
-                        try await blueskyClient.blockActor(
+                        try await container.blueskyClient.blockActor(
                             did: actor.did,
                             account: account,
                             appPassword: appPassword
@@ -382,7 +388,7 @@ struct RelationshipsView: View {
                 showBlockBackConfirm2 = true
             }
         } message: {
-            if let count = unblockedBlockersCount {
+            if let count = actionsVM.unblockedBlockersCount {
                 Text(loc("profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -397,7 +403,7 @@ struct RelationshipsView: View {
                 }
             }
         } message: {
-            if let count = unblockedBlockersCount {
+            if let count = actionsVM.unblockedBlockersCount {
                 Text(loc("profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -409,9 +415,9 @@ struct RelationshipsView: View {
                let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
-                ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: blueskyClient)
+                ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: container.blueskyClient)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: .init(get: { shareFileURL != nil }, set: { if !$0 { shareFileURL = nil } })) {
@@ -421,11 +427,14 @@ struct RelationshipsView: View {
         }
         .sheet(item: $batchOperationConfig) { config in
             BatchOperationProgressView(config: config)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         }
         .task {
             await loadAvailableTargetLists()
+        }
+        .task {
+            wireActionsVM()
         }
     }
 
@@ -496,7 +505,7 @@ struct RelationshipsView: View {
             } label: {
                 Label(loc("rel.block_all_back"), systemImage: "hand.raised.slash.fill")
             }
-            .disabled(isBlockingBack)
+            .disabled(actionsVM.isBlockingBack)
             if availableTargetLists.isEmpty {
                 Button {
                     Task { await loadAvailableTargetLists() }
@@ -540,97 +549,29 @@ struct RelationshipsView: View {
 
     /// Fetches the count of unblocked blockers and presents the first confirmation dialog.
     private func handleBlockAllBack() async {
-        guard let account = accountStore.activeAccount else { return }
-        do {
-            let count = try await blueskyClient.fetchUnblockedBlockersCount(for: account)
-            unblockedBlockersCount = count
-            guard count > 0 else {
-                showBlockBackAllClear = true
-                return
-            }
-            showBlockBackConfirm1 = true
-        } catch {
-            AppLogger.moderation.error("Failed to fetch unblocked blockers count: \\(error.localizedDescription, privacy: .public)")
+        guard accountStore.activeAccount != nil else { return }
+        await actionsVM.fetchBlockCounts(isOwnProfile: true)
+        guard let count = actionsVM.unblockedBlockersCount, count > 0 else {
+            showBlockBackAllClear = true
+            return
         }
+        showBlockBackConfirm1 = true
     }
 
-    /// Executes the block-back operation: fetches unblocked blocker actors and blocks each in batches.
-    private func blockBack(account: AppAccount, appPassword: String) async {
-        isBlockingBack = true
-        blockBackCompleted = 0
-        blockBackTotal = 0
-        blockBackSuccessCount = 0
-        blockBackFailureCount = 0
-        blockBackCurrentHandle = nil
-        showBlockBackResult = false
-
-        // Yield to let SwiftUI render the spinner before we set blockBackTotal
-        await Task.yield()
-
-        do {
-            let toBlock = try await blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
-
-            guard !toBlock.isEmpty else {
-                isBlockingBack = false
-                return
-            }
-
-            blockBackTotal = toBlock.count
-            let batchSize = 5
-
-            for batchStart in stride(from: 0, to: blockBackTotal, by: batchSize) {
-                let batchEnd = min(batchStart + batchSize, blockBackTotal)
-                let batch = toBlock[batchStart ..< batchEnd]
-
-                await withTaskGroup(of: (Bool, String).self) { group in
-                    for actor in batch {
-                        group.addTask {
-                            do {
-                                try await blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
-                                return (true, actor.handle)
-                            } catch {
-                                AppLogger.moderation.error("Block back failed for \(actor.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
-                                return (false, actor.handle)
-                            }
-                        }
-                    }
-                    for await (success, handle) in group {
-                        blockBackCurrentHandle = handle
-                        blockBackCompleted += 1
-                        if success {
-                            blockBackSuccessCount += 1
-                        } else {
-                            blockBackFailureCount += 1
-                        }
-                    }
-                }
-
-                if batchEnd < blockBackTotal {
-                    try await Task.sleep(for: .milliseconds(300))
-                }
-            }
-        } catch {
-            AppLogger.moderation.error("Block back failed: \(error.localizedDescription, privacy: .public)")
-        }
-
-        showBlockBackResult = true
-        blockBackCurrentHandle = nil
-
-        // Keep the result visible briefly
-        try? await Task.sleep(for: .seconds(4))
-        showBlockBackResult = false
-        isBlockingBack = false
+    /// Delegates to the shared VM.
+    private func blockBack(account _: AppAccount, appPassword _: String) async {
+        await actionsVM.blockBack(actors: nil)
     }
 
     /// A localized summary of the block-back operation result.
     private var blockBackResultSummary: String {
-        if blockBackFailureCount == 0 {
+        if actionsVM.blockBackFailureCount == 0 {
             loc("profile.block_back.result_success")
-                .replacingOccurrences(of: "{count}", with: "\(blockBackSuccessCount)")
+                .replacingOccurrences(of: "{count}", with: "\(actionsVM.blockBackSuccessCount)")
         } else {
             loc("profile.block_back.result")
-                .replacingOccurrences(of: "{success}", with: "\(blockBackSuccessCount)")
-                .replacingOccurrences(of: "{fail}", with: "\(blockBackFailureCount)")
+                .replacingOccurrences(of: "{success}", with: "\(actionsVM.blockBackSuccessCount)")
+                .replacingOccurrences(of: "{fail}", with: "\(actionsVM.blockBackFailureCount)")
         }
     }
 
@@ -641,7 +582,7 @@ struct RelationshipsView: View {
            let appPassword = accountStore.appPassword(for: account)
         {
             do {
-                lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+                lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
             } catch {
                 AppLogger.moderation.error("Failed to load available target lists: \\(error.localizedDescription, privacy: .public)")
             }
@@ -827,15 +768,15 @@ struct RelationshipsView: View {
             let result: [BlueskyActor]
             switch mode {
             case .followers:
-                result = try await blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+                result = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             case .following:
-                result = try await blueskyClient.fetchFollowing(actor: did, account: account, appPassword: appPassword)
+                result = try await container.blueskyClient.fetchFollowing(actor: did, account: account, appPassword: appPassword)
             case .blocking:
-                let r = try await blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
+                let r = try await container.blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
             case .blockedBy:
-                let r = try await blueskyClient.fetchBlockedByActors(account: account, appPassword: appPassword)
+                let r = try await container.blueskyClient.fetchBlockedByActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
             }

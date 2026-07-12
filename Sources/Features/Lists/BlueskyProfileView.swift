@@ -11,7 +11,7 @@ struct BlueskyProfileView: View {
     let list: BlueskyList?
 
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var chatStore: ChatStore
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -143,13 +143,13 @@ struct BlueskyProfileView: View {
                     searchAccount: preferredSearchAccount
                 )
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showManagePosts) {
             ManagePostsView(did: member.actor.did)
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
         }
         .sheet(item: $shareFileURL) { url in
             ShareSheet(activityItems: [url])
@@ -200,13 +200,13 @@ struct BlueskyProfileView: View {
             if let profile = viewModel.profile {
                 MediaBrowserView(did: profile.did, handle: profile.handle)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showClearskyLists) {
             ClearskyListsView(entries: viewModel.clearskyLists)
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
         }
         .sheet(isPresented: $showOwnedLists) {
             NavigationStack {
@@ -222,7 +222,7 @@ struct BlueskyProfileView: View {
                                         onListUpdated: { _ in }
                                     )
                                     .environmentObject(accountStore)
-                                    .environmentObject(blueskyClient)
+                                    .environmentObject(container.blueskyClient)
                                     .environmentObject(workspaceStore)
                                 } label: {
                                     VStack(alignment: .leading, spacing: 4) {
@@ -264,7 +264,7 @@ struct BlueskyProfileView: View {
                                 reason: reportReasonText.nilIfBlank,
                                 account: account,
                                 appPassword: appPassword,
-                                using: blueskyClient
+                                using: container.blueskyClient
                             )
                         }
                     }
@@ -313,12 +313,12 @@ struct BlueskyProfileView: View {
                             kind: .moderation,
                             account: sheetAccount,
                             appPassword: sheetAppPassword,
-                            using: blueskyClient
+                            using: container.blueskyClient
                         )
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showCreateRegularList) {
@@ -333,12 +333,12 @@ struct BlueskyProfileView: View {
                             kind: .regular,
                             account: sheetAccount,
                             appPassword: sheetAppPassword,
-                            using: blueskyClient
+                            using: container.blueskyClient
                         )
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showCreateInternalList) {
@@ -406,7 +406,7 @@ struct BlueskyProfileView: View {
                                         onListUpdated: { _ in }
                                     )
                                     .environmentObject(accountStore)
-                                    .environmentObject(blueskyClient)
+                                    .environmentObject(container.blueskyClient)
                                     .environmentObject(workspaceStore)
                                 } label: {
                                     Text(info.name)
@@ -433,7 +433,7 @@ struct BlueskyProfileView: View {
             {
                 ProfileEditView(account: account, appPassword: password)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
         }
         .confirmationDialog(
@@ -743,7 +743,7 @@ struct BlueskyProfileView: View {
                                         await viewModel.toggleFollow(
                                             account: account,
                                             appPassword: appPassword,
-                                            using: blueskyClient
+                                            using: container.blueskyClient
                                         )
                                     }
                                 }
@@ -759,7 +759,7 @@ struct BlueskyProfileView: View {
                                         await viewModel.toggleBlock(
                                             account: account,
                                             appPassword: appPassword,
-                                            using: blueskyClient
+                                            using: container.blueskyClient
                                         )
                                     }
                                 }
@@ -783,7 +783,7 @@ struct BlueskyProfileView: View {
                                         await viewModel.toggleMute(
                                             account: account,
                                             appPassword: appPassword,
-                                            using: blueskyClient
+                                            using: container.blueskyClient
                                         )
                                     }
                                 }
@@ -822,7 +822,7 @@ struct BlueskyProfileView: View {
                                                 membership,
                                                 account: account,
                                                 appPassword: appPassword,
-                                                using: blueskyClient
+                                                using: container.blueskyClient
                                             )
                                         }
                                     }
@@ -865,7 +865,7 @@ struct BlueskyProfileView: View {
                                                 membership,
                                                 account: account,
                                                 appPassword: appPassword,
-                                                using: blueskyClient
+                                                using: container.blueskyClient
                                             )
                                         }
                                     }
@@ -1228,7 +1228,7 @@ struct BlueskyProfileView: View {
                                         onListUpdated: { _ in }
                                     )
                                     .environmentObject(accountStore)
-                                    .environmentObject(blueskyClient)
+                                    .environmentObject(container.blueskyClient)
                                     .environmentObject(workspaceStore)
                                 } label: {
                                     VStack(alignment: .leading, spacing: 2) {
@@ -1296,7 +1296,7 @@ struct BlueskyProfileView: View {
                             viewerPassword: appPassword,
                             dataAccount: dataAccount ?? account,
                             dataPassword: dataAppPassword ?? appPassword,
-                            using: blueskyClient
+                            using: container.blueskyClient
                         )
                     }
                 }
@@ -1311,7 +1311,7 @@ struct BlueskyProfileView: View {
                     viewerPassword: appPassword,
                     dataAccount: dataAccount ?? account,
                     dataPassword: dataAppPassword ?? appPassword,
-                    using: blueskyClient
+                    using: container.blueskyClient
                 )
             }
         }
@@ -1323,7 +1323,7 @@ struct BlueskyProfileView: View {
                     viewerPassword: appPassword,
                     dataAccount: dataAccount ?? account,
                     dataPassword: dataAppPassword ?? appPassword,
-                    using: blueskyClient
+                    using: container.blueskyClient
                 )
             }
         }
@@ -1336,9 +1336,9 @@ struct BlueskyProfileView: View {
             searchAccount = preferredSearchAccount
             async let blocks = fetchBlockCounts()
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
-                async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: blueskyClient)
+                async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: container.blueskyClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
-                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: blueskyClient)
+                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: container.blueskyClient)
                     async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password, targetDID: did)
 
                     _ = await (blocks, clearsky, owned, subscribed)
@@ -1643,7 +1643,7 @@ struct BlueskyProfileView: View {
     }
 
     private func fetchSubscribedListsIfOwn(account: AppAccount, appPassword: String, targetDID: String? = nil) async {
-        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: blueskyClient, targetDID: targetDID)
+        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: container.blueskyClient, targetDID: targetDID)
     }
 
     private func fetchBlockCounts() async {
@@ -1659,9 +1659,9 @@ struct BlueskyProfileView: View {
         }
         isFetchingBlockCounts = true
         do {
-            async let b = blueskyClient.fetchBlockedByCount(for: account)
-            async let k = blueskyClient.fetchBlockingCount(for: account)
-            async let u = blueskyClient.fetchUnblockedBlockersCount(for: account)
+            async let b = container.blueskyClient.fetchBlockedByCount(for: account)
+            async let k = container.blueskyClient.fetchBlockingCount(for: account)
+            async let u = container.blueskyClient.fetchUnblockedBlockersCount(for: account)
             (blockedByCount, blockingCount, unblockedBlockersCount) = try await (b, k, u)
         } catch {
             AppLogger.moderation.error("Failed to fetch block counts: \(error.localizedDescription, privacy: .public)")
@@ -1676,7 +1676,7 @@ struct BlueskyProfileView: View {
         isFetchingBlockPreview = true
         showBlockBackPreview = true
         do {
-            blockPreviewActors = try await blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
+            blockPreviewActors = try await container.blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
         } catch {
             blockPreviewActors = []
             AppLogger.moderation.error("Failed to fetch block preview: \(error.localizedDescription, privacy: .public)")
@@ -1705,7 +1705,7 @@ struct BlueskyProfileView: View {
             if let actors {
                 toBlock = actors
             } else {
-                toBlock = try await blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
+                toBlock = try await container.blueskyClient.fetchUnblockedBlockerActors(account: account, appPassword: appPassword)
             }
         } catch {
             blockBackError = error.localizedDescription
@@ -1729,7 +1729,7 @@ struct BlueskyProfileView: View {
                 for actor in batch {
                     group.addTask {
                         do {
-                            try await blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
+                            try await container.blueskyClient.blockActor(did: actor.did, account: account, appPassword: appPassword)
                             return (true, actor.handle)
                         } catch {
                             AppLogger.moderation.error("Block back failed for \(actor.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -1856,7 +1856,7 @@ struct BlueskyProfileView: View {
         exportTask?.cancel()
         exportTask = Task {
             defer { isExportActive = false }
-            if let url = await viewModel.exportPosts(as: format, account: account, appPassword: appPassword, using: blueskyClient) {
+            if let url = await viewModel.exportPosts(as: format, account: account, appPassword: appPassword, using: container.blueskyClient) {
                 try? await Task.sleep(for: .milliseconds(600))
                 shareFileURL = url
                 showExportSheet = false

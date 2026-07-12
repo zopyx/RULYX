@@ -72,7 +72,6 @@ struct RULYXApp: App {
 
                     .environmentObject(deps.accountStore)
                     .environmentObject(deps.workspaceStore)
-                    .environmentObject(deps.blueskyClient)
                     .environmentObject(deps.localizationManager)
                     .environment(\.locale, deps.localizationManager.locale)
                     .environmentObject(deps.mutedWordsStore)
@@ -83,8 +82,16 @@ struct RULYXApp: App {
                     .environmentObject(deps.internalListStore)
                     .environmentObject(deps.aiService)
                     .environmentObject(deps.autoBlockBackService)
+                    .environmentObject(deps.serviceContainer)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
+
+                    // Lock screen overlay
+                    .overlay {
+                        if appLockManager.isLocked {
+                            LockScreenView()
+                        }
+                    }
 
                     // MARK: iCloud Privacy Alert
 

@@ -4,7 +4,7 @@ struct iPadProfileInspector: View {
     let did: String
 
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var navState: iPadNavigationState
 
@@ -73,7 +73,7 @@ struct iPadProfileInspector: View {
                 viewerPassword: password,
                 dataAccount: dataAccount,
                 dataPassword: dataPassword,
-                using: blueskyClient
+                using: container.blueskyClient
             )
         }
         .pageTitle(profileVM.inspection?.profile.handle ?? "")
@@ -148,13 +148,13 @@ struct iPadProfileInspector: View {
 
             HStack(spacing: 8) {
                 actionButton(loc("profile.block"), isActive: viewer?.isBlocking == true) {
-                    await profileVM.toggleBlock(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: blueskyClient)
+                    await profileVM.toggleBlock(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
                 }
                 actionButton(loc("profile.mute"), isActive: viewer?.muted == true) {
-                    await profileVM.toggleMute(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: blueskyClient)
+                    await profileVM.toggleMute(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
                 }
                 actionButton(loc("profile.follow"), isActive: viewer?.isFollowing == true) {
-                    await profileVM.toggleFollow(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: blueskyClient)
+                    await profileVM.toggleFollow(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
                 }
             }
         }
@@ -242,14 +242,14 @@ struct iPadProfileInspector: View {
         let handle = inspection.profile.handle
         return MediaBrowserView(did: did, handle: handle)
             .environmentObject(accountStore)
-            .environmentObject(blueskyClient)
+            .environmentObject(container.blueskyClient)
             .environmentObject(localizationManager)
     }
 
     private func listsTab(_: ProfileInspection) -> some View {
         ClearskyListsView(entries: profileVM.clearskyLists)
             .environmentObject(accountStore)
-            .environmentObject(blueskyClient)
+            .environmentObject(container.blueskyClient)
             .environmentObject(localizationManager)
     }
 }
