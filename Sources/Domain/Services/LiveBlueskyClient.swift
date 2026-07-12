@@ -45,7 +45,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         self.baseURL = baseURL
         let clientSession = URLSession.shared
         session = clientSession
-        self.httpClient = httpClient ?? HTTPClient(session: clientSession)
+        self.httpClient = httpClient ?? HTTPClient(session: clientSession, pinnedHashes: HTTPClient.defaultPinnedHashes)
         self.clearskyHeartbeat = clearskyHeartbeat
         let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, httpClient: self.httpClient)
         self.requestExecutor = executor

@@ -156,6 +156,14 @@ struct HTTPClient {
     ///   hashes from PEM-encoded certificate data.
     private let pinnedHashes: Set<String>
 
+    /// Default pinned certificate hashes for known RULYX API endpoints.
+    /// - `bsky.social`: Bluesky PDS / AppView
+    /// - `api.clearsky.app`: ClearSky blocklist API
+    static let defaultPinnedHashes: Set<String> = [
+        "Va6hs2tSCkc4CWC91P6Bga2S05J/R2R+Tp4WPAv7Hlc=",  // bsky.social
+        "QNiF2u+4j3KEEjVqkg0NURIcIBEZYwHuiUo83b0eTPY=",  // api.clearsky.app
+    ]
+
     private static let inflightManager = InflightManager()
 
     /// Creates an HTTP client with optional certificate pinning and debug store logging.
