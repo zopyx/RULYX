@@ -223,17 +223,20 @@ struct HTTPClient {
                     id: entryID ?? UUID(),
                     errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
                 )
+                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
                 throw BlueskyAPIError.invalidResponse
             }
             if (200 ..< 300).contains(httpResponse.statusCode) {
                 await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
             } else {
+                let bodyPreview = Self.prettyPrintedJSON(from: data) ?? String(data: data, encoding: .utf8) ?? ""
                 await debugStore?.fail(
                     id: entryID ?? UUID(),
                     statusCode: httpResponse.statusCode,
                     errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
                     errorResponseJSON: Self.prettyPrintedJSON(from: data)
                 )
+                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
             }
             return (data, httpResponse)
         } catch {
@@ -241,6 +244,7 @@ struct HTTPClient {
                 id: entryID ?? UUID(),
                 errorMessage: AppError.userMessage(from: error)
             )
+            AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
             throw error
         }
     }
@@ -333,17 +337,20 @@ struct HTTPClient {
                     id: entryID ?? UUID(),
                     errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
                 )
+                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
                 throw BlueskyAPIError.invalidResponse
             }
             if (200 ..< 300).contains(httpResponse.statusCode) {
                 await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
             } else {
+                let bodyPreview = Self.prettyPrintedJSON(from: data) ?? String(data: data, encoding: .utf8) ?? ""
                 await debugStore?.fail(
                     id: entryID ?? UUID(),
                     statusCode: httpResponse.statusCode,
                     errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
                     errorResponseJSON: Self.prettyPrintedJSON(from: data)
                 )
+                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
             }
             return (data, httpResponse)
         } catch {
@@ -351,6 +358,7 @@ struct HTTPClient {
                 id: entryID ?? UUID(),
                 errorMessage: AppError.userMessage(from: error)
             )
+            AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
             throw error
         }
     }

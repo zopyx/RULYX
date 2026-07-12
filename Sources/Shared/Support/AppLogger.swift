@@ -16,4 +16,6 @@ enum AppLogger {
     static let moderation = Logger(subsystem: subsystem, category: "moderation")
     /// Logger for performance tracking.
     static let performance = Logger(subsystem: subsystem, category: "performance")
+    /// Logger for HTTP request/response failures — visible in Xcode console.
+    static let http = Logger(subsystem: subsystem, category: "http")
 }
