@@ -22,6 +22,7 @@
 		06FEA6B4D36A6377A32B7495 /* ListDetailSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F40BDB6C5A807BB1DB2617E /* ListDetailSheets.swift */; };
 		07E5E914FD0F857DB27D520B /* UserSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C2FF704F9E17F5AFDD176B /* UserSearchSheet.swift */; };
 		092EC4D0A9B9F518C011B02D /* NotificationTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060293C72C6A9384467F3C6A /* NotificationTab.swift */; };
+		09900FA14AB6A93DD0EA65C2 /* ServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE87495FA903F80E0F00020A /* ServiceIntegrationTests.swift */; };
 		0BED6A17574F128BA23F66E3 /* InlineReplyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37502F47929637F644ECB4B5 /* InlineReplyRow.swift */; };
 		0C1ADEB015AFB30FB73A88CE /* ActorSearchResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00247ABCA73D8B2603E8CDE3 /* ActorSearchResultRow.swift */; };
 		0C2D9C541894EA1EB5453068 /* BlueskyFeedServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB53510EA9B66B893EE1021 /* BlueskyFeedServicing.swift */; };
@@ -165,6 +166,7 @@
 		6B22180DBE5962DB287D95F2 /* vi.json in Resources */ = {isa = PBXBuildFile; fileRef = 4E5900990CDF329A0C4D223C /* vi.json */; };
 		6B45F78FE7BE8F6DE3972AEF /* ListsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81930EF4108C09CDD9DB4507 /* ListsViewModelTests.swift */; };
 		6BB42169303728BA73067AAE /* AccountSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19F8289064A8E2ED734F301 /* AccountSummaryCard.swift */; };
+		6BBABB1B2076169FBE77F89B /* JailbreakDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66140BA7C48D2340546D4F37 /* JailbreakDetector.swift */; };
 		6BC845D443638044F0B78600 /* Text+Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E72FCCBFC99F97EE9776A02 /* Text+Localization.swift */; };
 		6C052B32660F20E8E8F04A54 /* BulkProfileLookupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACC01757A043BDAEEE26F55 /* BulkProfileLookupViewModel.swift */; };
 		6CE509BD1D1CB94B5F20C43E /* BlueskyProfileActionsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A1037F26DBBCB58FD4674 /* BlueskyProfileActionsViewModelTests.swift */; };
@@ -478,6 +480,7 @@
 		64E0E9C888D2514617D3E9C0 /* nl.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = nl.json; sourceTree = "<group>"; };
 		64F6BF1B58BC5CD685E5EAD9 /* HTTPRequestDebugStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequestDebugStoreTests.swift; sourceTree = "<group>"; };
 		6578B3A3E0D7B991826A37B9 /* ProfileInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInspectorView.swift; sourceTree = "<group>"; };
+		66140BA7C48D2340546D4F37 /* JailbreakDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetector.swift; sourceTree = "<group>"; };
 		678D0031FC923D1451B284B2 /* GIFServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFServiceTests.swift; sourceTree = "<group>"; };
 		67BAF95DBA686753FF29171E /* RULYXUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RULYXUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		68C97F905D78C83E4BE674AB /* FeedPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPickerView.swift; sourceTree = "<group>"; };
@@ -647,6 +650,7 @@
 		D8BD2A0F847488D0E669E7DD /* CommonDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonDTOs.swift; sourceTree = "<group>"; };
 		D9247E08E5551755A2ED991A /* BlueskySessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskySessionService.swift; sourceTree = "<group>"; };
 		DC0ECA2AA45475B39419E281 /* BlueskyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyList.swift; sourceTree = "<group>"; };
+		DE87495FA903F80E0F00020A /* ServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		E13525C9AD087392E70A31A8 /* BlueskyRequestExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyRequestExecutorTests.swift; sourceTree = "<group>"; };
 		E39B2D684253070A871359D9 /* iPadMentionsSearchWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadMentionsSearchWrapper.swift; sourceTree = "<group>"; };
 		E4ECC0E25DA75F1AFBD6A358 /* ListDiffControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDiffControllerTests.swift; sourceTree = "<group>"; };
@@ -764,6 +768,7 @@
 				77B4BA42B59065562FF3217C /* PluralRulesTests.swift */,
 				C30715AF6695593A0B1C986D /* ProfileInspectorViewModelTests.swift */,
 				123EC6941CBDC43FA504ECE3 /* RelationshipCacheTests.swift */,
+				DE87495FA903F80E0F00020A /* ServiceIntegrationTests.swift */,
 				8C6580FDFEE12BF203E463AC /* ServiceTests.swift */,
 				D56702946833B4C168C9F620 /* StringCSVTests.swift */,
 				7F6E935CDEF1D4A0995B5A76 /* TestHelpers.swift */,
@@ -1262,6 +1267,7 @@
 				EE61BB0D0695717F8D386676 /* DateFormatters.swift */,
 				F4D7F5145B9830E215B77DB3 /* HTTPRequestDebugStore.swift */,
 				2E37F4F541F373F2F2BF7B6C /* iCloudAccountSync.swift */,
+				66140BA7C48D2340546D4F37 /* JailbreakDetector.swift */,
 				33EF653F31A59993FEAE06B8 /* LoadableState.swift */,
 				BB0242DFC00F4FAE036431B8 /* ModerationRuleStore.swift */,
 				EDD3657FF782773F78DF0AA0 /* NetworkMonitor.swift */,
@@ -1482,6 +1488,7 @@
 				2488A9706FF1B7AFC18FBADC /* PluralRulesTests.swift in Sources */,
 				7E857B988FB37D68B7CCCC9F /* ProfileInspectorViewModelTests.swift in Sources */,
 				67CAE58679130123ECB4F1AB /* RelationshipCacheTests.swift in Sources */,
+				09900FA14AB6A93DD0EA65C2 /* ServiceIntegrationTests.swift in Sources */,
 				1645D38F36D0283350DC05D1 /* ServiceTests.swift in Sources */,
 				26499558E905B606D537A035 /* StringCSVTests.swift in Sources */,
 				34400D24383390F3F173D351 /* TestHelpers.swift in Sources */,
@@ -1606,6 +1613,7 @@
 				6DC93CC2765A659BE90C747C /* InternalList.swift in Sources */,
 				B353DCB351A69FF1A6D60F8B /* InternalListDetailView.swift in Sources */,
 				A5330EB3555B049AECCF5697 /* InternalListStore.swift in Sources */,
+				6BBABB1B2076169FBE77F89B /* JailbreakDetector.swift in Sources */,
 				EA3A777F8D25057582F26EA3 /* KeychainService.swift in Sources */,
 				41DE6B5BD94716A833F0FC65 /* LikesListView.swift in Sources */,
 				58F40A634244FD0E9CA72366 /* ListBatchController.swift in Sources */,
