@@ -147,12 +147,12 @@ extension View {
 
     /// Switch to the given account with haptic feedback.
     private func switchTo(_ account: AppAccount, store: AccountStore, client: LiveBlueskyClient, workspace: ModerationWorkspaceStore) {
-        let generator = UISelectionFeedbackGenerator()
+        let generator = UIImpactFeedbackGenerator(style: .rigid)
         generator.prepare()
         Task {
             await store.switchAccount(to: account, using: client)
             workspace.returnToModerationRoot()
-            generator.selectionChanged()
+            generator.impactOccurred()
         }
     }
 

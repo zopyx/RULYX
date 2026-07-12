@@ -79,12 +79,12 @@ struct AccountQuickSwitcherSheet: View {
     /// Switch to the given account with haptic feedback, then dismiss the sheet.
     private func switchAccount(to account: AppAccount) {
         switchingAccountID = account.id
-        let generator = UISelectionFeedbackGenerator()
+        let generator = UIImpactFeedbackGenerator(style: .rigid)
         generator.prepare()
         Task { @MainActor in
             await accountStore.switchAccount(to: account, using: container.blueskyClient)
             workspaceStore.returnToModerationRoot()
-            generator.selectionChanged()
+            generator.impactOccurred()
             switchingAccountID = nil
             dismiss()
         }

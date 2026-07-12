@@ -377,8 +377,11 @@ struct AccountTabView: View {
     private func switchToAccount(_ account: AppAccount) {
         switchingAccountID = account.id
         workspaceStore.returnToModerationRoot()
+        let generator = UIImpactFeedbackGenerator(style: .rigid)
+        generator.prepare()
         Task { @MainActor in
             await accountStore.switchAccount(to: account, using: container.blueskyClient)
+            generator.impactOccurred()
             switchingAccountID = nil
         }
     }
