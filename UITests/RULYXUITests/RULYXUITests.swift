@@ -18,7 +18,7 @@ final class RULYXUITests: XCTestCase {
 
         // Wait for the app to be fully ready — the custom tab bar
         // should render with all navigation buttons visible.
-        let tabButton = app.buttons["Moderation"]
+        let tabButton = app.buttons["tab-moderation"]
         XCTAssertTrue(tabButton.waitForExistence(timeout: 8),
                       "App should launch and show the Moderation tab button, got: \(app.debugDescription)")
     }
@@ -58,17 +58,21 @@ final class RULYXUITests: XCTestCase {
 
         // --- Phase 2: Complete onboarding ---
         getStartedButton.tap()
+        sleep(1)
 
         // After dismissal, the main app should load with tab navigation visible.
-        let tabButton = onboardingApp.buttons["Moderation"]
+        let tabButton = onboardingApp.buttons["tab-moderation"]
         XCTAssertTrue(tabButton.waitForExistence(timeout: 5),
                       "Main app with Moderation tab should appear after completing onboarding")
 
-        // Verify all expected tabs are present.
-        let expectedTabs = ["Moderation", "Timeline", "Notifications", "Chat", "Info", "Settings", "Accounts"]
-        for tab in expectedTabs {
-            XCTAssertTrue(onboardingApp.buttons[tab].exists,
-                          "Tab '\(tab)' should be visible after onboarding")
+        // Verify all expected tabs are present using accessibility identifiers.
+        let expectedTabIDs = [
+            "tab-moderation", "tab-timeline", "tab-notifications",
+            "tab-chat", "tab-info", "tab-settings", "tab-accounts"
+        ]
+        for tabID in expectedTabIDs {
+            XCTAssertTrue(onboardingApp.buttons[tabID].exists,
+                          "Tab '\(tabID)' should be visible after onboarding")
         }
     }
 
@@ -78,9 +82,10 @@ final class RULYXUITests: XCTestCase {
     /// and verifies the toggle state persists after re-navigating.
     func testSettingsNavigationAndToggle() throws {
         // Navigate to Settings tab.
-        let settingsTab = app.buttons["Settings"]
+        let settingsTab = app.buttons["tab-settings"]
         XCTAssertTrue(settingsTab.exists, "Settings tab button should exist")
         settingsTab.tap()
+        sleep(1)
 
         // Verify we're on Settings — look for the Appearance picker.
         let appearancePicker = app.buttons["Appearance"]
@@ -125,9 +130,10 @@ final class RULYXUITests: XCTestCase {
     /// Navigates to the Accounts tab and verifies preview accounts are listed.
     func testAccountsTabShowsAccounts() throws {
         // Navigate to Accounts tab.
-        let accountsTab = app.buttons["Accounts"]
+        let accountsTab = app.buttons["tab-accounts"]
         XCTAssertTrue(accountsTab.exists, "Accounts tab button should exist")
         accountsTab.tap()
+        sleep(1)
 
         // Wait for the account list to render.
         // In preview mode, two accounts are injected:
@@ -161,8 +167,9 @@ final class RULYXUITests: XCTestCase {
     /// content renders — either list items or an empty state view.
     func testModerationTabNavigation() throws {
         // Moderation is the default tab after launch — verify it's loaded.
-        let moderationTab = app.buttons["Moderation"]
+        let moderationTab = app.buttons["tab-moderation"]
         XCTAssertTrue(moderationTab.exists, "Moderation tab button should exist")
+        sleep(1)
 
         // The Moderation tab should show at least some content.
         // It may show a loading indicator, an account summary card, or list sections.
@@ -172,13 +179,13 @@ final class RULYXUITests: XCTestCase {
                       "Moderation tab should render at least some text content, got: \(app.debugDescription)")
 
         // Navigate away and back to verify the tab stays stable.
-        app.buttons["Settings"].tap()
+        app.buttons["tab-settings"].tap()
         sleep(1)
-        app.buttons["Moderation"].tap()
+        app.buttons["tab-moderation"].tap()
         sleep(1)
 
         // Content should still render after returning.
-        XCTAssertTrue(app.buttons["Moderation"].exists,
+        XCTAssertTrue(app.buttons["tab-moderation"].exists,
                       "Moderation tab should still be accessible after navigating away and back")
     }
 
@@ -189,20 +196,21 @@ final class RULYXUITests: XCTestCase {
     /// and confirms content appears for all three.
     func testInfoTabContent() throws {
         // Navigate to Info tab.
-        let infoTab = app.buttons["Info"]
+        let infoTab = app.buttons["tab-info"]
         XCTAssertTrue(infoTab.exists, "Info tab button should exist")
         infoTab.tap()
+        sleep(1)
 
         // Wait for the Info view to render.
         // Verify the segmented picker with Overview / Features / Legal is present.
-        let overviewSegment = app.buttons["Overview"]
+        let overviewSegment = app.buttons["Overview"].firstMatch
         XCTAssertTrue(overviewSegment.waitForExistence(timeout: 5),
                       "Overview segment should be visible on Info tab, got: \(app.debugDescription)")
 
-        let featuresSegment = app.buttons["Features"]
+        let featuresSegment = app.buttons["Features"].firstMatch
         XCTAssertTrue(featuresSegment.exists,
                       "Features segment should be visible")
-        let legalSegment = app.buttons["Legal"]
+        let legalSegment = app.buttons["Legal"].firstMatch
         XCTAssertTrue(legalSegment.exists,
                       "Legal segment should be visible")
 
@@ -236,24 +244,28 @@ final class RULYXUITests: XCTestCase {
     /// Verifies that switching between tabs and returning preserves
     /// content — no blank screens or crashes.
     func testTabPersistenceAcrossAllTabs() throws {
-        let tabs = ["Moderation", "Timeline", "Notifications", "Chat", "Info", "Settings", "Accounts"]
+        let tabIDs = [
+            "tab-moderation", "tab-timeline", "tab-notifications",
+            "tab-chat", "tab-info", "tab-settings", "tab-accounts"
+        ]
 
-        for tab in tabs {
-            let tabButton = app.buttons[tab]
-            XCTAssertTrue(tabButton.exists, "Tab '\(tab)' should exist before tapping")
+        for tabID in tabIDs {
+            let tabButton = app.buttons[tabID]
+            XCTAssertTrue(tabButton.exists, "Tab '\(tabID)' should exist before tapping")
             tabButton.tap()
             sleep(1)
 
             // After tapping each tab, verify the tab bar is still visible
             // (no crash / blank screen).
-            let moderationTab = app.buttons["Moderation"]
+            let moderationTab = app.buttons["tab-moderation"]
             XCTAssertTrue(moderationTab.waitForExistence(timeout: 3),
-                          "Tab bar should remain visible after navigating to '\(tab)'")
+                          "Tab bar should remain visible after navigating to '\(tabID)'")
         }
 
         // Final assertion: navigating back to Moderation works.
-        app.buttons["Moderation"].tap()
-        XCTAssertTrue(app.buttons["Moderation"].waitForExistence(timeout: 3),
+        app.buttons["tab-moderation"].tap()
+        sleep(1)
+        XCTAssertTrue(app.buttons["tab-moderation"].waitForExistence(timeout: 3),
                       "Should return to Moderation tab successfully after cycling all tabs")
     }
 }
