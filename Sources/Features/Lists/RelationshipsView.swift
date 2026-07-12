@@ -726,13 +726,13 @@ struct RelationshipsView: View {
 
     /// Loads cached data first, then fetches fresh data from the API.
     private func load() async {
-        guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account)
+        guard let account = accountStore.activeAccount
         else {
             errorMessage = String.localized("rel.select_account_first")
             isLoading = false
             return
         }
+        let appPassword = accountStore.appPassword(for: account)
 
         actors = []
         errorMessage = nil
@@ -755,15 +755,15 @@ struct RelationshipsView: View {
 
     /// Pull-to-refresh that bypasses cache.
     private func refresh() async {
-        guard let account = accountStore.activeAccount,
-              let appPassword = accountStore.appPassword(for: account) else { return }
+        guard let account = accountStore.activeAccount else { return }
+        let appPassword = accountStore.appPassword(for: account)
         isRefreshing = true
         await fetchFromAPI(account: account, appPassword: appPassword)
         isRefreshing = false
     }
 
     /// Fetches actors from the Bluesky/CloudSky API based on mode, then caches the result.
-    private func fetchFromAPI(account: AppAccount, appPassword: String) async {
+    private func fetchFromAPI(account: AppAccount, appPassword: String?) async {
         do {
             let did = profileDID ?? account.did ?? account.handle
             let result: [BlueskyActor]
