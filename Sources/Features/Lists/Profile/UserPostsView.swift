@@ -721,38 +721,38 @@ struct ComposeSheetsModifier: ViewModifier {
                     )
                     .presentationDetents([.medium, .large])
                 } else {
-                    ComposePostView(
+                    ComposePostView(viewModel: ComposePostViewModel(
+                        blueskyClient: blueskyClient,
                         account: context.account,
                         appPassword: context.appPassword,
-                        blueskyClient: blueskyClient,
                         onComplete: { Task { await refresh() } },
                         quote: (context.uri, context.cid)
-                    )
+                    ))
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
                 }
             }
             .sheet(isPresented: $showNewPostComposer) {
                 if let account = accountStore.activeAccount, let appPassword = accountStore.appPassword(for: account) {
-                    ComposePostView(
+                    ComposePostView(viewModel: ComposePostViewModel(
+                        blueskyClient: blueskyClient,
                         account: account,
                         appPassword: appPassword,
-                        blueskyClient: blueskyClient,
                         onComplete: { Task { await refresh() } }
-                    )
+                    ))
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
                 }
             }
             .sheet(item: $editPostEntry) { entry in
                 if let account = accountStore.activeAccount, let appPassword = accountStore.appPassword(for: account) {
-                    ComposePostView(
+                    ComposePostView(viewModel: ComposePostViewModel(
+                        blueskyClient: blueskyClient,
                         account: account,
                         appPassword: appPassword,
-                        blueskyClient: blueskyClient,
                         onComplete: { Task { await refresh() } },
                         editPost: entry
-                    )
+                    ))
                     .environmentObject(accountStore)
                     .environmentObject(blueskyClient)
                 }

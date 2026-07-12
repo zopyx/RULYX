@@ -111,23 +111,23 @@ struct ThreadView: View {
         }
         .sheet(item: $composeContext) { context in
             if context.isReply {
-                ComposePostView(
+                ComposePostView(viewModel: ComposePostViewModel(
+                    blueskyClient: blueskyClient,
                     account: context.account,
                     appPassword: context.appPassword,
-                    blueskyClient: blueskyClient,
                     onComplete: { reloadThread() },
                     replyTo: (context.parentURI, context.parentCID, context.rootURI, context.rootCID)
-                )
+                ))
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             } else {
-                ComposePostView(
+                ComposePostView(viewModel: ComposePostViewModel(
+                    blueskyClient: blueskyClient,
                     account: context.account,
                     appPassword: context.appPassword,
-                    blueskyClient: blueskyClient,
                     onComplete: { reloadThread() },
                     quote: (context.uri, context.cid)
-                )
+                ))
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             }

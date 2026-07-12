@@ -89,12 +89,12 @@ struct FeedTimelineView: View {
             if let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
-                ComposePostView(
+                ComposePostView(viewModel: ComposePostViewModel(
+                    blueskyClient: blueskyClient,
                     account: account,
                     appPassword: appPassword,
-                    blueskyClient: blueskyClient,
                     onComplete: { refreshAfterAction() }
-                )
+                ))
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             }
@@ -113,13 +113,13 @@ struct FeedTimelineView: View {
                 )
                 .presentationDetents([.medium, .large])
             } else {
-                ComposePostView(
+                ComposePostView(viewModel: ComposePostViewModel(
+                    blueskyClient: blueskyClient,
                     account: context.account,
                     appPassword: context.appPassword,
-                    blueskyClient: blueskyClient,
                     onComplete: { refreshAfterAction() },
                     quote: (context.uri, context.cid)
-                )
+                ))
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             }
@@ -128,13 +128,13 @@ struct FeedTimelineView: View {
             if let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
-                ComposePostView(
+                ComposePostView(viewModel: ComposePostViewModel(
+                    blueskyClient: blueskyClient,
                     account: account,
                     appPassword: appPassword,
-                    blueskyClient: blueskyClient,
                     onComplete: { refreshAfterAction() },
                     editPost: entry
-                )
+                ))
                 .environmentObject(accountStore)
                 .environmentObject(blueskyClient)
             }
