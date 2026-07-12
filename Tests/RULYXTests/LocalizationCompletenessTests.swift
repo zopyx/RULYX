@@ -5,15 +5,30 @@ import XCTest
 final class LocalizationCompletenessTests: XCTestCase {
     private let supportedLanguages = ["en", "de", "fr", "it", "ja", "zh", "es", "pt", "ko", "ru", "ar", "nl", "pl", "tr", "th", "vi"]
 
+    override func setUp() {
+        super.setUp()
+        // Ensure localization bundles are loaded from the app bundle, not the test bundle.
+        // LocalizationManager.shared uses Bundle.main by default, which in tests
+        // is the XCTest runner — not the app. Pre-load them manually.
+        if LocalizationManager.shared.allBundles["en"]?.isEmpty ?? true {
+            let appBundle = Bundle(for: AppDependencies.self)
+            for lang in supportedLanguages {
+                guard let url = appBundle.url(forResource: lang, withExtension: "json"),
+                      let data = try? Data(contentsOf: url),
+                      let dict = try? JSONDecoder().decode([String: String].self, from: data)
+                else { continue }
+                LocalizationManager.shared.allBundles[lang] = dict
+            }
+        }
+    }
+
     func testEnglishValuesAreNonEmpty() throws {
-        try XCTSkipIf(LocalizationManager.shared.allBundles["en"]?.isEmpty ?? true, "Localization bundles not loaded (test environment)")
         let en = try XCTUnwrap(LocalizationManager.shared.allBundles["en"])
         let empty = en.filter { $0.value.trimmingCharacters(in: .whitespaces).isEmpty }
         XCTAssertTrue(empty.isEmpty, "\(empty.count) empty English translation(s): \(empty.keys.sorted())")
     }
 
     func testEnglishKeysAreNotPlaceholders() throws {
-        try XCTSkipIf(LocalizationManager.shared.allBundles["en"]?.isEmpty ?? true, "Localization bundles not loaded (test environment)")
         let en = try XCTUnwrap(LocalizationManager.shared.allBundles["en"])
         let placeholders = en.filter { $0.key == $0.value.trimmingCharacters(in: .whitespaces) }
         XCTAssertTrue(placeholders.isEmpty, "\(placeholders.count) key(s) where value equals key: \(placeholders.keys.sorted())")
@@ -41,17 +56,21 @@ final class LocalizationCompletenessTests: XCTestCase {
     }
 
     func testEnglishFileIsComplete() throws {
-        try XCTSkipIf(LocalizationManager.shared.allBundles["en"]?.isEmpty ?? true, "Localization bundles not loaded (test environment)")
         let en = try XCTUnwrap(LocalizationManager.shared.allBundles["en"])
         XCTAssertGreaterThan(en.count, 900, "en.json has too few keys")
     }
 
     func testAllLanguageFilesAreLoadable() throws {
-        try XCTSkipIf(LocalizationManager.shared.allBundles["en"]?.isEmpty ?? true, "Localization bundles not loaded (test environment)")
+        // All 16 language bundles should be loaded by setUp
+        for lang in supportedLanguages {
+            XCTAssertNotNil(LocalizationManager.shared.allBundles[lang],
+                           "\(lang) bundle should be loaded")
+            XCTAssertFalse(LocalizationManager.shared.allBundles[lang]?.isEmpty ?? true,
+                           "\(lang) bundle should not be empty")
+        }
     }
 
     func testAllLanguagesPreserveEnglishPlaceholderContracts() throws {
-        try XCTSkipIf(LocalizationManager.shared.allBundles["en"]?.isEmpty ?? true, "Localization bundles not loaded (test environment)")
         let english = try XCTUnwrap(LocalizationManager.shared.allBundles["en"])
         var failures: [String] = []
 
