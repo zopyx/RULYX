@@ -12,16 +12,52 @@ import UserNotifications
 ///
 /// Controlled by:
 /// - `@AppStorage("autoBlockBackEnabled")` (default: `true`)
+/// - `@AppStorage("autoBlockBackIntervalMinutes")` (default: `30`)
 /// - `@AppStorage("autoBlockTargetListIDs")` — JSON-encoded `[String]` of list IDs
+///
+/// Interval options (in minutes):
+/// - `0` = never (don't auto-run in background; manual only via foreground trigger)
+/// - `5` = every 5 minutes
+/// - `20` = every 20 minutes
+/// - `60` = every hour
+/// - `360` = every 6 hours
+/// - `1440` = once per day
 @MainActor
 final class AutoBlockBackService: ObservableObject {
+    // MARK: - Interval
+
+    /// Predefined notification intervals for the Settings picker.
+    enum Interval: Int, CaseIterable, Identifiable {
+        case never = 0
+        case fiveMinutes = 5
+        case twentyMinutes = 20
+        case oneHour = 60
+        case sixHours = 360
+        case oneDay = 1440
+
+        var id: Int { rawValue }
+
+        var labelKey: String {
+            switch self {
+            case .never: "autoblock.interval.never"
+            case .fiveMinutes: "autoblock.interval.5min"
+            case .twentyMinutes: "autoblock.interval.20min"
+            case .oneHour: "autoblock.interval.1hour"
+            case .sixHours: "autoblock.interval.6hours"
+            case .oneDay: "autoblock.interval.1day"
+            }
+        }
+    }
+
     // MARK: - Constants
 
     private static let taskIdentifier = "com.ajung.RULYX.autoblockback"
+    private static let lastRunKey = "autoBlockBackLastRunTimestamp"
 
     // MARK: - Properties
 
     @AppStorage("autoBlockBackEnabled") var isEnabled = true
+    @AppStorage("autoBlockBackIntervalMinutes") var intervalMinutes = 30
     @AppStorage("autoBlockTargetListIDs") private var targetListIDsData = Data()
 
     @Published private(set) var isRunning = false
@@ -62,6 +98,19 @@ final class AutoBlockBackService: ObservableObject {
     func performAutoBlockBack() async {
         guard isEnabled else { return }
         guard !isRunning else { return }
+
+        // Check interval: skip if not enough time has passed since last run
+        if intervalMinutes > 0 {
+            let lastRun = UserDefaults.standard.double(forKey: Self.lastRunKey)
+            if lastRun > 0 {
+                let elapsed = Date.now.timeIntervalSince1970 - lastRun
+                let minimumInterval = Double(intervalMinutes) * 60.0
+                if elapsed < minimumInterval {
+                    return
+                }
+            }
+        }
+
         guard let client = blueskyClient,
               let account = accountStore?.activeAccount,
               let appPassword = accountStore?.appPassword(for: account) else { return }
@@ -135,6 +184,9 @@ final class AutoBlockBackService: ObservableObject {
                 timestamp: .now
             )
 
+            // Record last successful run timestamp
+            UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: Self.lastRunKey)
+
             if blocked > 0 {
                 await sendNotification(
                     blockedCount: blocked,
@@ -161,8 +213,10 @@ final class AutoBlockBackService: ObservableObject {
     /// Schedules the next `BGAppRefreshTask`. Call when the app enters background.
     func scheduleBackgroundTask() {
         guard isEnabled else { return }
+        // Never run in background if interval is 0
+        guard intervalMinutes > 0 else { return }
         let request = BGAppRefreshTaskRequest(identifier: Self.taskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 30 * 60) // 30 minutes
+        request.earliestBeginDate = Date(timeIntervalSinceNow: Double(intervalMinutes) * 60.0)
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {

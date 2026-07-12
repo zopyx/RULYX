@@ -28,6 +28,10 @@ struct SettingsView: View {
     /// UserDefaults key `"autoBlockBackEnabled"`: automatically blocks back accounts that block the user.
     @AppStorage("autoBlockBackEnabled") private var autoBlockBackEnabled = true
 
+    /// UserDefaults key `"autoBlockBackIntervalMinutes"`: how often to check for new blockers.
+    /// 0 = never, 5/20/60/360/1440 minutes.
+    @AppStorage("autoBlockBackIntervalMinutes") private var autoBlockBackInterval = 30
+
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"`.
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
@@ -101,6 +105,21 @@ struct SettingsView: View {
                         }
                     }
                     .accessibilityHint(loc("settings.autoblock.hint"))
+
+                    if autoBlockBackEnabled {
+                        Picker(selection: $autoBlockBackInterval) {
+                            ForEach(AutoBlockBackService.Interval.allCases) { interval in
+                                Text(loc(interval.labelKey))
+                                    .tag(interval.rawValue)
+                            }
+                        } label: {
+                            Label {
+                                Text(loc("settings.autoblock.interval"))
+                            } icon: {
+                                Image(systemName: "clock.arrow.circlepath")
+                            }
+                        }
+                    }
 
                     NavigationLink {
                         AutoBlockListPickerView()
