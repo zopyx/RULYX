@@ -1,3 +1,4 @@
+import Observation
 import PhotosUI
 import SwiftUI
 import UIKit
@@ -6,7 +7,8 @@ import UIKit
 /// Extracted from the view to enable isolated unit testing with protocol-typed
 /// service injection.
 @MainActor
-final class ComposePostViewModel: ObservableObject {
+@Observable
+final class ComposePostViewModel {
     // MARK: - Dependencies
 
     private let postService: BlueskyPostServicing
@@ -25,32 +27,32 @@ final class ComposePostViewModel: ObservableObject {
 
     // MARK: - Published state
 
-    @Published var postText = ""
-    @Published var selectedItems: [PhotosPickerItem] = []
-    @Published var selectedImages: [(data: Data, mimeType: String)] = []
-    @Published var imageAlts: [String] = []
-    @Published var videoAttachment: PostVideoAttachment?
-    @Published var selectedGIFPreviewURL: String?
-    @Published var selectedGIFLinkURL: String?
-    @Published var selectedGIFTitle = ""
-    @Published var isPosting = false
-    @Published var uploadProgress: Double?
-    @Published var uploadSpeed: String?
-    @Published var errorMessage: String?
-    @Published var referencedPost: ThreadPostNode?
-    @Published var showGIFPicker = false
-    @Published var isDownloadingGIF = false
-    @Published var isPreloadingEdit = false
-    @Published var editReplyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
-    @Published var replyRule: ThreadGateRule?
-    @Published var allowQuoting = true
-    @Published var showReplyPicker = false
-    @Published var showListPicker = false
-    @Published var userLists: [BlueskyList] = []
-    @Published var showImageResizeAlert = false
-    @Published var pendingImageResize: (() -> Void)?
-    @Published var isScaling = false
-    @Published var altEditIndex: Int?
+var postText = ""
+var selectedItems: [PhotosPickerItem] = []
+var selectedImages: [(data: Data, mimeType: String)] = []
+var imageAlts: [String] = []
+var videoAttachment: PostVideoAttachment?
+var selectedGIFPreviewURL: String?
+var selectedGIFLinkURL: String?
+var selectedGIFTitle = ""
+var isPosting = false
+var uploadProgress: Double?
+var uploadSpeed: String?
+var errorMessage: String?
+var referencedPost: ThreadPostNode?
+var showGIFPicker = false
+var isDownloadingGIF = false
+var isPreloadingEdit = false
+var editReplyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
+var replyRule: ThreadGateRule?
+var allowQuoting = true
+var showReplyPicker = false
+var showListPicker = false
+var userLists: [BlueskyList] = []
+var showImageResizeAlert = false
+var pendingImageResize: (() -> Void)?
+var isScaling = false
+var altEditIndex: Int?
 
     // MARK: - Constants
 

@@ -1,3 +1,4 @@
+import Observation
 import PhotosUI
 import SwiftUI
 import UIKit
@@ -6,7 +7,7 @@ import UIKit
 /// Supports text, images (up to 4), GIFs (beta), video, alt text, reply controls
 /// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
-    @ObservedObject var viewModel: ComposePostViewModel
+    @Bindable var viewModel: ComposePostViewModel
 
     @Environment(\.dismiss) private var dismiss
     @State private var textViewRef: UITextView?
