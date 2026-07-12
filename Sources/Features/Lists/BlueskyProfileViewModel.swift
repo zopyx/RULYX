@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// Metadata about a moderation list that is blocking the inspected profile.
 struct BlockingListInfo: Identifiable, Hashable {
@@ -18,69 +19,69 @@ final class BlueskyProfileViewModel: ObservableObject {
     // MARK: - Properties
 
     /// The full profile inspection result (profile + list memberships + starter packs).
-    @Published private(set) var inspection: ProfileInspection?
+    private(set) var inspection: ProfileInspection?
     /// True while the initial profile load is in progress.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while a moderation toggles (block/mute/follow) is executing.
-    @Published private(set) var isUpdatingModeration = false
+    private(set) var isUpdatingModeration = false
     /// Handle change history from the PLC audit log.
-    @Published private(set) var handleHistory: [HandleChange] = []
+    private(set) var handleHistory: [HandleChange] = []
     /// Total image count across all scanned posts.
-    @Published private(set) var mediaImageCount = 0
+    private(set) var mediaImageCount = 0
     /// Total video count across all scanned posts.
-    @Published private(set) var mediaVideoCount = 0
+    private(set) var mediaVideoCount = 0
     /// True while scanning posts for media content.
-    @Published private(set) var isScanningMedia = false
+    private(set) var isScanningMedia = false
     /// User-facing success message (e.g. "Account muted."), auto-cleared on next load.
-    @Published var statusMessage: String?
+    var statusMessage: String?
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
     /// True while generating a post export file.
-    @Published private(set) var isExportingPosts = false
+    private(set) var isExportingPosts = false
     /// Localized label shown during export (page count / writing status).
-    @Published private(set) var exportProgressLabel: String?
+    private(set) var exportProgressLabel: String?
     /// Error that occurred during post export.
-    @Published var exportError: String?
+    var exportError: String?
     /// Lists from ClearSky that contain this profile.
-    @Published private(set) var clearskyLists: [ClearskyListEntry] = []
+    private(set) var clearskyLists: [ClearskyListEntry] = []
     /// True while fetching ClearSky list data.
-    @Published private(set) var isFetchingLists = false
+    private(set) var isFetchingLists = false
     /// Error from ClearSky list fetch.
-    @Published var listError: String?
+    var listError: String?
     /// Optimistic pending state for follow toggle (nil = resolved).
-    @Published private(set) var pendingFollowingState: Bool?
+    private(set) var pendingFollowingState: Bool?
     /// Optimistic pending state for block toggle (nil = resolved).
-    @Published private(set) var pendingBlockState: Bool?
+    private(set) var pendingBlockState: Bool?
     /// Optimistic pending state for mute toggle (nil = resolved).
-    @Published private(set) var pendingMuteState: Bool?
+    private(set) var pendingMuteState: Bool?
     /// Per-list optimistic pending states for membership toggles (nil = resolved).
-    @Published private(set) var pendingListMemberStates: [String: Bool] = [:]
+    private(set) var pendingListMemberStates: [String: Bool] = [:]
     /// True when the report sheet is presented.
-    @Published var showReportSheet = false
+    var showReportSheet = false
     /// True while a report is being submitted.
-    @Published var isReporting = false
+    var isReporting = false
     /// The selected report reason for the current report.
-    @Published var selectedReportReason = ModerationReportReasonType.simplifiedDefault
+    var selectedReportReason = ModerationReportReasonType.simplifiedDefault
     /// Lists owned/created by this profile.
-    @Published private(set) var ownedLists: [BlueskyList]?
+    private(set) var ownedLists: [BlueskyList]?
     /// True while fetching owned lists.
-    @Published private(set) var isFetchingOwnedLists = false
+    private(set) var isFetchingOwnedLists = false
     /// True while fetching list memberships after initial load.
-    @Published private(set) var isFetchingMemberships = false
+    private(set) var isFetchingMemberships = false
     /// True while toggling a list membership.
-    @Published private(set) var isUpdatingListMembership = false
+    private(set) var isUpdatingListMembership = false
     /// Moderation lists that the viewer subscribes to.
-    @Published private(set) var subscribedLists: [SubscribedListInfo]?
+    private(set) var subscribedLists: [SubscribedListInfo]?
     /// Names of subscribed moderation lists blocking this profile.
-    @Published private(set) var subscribedListBlockingNames: [String] = []
+    private(set) var subscribedListBlockingNames: [String] = []
     /// Combined list of all blocking names (owned memberships + subscribed lists).
-    @Published private(set) var combinedBlockingNames: [String] = []
+    private(set) var combinedBlockingNames: [String] = []
     /// Structs combining name, URI, and count for each blocking list.
-    @Published private(set) var blockingLists: [BlockingListInfo] = []
+    private(set) var blockingLists: [BlockingListInfo] = []
     /// True while fetching subscribed moderation lists.
-    @Published private(set) var isFetchingSubscribedLists = false
+    private(set) var isFetchingSubscribedLists = false
     /// True while creating a new list and adding the profile to it.
-    @Published private(set) var isCreatingList = false
+    private(set) var isCreatingList = false
 
     // MARK: - Computed Properties
 
@@ -440,9 +441,9 @@ final class BlueskyProfileViewModel: ObservableObject {
     }
 
     /// True while downloading the latest images from the profile's feed.
-    @Published var isDownloadingImages = false
+    var isDownloadingImages = false
     /// Tracks (currentBatch, totalBatches, totalImages) during image download.
-    @Published var downloadProgress: (currentBatch: Int, totalBatches: Int, totalImages: Int)?
+    var downloadProgress: (currentBatch: Int, totalBatches: Int, totalImages: Int)?
 
     /// Downloads up to 500 images from the profile's recent posts to the specified directory.
     /// - Parameter directory: The parent directory; images are saved to `directory/handle/`.
@@ -555,9 +556,9 @@ final class BlueskyProfileViewModel: ObservableObject {
     }
 
     /// True while fetching and queueing followers for blocking.
-    @Published var isBlockingFollowers = false
+    var isBlockingFollowers = false
     /// Progress information for the block-followers operation.
-    @Published var blockFollowersProgress: BatchProgress?
+    var blockFollowersProgress: BatchProgress?
 
     /// Fetches all followers and enqueues them as block operations in the `ActionQueueStore`.
     func blockAllFollowers(

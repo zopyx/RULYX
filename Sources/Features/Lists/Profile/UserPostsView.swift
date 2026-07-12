@@ -25,7 +25,7 @@ struct UserPostsView: View {
     let displayName: String
     let searchAccount: AppAccount?
 
-    @StateObject private var viewModel: UserPostsViewModel
+    @State private var viewModel: UserPostsViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -55,7 +55,7 @@ struct UserPostsView: View {
         self.did = did
         self.displayName = displayName
         self.searchAccount = searchAccount
-        _viewModel = StateObject(wrappedValue: UserPostsViewModel(did: did))
+        _viewModel = State(wrappedValue: UserPostsViewModel(did: did))
     }
 
     // MARK: - Body

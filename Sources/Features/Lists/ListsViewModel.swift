@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// Manages the moderation dashboard: lists grouped by kind, active profile info, and blocking counts.
 ///
@@ -9,21 +10,21 @@ final class ListsViewModel: ObservableObject {
     // MARK: - Properties
 
     /// All moderation lists grouped by their kind (moderation, reference, etc.).
-    @Published private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
+    private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     /// Profile of the currently active account.
-    @Published private(set) var activeProfile: BlueskyProfile?
+    private(set) var activeProfile: BlueskyProfile?
     /// Number of accounts this user is blocking.
-    @Published private(set) var blockingCount: Int?
+    private(set) var blockingCount: Int?
     /// Number of accounts blocking this user.
-    @Published private(set) var blockedByCount: Int?
+    private(set) var blockedByCount: Int?
     /// True while the initial load is in progress (no cache).
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while a manual refresh is in progress.
-    @Published private(set) var isRefreshing = false
+    private(set) var isRefreshing = false
     /// True when the displayed data was loaded from cache.
-    @Published private(set) var isFromCache = false
+    private(set) var isFromCache = false
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     // MARK: - Public Methods
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import Observation
 
 /// Displays a single post thread with ancestors (reversed), the root post,
 /// and threaded replies with depth-based indentation and connection lines.
@@ -471,11 +472,11 @@ struct ThreadView: View {
 @MainActor
 final class ThreadViewModel: ObservableObject {
     /// The loaded thread node containing the post and its replies.
-    @Published private(set) var thread: ThreadNode?
+    private(set) var thread: ThreadNode?
     /// True while the thread is loading. Starts as `true`.
-    @Published private(set) var isLoading = true
+    private(set) var isLoading = true
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     /// Handles the case where credentials are missing, showing a localized error.
     func handleMissingCredentials() {

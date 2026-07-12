@@ -1,54 +1,63 @@
-import Combine
 import Foundation
+import Observation
 
 /// Manages a user's posts with search/filter, CSV/JSON export, optimistic interactions, and inline thread expansion.
 ///
 /// Loads paginated feed data via `fetchRichFeed`, supports client-side text and date filtering,
 /// optimistic like/repost toggles, inline thread caching/expansion, and provides `sortedFilteredPosts` for display.
 @MainActor
-final class UserPostsViewModel: ObservableObject {
+@Observable
+final class UserPostsViewModel {
     // MARK: - Properties
 
     /// All loaded posts, unsorted. Display via `sortedFilteredPosts`.
-    @Published private(set) var posts: [RichFeedEntry] = []
+    private(set) var posts: [RichFeedEntry] = [] {
+        didSet { updateFilteredPosts() }
+    }
     /// True while the initial load is in progress.
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while loading the next page.
-    @Published private(set) var isLoadingMore = false
+    private(set) var isLoadingMore = false
     /// False when no more pages are available.
-    @Published private(set) var hasMore = true
+    private(set) var hasMore = true
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
     /// Filter text for client-side post body search.
-    @Published var searchText = ""
+    var searchText = "" {
+        didSet { updateFilteredPosts() }
+    }
     /// Inclusive start date for filtering posts.
-    @Published var fromDate: Date?
+    var fromDate: Date? {
+        didSet { updateFilteredPosts() }
+    }
     /// Inclusive end date for filtering posts.
-    @Published var toDate: Date?
+    var toDate: Date? {
+        didSet { updateFilteredPosts() }
+    }
 
     /// Posts filtered by search text and date range, sorted newest-first.
-    @Published private(set) var sortedFilteredPosts: [RichFeedEntry] = []
+    private(set) var sortedFilteredPosts: [RichFeedEntry] = []
 
     // MARK: - Optimistic Interactions
 
-    @Published private var optimisticLikes: [String: Bool] = [:]
-    @Published private var optimisticReposts: [String: Bool] = [:]
-    @Published private var optimisticLikeURIs: [String: String] = [:]
-    @Published private var optimisticRepostURIs: [String: String] = [:]
-    @Published private var optimisticLikeCounts: [String: Int] = [:]
-    @Published private var optimisticRepostCounts: [String: Int] = [:]
+    private var optimisticLikes: [String: Bool] = [:]
+    private var optimisticReposts: [String: Bool] = [:]
+    private var optimisticLikeURIs: [String: String] = [:]
+    private var optimisticRepostURIs: [String: String] = [:]
+    private var optimisticLikeCounts: [String: Int] = [:]
+    private var optimisticRepostCounts: [String: Int] = [:]
 
     // MARK: - Scanning
 
     /// True while auto-scanning threads for replies from other users.
-    @Published private(set) var isScanning = false
+    private(set) var isScanning = false
     /// Progress label shown during thread scanning.
-    @Published private(set) var scanProgressLabel: String?
+    private(set) var scanProgressLabel: String?
 
     // MARK: - Inline Threads
 
-    @Published var expandedThreadURIs: Set<String> = []
-    @Published var inlineThreads: [String: ThreadNode] = [:]
+    var expandedThreadURIs: Set<String> = []
+    var inlineThreads: [String: ThreadNode] = [:]
 
     // MARK: - Private Properties
 
@@ -56,52 +65,48 @@ final class UserPostsViewModel: ObservableObject {
     private var cursor: String?
     /// The DID of the profile whose posts are being viewed.
     private let did: String
-    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
 
     init(did: String) {
         self.did = did
+    }
 
-        $posts
-            .combineLatest($searchText, $fromDate, $toDate)
-            .map { posts, searchText, fromDate, toDate in
-                var result = posts
+    // MARK: - Private Helpers
 
-                if !searchText.isEmpty {
-                    let query = searchText.lowercased()
-                    result = result.filter { entry in
-                        entry.post.safeRecord.text?.lowercased().contains(query) ?? false
-                    }
-                }
+    /// Recomputes `sortedFilteredPosts` from current state.
+    /// Called via `didSet` on posts, searchText, fromDate, toDate.
+    private func updateFilteredPosts() {
+        var result = posts
 
-                if let fromDate {
-                    result = result.filter { entry in
-                        guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
-                        return d >= fromDate
-                    }
-                }
-
-                if let toDate {
-                    result = result.filter { entry in
-                        guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
-                        return d <= toDate
-                    }
-                }
-
-                result.sort { a, b in
-                    let dateA = parseDate(a.post.safeRecord.createdAt) ?? .distantPast
-                    let dateB = parseDate(b.post.safeRecord.createdAt) ?? .distantPast
-                    return dateA > dateB
-                }
-
-                return result
+        if !searchText.isEmpty {
+            let query = searchText.lowercased()
+            result = result.filter { entry in
+                entry.post.safeRecord.text?.lowercased().contains(query) ?? false
             }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] filtered in
-                self?.sortedFilteredPosts = filtered
+        }
+
+        if let fromDate {
+            result = result.filter { entry in
+                guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
+                return d >= fromDate
             }
-            .store(in: &cancellables)
+        }
+
+        if let toDate {
+            result = result.filter { entry in
+                guard let d = parseDate(entry.post.safeRecord.createdAt) else { return false }
+                return d <= toDate
+            }
+        }
+
+        result.sort { a, b in
+            let dateA = parseDate(a.post.safeRecord.createdAt) ?? .distantPast
+            let dateB = parseDate(b.post.safeRecord.createdAt) ?? .distantPast
+            return dateA > dateB
+        }
+
+        sortedFilteredPosts = result
     }
 
     // MARK: - Public Methods
