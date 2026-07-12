@@ -75,13 +75,13 @@ extension ListDetailView {
             for: currentList,
             account: account,
             appPassword: appPassword,
-            using: blueskyClient
+            using: container.blueskyClient
         )
         async let listsTask: Void = viewModel.loadAvailableLists(
             excluding: currentList,
             account: account,
             appPassword: appPassword,
-            using: blueskyClient
+            using: container.blueskyClient
         )
         async let subscriptionTask: Void = loadSubscriptionStateIfNeeded(
             account: account,
@@ -121,7 +121,7 @@ extension ListDetailView {
         }
 
         do {
-            isSubscribedToModerationList = try await blueskyClient.isSubscribedToModerationList(
+            isSubscribedToModerationList = try await container.blueskyClient.isSubscribedToModerationList(
                 currentList.id,
                 account: account,
                 appPassword: appPassword
@@ -175,7 +175,7 @@ extension ListDetailView {
                             sourceDescription: url.lastPathComponent,
                             account: account,
                             appPassword: appPassword,
-                            using: blueskyClient
+                            using: container.blueskyClient
                         )
                     }
                 }

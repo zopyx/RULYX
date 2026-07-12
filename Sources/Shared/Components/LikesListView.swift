@@ -9,7 +9,7 @@ struct LikesListView: View {
     let uri: String
 
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @Environment(\.dismiss) private var dismiss
     @State private var likes: [LikeItem] = []
     @State private var isLoading = true
@@ -128,7 +128,7 @@ struct LikesListView: View {
         isLoading = true
         errorMessage = nil
         do {
-            let response = try await blueskyClient.fetchLikes(uri: uri, account: account, appPassword: appPassword)
+            let response = try await container.blueskyClient.fetchLikes(uri: uri, account: account, appPassword: appPassword)
             likes = response.likes
             cursor = response.cursor
         } catch {
@@ -144,7 +144,7 @@ struct LikesListView: View {
               let appPassword = accountStore.appPassword(for: account),
               let cursor else { return }
         do {
-            let response = try await blueskyClient.fetchLikes(uri: uri, cursor: cursor, account: account, appPassword: appPassword)
+            let response = try await container.blueskyClient.fetchLikes(uri: uri, cursor: cursor, account: account, appPassword: appPassword)
             likes += response.likes
             self.cursor = response.cursor
         } catch {

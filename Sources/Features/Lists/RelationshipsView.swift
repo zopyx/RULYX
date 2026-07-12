@@ -35,7 +35,7 @@ struct RelationshipsView: View {
     var profileDID: String?
     var profileHandle: String?
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @AppStorage("debugMode") private var debugMode = false
@@ -66,8 +66,8 @@ struct RelationshipsView: View {
 
     private func wireActionsVM() {
         actionsVM.reconfigure(
-            profileService: blueskyClient,
-            clearskyService: blueskyClient,
+            profileService: container.blueskyClient,
+            clearskyService: container.blueskyClient,
             accountStore: accountStore
         )
         actionsVM.resultDisplayDuration = 0 // fast transition in list view
@@ -365,7 +365,7 @@ struct RelationshipsView: View {
                       let appPassword = accountStore.appPassword(for: account) else { return }
                 Task {
                     do {
-                        try await blueskyClient.blockActor(
+                        try await container.blueskyClient.blockActor(
                             did: actor.did,
                             account: account,
                             appPassword: appPassword
@@ -415,9 +415,9 @@ struct RelationshipsView: View {
                let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
-                ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: blueskyClient)
+                ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: container.blueskyClient)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: .init(get: { shareFileURL != nil }, set: { if !$0 { shareFileURL = nil } })) {
@@ -427,7 +427,7 @@ struct RelationshipsView: View {
         }
         .sheet(item: $batchOperationConfig) { config in
             BatchOperationProgressView(config: config)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         }
         .task {
@@ -582,7 +582,7 @@ struct RelationshipsView: View {
            let appPassword = accountStore.appPassword(for: account)
         {
             do {
-                lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+                lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
             } catch {
                 AppLogger.moderation.error("Failed to load available target lists: \\(error.localizedDescription, privacy: .public)")
             }
@@ -768,15 +768,15 @@ struct RelationshipsView: View {
             let result: [BlueskyActor]
             switch mode {
             case .followers:
-                result = try await blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+                result = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             case .following:
-                result = try await blueskyClient.fetchFollowing(actor: did, account: account, appPassword: appPassword)
+                result = try await container.blueskyClient.fetchFollowing(actor: did, account: account, appPassword: appPassword)
             case .blocking:
-                let r = try await blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
+                let r = try await container.blueskyClient.fetchBlockedActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
             case .blockedBy:
-                let r = try await blueskyClient.fetchBlockedByActors(account: account, appPassword: appPassword)
+                let r = try await container.blueskyClient.fetchBlockedByActors(account: account, appPassword: appPassword)
                 result = r.actors
                 clearskyTotal = r.totalCount
             }

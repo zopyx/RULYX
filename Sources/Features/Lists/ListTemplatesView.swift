@@ -22,7 +22,7 @@ private let templates: [ListTemplate] = [
 /// Trusted Sources, etc.) that create a new list with one tap.
 struct ListTemplatesView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @Environment(\.dismiss) private var dismiss
     let onListCreated: (BlueskyList) -> Void
@@ -60,7 +60,7 @@ struct ListTemplatesView: View {
         isCreating = true
         Task {
             do {
-                let list = try await blueskyClient.createList(name: template.name, description: template.description, kind: template.kind, account: account, appPassword: appPassword)
+                let list = try await container.blueskyClient.createList(name: template.name, description: template.description, kind: template.kind, account: account, appPassword: appPassword)
                 onListCreated(list)
                 dismiss()
             } catch {}

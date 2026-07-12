@@ -10,7 +10,7 @@ struct MentionsSearchView: View {
 
     @StateObject private var viewModel: MentionsSearchViewModel
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPostURI: String?
@@ -88,7 +88,7 @@ struct MentionsSearchView: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(viewModel.entries, id: \.post.uri) { entry in
-                    let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+                    let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
                     let entryCallbacks = PostRowCallbacks(
                         onTapThread: { selectedPostURI = entry.post.uri },
                         onTapImage: { index in
@@ -167,7 +167,7 @@ struct MentionsSearchView: View {
             NavigationStack {
                 ThreadView(postURI: uri, searchAccount: searchAccount)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton()
@@ -188,12 +188,12 @@ struct MentionsSearchView: View {
         .sheet(item: $showLikesForURI) { uri in
             LikesListView(uri: uri)
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
         }
         .sheet(item: $batchOperationConfig) { config in
             BatchOperationProgressView(config: config)
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
         }
         .navigationDestination(item: $showProfileFor) { actor in
             BlueskyProfileView(
@@ -201,7 +201,7 @@ struct MentionsSearchView: View {
                 list: nil
             )
             .environmentObject(accountStore)
-            .environmentObject(blueskyClient)
+            .environmentObject(container.blueskyClient)
         }
         .alert(String.localized("post.block_likers.confirm_title", replacements: ["count": "\(pendingLikerTargets.count)"]), isPresented: $showBlockLikersConfirmation) {
             Button(loc("post.block_likers.confirm_block"), role: .destructive) {
@@ -350,7 +350,7 @@ struct MentionsSearchView: View {
             var allLikes: [LikeItem] = []
             var cursor: String?
             repeat {
-                let response = try await blueskyClient.fetchLikes(uri: postURI, cursor: cursor, account: account, appPassword: appPassword)
+                let response = try await container.blueskyClient.fetchLikes(uri: postURI, cursor: cursor, account: account, appPassword: appPassword)
                 allLikes += response.likes
                 cursor = response.cursor
             } while cursor != nil
@@ -413,7 +413,7 @@ struct MentionsSearchView: View {
         }
         var lists: [BlueskyList] = []
         do {
-            lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
+            lists = try await container.blueskyClient.fetchLists(for: account, appPassword: appPassword)
                 .sorted { lhs, rhs in
                     if lhs.kind != rhs.kind {
                         return lhs.kind.sortOrder < rhs.kind.sortOrder
@@ -446,7 +446,7 @@ struct MentionsSearchView: View {
     private func loadInitial() async {
         guard let account = searchAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.load(account: account, appPassword: appPassword, using: blueskyClient)
+        await viewModel.load(account: account, appPassword: appPassword, using: container.blueskyClient)
     }
 
     private func loadMore() async {
@@ -454,7 +454,7 @@ struct MentionsSearchView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMore(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         loadMoreTask = task
         await task.value
@@ -464,6 +464,6 @@ struct MentionsSearchView: View {
     private func refresh() async {
         guard let account = searchAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
     }
 }

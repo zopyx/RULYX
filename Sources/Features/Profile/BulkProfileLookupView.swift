@@ -7,7 +7,7 @@ import SwiftUI
 /// unresolvable entries.
 struct BulkProfileLookupView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var viewModel = BulkProfileLookupViewModel()
 
@@ -101,7 +101,7 @@ struct BulkProfileLookupView: View {
         await viewModel.lookup(
             account: accountStore.activeAccount,
             appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
-            using: blueskyClient
+            using: container.blueskyClient
         )
     }
 }

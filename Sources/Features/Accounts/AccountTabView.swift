@@ -5,7 +5,7 @@ import SwiftUI
 /// accounts as JSON.
 struct AccountTabView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var isPresentingAddAccount = false
@@ -80,7 +80,7 @@ struct AccountTabView: View {
                         .onDelete { indexSet in
                             for index in indexSet {
                                 let account = accountStore.accounts[index]
-                                accountStore.removeAccount(account, client: blueskyClient)
+                                accountStore.removeAccount(account, client: container.blueskyClient)
                             }
                         }
                     } header: {
@@ -175,13 +175,13 @@ struct AccountTabView: View {
             .pageTitle(loc("account.manage.title"))
             .navigationBarBackButtonHidden(true)
             .task {
-                await accountStore.refreshAccountProfiles(using: blueskyClient)
+                await accountStore.refreshAccountProfiles(using: container.blueskyClient)
             }
             .environment(\.editMode, $editMode)
             .sheet(isPresented: $isPresentingAddAccount) {
                 AddAccountView()
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .alert(Text(loc: "account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
                 Button(loc("actions.ok")) {
@@ -334,7 +334,7 @@ struct AccountTabView: View {
                             handle: handle,
                             appPassword: password,
                             entrywayURL: entrywayURL,
-                            client: blueskyClient
+                            client: container.blueskyClient
                         )
                         if result == .success { added += 1 } else { skipped += 1 }
                     }
@@ -378,7 +378,7 @@ struct AccountTabView: View {
         switchingAccountID = account.id
         workspaceStore.returnToModerationRoot()
         Task { @MainActor in
-            await accountStore.switchAccount(to: account, using: blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.blueskyClient)
             switchingAccountID = nil
         }
     }

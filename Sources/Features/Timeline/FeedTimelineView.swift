@@ -8,7 +8,7 @@ struct FeedTimelineView: View {
     @ObservedObject var viewModel: FeedTimelineViewModel
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject var mutedWordsStore: MutedWordsStore
     @EnvironmentObject var analyticsStore: AnalyticsStore
@@ -80,7 +80,7 @@ struct FeedTimelineView: View {
         .sheet(item: $showLikesForURI) { uri in
             LikesListView(uri: uri)
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
         }
         .sheet(isPresented: $showFeedPicker) {
             FeedPickerView(feedStore: viewModel.feedStore)
@@ -90,13 +90,13 @@ struct FeedTimelineView: View {
                let appPassword = accountStore.appPassword(for: account)
             {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: blueskyClient,
+                    blueskyClient: container.blueskyClient,
                     account: account,
                     appPassword: appPassword,
                     onComplete: { refreshAfterAction() }
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $composeContext) { context in
@@ -104,7 +104,7 @@ struct FeedTimelineView: View {
                 ReplyComposerView(
                     account: context.account,
                     appPassword: context.appPassword,
-                    blueskyClient: blueskyClient,
+                    blueskyClient: container.blueskyClient,
                     parentURI: context.parentURI,
                     parentCID: context.parentCID,
                     rootURI: context.rootURI,
@@ -114,14 +114,14 @@ struct FeedTimelineView: View {
                 .presentationDetents([.medium, .large])
             } else {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: blueskyClient,
+                    blueskyClient: container.blueskyClient,
                     account: context.account,
                     appPassword: context.appPassword,
                     onComplete: { refreshAfterAction() },
                     quote: (context.uri, context.cid)
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $editPostEntry) { entry in
@@ -129,14 +129,14 @@ struct FeedTimelineView: View {
                let appPassword = accountStore.appPassword(for: account)
             {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: blueskyClient,
+                    blueskyClient: container.blueskyClient,
                     account: account,
                     appPassword: appPassword,
                     onComplete: { refreshAfterAction() },
                     editPost: entry
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $profileToShow) { actor in
@@ -154,7 +154,7 @@ struct FeedTimelineView: View {
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(mutedWordsStore)
                 .environmentObject(analyticsStore)
@@ -182,12 +182,12 @@ struct FeedTimelineView: View {
             await loadInitial()
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
-            viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
+            viewModel.startPolling(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         .task {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
-            await likerActions.loadAvailableTargetLists(using: blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            await likerActions.loadAvailableTargetLists(using: container.blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
         }
         .task(id: viewModel.state) {
             await classifyVisiblePosts()
@@ -208,7 +208,7 @@ struct FeedTimelineView: View {
                 await loadInitial()
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                viewModel.startPolling(account: account, appPassword: appPassword, using: blueskyClient)
+                viewModel.startPolling(account: account, appPassword: appPassword, using: container.blueskyClient)
             }
         }
         .postLikerActions(manager: likerActions)
@@ -279,7 +279,7 @@ struct FeedTimelineView: View {
     // MARK: - Post row
 
     private func postRowView(for entry: RichFeedEntry) -> some View {
-        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: blueskyClient, internalListStore: internalListStore)
+        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
         return VStack(alignment: .leading, spacing: 0) {
             PostRowView(
                 entry: entry,
@@ -311,14 +311,14 @@ struct FeedTimelineView: View {
                     onBlockAllLikers: {
                         guard let account = accountStore.activeAccount,
                               let appPassword = accountStore.appPassword(for: account) else { return }
-                        likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+                        likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword)
                     },
                     onAddAllLikersToList: { list in
                         guard let fetchAccount = accountStore.activeAccount,
                               let fetchPassword = accountStore.appPassword(for: fetchAccount),
                               let activeAccount = accountStore.activeAccount,
                               let activePassword = accountStore.appPassword(for: activeAccount) else { return }
-                        likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+                        likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
                     },
                     onClassify: { likerActions.postToClassify = entry },
                     onBlockAuthor: authorCB.onBlock,
@@ -435,7 +435,7 @@ struct FeedTimelineView: View {
                     Task {
                         guard let account = accountStore.activeAccount,
                               let appPassword = accountStore.appPassword(for: account) else { return }
-                        await viewModel.toggleInlineThread(uri: uri, account: account, appPassword: appPassword, using: blueskyClient)
+                        await viewModel.toggleInlineThread(uri: uri, account: account, appPassword: appPassword, using: container.blueskyClient)
                     }
                 } label: {
                     HStack(spacing: 6) {
@@ -501,7 +501,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         Task {
-            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient)
         }
     }
 
@@ -509,7 +509,7 @@ struct FeedTimelineView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         Task {
-            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient)
         }
     }
 
@@ -535,7 +535,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         initialLoadTask?.cancel()
         let task = Task {
-            await viewModel.loadTimeline(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.loadTimeline(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         initialLoadTask = task
         await task.value
@@ -546,7 +546,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMore(account: account, appPassword: appPassword, using: blueskyClient)
+            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient)
         }
         loadMoreTask = task
         defer { loadMoreTask = nil }
@@ -566,7 +566,7 @@ struct FeedTimelineView: View {
         viewModel.removeEntry(uri: entryURI)
         postToDelete = nil
         do {
-            _ = try await blueskyClient.deleteRecord(recordURI: entryURI, account: account, appPassword: appPassword)
+            _ = try await container.blueskyClient.deleteRecord(recordURI: entryURI, account: account, appPassword: appPassword)
         } catch {
             if let removedIndex {
                 viewModel.insertEntry(entry, at: removedIndex)
@@ -626,7 +626,7 @@ struct FeedTimelineView: View {
     private func refresh() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.refresh(account: account, appPassword: appPassword, using: blueskyClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
     }
 
     private func muteUser(handle: String, did: String?) async {
@@ -634,7 +634,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account),
               let did else { return }
         do {
-            try await blueskyClient.muteActor(did: did, account: account, appPassword: appPassword)
+            try await container.blueskyClient.muteActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Muted @\(handle, privacy: .public)")
         } catch {
             AppLogger.moderation.error("Failed to mute @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -646,7 +646,7 @@ struct FeedTimelineView: View {
               let appPassword = accountStore.appPassword(for: account),
               let did else { return }
         do {
-            try await blueskyClient.blockActor(did: did, account: account, appPassword: appPassword)
+            try await container.blueskyClient.blockActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Blocked @\(handle, privacy: .public)")
         } catch {
             AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")

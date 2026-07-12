@@ -14,7 +14,7 @@ import SwiftUI
 struct SettingsView: View {
     // MARK: - Properties
 
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var appLockManager: AppLockManager
     @EnvironmentObject private var httpRequestDebugStore: HTTPRequestDebugStore
@@ -104,7 +104,7 @@ struct SettingsView: View {
 
                     NavigationLink {
                         AutoBlockListPickerView()
-                            .environmentObject(blueskyClient)
+                            .environmentObject(container.blueskyClient)
                             .environmentObject(accountStore)
                             .environmentObject(internalListStore)
                             .environmentObject(localizationManager)
@@ -244,7 +244,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button(localizationManager.localized("settings.clear_cache"), role: .destructive) {
-                    blueskyClient.clearCache()
+                    container.blueskyClient.clearCache()
                     cacheStatusMessage = loc("settings.cache_cleared")
                 }
                 Button(localizationManager.localized("settings.cancel"), role: .cancel) {}

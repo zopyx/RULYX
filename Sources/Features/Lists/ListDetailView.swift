@@ -8,7 +8,7 @@ struct ListDetailView: View {
     let onListUpdated: ((BlueskyList) -> Void)?
 
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject var internalListStore: InternalListStore
     @StateObject var viewModel = ListDetailViewModel()
@@ -92,7 +92,7 @@ struct ListDetailView: View {
                                 description: description,
                                 account: account,
                                 appPassword: appPassword,
-                                using: blueskyClient
+                                using: container.blueskyClient
                             ) {
                                 currentList = updatedList
                                 onListUpdated?(updatedList)
@@ -173,7 +173,7 @@ struct ListDetailView: View {
                                 comparisonList: comparisonList,
                                 account: account,
                                 appPassword: appPassword,
-                                using: blueskyClient
+                                using: container.blueskyClient
                             )
                             syncSnapshot()
                         }
@@ -196,7 +196,7 @@ struct ListDetailView: View {
                     {
                         Task {
                             do {
-                                try await blueskyClient.deleteList(
+                                try await container.blueskyClient.deleteList(
                                     list: currentList,
                                     account: account,
                                     appPassword: appPassword
@@ -389,7 +389,7 @@ struct ListDetailView: View {
                         sourceDescription: loc("list.import.pasted_input"),
                         account: account,
                         appPassword: appPassword,
-                        using: blueskyClient
+                        using: container.blueskyClient
                     )
                 }
             }
@@ -413,7 +413,7 @@ struct ListDetailView: View {
                         to: currentList,
                         account: account,
                         appPassword: appPassword,
-                        using: blueskyClient
+                        using: container.blueskyClient
                     )
                     syncSnapshot()
                 }
@@ -436,7 +436,7 @@ struct ListDetailView: View {
                 NavigationLink {
                     ListTimelineView(list: currentList)
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                         .environmentObject(internalListStore)
                 } label: {
                     Label(loc("list.timeline.link"), systemImage: "clock.arrow.circlepath")
@@ -530,7 +530,7 @@ struct ListDetailView: View {
                 query: searchQuery,
                 account: account,
                 appPassword: appPassword,
-                using: blueskyClient
+                using: container.blueskyClient
             )
         }
         .refreshable {
@@ -575,7 +575,7 @@ struct ListDetailView: View {
         exportProgressMessage = "Processing..."
         let members: [BlueskyListMember]
         do {
-            members = try await blueskyClient.fetchListMembers(list: currentList, account: account, appPassword: appPassword)
+            members = try await container.blueskyClient.fetchListMembers(list: currentList, account: account, appPassword: appPassword)
         } catch {
             viewModel.errorMessage = AppError.userMessage(from: error)
             isExporting = false
@@ -738,7 +738,7 @@ struct ListDetailView: View {
         defer { isReportingList = false }
 
         do {
-            try await blueskyClient.reportList(
+            try await container.blueskyClient.reportList(
                 currentList,
                 selectedReason: selectedReportReason,
                 reason: reportEvidenceText.nilIfBlank,

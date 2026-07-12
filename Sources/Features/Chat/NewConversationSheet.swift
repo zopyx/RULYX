@@ -4,7 +4,7 @@ import SwiftUI
 /// handle/display name, select them, and create (or get existing) conversation.
 struct NewConversationSheet: View {
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject var chatStore: ChatStore
     @Environment(\.dismiss) private var dismiss
     @State private var searchQuery = ""
@@ -78,7 +78,7 @@ struct NewConversationSheet: View {
         guard let account = accountStore.activeAccount else { return }
         do {
             let pw = accountStore.appPassword(for: account)
-            let response = try await blueskyClient.searchActors(query: searchQuery, account: account, appPassword: pw)
+            let response = try await container.blueskyClient.searchActors(query: searchQuery, account: account, appPassword: pw)
             searchResults = response
         } catch {
             searchResults = []

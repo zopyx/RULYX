@@ -10,7 +10,7 @@ struct AccountSwitcherSheet: View {
     @Binding var isPresented: Bool
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var isPresentingAddAccount = false
@@ -55,7 +55,7 @@ struct AccountSwitcherSheet: View {
                             .accessibilityHint("Switches the active account to \(account.label ?? account.handle)")
                             .contextMenu {
                                 Button(role: .destructive) {
-                                    accountStore.removeAccount(account, client: blueskyClient)
+                                    accountStore.removeAccount(account, client: container.blueskyClient)
                                 } label: {
                                     Label(loc("account.remove"), systemImage: "trash")
                                 }
@@ -74,7 +74,7 @@ struct AccountSwitcherSheet: View {
                         .onDelete { indexSet in
                             for index in indexSet {
                                 let account = accountStore.accounts[index]
-                                accountStore.removeAccount(account, client: blueskyClient)
+                                accountStore.removeAccount(account, client: container.blueskyClient)
                             }
                         }
                     } header: {
@@ -87,7 +87,7 @@ struct AccountSwitcherSheet: View {
             }
             .pageTitle(loc("account.manage.title"))
             .task {
-                await accountStore.refreshAccountProfiles(using: blueskyClient)
+                await accountStore.refreshAccountProfiles(using: container.blueskyClient)
             }
             .environment(\.editMode, $editMode)
             .toolbar {
@@ -112,7 +112,7 @@ struct AccountSwitcherSheet: View {
             .sheet(isPresented: $isPresentingAddAccount) {
                 AddAccountView()
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .sheet(isPresented: $showAccountHelp) {
                 NavigationStack {
@@ -196,7 +196,7 @@ struct AccountSwitcherSheet: View {
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
         Task { @MainActor in
-            await accountStore.switchAccount(to: account, using: blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.blueskyClient)
             workspaceStore.returnToModerationRoot()
             generator.selectionChanged()
             switchingAccountID = nil

@@ -6,7 +6,7 @@ import SwiftUI
 /// it embeds `ListsView` directly in a `NavigationStack`.
 struct ModerationSplitView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -18,13 +18,13 @@ struct ModerationSplitView: View {
         if horizontalSizeClass == .regular {
             ListsView()
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         } else {
             ListsView()
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         }

@@ -72,7 +72,6 @@ struct RULYXApp: App {
 
                     .environmentObject(deps.accountStore)
                     .environmentObject(deps.workspaceStore)
-                    .environmentObject(deps.blueskyClient)
                     .environmentObject(deps.localizationManager)
                     .environment(\.locale, deps.localizationManager.locale)
                     .environmentObject(deps.mutedWordsStore)

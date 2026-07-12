@@ -9,7 +9,7 @@ struct ProfileEditView: View {
     let appPassword: String?
 
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @Environment(\.dismiss) private var dismiss
 
@@ -314,7 +314,7 @@ struct ProfileEditView: View {
 
         // Try to get description from a fresh profile fetch
         do {
-            let profile = try await blueskyClient.fetchProfile(
+            let profile = try await container.blueskyClient.fetchProfile(
                 did: account.did ?? account.handle,
                 account: account,
                 appPassword: appPassword
@@ -330,7 +330,7 @@ struct ProfileEditView: View {
 
         // Fetch raw profile record to get current blob refs
         do {
-            if let record = try await blueskyClient.fetchMyProfileRecord(account: account, appPassword: appPassword) {
+            if let record = try await container.blueskyClient.fetchMyProfileRecord(account: account, appPassword: appPassword) {
                 currentAvatarBlob = record.avatar
                 currentBannerBlob = record.banner
             }
@@ -366,7 +366,7 @@ struct ProfileEditView: View {
             // 1. Upload new avatar if changed
             var avatarBlob: UploadedBlob?
             if let data = avatarImageData {
-                let response = try await blueskyClient.uploadBlob(
+                let response = try await container.blueskyClient.uploadBlob(
                     data: data,
                     mimeType: "image/jpeg",
                     account: account,
@@ -382,7 +382,7 @@ struct ProfileEditView: View {
             // 2. Upload new banner if changed
             var bannerBlob: UploadedBlob?
             if let data = bannerImageData {
-                let response = try await blueskyClient.uploadBlob(
+                let response = try await container.blueskyClient.uploadBlob(
                     data: data,
                     mimeType: "image/jpeg",
                     account: account,
@@ -405,10 +405,10 @@ struct ProfileEditView: View {
             )
 
             // 4. Write the record
-            try await blueskyClient.putProfileRecord(record, account: account, appPassword: appPassword)
+            try await container.blueskyClient.putProfileRecord(record, account: account, appPassword: appPassword)
 
             // 5. Refresh account store profile data
-            await accountStore.refreshAccountProfiles(using: blueskyClient)
+            await accountStore.refreshAccountProfiles(using: container.blueskyClient)
 
             dismiss()
         } catch {

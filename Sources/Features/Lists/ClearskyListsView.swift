@@ -8,7 +8,7 @@ struct ClearskyListsView: View {
     let entries: [ClearskyListEntry]
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var ownerHandles: [String: String] = [:]
 
@@ -32,7 +32,7 @@ struct ClearskyListsView: View {
                                 onListUpdated: { _ in }
                             )
                             .environmentObject(accountStore)
-                            .environmentObject(blueskyClient)
+                            .environmentObject(container.blueskyClient)
                         } label: {
                             rowContent(entry)
                         }

@@ -4,7 +4,7 @@ import SwiftUI
 
 struct FollowerDiffView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var followers: [BlueskyActor] = []
     @State private var previousFollowers: [BlueskyActor] = []
@@ -87,7 +87,7 @@ struct FollowerDiffView: View {
         previousFollowers = RelationshipCache.load(forKey: cacheKey)
 
         do {
-            followers = try await blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+            followers = try await container.blueskyClient.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             RelationshipCache.save(followers, forKey: cacheKey)
             statusMessage = previousFollowers.isEmpty ? loc("follower_diff.baseline") : nil
         } catch {

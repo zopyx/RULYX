@@ -8,7 +8,7 @@ import SwiftUI
 /// direct replies).
 struct ListsView: View {
     @EnvironmentObject var accountStore: AccountStore
-    @EnvironmentObject var blueskyClient: LiveBlueskyClient
+    @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject var internalListStore: InternalListStore
@@ -328,7 +328,7 @@ struct ListsView: View {
                 NavigationStack {
                     BulkProfileLookupView()
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                 }
             }
             .sheet(isPresented: $presentationState.isShowingCreateList) {
@@ -338,7 +338,7 @@ struct ListsView: View {
                     {
                         Task {
                             do {
-                                let newList = try await blueskyClient.createList(
+                                let newList = try await container.blueskyClient.createList(
                                     name: name,
                                     description: description,
                                     kind: kind,
@@ -353,7 +353,7 @@ struct ListsView: View {
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(blueskyClient)
+                .environmentObject(container.blueskyClient)
             }
             .sheet(isPresented: $presentationState.isShowingCreateInternalList) {
                 NavigationStack {
@@ -397,7 +397,7 @@ struct ListsView: View {
                 NavigationStack {
                     UserSearchSheet()
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                 }
             }
             .sheet(isPresented: $isShowingListPicker) {
@@ -407,7 +407,7 @@ struct ListsView: View {
                 NavigationStack {
                     AccountSwitcherSheet(isPresented: $presentationState.isShowingAccountManagement)
                         .environmentObject(accountStore)
-                        .environmentObject(blueskyClient)
+                        .environmentObject(container.blueskyClient)
                 }
             }
             .sheet(isPresented: $showModerationListsHelp) {
@@ -450,28 +450,28 @@ struct ListsView: View {
                         list: nil
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
                 }
             }
             .navigationDestination(isPresented: $presentationState.showFollowers) {
                 RelationshipsView(mode: .followers, initialCount: viewModel.activeProfile?.followersCount)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showFollowing) {
                 RelationshipsView(mode: .following, initialCount: viewModel.activeProfile?.followsCount)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlocking) {
                 RelationshipsView(mode: .blocking, initialCount: viewModel.blockingCount)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlockedBy) {
                 RelationshipsView(mode: .blockedBy, initialCount: viewModel.blockedByCount)
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showMentionsSearch) {
                 if let activeAccount = accountStore.activeAccount {
@@ -481,13 +481,13 @@ struct ListsView: View {
                         displayName: activeAccount.displayName
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
                 }
             }
             .navigationDestination(isPresented: $presentationState.showCustomSearch) {
                 CustomSearchView()
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showDirectReplies) {
                 if let activeAccount = accountStore.activeAccount {
@@ -497,7 +497,7 @@ struct ListsView: View {
                         displayName: activeAccount.displayName
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(blueskyClient)
+                    .environmentObject(container.blueskyClient)
                 }
             }
         }
@@ -540,7 +540,7 @@ struct ListsView: View {
         await viewModel.load(
             for: accountStore.activeAccount,
             appPassword: password,
-            using: blueskyClient
+            using: container.blueskyClient
         )
     }
 
@@ -549,7 +549,7 @@ struct ListsView: View {
         await viewModel.load(
             for: accountStore.activeAccount,
             appPassword: password,
-            using: blueskyClient,
+            using: container.blueskyClient,
             isExplicitRefresh: true
         )
     }
