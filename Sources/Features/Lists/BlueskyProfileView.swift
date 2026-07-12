@@ -1068,22 +1068,44 @@ struct BlueskyProfileView: View {
                     Section {
                         if !clearskyHeartbeat.isClearskyAvailable {
                             ClearskyBanner()
-                        } else if actionsVM?.isFetchingBlockCounts ?? false {
-                            HStack {
-                                ProgressView()
-                                    .scaleEffect(0.7)
-                                Text(loc: "profile.block_back.loading")
-                                    .foregroundStyle(.secondary)
-                            }
                         } else {
-                            LabeledContent("profile.block_back.blocking", value: BlueskyProfileActionsViewModel.countText(actionsVM?.blockingCount))
-                            LabeledContent("profile.block_back.blocked_by", value: BlueskyProfileActionsViewModel.countText(actionsVM?.blockedByCount))
+                            // Blocking count
+                            HStack {
+                                Text(loc: "profile.block_back.blocking")
+                                Spacer()
+                                if actionsVM?.isFetchingBlocking ?? false {
+                                    ProgressView().scaleEffect(0.7)
+                                } else {
+                                    Text(BlueskyProfileActionsViewModel.countText(actionsVM?.blockingCount))
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            // Blocked by count
+                            HStack {
+                                Text(loc: "profile.block_back.blocked_by")
+                                Spacer()
+                                if actionsVM?.isFetchingBlockedBy ?? false {
+                                    ProgressView().scaleEffect(0.7)
+                                } else {
+                                    Text(BlueskyProfileActionsViewModel.countText(actionsVM?.blockedByCount))
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
 
                             Button {
                                 Task { await actionsVM?.fetchBlockPreview() ?? () }
                             } label: {
                                 HStack {
-                                    LabeledContent("profile.block_back.unblocked", value: BlueskyProfileActionsViewModel.countText(actionsVM?.unblockedBlockersCount))
+                                    HStack {
+                                        Text(loc: "profile.block_back.unblocked")
+                                        Spacer()
+                                        if actionsVM?.isFetchingUnblocked ?? false {
+                                            ProgressView().scaleEffect(0.7)
+                                        } else {
+                                            Text(BlueskyProfileActionsViewModel.countText(actionsVM?.unblockedBlockersCount))
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
                                     if actionsVM?.blockBackPreviewAvailable ?? false {
                                         Image(systemName: "chevron.right")
                                             .flipsForRightToLeftLayoutDirection(true)

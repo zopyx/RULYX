@@ -19,7 +19,12 @@ final class BlueskyProfileActionsViewModel {
     var blockingCount: Int?
     var blockedByCount: Int?
     var unblockedBlockersCount: Int?
-    var isFetchingBlockCounts = false
+    /// True while the blocking count is being fetched.
+    var isFetchingBlocking = false
+    /// True while the blocked-by count is being fetched.
+    var isFetchingBlockedBy = false
+    /// True while the unblocked-blockers count is being fetched.
+    var isFetchingUnblocked = false
 
     // MARK: - Block Back State
 
@@ -79,7 +84,7 @@ final class BlueskyProfileActionsViewModel {
     // MARK: - Block Counts
 
     /// Fetches blocking/blocked-by/unblocked counts from ClearSky.
-    /// Three states: idle (nil → "-"), loading (spinner), loaded (numbers).
+    /// Each count has its own `isFetching*` flag for per-call spinners.
     func fetchBlockCounts(isOwnProfile: Bool) async {
         guard isOwnProfile else {
             resetBlockBackCounts()
@@ -87,29 +92,39 @@ final class BlueskyProfileActionsViewModel {
         }
         guard let account = accountStore.activeAccount else { return }
 
-        // State 1 → 2: clear numbers, show spinner
-        blockingCount = nil
-        blockedByCount = nil
-        unblockedBlockersCount = nil
-        isFetchingBlockCounts = true
+        // Clear numbers, show individual spinners
+        blockingCount = nil; isFetchingBlocking = true
+        blockedByCount = nil; isFetchingBlockedBy = true
+        unblockedBlockersCount = nil; isFetchingUnblocked = true
 
-        // State 2 → 3: fetch in parallel, set all at once
-        async let blocking = clearskyService.fetchBlockingCount(for: account)
-        async let blockedBy = clearskyService.fetchBlockedByCount(for: account)
-        async let unblocked = clearskyService.fetchUnblockedBlockersCount(for: account)
-
-        do {
-            let (b, bb, ub) = try await (blocking, blockedBy, unblocked)
-            blockingCount = b
-            blockedByCount = bb
-            unblockedBlockersCount = ub
-        } catch {
-            if let b = try? await blocking { blockingCount = b }
-            if let bb = try? await blockedBy { blockedByCount = bb }
-            if let ub = try? await unblocked { unblockedBlockersCount = ub }
+        // Fetch all three in parallel with individual progress
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                do {
+                    let val = try await self.clearskyService.fetchBlockingCount(for: account)
+                    await MainActor.run { self.blockingCount = val; self.isFetchingBlocking = false }
+                } catch {
+                    await MainActor.run { self.isFetchingBlocking = false }
+                }
+            }
+            group.addTask {
+                do {
+                    let val = try await self.clearskyService.fetchBlockedByCount(for: account)
+                    await MainActor.run { self.blockedByCount = val; self.isFetchingBlockedBy = false }
+                } catch {
+                    await MainActor.run { self.isFetchingBlockedBy = false }
+                }
+            }
+            group.addTask {
+                do {
+                    let val = try await self.clearskyService.fetchUnblockedBlockersCount(for: account)
+                    await MainActor.run { self.unblockedBlockersCount = val; self.isFetchingUnblocked = false }
+                } catch {
+                    await MainActor.run { self.isFetchingUnblocked = false }
+                }
+            }
+            try? await group.waitForAll()
         }
-
-        isFetchingBlockCounts = false
     }
 
     // MARK: - Block Back Preview
@@ -236,7 +251,9 @@ final class BlueskyProfileActionsViewModel {
         blockingCount = nil
         blockedByCount = nil
         unblockedBlockersCount = nil
-        isFetchingBlockCounts = false
+        isFetchingBlocking = false
+        isFetchingBlockedBy = false
+        isFetchingUnblocked = false
         isFetchingBlockPreview = false
         showBlockBackPreview = false
         blockPreviewActors = []

@@ -107,7 +107,7 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.blockingCount, 42)
         XCTAssertEqual(sut.blockedByCount, 17)
         XCTAssertEqual(sut.unblockedBlockersCount, 5)
-        XCTAssertFalse(sut.isFetchingBlockCounts)
+        XCTAssertFalse(sut.isFetchingBlocking || sut.isFetchingBlockedBy || sut.isFetchingUnblocked)
     }
 
     func testFetchBlockCountsResetsForNonOwnProfile() async {
@@ -197,7 +197,7 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
         // Then: both blocking and blocked-by counts are populated
         XCTAssertEqual(sut.blockingCount, 25)
         XCTAssertEqual(sut.blockedByCount, 15)
-        XCTAssertFalse(sut.isFetchingBlockCounts)
+        XCTAssertFalse(sut.isFetchingBlocking || sut.isFetchingBlockedBy || sut.isFetchingUnblocked)
     }
 
     func testFetchBlockCountsWhenProfileIsNotOwn() async {
