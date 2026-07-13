@@ -12,7 +12,8 @@ struct BlueskyListMember: Identifiable, Hashable {
     /// The Bluesky actor profile for this member.
     let actor: BlueskyActor
     /// The timestamp when this member was added to the list.
-    /// Extracted from the record URI's timestamp ID (TID) when not explicitly provided.
+    /// Prefer the list item record's `createdAt` value returned by the API.
+    /// Falls back to the list item record key timestamp when the API omits `createdAt`.
     let createdAt: Date?
 
     // MARK: - Init
@@ -21,36 +22,43 @@ struct BlueskyListMember: Identifiable, Hashable {
     /// - Parameters:
     ///   - recordURI: The AT URI of the list membership record.
     ///   - actor: The Bluesky actor profile for this member.
-    ///   - createdAt: The date the member was added. If nil, extracted from the URI's TID.
+    ///   - createdAt: The date the member was added to the list, when provided by the API.
     init(recordURI: String, actor: BlueskyActor, createdAt: Date? = nil) {
         id = recordURI
         self.recordURI = recordURI
         self.actor = actor
-        // Falls back to parsing the record creation timestamp from the URI's TID component.
         self.createdAt = createdAt ?? Self.extractTimestampFromURI(recordURI)
     }
 
     // MARK: - Private Helpers
 
-    /// Decodes the Bluesky TID (timestamp ID) from a record URI to extract the creation date.
-    /// TIDs are 13-character base-32 encoded strings where the lower 53 bits represent microsecond timestamps.
-    /// - Parameter uri: The full AT record URI.
-    /// - Returns: The decoded date, or nil if parsing fails.
+    /// Decodes the AT Protocol TID record key from an AT URI.
+    /// TIDs encode microseconds since Unix epoch in the high 53 bits and reserve
+    /// the low 10 bits for clock/sequence data.
     private static func extractTimestampFromURI(_ uri: String) -> Date? {
         let tidChars = "234567abcdefghijklmnopqrstuvwxyz"
         var charToValue: [Character: UInt64] = [:]
-        for (i, c) in tidChars.enumerated() {
-            charToValue[c] = UInt64(i)
+        for (index, character) in tidChars.enumerated() {
+            charToValue[character] = UInt64(index)
         }
-        // TID is the last path component and must be exactly 13 characters.
-        guard let tid = uri.split(separator: "/").last, tid.count == 13 else { return nil }
+
+        guard let tid = uri.split(separator: "/").last, tid.count == 13 else {
+            return nil
+        }
+
         var value: UInt64 = 0
-        for c in tid {
-            guard let v = charToValue[c] else { return nil }
-            value = (value << 5) | v
+        for character in tid {
+            guard let digit = charToValue[character] else {
+                return nil
+            }
+            value = (value << 5) | digit
         }
-        // Lower 53 bits encode the microsecond timestamp per the AT Protocol spec.
-        let timestampMicros = value & ((1 << 53) - 1)
-        return Date(timeIntervalSince1970: Double(timestampMicros) / 1_000_000)
+
+        let timestampMicros = value >> 10
+        let date = Date(timeIntervalSince1970: Double(timestampMicros) / 1_000_000)
+        guard date <= Date().addingTimeInterval(60 * 60 * 24) else {
+            return nil
+        }
+        return date
     }
 }

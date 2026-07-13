@@ -194,7 +194,7 @@ final class BlueskyListServiceTests: XCTestCase {
     func testFetchListMembersPageSuccess() async throws {
         sessionService.onAuthenticatedRequest = { _, _ in
             let json = """
-            {"cursor": "next", "items": [{"uri": "at://item/1", "subject": {"did": "did:plc:1", "handle": "u1.bsky.social"}}]}
+            {"cursor": "next", "items": [{"uri": "at://item/1", "subject": {"did": "did:plc:1", "handle": "u1.bsky.social"}, "createdAt": "2024-05-01T12:00:00Z"}]}
             """.data(using: .utf8)!
             return try JSONDecoder().decode(GetListResponse.self, from: json)
         }
@@ -202,5 +202,6 @@ final class BlueskyListServiceTests: XCTestCase {
         let page = try await service.fetchListMembersPage(list: makeList(), cursor: nil, account: makeAccount(), appPassword: "pass")
         XCTAssertEqual(page.members.count, 1)
         XCTAssertEqual(page.cursor, "next")
+        XCTAssertEqual(page.members.first?.createdAt, SharedDateFormatters.parseISO8601("2024-05-01T12:00:00Z"))
     }
 }

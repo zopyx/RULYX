@@ -84,7 +84,15 @@ extension ListDetailView {
                         NavigationLink {
                             BlueskyProfileView(member: member, list: currentList)
                         } label: {
-                            BlueskyActorRow(actor: member.actor)
+                            HStack(alignment: .center, spacing: 8) {
+                                BlueskyActorRow(actor: member.actor)
+
+                                if let createdAt = member.createdAt {
+                                    Text(relativeTimeString(from: createdAt))
+                                        .font(.caption)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) {

@@ -149,12 +149,28 @@ final class BlueskyListTests: XCTestCase {
 }
 
 final class BlueskyListMemberTests: XCTestCase {
-    func testExtractsTimestampFromURI() {
+    func testUsesExplicitMembershipCreatedAt() {
+        let actor = BlueskyActor(did: "did:plc:member", handle: "member.bsky.social")
+        let uri = "at://did:plc:owner/app.bsky.graph.listitem/3krggwxmg2222"
+        let createdAt = Date(timeIntervalSince1970: 1_714_560_000)
+        let member = BlueskyListMember(recordURI: uri, actor: actor, createdAt: createdAt)
+        XCTAssertEqual(member.id, uri)
+        XCTAssertEqual(member.actor.did, "did:plc:member")
+        XCTAssertEqual(member.createdAt, createdAt)
+    }
+
+    func testFallsBackToRecordKeyTimestampWhenCreatedAtIsMissing() {
+        let actor = BlueskyActor(did: "did:plc:member", handle: "member.bsky.social")
+        let uri = "at://did:plc:owner/app.bsky.graph.listitem/3krggwxmg2222"
+        let member = BlueskyListMember(recordURI: uri, actor: actor)
+        XCTAssertEqual(member.createdAt, SharedDateFormatters.parseISO8601("2024-05-01T12:00:00Z"))
+    }
+
+    func testDoesNotShowDateForInvalidRecordKeyTimestamp() {
         let actor = BlueskyActor(did: "did:plc:member", handle: "member.bsky.social")
         let uri = "at://did:plc:owner/app.bsky.graph.listitem/3j7s2k5h4t6a8"
         let member = BlueskyListMember(recordURI: uri, actor: actor)
-        XCTAssertEqual(member.id, uri)
-        XCTAssertEqual(member.actor.did, "did:plc:member")
+        XCTAssertNil(member.createdAt)
     }
 }
 
