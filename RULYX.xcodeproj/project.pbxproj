@@ -234,6 +234,7 @@
 		A10F7A613DDC385A177EB9ED /* ComposePostViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE31478C855109451E267AB /* ComposePostViewModelTests.swift */; };
 		A2FBC545A34138B4A92FC400 /* HTTPDebugStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8E06586B7B53653D0529F7 /* HTTPDebugStatsView.swift */; };
 		A3F9083B91B419D2A444D9AB /* PostReplyContextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1897512AB5CD424C25E2E3C8 /* PostReplyContextView.swift */; };
+		A4968323AA9B14B1BD019803 /* AutoBlockBackServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6FE3D947649618C9D859AC4 /* AutoBlockBackServiceTests.swift */; };
 		A5330EB3555B049AECCF5697 /* InternalListStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D626301509B540236FD40A6 /* InternalListStore.swift */; };
 		A55397394AAD6CD33BE0E729 /* AccountTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B7DD20B3AC717E85BF2EBB /* AccountTabView.swift */; };
 		A6E5C47E5939964BEC7C9684 /* MentionsSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E840C377C753EBA001128ABF /* MentionsSearchView.swift */; };
@@ -646,6 +647,7 @@
 		D495EFD4FEF70FB5C0D7BA2B /* String+CSV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+CSV.swift"; sourceTree = "<group>"; };
 		D4F6D1DF0921A11BEE1A9854 /* AppLockManagerTimeoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockManagerTimeoutTests.swift; sourceTree = "<group>"; };
 		D56702946833B4C168C9F620 /* StringCSVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringCSVTests.swift; sourceTree = "<group>"; };
+		D6FE3D947649618C9D859AC4 /* AutoBlockBackServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBlockBackServiceTests.swift; sourceTree = "<group>"; };
 		D7A39B45AC0B961A32846F08 /* BlueskyAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAppDelegate.swift; sourceTree = "<group>"; };
 		D7BFB1D29D75F3D69ABA8FEB /* ChatStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStatusBanner.swift; sourceTree = "<group>"; };
 		D87E4164F1065B2DEB4B0AF8 /* ClearskyDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearskyDTOs.swift; sourceTree = "<group>"; };
@@ -738,6 +740,7 @@
 				D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */,
 				D4F6D1DF0921A11BEE1A9854 /* AppLockManagerTimeoutTests.swift */,
 				1FB55CC1C36F923726C8AE96 /* ArchitectureEnforcementTests.swift */,
+				D6FE3D947649618C9D859AC4 /* AutoBlockBackServiceTests.swift */,
 				BD3C1DD3F3BB3D87F33F4615 /* BlueskyAPIDTOsTests.swift */,
 				5FBBE749A4442A2FAD4D7772 /* BlueskyListServiceTests.swift */,
 				6C3A1037F26DBBCB58FD4674 /* BlueskyProfileActionsViewModelTests.swift */,
@@ -1451,6 +1454,7 @@
 				680E3BB4754FCFB8FAEB3436 /* AppErrorTests.swift in Sources */,
 				2A87E42386B541FFA4D364B8 /* AppLockManagerTimeoutTests.swift in Sources */,
 				EF2202507248EAD72CEAC0DB /* ArchitectureEnforcementTests.swift in Sources */,
+				A4968323AA9B14B1BD019803 /* AutoBlockBackServiceTests.swift in Sources */,
 				250FF75DC49FBBA5927742A2 /* BlueskyAPIDTOsTests.swift in Sources */,
 				F00D2CE8A347BD81931B72E7 /* BlueskyListServiceTests.swift in Sources */,
 				6CE509BD1D1CB94B5F20C43E /* BlueskyProfileActionsViewModelTests.swift in Sources */,

@@ -101,7 +101,10 @@ final class AppDependencies: ObservableObject {
         internalListStore = InternalListStore()
         aiService = LiveAIService()
         autoBlockBackService = AutoBlockBackService(
-            blueskyClient: blueskyClient,
+            clearskyService: blueskyClient,
+            profileService: blueskyClient,
+            listService: blueskyClient,
+            socialService: blueskyClient,
             accountStore: accountStore,
             internalListStore: internalListStore
         )

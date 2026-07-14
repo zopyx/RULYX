@@ -314,6 +314,7 @@ struct RootView: View {
                         hasSeenOnboarding = true
                     }
                     .accessibilityLabel(loc: "onboarding.close.label")
+                    .accessibilityIdentifier("Close")
                 }
             }
         }

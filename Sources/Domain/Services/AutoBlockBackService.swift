@@ -65,8 +65,12 @@ final class AutoBlockBackService: ObservableObject {
     @Published private(set) var isRunning = false
     @Published private(set) var lastResult: Result?
 
-    private weak var blueskyClient: LiveBlueskyClient?
-    private weak var accountStore: AccountStore?
+    private weak var container: BlueskyServiceContainerWrapper?
+    private var clearskyService: BlueskyClearSkyServicing?
+    private var profileService: BlueskyProfileInspecting?
+    private var listService: BlueskyListServicing?
+    private var socialService: BlueskySocialServicing?
+    private weak var accountStore: AccountStoreProtocol?
     private weak var internalListStore: InternalListStore?
 
     // MARK: - Result
@@ -81,15 +85,39 @@ final class AutoBlockBackService: ObservableObject {
 
     // MARK: - Init
 
+    /// Creates the service with the required dependencies.
     init(
-        blueskyClient: LiveBlueskyClient,
-        accountStore: AccountStore,
+        clearskyService: BlueskyClearSkyServicing,
+        profileService: BlueskyProfileInspecting,
+        listService: BlueskyListServicing,
+        socialService: BlueskySocialServicing,
+        accountStore: AccountStoreProtocol,
         internalListStore: InternalListStore
     ) {
-        self.blueskyClient = blueskyClient
+        self.clearskyService = clearskyService
+        self.profileService = profileService
+        self.listService = listService
+        self.socialService = socialService
         self.accountStore = accountStore
         self.internalListStore = internalListStore
         registerBGTask()
+    }
+
+    /// Convenience initializer using BlueskyServiceContainerWrapper (production use).
+    convenience init(
+        container: BlueskyServiceContainerWrapper,
+        accountStore: AccountStoreProtocol,
+        internalListStore: InternalListStore
+    ) {
+        self.init(
+            clearskyService: container.clearsky,
+            profileService: container.profile,
+            listService: container.list,
+            socialService: container.social,
+            accountStore: accountStore,
+            internalListStore: internalListStore
+        )
+        self.container = container
     }
 
     // MARK: - Public API
@@ -113,7 +141,10 @@ final class AutoBlockBackService: ObservableObject {
             }
         }
 
-        guard let client = blueskyClient,
+        guard let clearsky = clearskyService,
+              let profile = profileService,
+              let listSvc = listService,
+              let social = socialService,
               let account = accountStore?.activeAccount,
               let appPassword = accountStore?.appPassword(for: account) else { return }
 
@@ -121,7 +152,7 @@ final class AutoBlockBackService: ObservableObject {
         defer { isRunning = false }
 
         do {
-            let toBlock = try await client.fetchUnblockedBlockerActors(
+            let toBlock = try await clearsky.fetchUnblockedBlockerActors(
                 account: account,
                 appPassword: appPassword
             )
@@ -137,7 +168,7 @@ final class AutoBlockBackService: ObservableObject {
             // P0: Pre-filter against PDS-level block records to avoid duplicates.
             let existingBlockedDIDs: Set<String>
             do {
-                existingBlockedDIDs = try await client.fetchExistingBlockedDIDs(
+                existingBlockedDIDs = try await profile.fetchExistingBlockedDIDs(
                     account: account, appPassword: appPassword
                 )
             } catch {
@@ -160,7 +191,7 @@ final class AutoBlockBackService: ObservableObject {
             let targetLists = await loadTargetLists(
                 account: account,
                 appPassword: appPassword,
-                using: client
+                using: listSvc
             )
 
             var blocked = 0
@@ -176,7 +207,7 @@ final class AutoBlockBackService: ObservableObject {
                     for actor in batch {
                         group.addTask {
                             do {
-                                try await client.blockActor(
+                                try await social.blockActor(
                                     did: actor.did, account: account, appPassword: appPassword
                                 )
                                 return (true, actor)
@@ -205,7 +236,7 @@ final class AutoBlockBackService: ObservableObject {
                                         list: list,
                                         account: account,
                                         appPassword: appPassword,
-                                        using: client
+                                        using: listSvc
                                     )
                                 } catch {
                                     AppLogger.moderation.error(
@@ -292,10 +323,10 @@ final class AutoBlockBackService: ObservableObject {
     }
 
     /// Loads the target lists whose IDs are stored in UserDefaults.
-    private func loadTargetLists(
+    func loadTargetLists(
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using listService: BlueskyListServicing
     ) async -> [BlueskyList] {
         guard let ids = try? JSONDecoder().decode([String].self, from: targetListIDsData),
               !ids.isEmpty else { return [] }
@@ -305,7 +336,7 @@ final class AutoBlockBackService: ObservableObject {
         // Fetch remote lists and internal lists
         var allLists: [BlueskyList] = []
         do {
-            allLists = try await client.fetchLists(for: account, appPassword: appPassword)
+            allLists = try await listService.fetchLists(for: account, appPassword: appPassword)
         } catch {
             AppLogger.moderation.error(
                 "Auto-block-back: failed to fetch lists for target list matching: \(error.localizedDescription, privacy: .public)"
@@ -337,19 +368,19 @@ final class AutoBlockBackService: ObservableObject {
 
     /// Adds an actor to a target list. For internal lists, uses direct `InternalListStore` add;
     /// for external lists, uses the Bluesky API.
-    private func addActorToTargetList(
+    func addActorToTargetList(
         did: String,
         handle: String,
         list: BlueskyList,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using listService: BlueskyListServicing
     ) async throws {
         if list.kind == .internal, let store = internalListStore {
             let listID = store.listID(from: list.id)
             store.addMember(did: did, handle: handle, to: listID)
         } else {
-            _ = try await client.addActor(did: did, to: list, account: account, appPassword: appPassword)
+            _ = try await listService.addActor(did: did, to: list, account: account, appPassword: appPassword)
         }
     }
 
