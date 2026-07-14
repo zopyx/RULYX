@@ -300,11 +300,10 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .public)")
         // Track the previous account before switching
         previousActiveAccountID = activeAccountID
-        client.clearCache()
-        await Task.detached(priority: .utility) {
-            DashboardCache.clearAll()
-            RelationshipCache.clearAll()
-        }.value
+        // Clear ALL caches — await both URL/API cache and Dashboard/Relationship cache
+        await client.clearAllCaches()
+        DashboardCache.clearAll()
+        RelationshipCache.clearAll()
         activeAccountID = account.id
         if let index = accounts.firstIndex(of: account) {
             accounts[index].lastUsedAt = .now

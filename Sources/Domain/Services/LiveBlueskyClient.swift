@@ -66,6 +66,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         Task { await BlueskyAPICache.shared.clearAll() }
     }
 
+    /// Async version of clearCache that properly awaits all cache clearing, including the API cache.
+    /// Used during account switching where ordering matters.
+    func clearAllCaches() async {
+        session.configuration.urlCache?.removeAllCachedResponses()
+        URLCache.shared.removeAllCachedResponses()
+        sessionService.clearSessionCache()
+        await BlueskyAPICache.shared.clearAll()
+    }
+
     // MARK: - Authentication & Session
 
     /// Authenticates against the Bluesky PDS using a handle and app password.
