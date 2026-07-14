@@ -1116,11 +1116,25 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         endpoint: String,
         onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil
     ) async throws -> [ClearskyBlocklistEntry] {
+        // Check BlueskyAPICache (2-min TTL) to avoid full pagination on every dashboard load
+        let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
+        if let cached = await BlueskyAPICache.shared.read(accountDID: actorDID, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.relationship) {
+            if !cached.isStale,
+               let entries = try? JSONDecoder().decode([ClearskyBlocklistEntry].self, from: cached.data)
+            {
+                AppLogger.performance.debug("Clearsky cache HIT for \(endpoint)/\(actorDID) (\(entries.count) entries)")
+                return entries
+            }
+        }
+
         // Step 1: fetch page 1 synchronously — determines if more pages exist
         let page1 = try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: 1)
         var seenDIDs = Set(page1.map(\.did))
         await onProgress?(seenDIDs.count)
-        guard page1.count >= 100 else { return page1 }
+        guard page1.count >= 100 else {
+            await cacheClearskyEntries(page1, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
+            return page1
+        }
 
         var allEntries = page1
         let batchSize = 3
@@ -1168,7 +1182,21 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             page = batchEnd + 1
         }
 
+        // Cache the complete result
+        await cacheClearskyEntries(allEntries, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
         return allEntries
+    }
+
+    /// Writes fetched ClearSky entries to BlueskyAPICache as JSON-encoded Data.
+    private func cacheClearskyEntries(
+        _ entries: [ClearskyBlocklistEntry],
+        actorDID: String,
+        endpoint: String,
+        cacheURL: String
+    ) async {
+        guard let data = try? JSONEncoder().encode(entries) else { return }
+        await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
+        AppLogger.performance.debug("Clearsky cache WRITE for \(endpoint)/\(actorDID) (\(entries.count) entries)")
     }
 
     /// Fetches a single page from ClearSky. Returns the parsed entries or

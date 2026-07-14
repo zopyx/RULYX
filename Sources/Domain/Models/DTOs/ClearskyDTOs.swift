@@ -25,7 +25,7 @@ struct ClearskyAPIErrorResponse: Decodable {
 }
 
 /// A single entry in a ClearSky blocklist.
-struct ClearskyBlocklistEntry: Decodable {
+struct ClearskyBlocklistEntry: Codable {
     let did: String
     /// ISO 8601 date string of when the block was created.
     let blockedDate: String
