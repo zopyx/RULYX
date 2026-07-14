@@ -15,6 +15,9 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     @Published private(set) var accounts: [AppAccount] = []
     /// The ID of the currently active (selected) account. `nil` when no accounts exist.
     @Published private(set) var activeAccountID: AppAccount.ID?
+    /// The ID of the account that was active before the current one. `nil` when there is no previous account.
+    /// Used for quick double-tap switching between the last two accounts.
+    @Published private(set) var previousActiveAccountID: AppAccount.ID?
     /// The ID of the account used for search operations. Defaults to `activeAccount`.
     /// Persisted to UserDefaults under `"bluesky.preferredSearchAccountID"`.
     @Published var preferredSearchAccountID: AppAccount.ID? {
@@ -272,6 +275,10 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             preferredSearchAccountID = accounts.first?.id
         }
 
+        if previousActiveAccountID == account.id {
+            previousActiveAccountID = nil
+        }
+
         persist()
     }
 
@@ -289,7 +296,10 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// Switches the active account and clears all caches (HTTP cache, DashboardCache, RelationshipCache).
     func switchAccount(to account: AppAccount, using client: LiveBlueskyClient) async {
         guard accounts.contains(account) else { return }
+        guard account.id != activeAccountID else { return } // no-op if already active
         AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .public)")
+        // Track the previous account before switching
+        previousActiveAccountID = activeAccountID
         client.clearCache()
         await Task.detached(priority: .utility) {
             DashboardCache.clearAll()

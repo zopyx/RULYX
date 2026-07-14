@@ -172,6 +172,17 @@ struct RootView: View {
                                     Circle()
                                         .stroke(tint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
                                 }
+                                // Visual indicator: small chevron when quick-switch is available
+                                .overlay(alignment: .bottomTrailing) {
+                                    if accountStore.previousActiveAccountID != nil {
+                                        Image(systemName: "chevron.left.2")
+                                            .font(.system(size: 7, weight: .bold))
+                                            .foregroundStyle(.secondary)
+                                            .padding(2)
+                                            .background(Circle().fill(.bar))
+                                            .offset(x: 4, y: 4)
+                                    }
+                                }
                         } else {
                             Image(systemName: "person.crop.circle")
                                 .font(.system(size: 22))
@@ -182,6 +193,16 @@ struct RootView: View {
                     }
                     .foregroundStyle(workspaceStore.selectedTab == .account ? tint : .secondary)
                 }
+                // Double-tap: switch to previous account
+                .simultaneousGesture(TapGesture(count: 2).onEnded {
+                    guard let prevID = accountStore.previousActiveAccountID,
+                          let prevAccount = accountStore.accounts.first(where: { $0.id == prevID })
+                    else { return }
+                    let generator = UIImpactFeedbackGenerator(style: .rigid)
+                    generator.prepare()
+                    generator.impactOccurred()
+                    switchAccount(prevAccount)
+                })
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
