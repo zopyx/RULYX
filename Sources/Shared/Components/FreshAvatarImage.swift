@@ -56,7 +56,7 @@ struct FreshAvatarImage<Placeholder: View>: View {
             uiImage = image
             loadedURL = url
         } catch {
-            if !(error is CancellationError) {
+            if !(error is CancellationError), let urlError = error as? URLError, urlError.code != .cancelled {
                 AppLogger.performance.debug(
                     "FreshAvatarImage load failed for \(url.absoluteString, privacy: .public): \(error.localizedDescription, privacy: .public)"
                 )
