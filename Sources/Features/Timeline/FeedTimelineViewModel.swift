@@ -55,13 +55,37 @@ final class FeedTimelineViewModel {
 
     // MARK: - Polling
 
-    /// Starts a background polling task that checks for new posts at the given interval.
-    func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 8) {
+    /// Timestamp of the last user interaction (scroll, tap, etc.) for adaptive interval.
+    private var lastInteractionTime = Date()
+    /// Active polling interval that may adapt over time.
+    private var currentPollingInterval: TimeInterval = 15
+
+    /// Notifies the polling system that the user has interacted with the timeline.
+    /// Resets the adaptive interval to the base rate.
+    func userDidInteract() {
+        lastInteractionTime = Date()
+        currentPollingInterval = 15
+    }
+
+    /// Starts a background polling task that checks for new posts at an adaptive interval.
+    ///
+    /// Base interval is 15 seconds (reduced from 8s for battery efficiency).
+    /// After 120 seconds without user interaction, backs off to 30 seconds.
+    func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 15) {
         stopPolling()
+        currentPollingInterval = interval
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
                 guard let self, !Task.isCancelled else { return }
+                try? await Task.sleep(nanoseconds: UInt64(currentPollingInterval * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                // Adaptive back-off: if no interaction for 2 minutes, go to 30s
+                let elapsed = Date().timeIntervalSince(lastInteractionTime)
+                if elapsed > 120, currentPollingInterval < 30 {
+                    currentPollingInterval = 30
+                } else if elapsed <= 120, currentPollingInterval > 15 {
+                    currentPollingInterval = 15
+                }
                 await checkForNewPosts(account: account, appPassword: appPassword, using: client)
             }
         }
@@ -84,7 +108,9 @@ final class FeedTimelineViewModel {
             knownURIs.formUnion(newURIs)
             newPostCount += newURIs.count
         } catch {
-            if AppError.isCancellation(error) { return }
+            if AppError.isCancellation(error) {
+                return
+            }
             AppLogger.moderation.debug("Polling check failed: \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -148,13 +174,17 @@ final class FeedTimelineViewModel {
 
     /// Returns the effective like count, preferring optimistic value over server data.
     func effectiveLikeCount(uri: String) -> Int {
-        if let count = optimisticLikeCounts[uri] { return count }
+        if let count = optimisticLikeCounts[uri] {
+            return count
+        }
         return entries.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
     }
 
     /// Returns the effective repost count, preferring optimistic value over server data.
     func effectiveRepostCount(uri: String) -> Int {
-        if let count = optimisticRepostCounts[uri] { return count }
+        if let count = optimisticRepostCounts[uri] {
+            return count
+        }
         return entries.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
     }
 
@@ -176,7 +206,9 @@ final class FeedTimelineViewModel {
         } catch {
             optimisticLikes.removeValue(forKey: uri)
             optimisticLikeCounts.removeValue(forKey: uri)
-            if wasLiked { optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI }
+            if wasLiked {
+                optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
+            }
             AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -199,7 +231,9 @@ final class FeedTimelineViewModel {
         } catch {
             optimisticReposts.removeValue(forKey: uri)
             optimisticRepostCounts.removeValue(forKey: uri)
-            if wasReposted { optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI }
+            if wasReposted {
+                optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
+            }
             AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
         }
     }

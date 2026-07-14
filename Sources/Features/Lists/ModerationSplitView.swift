@@ -12,7 +12,7 @@ struct ModerationSplitView: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    @StateObject private var viewModel = ListsViewModel()
+    @State private var viewModel = ListsViewModel()
 
     var body: some View {
         if horizontalSizeClass == .regular {

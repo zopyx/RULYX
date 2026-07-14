@@ -168,7 +168,11 @@ struct FeedTimelineView: View {
         }
         .confirmationDialog(
             loc("post.delete.confirm"),
-            isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
+            isPresented: .init(get: { postToDelete != nil }, set: {
+                if !$0 {
+                    postToDelete = nil
+                }
+            }),
             titleVisibility: .visible,
             presenting: postToDelete
         ) { post in
@@ -270,6 +274,10 @@ struct FeedTimelineView: View {
         .refreshable {
             await refresh()
         }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 5)
+                .onChanged { _ in viewModel.userDidInteract() }
+        )
         .overlay(alignment: .top) {
             if viewModel.newPostCount > 0 {
                 newPostsBanner

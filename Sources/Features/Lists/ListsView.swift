@@ -12,7 +12,7 @@ struct ListsView: View {
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject var internalListStore: InternalListStore
-    @StateObject var viewModel = ListsViewModel()
+    @State var viewModel = ListsViewModel()
 
     // MARK: - Properties
 

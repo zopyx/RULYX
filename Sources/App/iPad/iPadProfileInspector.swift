@@ -8,7 +8,7 @@ struct iPadProfileInspector: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var navState: iPadNavigationState
 
-    @StateObject private var profileVM = BlueskyProfileViewModel()
+    @State private var profileVM = BlueskyProfileViewModel()
 
     @State private var selectedTab: ProfileTab = .profile
 
@@ -110,54 +110,54 @@ struct iPadProfileInspector: View {
 
             VStack(spacing: 12) {
                 HStack(spacing: 16) {
-                AsyncImage(url: profile.avatarURL) { phase in
-                    switch phase {
-                    case let .success(image):
-                        image.resizable().scaledToFill()
-                    default:
-                        Image(systemName: "person.crop.circle.fill")
-                            .font(.system(size: 64))
-                            .foregroundStyle(.tertiary)
+                    AsyncImage(url: profile.avatarURL) { phase in
+                        switch phase {
+                        case let .success(image):
+                            image.resizable().scaledToFill()
+                        default:
+                            Image(systemName: "person.crop.circle.fill")
+                                .font(.system(size: 64))
+                                .foregroundStyle(.tertiary)
+                        }
                     }
-                }
-                .frame(width: 72, height: 72)
-                .clipShape(Circle())
+                    .frame(width: 72, height: 72)
+                    .clipShape(Circle())
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(profile.displayName ?? profile.handle)
-                        .font(.title2.weight(.bold))
-                    Text("@\(profile.handle)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    if let description = profile.description, !description.isEmpty {
-                        Text(description)
-                            .font(.caption)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(profile.displayName ?? profile.handle)
+                            .font(.title2.weight(.bold))
+                        Text("@\(profile.handle)")
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
-                            .lineLimit(3)
+                        if let description = profile.description, !description.isEmpty {
+                            Text(description)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(3)
+                        }
+                    }
+
+                    Spacer()
+                }
+
+                HStack(spacing: 24) {
+                    statView(loc("profile.followers"), value: profile.followersCount)
+                    statView(loc("profile.following"), value: profile.followsCount)
+                    statView(loc("profile.posts"), value: profile.postsCount)
+                }
+
+                HStack(spacing: 8) {
+                    actionButton(loc("profile.block"), isActive: viewer?.isBlocking == true) {
+                        await profileVM.toggleBlock(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
+                    }
+                    actionButton(loc("profile.mute"), isActive: viewer?.muted == true) {
+                        await profileVM.toggleMute(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
+                    }
+                    actionButton(loc("profile.follow"), isActive: viewer?.isFollowing == true) {
+                        await profileVM.toggleFollow(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
                     }
                 }
-
-                Spacer()
             }
-
-            HStack(spacing: 24) {
-                statView(loc("profile.followers"), value: profile.followersCount)
-                statView(loc("profile.following"), value: profile.followsCount)
-                statView(loc("profile.posts"), value: profile.postsCount)
-            }
-
-            HStack(spacing: 8) {
-                actionButton(loc("profile.block"), isActive: viewer?.isBlocking == true) {
-                    await profileVM.toggleBlock(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
-                }
-                actionButton(loc("profile.mute"), isActive: viewer?.muted == true) {
-                    await profileVM.toggleMute(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
-                }
-                actionButton(loc("profile.follow"), isActive: viewer?.isFollowing == true) {
-                    await profileVM.toggleFollow(account: accountStore.activeAccount!, appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "", using: container.blueskyClient)
-                }
-            }
-        }
         }
         .padding()
     }

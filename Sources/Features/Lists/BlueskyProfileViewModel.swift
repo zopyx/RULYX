@@ -15,7 +15,8 @@ struct BlockingListInfo: Identifiable, Hashable {
 /// fetching list memberships, owned/subscribed lists, ClearSky data, media counts,
 /// handle history, and post export. Uses optimistic pending states for instant UI feedback.
 @MainActor
-final class BlueskyProfileViewModel: ObservableObject {
+@Observable
+final class BlueskyProfileViewModel {
     // MARK: - Properties
 
     /// The full profile inspection result (profile + list memberships + starter packs).
@@ -155,8 +156,8 @@ final class BlueskyProfileViewModel: ObservableObject {
                         memberCount: list.memberCount,
                         kind: list.kind
                     )
-                    // Check up to 5 pages of each list to find the target
-                    while !found, pagesChecked < 5 {
+                    // Check up to 2 pages of each list to find the target
+                    while !found, pagesChecked < 2 {
                         guard let page = try? await client.fetchListMembersPage(
                             list: bskyList, cursor: cursor,
                             account: account, appPassword: appPassword
@@ -164,9 +165,13 @@ final class BlueskyProfileViewModel: ObservableObject {
                         found = page.members.contains(where: { $0.actor.did == targetDID })
                         cursor = page.cursor
                         pagesChecked += 1
-                        if cursor == nil { break }
+                        if cursor == nil {
+                            break
+                        }
                     }
-                    if found { blockingNames.append(list.name) }
+                    if found {
+                        blockingNames.append(list.name)
+                    }
                 }
                 subscribedListBlockingNames = blockingNames.sorted()
                 recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
@@ -269,13 +274,9 @@ final class BlueskyProfileViewModel: ObservableObject {
         isLoading = false
         guard let profile else { return }
 
-        // Fetch handle history and media counts in parallel
+        // Fetch handle history and media counts in parallel (non-blocking — load() returns immediately)
         async let auditLog = client.fetchPLCAuditLog(did: profile.did)
-        await countMedia(for: profile.did, account: dataAccount, appPassword: dataPassword, using: client)
-
-        if let log = try? await auditLog {
-            handleHistory = parseHandleChanges(from: log, currentHandle: profile.handle)
-        }
+        async let mediaCount = countMedia(for: profile.did, account: dataAccount, appPassword: dataPassword, using: client)
 
         // Deferred membership fetch if not available from inspection
         if isFetchingMemberships {
@@ -287,6 +288,12 @@ final class BlueskyProfileViewModel: ObservableObject {
         }
 
         recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
+
+        // Handle history (media count already completed in background)
+        if let log = try? await auditLog {
+            handleHistory = parseHandleChanges(from: log, currentHandle: profile.handle)
+        }
+        await mediaCount
     }
 
     // MARK: - Private Helpers
@@ -306,7 +313,9 @@ final class BlueskyProfileViewModel: ObservableObject {
                     guard !Task.isCancelled else { return }
                     if let embed = entry.post.embed {
                         images += embed.images?.count ?? 0
-                        if embed.video != nil { videos += 1 }
+                        if embed.video != nil {
+                            videos += 1
+                        }
                     }
                 }
                 guard let next = response.cursor else { break }

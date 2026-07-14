@@ -1,31 +1,20 @@
 import SwiftUI
 
-// MARK: - AvatarSession
-
-/// Shared ephemeral URLSession for avatar image loading.
-/// Bypasses all caches so avatars are always fresh from the server.
-private enum AvatarSession {
-    static let session: URLSession = {
-        let config = URLSessionConfiguration.ephemeral
-        config.requestCachePolicy = .reloadIgnoringLocalCacheData
-        config.timeoutIntervalForRequest = 15
-        return URLSession(configuration: config)
-    }()
-}
-
 // MARK: - FreshAvatarImage
 
-/// Loads a remote avatar image bypassing both the shared URLCache
-/// and SwiftUI's internal AsyncImage cache. Uses an ephemeral
-/// URLSession so each fetch is a fresh network request.
+/// Loads a remote avatar image using the shared `ThumbnailPipeline` which
+/// provides in-memory + disk caching and ImageIO-based downsampling.
 ///
-/// Avatars change infrequently and are small, so caching is not
-/// needed. This prevents stale avatars from lingering after a
-/// profile picture update on Bluesky.
+/// Unlike the previous ephemeral URLSession approach, avatars benefit from
+/// caching across view appearances and app relaunches, with a 24-hour TTL
+/// to handle profile picture updates on Bluesky.
 struct FreshAvatarImage<Placeholder: View>: View {
     let url: URL?
+    /// Time-to-live in seconds for the disk cache (default 24h).
+    var cacheTTL: TimeInterval = 86400
     @ViewBuilder let placeholder: () -> Placeholder
 
+    @Environment(\.displayScale) private var displayScale
     @State private var uiImage: UIImage?
     @State private var loadedURL: URL?
 
@@ -50,16 +39,20 @@ struct FreshAvatarImage<Placeholder: View>: View {
             loadedURL = nil
             return
         }
-        if loadedURL == url, uiImage != nil { return }
+        if loadedURL == url, uiImage != nil {
+            return
+        }
 
         do {
-            let (data, response) = try await AvatarSession.session.data(from: url)
-            guard (200 ..< 300).contains((response as? HTTPURLResponse)?.statusCode ?? 0) else {
-                throw URLError(.badServerResponse)
-            }
-            guard let image = UIImage(data: data) else {
-                throw URLError(.cannotDecodeContentData)
-            }
+            // Use ThumbnailPipeline for cached + downsampled loading
+            // Avatars are typically small, so maxPixelSize ~72 * 3 = 216 at 3x
+            let maxPixel: CGFloat = 72
+            let image = try await ThumbnailPipeline.shared.image(
+                for: url,
+                maxPixelSize: maxPixel,
+                scale: displayScale,
+                ttl: cacheTTL
+            )
             uiImage = image
             loadedURL = url
         } catch {

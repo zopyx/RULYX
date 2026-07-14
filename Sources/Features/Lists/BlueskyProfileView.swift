@@ -18,7 +18,7 @@ struct BlueskyProfileView: View {
     @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
     @EnvironmentObject var internalListStore: InternalListStore
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel = BlueskyProfileViewModel()
+    @State private var viewModel = BlueskyProfileViewModel()
     @State private var actionsVM: BlueskyProfileActionsViewModel? = nil
 
     // MARK: - Properties
@@ -1410,7 +1410,11 @@ struct BlueskyProfileView: View {
         }
         .sheet(isPresented: Binding(
             get: { actionsVM?.showBlockBackPreview ?? false },
-            set: { if actionsVM != nil { actionsVM!.showBlockBackPreview = $0 } }
+            set: {
+                if actionsVM != nil {
+                    actionsVM!.showBlockBackPreview = $0
+                }
+            }
         )) {
             blockBackPreviewSheet
         }
@@ -1490,7 +1494,11 @@ struct BlueskyProfileView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button(loc("profile.block_back.action")) {
-                    if actionsVM != nil { actionsVM!.showBlockBackPreview = false }
+                    if actionsVM != nil {
+                        actionsVM!.showBlockBackPreview = false
+                    }
+                    // Re-fetch count so the confirmation shows the current state
+                    Task { await actionsVM?.fetchBlockCounts(isOwnProfile: isOwnProfile) }
                     showBlockBackConfirm1 = true
                 }
                 .disabled((actionsVM?.blockPreviewActors ?? []).isEmpty)

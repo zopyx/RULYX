@@ -6,25 +6,26 @@ import Observation
 /// Supports caching via `DashboardCache` so the dashboard loads instantly from disk
 /// while quietly refreshing data in the background.
 @MainActor
-final class ListsViewModel: ObservableObject {
+@Observable
+final class ListsViewModel {
     // MARK: - Properties
 
     /// All moderation lists grouped by their kind (moderation, reference, etc.).
-    @Published private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
+    private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     /// Profile of the currently active account.
-    @Published private(set) var activeProfile: BlueskyProfile?
+    private(set) var activeProfile: BlueskyProfile?
     /// Number of accounts this user is blocking.
-    @Published private(set) var blockingCount: Int?
+    private(set) var blockingCount: Int?
     /// Number of accounts blocking this user.
-    @Published private(set) var blockedByCount: Int?
+    private(set) var blockedByCount: Int?
     /// True while the initial load is in progress (no cache).
-    @Published private(set) var isLoading = false
+    private(set) var isLoading = false
     /// True while a manual refresh is in progress.
-    @Published private(set) var isRefreshing = false
+    private(set) var isRefreshing = false
     /// True when the displayed data was loaded from cache.
-    @Published private(set) var isFromCache = false
+    private(set) var isFromCache = false
     /// User-facing error message.
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     // MARK: - Public Methods
 
@@ -79,12 +80,20 @@ final class ListsViewModel: ObservableObject {
             let blockedByKey = "blockedBy_\(did)"
             let cachedBlocking = RelationshipCache.load(forKey: blockingKey)
             let cachedBlockedBy = RelationshipCache.load(forKey: blockedByKey)
-            if !cachedBlocking.isEmpty { blockingCount = cachedBlocking.count }
-            if !cachedBlockedBy.isEmpty { blockedByCount = cachedBlockedBy.count }
+            if !cachedBlocking.isEmpty {
+                blockingCount = cachedBlocking.count
+            }
+            if !cachedBlockedBy.isEmpty {
+                blockedByCount = cachedBlockedBy.count
+            }
         }
 
-        if !hasCache { isLoading = true }
-        if isExplicitRefresh { isRefreshing = true }
+        if !hasCache {
+            isLoading = true
+        }
+        if isExplicitRefresh {
+            isRefreshing = true
+        }
         errorMessage = nil
 
         // Fire all four fetches in parallel
@@ -116,7 +125,7 @@ final class ListsViewModel: ObservableObject {
         isRefreshing = false
     }
 
-    /// Applies a cached `DashboardCacheData` snapshot to all published properties.
+    /// Applies a cached `DashboardCacheData` snapshot to all properties.
     private func applyCached(_ cached: DashboardCacheData) {
         listsByKind = Dictionary(grouping: cached.lists, by: \.kind)
         activeProfile = cached.profile

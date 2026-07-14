@@ -8,7 +8,7 @@ struct iPadListsView: View {
     @EnvironmentObject private var navState: iPadNavigationState
     @EnvironmentObject var internalListStore: InternalListStore
 
-    @StateObject private var viewModel = ListsViewModel()
+    @State private var viewModel = ListsViewModel()
 
     @State private var showCreateList = false
     @State private var showInternalListCreate = false
