@@ -58,11 +58,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Cache
 
-    /// Clears all in-memory and on-disk URL cache responses plus the session cache.
+    /// Clears all in-memory and on-disk URL cache responses plus the session cache and API cache.
     func clearCache() {
         session.configuration.urlCache?.removeAllCachedResponses()
         URLCache.shared.removeAllCachedResponses()
         sessionService.clearSessionCache()
+        Task { await BlueskyAPICache.shared.clearAll() }
     }
 
     // MARK: - Authentication & Session
@@ -89,8 +90,36 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - List Operations
 
-    /// Fetches all lists owned by the authenticated account.
+    /// Protocol conformance — delegates to cached variant.
     func fetchLists(for account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
+        try await fetchLists(for: account, appPassword: appPassword, forceRefresh: false)
+    }
+
+    /// Fetches all lists owned by the authenticated account.
+    /// Uses `BlueskyAPICache`; set `forceRefresh = true` to bypass cache.
+    func fetchLists(for account: AppAccount, appPassword: String?, forceRefresh: Bool = false) async throws -> [BlueskyList] {
+        // Cache check
+        if !forceRefresh, let did = account.did {
+            let cacheURL = "app.bsky.graph.getLists"
+            if let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.list) {
+                if let lists = try? JSONDecoder().decode([BlueskyList].self, from: cached.data) {
+                    if !cached.isStale {
+                        return lists
+                    }
+                    // Stale: return cached but fire background refresh
+                    Task { [weak self] in
+                        _ = try? await self?.fetchListsNetwork(account: account, appPassword: appPassword)
+                    }
+                    return lists
+                }
+            }
+        }
+
+        return try await fetchListsNetwork(account: account, appPassword: appPassword)
+    }
+
+    /// Direct network fetch for lists, bypassing cache.
+    private func fetchListsNetwork(account: AppAccount, appPassword: String?) async throws -> [BlueskyList] {
         let response: GetListsResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
@@ -107,7 +136,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             )
         }
 
-        return response.lists.map { item in
+        let lists = response.lists.map { item in
             BlueskyList(
                 id: item.uri,
                 name: item.name,
@@ -118,6 +147,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 cid: item.cid
             )
         }
+
+        // Write to cache
+        if let did = account.did, let encoded = try? JSONEncoder().encode(lists) {
+            await BlueskyAPICache.shared.write(accountDID: did, url: "app.bsky.graph.getLists", data: encoded)
+        }
+
+        return lists
     }
 
     /// Fetches all lists owned by a specific actor (by DID or handle).
@@ -583,6 +619,44 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
+    /// Fetches the set of DIDs currently blocked by the account directly from the PDS.
+    /// Paginates through all `app.bsky.graph.block` records.
+    func fetchExistingBlockedDIDs(account: AppAccount, appPassword: String?) async throws -> Set<String> {
+        try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            var allDIDs = Set<String>()
+            var cursor: String?
+
+            repeat {
+                var queryItems: [URLQueryItem] = [
+                    URLQueryItem(name: "repo", value: authSession.did),
+                    URLQueryItem(name: "collection", value: "app.bsky.graph.block"),
+                    URLQueryItem(name: "limit", value: "100"),
+                ]
+                if let cursor {
+                    queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+                }
+
+                let response: BlockListRecordsResponse = try await requestExecutor.send(
+                    path: "com.atproto.repo.listRecords",
+                    method: "GET",
+                    queryItems: queryItems,
+                    accessToken: authSession.accessJWT,
+                    hostURL: authSession.pdsURL
+                )
+
+                for entry in response.records {
+                    allDIDs.insert(entry.value.subject)
+                }
+                cursor = response.cursor
+            } while cursor != nil
+
+            return allDIDs
+        }
+    }
+
     /// Unblocks an actor by their block record URI. Delegates to `removeMember`.
     func unblockActor(recordURI: String, account: AppAccount, appPassword: String?) async throws {
         try await removeMember(recordURI: recordURI, account: account, appPassword: appPassword)
@@ -910,9 +984,37 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Profile
 
+    /// Protocol conformance — delegates to cached variant.
+    func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> BlueskyProfile {
+        try await fetchProfile(did: actorDID, account: account, appPassword: appPassword, forceRefresh: false)
+    }
+
     /// Fetches a full profile by DID or handle for a given account context.
     /// Returns a `BlueskyProfile` with viewer state, labels, and associated counts.
-    func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> BlueskyProfile {
+    /// Uses `BlueskyAPICache` for instant re-visits; set `forceRefresh = true` to bypass cache.
+    func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?, forceRefresh: Bool = false) async throws -> BlueskyProfile {
+        // Cache check (unless forced refresh)
+        if !forceRefresh, let did = account.did {
+            let cacheURL = "app.bsky.actor.getProfile?actor=\(actorDID)"
+            if let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.profile) {
+                if let profile = try? JSONDecoder().decode(BlueskyProfile.self, from: cached.data) {
+                    if !cached.isStale {
+                        return profile
+                    }
+                    // Stale: return profile but fire-and-forget a background refresh
+                    Task { [weak self] in
+                        _ = try? await self?.fetchProfileNetwork(actorDID: actorDID, account: account, appPassword: appPassword)
+                    }
+                    return profile
+                }
+            }
+        }
+
+        return try await fetchProfileNetwork(actorDID: actorDID, account: account, appPassword: appPassword)
+    }
+
+    /// Direct network fetch for profile data, bypassing cache.
+    private func fetchProfileNetwork(actorDID: String, account: AppAccount, appPassword: String?) async throws -> BlueskyProfile {
         let response: ProfileViewDetailed = try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
@@ -926,7 +1028,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             )
         }
 
-        return BlueskyProfile(
+        let profile = BlueskyProfile(
             id: response.did, did: response.did, handle: response.handle,
             displayName: response.displayName, description: response.description,
             websiteURL: URL(string: response.website ?? ""), avatarURL: URL(string: response.avatar ?? ""),
@@ -936,6 +1038,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             createdAt: parseDate(response.createdAt), labels: response.labels?.map(\.val) ?? [],
             viewerState: mapViewerState(response.viewer)
         )
+
+        // Write to cache
+        if let did = account.did, let encoded = try? JSONEncoder().encode(profile) {
+            let cacheURL = "app.bsky.actor.getProfile?actor=\(actorDID)"
+            await BlueskyAPICache.shared.write(accountDID: did, url: cacheURL, data: encoded)
+        }
+
+        return profile
     }
 
     // MARK: - Clearsky Integration
@@ -949,22 +1059,40 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Fetches the list of actors blocked by the account (the "my blocklist" view).
     func fetchBlockedActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
-        try await fetchClearskyActors(account: account, endpoint: "blocklist")
+        try await fetchClearskyActors(account: account, endpoint: "blocklist", onProgress: nil)
+    }
+
+    /// Fetches the list of actors blocked by the account (the "my blocklist" view), reporting partial counts as pages load.
+    func fetchBlockedActors(
+        account: AppAccount,
+        appPassword _: String?,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?
+    ) async throws -> ClearskyBlocklistResult {
+        try await fetchClearskyActors(account: account, endpoint: "blocklist", onProgress: onProgress)
     }
 
     /// Fetches the list of actors that have blocked the account (the "blocked by" view).
     func fetchBlockedByActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
-        try await fetchClearskyActors(account: account, endpoint: "single-blocklist")
+        try await fetchClearskyActors(account: account, endpoint: "single-blocklist", onProgress: nil)
+    }
+
+    /// Fetches the list of actors that have blocked the account (the "blocked by" view), reporting partial counts as pages load.
+    func fetchBlockedByActors(
+        account: AppAccount,
+        appPassword _: String?,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?
+    ) async throws -> ClearskyBlocklistResult {
+        try await fetchClearskyActors(account: account, endpoint: "single-blocklist", onProgress: onProgress)
     }
 
     /// Returns the total count of actors the account has blocked.
     func fetchBlockingCount(for account: AppAccount) async throws -> Int {
-        try await fetchClearskyActors(account: account, endpoint: "blocklist").totalCount
+        try await fetchClearskyActors(account: account, endpoint: "blocklist", onProgress: nil).totalCount
     }
 
     /// Returns the total count of actors that have blocked the account.
     func fetchBlockedByCount(for account: AppAccount) async throws -> Int {
-        try await fetchClearskyActors(account: account, endpoint: "single-blocklist").totalCount
+        try await fetchClearskyActors(account: account, endpoint: "single-blocklist", onProgress: nil).totalCount
     }
 
     /// Returns the count of actors that block the account but are not blocked back.
@@ -983,9 +1111,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// are fetched in mini-batches of 5 via TaskGroup (parallel within batch).
     /// Once a page returns < 100 entries, remaining batches are skipped.
     /// On cancellation or errors, returns whatever was collected so far.
-    private func fetchClearskyEntries(actorDID: String, endpoint: String) async throws -> [ClearskyBlocklistEntry] {
+    private func fetchClearskyEntries(
+        actorDID: String,
+        endpoint: String,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil
+    ) async throws -> [ClearskyBlocklistEntry] {
         // Step 1: fetch page 1 synchronously — determines if more pages exist
         let page1 = try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: 1)
+        var seenDIDs = Set(page1.map(\.did))
+        await onProgress?(seenDIDs.count)
         guard page1.count >= 100 else { return page1 }
 
         var allEntries = page1
@@ -1003,7 +1137,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
                 for p in batchStart ... batchEnd {
                     group.addTask { [self] in
-                        let entries = (try? await self.fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)) ?? []
+                        let entries = await (try? fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)) ?? []
                         return (p, entries)
                     }
                 }
@@ -1017,13 +1151,19 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             var foundLast = false
             for (p, entries) in batchResults.sorted(by: { $0.0 < $1.0 }) {
                 allEntries.append(contentsOf: entries)
+                for entry in entries {
+                    seenDIDs.insert(entry.did)
+                }
                 if entries.count < 100 {
                     AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(p) (\(entries.count) entries)")
                     foundLast = true
                     break
                 }
             }
-            if foundLast { break }
+            await onProgress?(seenDIDs.count)
+            if foundLast {
+                break
+            }
 
             page = batchEnd + 1
         }
@@ -1034,7 +1174,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// Fetches a single page from ClearSky. Returns the parsed entries or
     /// an empty array if the page doesn't exist (non-2xx / decode failure).
     private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry] {
-        if Task.isCancelled { return [] }
+        if Task.isCancelled {
+            return []
+        }
         let urlString = page == 1
             ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
             : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
@@ -1092,6 +1234,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
     }
 
+    /// Public wrapper: fetches DIDs from a ClearSky endpoint (DIDs only, no profile resolution).
+    func fetchClearskyBlockDIDs(endpoint: String, for account: AppAccount) async throws -> Set<String> {
+        try guardClearskyAvailable()
+        let actorDID = try await resolveAccountDID(account)
+        return try await fetchClearskyDIDs(actorDID: actorDID, endpoint: endpoint)
+    }
+
     /// Resolves profiles for a list of DIDs in parallel batches of 25.
     /// Silently ignores individual batch failures (best-effort resolution).
     private func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
@@ -1122,16 +1271,22 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// Resolves the DID for an account. If the account already has a DID, returns it;
     /// otherwise resolves the handle to a DID via ClearSky.
     private func resolveAccountDID(_ account: AppAccount) async throws -> String {
-        if let did = account.did { return did }
+        if let did = account.did {
+            return did
+        }
         return try await resolveHandleToDID(handle: account.handle)
     }
 
     /// Fetches ClearSky blocklist entries and resolves all actor profiles.
-    private func fetchClearskyActors(account: AppAccount, endpoint: String) async throws -> ClearskyBlocklistResult {
+    private func fetchClearskyActors(
+        account: AppAccount,
+        endpoint: String,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?
+    ) async throws -> ClearskyBlocklistResult {
         try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
-        let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint)
+        let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint, onProgress: onProgress)
         var allDIDs = Set<String>()
         var blockedDates = [String: String]()
         for entry in entries {
@@ -1179,7 +1334,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             }
             let decoded = try JSONDecoder().decode(ClearskyListsResponse.self, from: data)
             allLists += decoded.data.lists
-            if decoded.data.lists.count < 100 { break }
+            if decoded.data.lists.count < 100 {
+                break
+            }
             page += 1
         } while true
         return allLists
@@ -1440,12 +1597,16 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 all.append(contentsOf: page.actors)
                 cursor = page.cursor
                 pageCount += 1
-                if pageCount >= maxPages { break }
+                if pageCount >= maxPages {
+                    break
+                }
                 lastError = nil
             } catch {
                 lastError = error
                 // If we have a cursor, we can continue from the error; if no cursor, rethrow.
-                if cursor == nil { throw error }
+                if cursor == nil {
+                    throw error
+                }
                 break
             }
         } while cursor != nil
@@ -1465,7 +1626,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 URLQueryItem(name: "actor", value: actorDID),
                 URLQueryItem(name: "limit", value: "100"),
             ]
-            if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
+            if let cursor {
+                queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+            }
             return try await requestExecutor.send(
                 path: "app.bsky.graph.getFollowers",
                 method: "GET",
@@ -1495,11 +1658,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 all.append(contentsOf: page.actors)
                 cursor = page.cursor
                 pageCount += 1
-                if pageCount >= maxPages { break }
+                if pageCount >= maxPages {
+                    break
+                }
                 lastError = nil
             } catch {
                 lastError = error
-                if cursor == nil { throw error }
+                if cursor == nil {
+                    throw error
+                }
                 break
             }
         } while cursor != nil
@@ -1519,7 +1686,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 URLQueryItem(name: "actor", value: actorDID),
                 URLQueryItem(name: "limit", value: "100"),
             ]
-            if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
+            if let cursor {
+                queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+            }
             return try await requestExecutor.send(
                 path: "app.bsky.graph.getFollows",
                 method: "GET",
@@ -1547,7 +1716,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
 
         // Fire off profile, list membership, and starter pack requests in parallel.
-        let (profile, _, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
+        let (profile, lists, starterPacks): (ProfileViewDetailed, ListsWithMembershipResponse?, StarterPacksWithMembershipResponse?) =
             try await sessionService.performAuthenticatedRequest(
                 account: account,
                 appPassword: appPassword
@@ -1582,12 +1751,18 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             viewerState: mapViewerState(profile.viewer)
         )
 
-        // Fetch list memberships separately (paginated through the account's own lists).
-        let listMemberships = await fetchListMemberships(for: profile.did, account: account, appPassword: appPassword)
-
         return ProfileInspection(
             profile: mappedProfile,
-            listMemberships: listMemberships,
+            listMemberships: lists?.listsWithMembership.map {
+                ProfileListMembership(
+                    listURI: $0.list.uri,
+                    name: $0.list.name,
+                    kind: $0.list.purpose.kind,
+                    memberCount: $0.list.listItemCount,
+                    isMember: $0.listItem != nil,
+                    listItemRecordURI: $0.listItem?.uri
+                )
+            } ?? [],
             starterPackMemberships: starterPacks?.starterPacksWithMembership.map {
                 ProfileStarterPackMembership(uri: $0.starterPack.uri, name: $0.starterPack.name ?? $0.starterPack.uri, memberCount: $0.starterPack.listItemCount, joinedAllTimeCount: $0.starterPack.joinedAllTimeCount, isMember: $0.listItem != nil)
             } ?? []
@@ -1595,7 +1770,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Checks which of the account's lists contain a given target DID.
-    /// Pages through up to 5 pages of each list to find the member.
+    /// Pages through up to 2 pages of each list to find the member.
     func fetchListMemberships(
         for targetDID: String,
         account: AppAccount,
@@ -1613,8 +1788,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     var foundItem: BlueskyListMember?
                     var pagesChecked = 0
 
-                    // Search up to 5 pages of members per list.
-                    while foundItem == nil, pagesChecked < 5 {
+                    // Search up to 2 pages of members per list.
+                    while foundItem == nil, pagesChecked < 2 {
                         guard let page = try? await self.fetchListMembersPage(
                             list: list, cursor: cursor,
                             account: account, appPassword: appPassword
@@ -1622,7 +1797,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                         foundItem = page.members.first { $0.actor.did == targetDID }
                         cursor = page.cursor
                         pagesChecked += 1
-                        if cursor == nil { break }
+                        if cursor == nil {
+                            break
+                        }
                     }
 
                     return ProfileListMembership(
@@ -1638,7 +1815,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
             var results: [ProfileListMembership] = []
             for await result in group {
-                if let result { results.append(result) }
+                if let result {
+                    results.append(result)
+                }
             }
             return results
         }
@@ -1685,7 +1864,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             }
             return response.value
         } catch let error as BlueskyAPIError {
-            if case .server = error { return nil }
+            if case .server = error {
+                return nil
+            }
             throw error
         } catch {
             return nil

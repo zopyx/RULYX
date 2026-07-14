@@ -123,7 +123,7 @@ struct SettingsView: View {
 
                     NavigationLink {
                         AutoBlockListPickerView()
-                            .environmentObject(container.blueskyClient)
+                            .environmentObject(container)
                             .environmentObject(accountStore)
                             .environmentObject(internalListStore)
                             .environmentObject(localizationManager)
@@ -200,6 +200,26 @@ struct SettingsView: View {
                     }
                     .accessibilityHint(loc: "settings.debug_tools.hint")
 
+                    if debugMode {
+                        Toggle(isOn: .init(get: { UserDefaults.standard.bool(forKey: "performanceOverlayEnabled") }, set: { UserDefaults.standard.set($0, forKey: "performanceOverlayEnabled") })) {
+                            Label {
+                                Text("Performance Overlay")
+                            } icon: {
+                                Image(systemName: "chart.bar.fill")
+                            }
+                        }
+
+                        Button {
+                            isShowingHTTPRequestDebugView = true
+                        } label: {
+                            Label {
+                                Text(localizationManager.localized("debug.http.title"))
+                            } icon: {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                            }
+                        }
+                    }
+
                     Button(role: .destructive) {
                         isShowingClearCacheConfirmation = true
                     } label: {
@@ -217,7 +237,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    // MARK: HTTP Debug View (debug mode only)
+                    // MARK: Performance & HTTP Debug (debug mode only)
 
                     if debugMode {
                         Button {

@@ -52,6 +52,8 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     @MainActor @Published private(set) var entries: [HTTPRequestDebugEntry] = []
     @MainActor private var nextSequenceNumber = 1
     @MainActor private var lastPurgeDate: Date?
+    /// Per-endpoint latency tracking for the performance overlay.
+    @MainActor private var endpointStats: [String: EndpointLatencyStats] = [:]
 
     private let maxEntries: Int
     private let maxAge: TimeInterval = 24 * 60 * 60
@@ -200,6 +202,42 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
 
 // MARK: - Stats models
 
+/// Per-endpoint latency tracking for the performance monitor overlay.
+struct EndpointLatencyStats: Codable {
+    /// The endpoint path (e.g. "app.bsky.actor.getProfile").
+    let endpoint: String
+    /// Total request count.
+    let count: Int
+    /// Total duration of all requests in seconds.
+    let totalDuration: TimeInterval
+    /// Maximum duration observed.
+    let maxDuration: TimeInterval
+    /// Minimum duration observed.
+    let minDuration: TimeInterval
+
+    var averageDuration: TimeInterval {
+        count > 0 ? totalDuration / Double(count) : 0
+    }
+}
+
+/// Snapshot of performance metrics at a point in time.
+struct PerformanceMetricsSnapshot: Codable {
+    /// Total requests in the current session.
+    let totalRequests: Int
+    /// Session-level average latency.
+    let averageLatency: TimeInterval
+    /// Per-endpoint stats.
+    let endpoints: [EndpointLatencyStats]
+    /// Cache hit count.
+    let cacheHits: Int
+    /// Cache miss count.
+    let cacheMisses: Int
+    /// Cache hit ratio.
+    let cacheHitRatio: Double
+    /// Timestamp of the snapshot.
+    let timestamp: Date
+}
+
 /// Aggregation granularity for the stats timeline chart.
 enum HTTPDebugStatsGranularity: String, CaseIterable, Identifiable {
     case day
@@ -207,7 +245,9 @@ enum HTTPDebugStatsGranularity: String, CaseIterable, Identifiable {
     case minute
     case fiveMinutes
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     var bucketInterval: TimeInterval {
         switch self {

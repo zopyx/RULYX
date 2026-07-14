@@ -41,6 +41,11 @@ struct RootView: View {
     /// Values: `"light"`, `"dark"`, or `"system"` (default).
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
 
+    /// UserDefaults key `"performanceOverlayEnabled"`: show the performance monitor overlay.
+    @AppStorage("performanceOverlayEnabled") private var performanceOverlayEnabled = false
+    /// Tracks three-finger triple-tap to toggle overlay visibility.
+    @State private var overlayVisible = false
+
     /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
     /// Returns `.light`, `.dark`, or `nil` for system-following mode.
     private var preferredScheme: ColorScheme? {
@@ -201,6 +206,23 @@ struct RootView: View {
         .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
             onboardingContent
         }
+        .overlay(alignment: .top) {
+            if overlayVisible || performanceOverlayEnabled {
+                PerformanceMonitorOverlay()
+                    .environmentObject(HTTPRequestDebugStore.shared)
+            }
+        }
+        .highPriorityGesture(threeFingerGesture)
+    }
+
+    /// Three-finger triple-tap gesture that toggles the performance overlay.
+    /// Disabled when VoiceOver is running.
+    private var threeFingerGesture: some Gesture {
+        if UIAccessibility.isVoiceOverRunning {
+            return TapGesture().onEnded {}
+        }
+        return TapGesture(count: 3)
+            .onEnded { overlayVisible.toggle() }
     }
 
     private var onboardingContent: some View {
