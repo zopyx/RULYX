@@ -629,7 +629,12 @@ struct BlueskyProfileView: View {
                     }
                     .buttonStyle(.plain)
                     Button {
-                        if profile.viewerState?.blockedBy == true {
+                        if profile.viewerState?.blockedBy == true,
+                           preferredSearchAccount?.id == accountStore.activeAccountID
+                        {
+                            // Only block if the preferred search account is the same as the
+                            // active (blocked) viewer. If a different preferred search account
+                            // is configured, let the media browser use it to fetch data.
                             blockedAccessType = .media
                         } else {
                             showMediaBrowser = true
