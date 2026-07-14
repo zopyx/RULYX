@@ -7,6 +7,7 @@ extension ListDetailView {
     /// and owner info (with navigation to owner profile).
     struct ListDetailHeaderSection: View {
         let currentList: BlueskyList
+        let title: String
         let isOwnedList: Bool
         let ownerActor: BlueskyActor?
         @Binding var imagePreview: ImagePreviewCollection?
@@ -34,7 +35,7 @@ extension ListDetailView {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(currentList.name)
+                        Text(title)
                             .appFont(.title)
                             .lineLimit(3)
                         if !currentList.description.isEmpty, currentList.description != currentList.name {

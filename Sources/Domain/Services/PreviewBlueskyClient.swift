@@ -490,12 +490,21 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         0
     }
 
+    override func fetchClearskyBlockDIDs(endpoint _: String, for _: AppAccount) async throws -> Set<String> {
+        []
+    }
+
     override func blockActor(
         did _: String,
         account _: AppAccount,
         appPassword _: String?
     ) async throws {
         try await Task.sleep(for: .milliseconds(120))
+    }
+
+    override func fetchExistingBlockedDIDs(account _: AppAccount, appPassword _: String?) async throws -> Set<String> {
+        try await Task.sleep(for: .milliseconds(50))
+        return []
     }
 
     override func unblockActor(

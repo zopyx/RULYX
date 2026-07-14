@@ -167,7 +167,11 @@ struct ListTimelineView: View {
             }
             .confirmationDialog(
                 loc("post.delete.confirm"),
-                isPresented: .init(get: { postToDelete != nil }, set: { if !$0 { postToDelete = nil } }),
+                isPresented: .init(get: { postToDelete != nil }, set: {
+                    if !$0 {
+                        postToDelete = nil
+                    }
+                }),
                 titleVisibility: .visible,
                 presenting: postToDelete
             ) { post in

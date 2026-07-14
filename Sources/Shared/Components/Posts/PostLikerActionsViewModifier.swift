@@ -24,6 +24,18 @@ struct PostLikerActionsViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .overlay {
+                if manager.isFetchingLikers {
+                    ZStack {
+                        Color.black.opacity(0.25)
+                            .ignoresSafeArea()
+                        ProgressView(loc("post.block_likers.fetching"))
+                            .padding(20)
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    }
+                    .transition(.opacity.animation(.easeInOut(duration: 0.2)))
+                }
+            }
             .sheet(item: $manager.postToClassify) { entry in
                 NavigationStack {
                     PostClassificationView(entry: entry)
@@ -88,7 +100,11 @@ struct PostLikerActionsViewModifier: ViewModifier {
             }
             .alert(loc("list.detail.alert_title"), isPresented: .init(
                 get: { manager.blockError != nil },
-                set: { if !$0 { manager.blockError = nil } }
+                set: {
+                    if !$0 {
+                        manager.blockError = nil
+                    }
+                }
             )) {
                 Button(loc("actions.ok")) { manager.blockError = nil }
             } message: {

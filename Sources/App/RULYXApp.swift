@@ -85,7 +85,6 @@ struct RULYXApp: App {
                     .environmentObject(deps.serviceContainer)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
-
                     // Lock screen overlay
                     .overlay {
                         if appLockManager.isLocked {
@@ -97,7 +96,11 @@ struct RULYXApp: App {
 
                     // Prompts the user for consent before enabling iCloud account sync.
                     // Shows a privacy explanation alert with cancel/confirm buttons.
-                    .alert(Text(loc: "settings.icloud.privacy.title"), isPresented: Binding(get: { iCloudAccountSync.shared.showPrivacyAlert }, set: { if !$0 { iCloudAccountSync.shared.showPrivacyAlert = false } })) {
+                    .alert(Text(loc: "settings.icloud.privacy.title"), isPresented: Binding(get: { iCloudAccountSync.shared.showPrivacyAlert }, set: {
+                        if !$0 {
+                            iCloudAccountSync.shared.showPrivacyAlert = false
+                        }
+                    })) {
                         Button(loc("settings.icloud.privacy.cancel"), role: .cancel) {
                             iCloudAccountSync.shared.cancelEnable()
                         }

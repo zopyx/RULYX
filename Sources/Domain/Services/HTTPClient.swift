@@ -35,10 +35,14 @@ private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @u
         self.pinnedHashes = pinnedHashes
     }
 
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
-                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    func urlSession(
+        _: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-              let serverTrust = challenge.protectionSpace.serverTrust else {
+              let serverTrust = challenge.protectionSpace.serverTrust
+        else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
@@ -237,7 +241,7 @@ struct HTTPClient {
                     id: entryID ?? UUID(),
                     errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
                 )
-                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
+                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
                 throw BlueskyAPIError.invalidResponse
             }
             if (200 ..< 300).contains(httpResponse.statusCode) {
@@ -250,7 +254,7 @@ struct HTTPClient {
                     errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
                     errorResponseJSON: Self.prettyPrintedJSON(from: data)
                 )
-                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
+                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
             }
             return (data, httpResponse)
         } catch {
@@ -258,7 +262,7 @@ struct HTTPClient {
                 id: entryID ?? UUID(),
                 errorMessage: AppError.userMessage(from: error)
             )
-            AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
+            AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
             throw error
         }
     }
@@ -351,7 +355,7 @@ struct HTTPClient {
                     id: entryID ?? UUID(),
                     errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
                 )
-                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
+                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
                 throw BlueskyAPIError.invalidResponse
             }
             if (200 ..< 300).contains(httpResponse.statusCode) {
@@ -364,7 +368,7 @@ struct HTTPClient {
                     errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
                     errorResponseJSON: Self.prettyPrintedJSON(from: data)
                 )
-                AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
+                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
             }
             return (data, httpResponse)
         } catch {
@@ -372,7 +376,7 @@ struct HTTPClient {
                 id: entryID ?? UUID(),
                 errorMessage: AppError.userMessage(from: error)
             )
-            AppLogger.http.error("\(request.httpMethod ?? "?" ) \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
+            AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
             throw error
         }
     }

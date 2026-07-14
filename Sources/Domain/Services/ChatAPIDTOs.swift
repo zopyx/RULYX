@@ -308,7 +308,8 @@ struct LogEventUnionDTO: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let v = try? container.decode(LogBeginConvoDTO.self), v.rev != nil { beginConvo = v
+        if let v = try? container.decode(LogBeginConvoDTO.self), v.rev != nil {
+            beginConvo = v
             acceptConvo = nil
             leaveConvo = nil
             muteConvo = nil
@@ -320,7 +321,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogAcceptConvoDTO.self), v.rev != nil { acceptConvo = v
+        } else if let v = try? container.decode(LogAcceptConvoDTO.self), v.rev != nil {
+            acceptConvo = v
             beginConvo = nil
             leaveConvo = nil
             muteConvo = nil
@@ -332,7 +334,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogLeaveConvoDTO.self), v.rev != nil { leaveConvo = v
+        } else if let v = try? container.decode(LogLeaveConvoDTO.self), v.rev != nil {
+            leaveConvo = v
             beginConvo = nil
             acceptConvo = nil
             muteConvo = nil
@@ -344,7 +347,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogMuteConvoDTO.self), v.rev != nil { muteConvo = v
+        } else if let v = try? container.decode(LogMuteConvoDTO.self), v.rev != nil {
+            muteConvo = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -356,7 +360,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogUnmuteConvoDTO.self), v.rev != nil { unmuteConvo = v
+        } else if let v = try? container.decode(LogUnmuteConvoDTO.self), v.rev != nil {
+            unmuteConvo = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -368,7 +373,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogCreateMessageDTO.self), v.rev != nil { createMessage = v
+        } else if let v = try? container.decode(LogCreateMessageDTO.self), v.rev != nil {
+            createMessage = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -380,7 +386,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogDeleteMessageDTO.self), v.rev != nil { deleteMessage = v
+        } else if let v = try? container.decode(LogDeleteMessageDTO.self), v.rev != nil {
+            deleteMessage = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -392,7 +399,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogAddReactionDTO.self), v.rev != nil { addReaction = v
+        } else if let v = try? container.decode(LogAddReactionDTO.self), v.rev != nil {
+            addReaction = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -404,7 +412,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogRemoveReactionDTO.self), v.rev != nil { removeReaction = v
+        } else if let v = try? container.decode(LogRemoveReactionDTO.self), v.rev != nil {
+            removeReaction = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -416,7 +425,8 @@ struct LogEventUnionDTO: Decodable {
             readConvo = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogReadConvoDTO.self), v.rev != nil { readConvo = v
+        } else if let v = try? container.decode(LogReadConvoDTO.self), v.rev != nil {
+            readConvo = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -428,7 +438,8 @@ struct LogEventUnionDTO: Decodable {
             removeReaction = nil
             addMember = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogAddMemberDTO.self), v.rev != nil { addMember = v
+        } else if let v = try? container.decode(LogAddMemberDTO.self), v.rev != nil {
+            addMember = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -440,7 +451,8 @@ struct LogEventUnionDTO: Decodable {
             removeReaction = nil
             readConvo = nil
             removeMember = nil
-        } else if let v = try? container.decode(LogRemoveMemberDTO.self), v.rev != nil { removeMember = v
+        } else if let v = try? container.decode(LogRemoveMemberDTO.self), v.rev != nil {
+            removeMember = v
             beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
@@ -452,7 +464,8 @@ struct LogEventUnionDTO: Decodable {
             removeReaction = nil
             readConvo = nil
             addMember = nil
-        } else { beginConvo = nil
+        } else {
+            beginConvo = nil
             acceptConvo = nil
             leaveConvo = nil
             muteConvo = nil

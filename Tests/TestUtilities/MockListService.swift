@@ -1,5 +1,5 @@
-@testable import RULYX
 import Foundation
+@testable import RULYX
 
 /// Mock implementation of BlueskyListServicing for unit testing.
 /// Uses class semantics so handlers can be overridden after VM construction.
@@ -14,9 +14,11 @@ final class MockListService: BlueskyListServicing {
     var updateListMetadataHandler: @Sendable (BlueskyList, String, String, AppAccount, String?) async throws -> BlueskyList = { list, title, desc, _, _ in
         BlueskyList(id: list.id, name: title, description: desc, memberCount: list.memberCount, kind: list.kind)
     }
+
     var createListHandler: @Sendable (String, String, BlueskyList.Kind, AppAccount, String?) async throws -> BlueskyList = { name, desc, kind, _, _ in
         BlueskyList(id: "at://list/new", name: name, description: desc, memberCount: 0, kind: kind)
     }
+
     var deleteListHandler: @Sendable (BlueskyList, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var reportListHandler: @Sendable (BlueskyList, String?, AppAccount, String?) async throws -> Void = { _, _, _, _ in }
     var reportListTypedHandler: @Sendable (BlueskyList, ModerationReportReasonType?, String?, AppAccount, String?) async throws -> Void = { _, _, _, _, _ in }
@@ -76,9 +78,13 @@ final class MockListService: BlueskyListServicing {
         return (list, BlueskyActor(did: "did:plc:creator", handle: "creator.bsky.social"))
     }
 
-    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] { [] }
+    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] {
+        []
+    }
 
-    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool { false }
+    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool {
+        false
+    }
 
     func subscribeToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
 

@@ -152,15 +152,14 @@ final class LiveBlueskyClientTests: XCTestCase {
             if url.contains("getProfiles") {
                 // Only return the profiles whose DIDs are actually requested in the URL.
                 // The implementation should only request the unblocked-blocker DIDs after subtraction.
-                let json: String
-                if url.contains("actors=did:plc:only-blocked-by&")
+                let json = if url.contains("actors=did:plc:only-blocked-by&")
                     || url.hasSuffix("actors=did:plc:only-blocked-by")
                 {
-                    json = """
+                    """
                     {"profiles": [{"did": "did:plc:only-blocked-by", "handle": "only-blocked-by.bsky.social"}]}
                     """
                 } else {
-                    json = """
+                    """
                     {"profiles": [
                         {"did": "did:plc:shared", "handle": "shared.bsky.social"},
                         {"did": "did:plc:only-blocked", "handle": "only-blocked.bsky.social"},

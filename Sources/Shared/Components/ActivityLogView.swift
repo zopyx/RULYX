@@ -22,8 +22,12 @@ struct ActivityLogView: View {
     private var filtered: [ModerationOperationLogEntry] {
         let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return workspaceStore.operationLog.filter { entry in
-            if let selectedType, entry.title != selectedType { return false }
-            if q.isEmpty { return true }
+            if let selectedType, entry.title != selectedType {
+                return false
+            }
+            if q.isEmpty {
+                return true
+            }
             return entry.title.lowercased().contains(q) ||
                 entry.summary.lowercased().contains(q) ||
                 entry.succeededHandles.contains(where: { $0.lowercased().contains(q) }) ||

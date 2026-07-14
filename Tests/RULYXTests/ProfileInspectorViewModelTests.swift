@@ -219,4 +219,8 @@ private struct MockLiveBlueskyClient: BlueskyProfileInspecting {
     func reportAccount(did _: String, selectedReason _: ModerationReportReasonType?, reason _: String?, account _: AppAccount, appPassword _: String?) async throws {}
 
     func putProfileRecord(_: ProfileRecord, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func fetchExistingBlockedDIDs(account _: AppAccount, appPassword _: String?) async throws -> Set<String> {
+        []
+    }
 }

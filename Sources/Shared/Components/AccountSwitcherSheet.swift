@@ -158,7 +158,8 @@ struct AccountSwitcherSheet: View {
                                 } label: {
                                     HStack {
                                         Text(loc: "account.edit_label.\(option.lowercased())").foregroundStyle(.primary)
-                                        if editLabelText == option { Spacer()
+                                        if editLabelText == option {
+                                            Spacer()
                                             Image(systemName: "checkmark")
                                         }
                                     }

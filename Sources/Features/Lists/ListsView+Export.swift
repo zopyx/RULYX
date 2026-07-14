@@ -100,7 +100,9 @@ extension ListsView {
                 }
             }
             .onChange(of: shareFileURL) { _, url in
-                if url != nil { showShareSheet = true }
+                if url != nil {
+                    showShareSheet = true
+                }
             }
         }
     }

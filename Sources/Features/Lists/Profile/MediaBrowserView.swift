@@ -528,7 +528,9 @@ private struct ImagePreviewView: View {
                 }
             }
             .onTapGesture {
-                if scale <= 1 { onDismiss() }
+                if scale <= 1 {
+                    onDismiss()
+                }
             }
     }
 }

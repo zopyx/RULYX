@@ -283,7 +283,7 @@ struct BatchOperationProgressView: View {
     }
 
     /// Phase 1: fetch existing blocks, filter out already-blocked targets.
-    /// Phase 2: block each remaining target.
+    /// Phase 2: block each remaining target in parallel batches of 5.
     private func runBlock(account: AppAccount, appPassword: String) async {
         let blockedDIDs: Set<String>
         do {
@@ -303,7 +303,6 @@ struct BatchOperationProgressView: View {
                 toProcess.append(target)
             }
             checkedCount += 1
-            try? await Task.sleep(for: .milliseconds(10))
         }
         skippedCount = skips
         targetsToProcess = toProcess
@@ -314,23 +313,44 @@ struct BatchOperationProgressView: View {
             return
         }
 
-        for target in toProcess {
-            currentHandle = displayHandle(for: target)
-            do {
-                try await container.social.blockActor(did: target.did, account: account, appPassword: appPassword)
-                completedCount += 1
-            } catch {
-                failedCount += 1
-                AppLogger.moderation.error("Failed to block \(target.did): \(error.localizedDescription, privacy: .public)")
+        // Parallel batches of 5 with 300ms delay between batches
+        let client = container.blueskyClient
+        let batchSize = 5
+        for batchStart in stride(from: 0, to: toProcess.count, by: batchSize) {
+            let batchEnd = min(batchStart + batchSize, toProcess.count)
+            let batch = toProcess[batchStart ..< batchEnd]
+
+            await withTaskGroup(of: (Bool, String).self) { group in
+                for target in batch {
+                    group.addTask {
+                        do {
+                            try await client.blockActor(did: target.did, account: account, appPassword: appPassword)
+                            return (true, target.handle ?? target.did)
+                        } catch {
+                            return (false, target.handle ?? target.did)
+                        }
+                    }
+                }
+                for await (success, handle) in group {
+                    if success {
+                        completedCount += 1
+                    } else {
+                        failedCount += 1
+                    }
+                    currentHandle = "@\(handle)"
+                }
             }
-            await Task.yield()
+
+            if batchEnd < toProcess.count {
+                try? await Task.sleep(for: .milliseconds(300))
+            }
         }
         currentHandle = nil
         isExecuteComplete = true
     }
 
     /// Phase 1: fetch existing list members, filter out already-present targets.
-    /// Phase 2: add each remaining target to the list.
+    /// Phase 2: add each remaining target to the list in parallel batches of 5.
     private func runAddToList(list: BlueskyList, account: AppAccount, appPassword: String) async {
         let memberDIDs: Set<String>
         do {
@@ -350,7 +370,6 @@ struct BatchOperationProgressView: View {
                 toProcess.append(target)
             }
             checkedCount += 1
-            try? await Task.sleep(for: .milliseconds(10))
         }
         skippedCount = skips
         targetsToProcess = toProcess
@@ -361,26 +380,39 @@ struct BatchOperationProgressView: View {
             return
         }
 
-        for target in toProcess {
-            currentHandle = displayHandle(for: target)
-            do {
-                _ = try await container.list.addActor(did: target.did, to: list, account: account, appPassword: appPassword)
-                completedCount += 1
-            } catch {
-                failedCount += 1
-                AppLogger.moderation.error("Failed to add \(target.did) to \(list.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        // Parallel batches of 5 with 300ms delay between batches
+        let client = container.blueskyClient
+        let batchSize = 5
+        for batchStart in stride(from: 0, to: toProcess.count, by: batchSize) {
+            let batchEnd = min(batchStart + batchSize, toProcess.count)
+            let batch = toProcess[batchStart ..< batchEnd]
+
+            await withTaskGroup(of: (Bool, String).self) { group in
+                for target in batch {
+                    group.addTask {
+                        do {
+                            _ = try await client.addActor(did: target.did, to: list, account: account, appPassword: appPassword)
+                            return (true, target.handle ?? target.did)
+                        } catch {
+                            return (false, target.handle ?? target.did)
+                        }
+                    }
+                }
+                for await (success, handle) in group {
+                    if success {
+                        completedCount += 1
+                    } else {
+                        failedCount += 1
+                    }
+                    currentHandle = "@\(handle)"
+                }
             }
-            await Task.yield()
+
+            if batchEnd < toProcess.count {
+                try? await Task.sleep(for: .milliseconds(300))
+            }
         }
         currentHandle = nil
         isExecuteComplete = true
-    }
-
-    /// Returns "@handle" if available, otherwise falls back to the DID.
-    private func displayHandle(for target: PendingLikerTarget) -> String {
-        if let handle = target.handle, !handle.isEmpty {
-            return "@\(handle)"
-        }
-        return target.did
     }
 }

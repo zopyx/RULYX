@@ -76,7 +76,11 @@ struct ManagePostsView: View {
                 loc("post.delete.confirm"),
                 isPresented: .init(
                     get: { viewModel.pendingDeleteEntry != nil },
-                    set: { if !$0 { viewModel.pendingDeleteEntry = nil } }
+                    set: {
+                        if !$0 {
+                            viewModel.pendingDeleteEntry = nil
+                        }
+                    }
                 ),
                 titleVisibility: .visible,
                 presenting: viewModel.pendingDeleteEntry
@@ -116,7 +120,11 @@ struct ManagePostsView: View {
                 loc("profile.manage_posts.nuclear.title"),
                 isPresented: .init(
                     get: { viewModel.nuclearDeleteLevel == 1 },
-                    set: { if !$0 { viewModel.nuclearDeleteLevel = 0 } }
+                    set: {
+                        if !$0 {
+                            viewModel.nuclearDeleteLevel = 0
+                        }
+                    }
                 ),
                 titleVisibility: .visible
             ) {
@@ -133,7 +141,11 @@ struct ManagePostsView: View {
                 loc("profile.manage_posts.nuclear.title"),
                 isPresented: .init(
                     get: { viewModel.nuclearDeleteLevel == 2 },
-                    set: { if !$0 { viewModel.nuclearDeleteLevel = 0 } }
+                    set: {
+                        if !$0 {
+                            viewModel.nuclearDeleteLevel = 0
+                        }
+                    }
                 ),
                 titleVisibility: .visible
             ) {
@@ -150,7 +162,11 @@ struct ManagePostsView: View {
                 loc("profile.manage_posts.nuclear.title"),
                 isPresented: .init(
                     get: { viewModel.nuclearDeleteLevel == 3 },
-                    set: { if !$0 { viewModel.nuclearDeleteLevel = 0 } }
+                    set: {
+                        if !$0 {
+                            viewModel.nuclearDeleteLevel = 0
+                        }
+                    }
                 ),
                 titleVisibility: .visible
             ) {

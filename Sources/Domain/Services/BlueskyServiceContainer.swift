@@ -18,17 +18,17 @@ struct BlueskyServiceContainer {
     let accountStore: AccountStoreProtocol
 
     init(liveClient: LiveBlueskyClient, accountStore: AccountStoreProtocol) {
-        self.auth = liveClient
-        self.profile = liveClient
-        self.list = liveClient
-        self.feed = liveClient
-        self.post = liveClient
-        self.social = liveClient
-        self.moderation = liveClient
-        self.clearsky = liveClient
-        self.notification = liveClient
-        self.identity = liveClient
-        self.media = liveClient
+        auth = liveClient
+        profile = liveClient
+        list = liveClient
+        feed = liveClient
+        post = liveClient
+        social = liveClient
+        moderation = liveClient
+        clearsky = liveClient
+        notification = liveClient
+        identity = liveClient
+        media = liveClient
         self.accountStore = accountStore
     }
 

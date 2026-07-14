@@ -120,8 +120,12 @@ final class MediaBrowserViewModel: ObservableObject {
     /// Filters that have at least one matching item.
     var availableFilters: [MediaFilter] {
         var result = [MediaFilter]()
-        if items.contains(where: { $0.type == .image }) { result.append(.images) }
-        if items.contains(where: { $0.type == .video }) { result.append(.videos) }
+        if items.contains(where: { $0.type == .image }) {
+            result.append(.images)
+        }
+        if items.contains(where: { $0.type == .video }) {
+            result.append(.videos)
+        }
         return result
     }
 
@@ -204,7 +208,9 @@ final class MediaBrowserViewModel: ObservableObject {
                     into: &batch
                 )
             }
-            if !batch.isEmpty { appendItems(batch) }
+            if !batch.isEmpty {
+                appendItems(batch)
+            }
             cursor = response.cursor
             hasMore = response.cursor != nil
         } catch is CancellationError {
@@ -323,11 +329,21 @@ final class MediaBrowserViewModel: ObservableObject {
     private static func makeAgeText(from date: Date?) -> String? {
         guard let date else { return nil }
         let interval = max(0, date.distance(to: .now))
-        if interval < 3600 { return "\(Int(interval / 60))m" }
-        if interval < 86400 { return "\(Int(interval / 3600))h" }
-        if interval < 604_800 { return "\(Int(interval / 86400))d" }
-        if interval < 2_592_000 { return "\(Int(interval / 604_800))w" }
-        if interval < 31_536_000 { return "\(Int(interval / 2_592_000))mo" }
+        if interval < 3600 {
+            return "\(Int(interval / 60))m"
+        }
+        if interval < 86400 {
+            return "\(Int(interval / 3600))h"
+        }
+        if interval < 604_800 {
+            return "\(Int(interval / 86400))d"
+        }
+        if interval < 2_592_000 {
+            return "\(Int(interval / 604_800))w"
+        }
+        if interval < 31_536_000 {
+            return "\(Int(interval / 2_592_000))mo"
+        }
         return "\(Int(interval / 31_536_000))y"
     }
 

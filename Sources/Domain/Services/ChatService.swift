@@ -30,8 +30,12 @@ final class ChatService: ChatServicing {
     /// Lists conversations with optional status and cursor pagination.
     func listConvos(account: AppAccount, appPassword: String?, status: String? = nil, cursor: String? = nil) async throws -> PagedConvos {
         var queryItems = [URLQueryItem(name: "limit", value: "50")]
-        if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
-        if let status { queryItems.append(URLQueryItem(name: "status", value: status)) }
+        if let cursor {
+            queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+        }
+        if let status {
+            queryItems.append(URLQueryItem(name: "status", value: status))
+        }
 
         let response: ListConvosResponse = try await chatRequest(
             path: "chat.bsky.convo.listConvos",
@@ -79,7 +83,9 @@ final class ChatService: ChatServicing {
             URLQueryItem(name: "convoId", value: convoId),
             URLQueryItem(name: "limit", value: "\(limit)"),
         ]
-        if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
+        if let cursor {
+            queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+        }
 
         let response: GetMessagesResponse = try await chatRequest(
             path: "chat.bsky.convo.getMessages",
@@ -175,7 +181,9 @@ final class ChatService: ChatServicing {
     /// Gets the chat event log (conversation creation, messages, reactions, etc.).
     func getLog(cursor: String?, account: AppAccount, appPassword: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {
         var queryItems: [URLQueryItem] = []
-        if let cursor { queryItems.append(URLQueryItem(name: "cursor", value: cursor)) }
+        if let cursor {
+            queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+        }
 
         let response: GetLogResponse = try await chatRequest(
             path: "chat.bsky.convo.getLog",
@@ -453,7 +461,9 @@ private extension LogEventUnionDTO {
 private func parseDate(_ string: String) -> Date? {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    if let date = formatter.date(from: string) { return date }
+    if let date = formatter.date(from: string) {
+        return date
+    }
     formatter.formatOptions = [.withInternetDateTime]
     return formatter.date(from: string)
 }

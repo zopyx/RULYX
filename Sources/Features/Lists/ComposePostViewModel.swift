@@ -27,32 +27,32 @@ final class ComposePostViewModel {
 
     // MARK: - Published state
 
-var postText = ""
-var selectedItems: [PhotosPickerItem] = []
-var selectedImages: [(data: Data, mimeType: String)] = []
-var imageAlts: [String] = []
-var videoAttachment: PostVideoAttachment?
-var selectedGIFPreviewURL: String?
-var selectedGIFLinkURL: String?
-var selectedGIFTitle = ""
-var isPosting = false
-var uploadProgress: Double?
-var uploadSpeed: String?
-var errorMessage: String?
-var referencedPost: ThreadPostNode?
-var showGIFPicker = false
-var isDownloadingGIF = false
-var isPreloadingEdit = false
-var editReplyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
-var replyRule: ThreadGateRule?
-var allowQuoting = true
-var showReplyPicker = false
-var showListPicker = false
-var userLists: [BlueskyList] = []
-var showImageResizeAlert = false
-var pendingImageResize: (() -> Void)?
-var isScaling = false
-var altEditIndex: Int?
+    var postText = ""
+    var selectedItems: [PhotosPickerItem] = []
+    var selectedImages: [(data: Data, mimeType: String)] = []
+    var imageAlts: [String] = []
+    var videoAttachment: PostVideoAttachment?
+    var selectedGIFPreviewURL: String?
+    var selectedGIFLinkURL: String?
+    var selectedGIFTitle = ""
+    var isPosting = false
+    var uploadProgress: Double?
+    var uploadSpeed: String?
+    var errorMessage: String?
+    var referencedPost: ThreadPostNode?
+    var showGIFPicker = false
+    var isDownloadingGIF = false
+    var isPreloadingEdit = false
+    var editReplyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
+    var replyRule: ThreadGateRule?
+    var allowQuoting = true
+    var showReplyPicker = false
+    var showListPicker = false
+    var userLists: [BlueskyList] = []
+    var showImageResizeAlert = false
+    var pendingImageResize: (() -> Void)?
+    var isScaling = false
+    var altEditIndex: Int?
 
     // MARK: - Constants
 
@@ -257,15 +257,21 @@ var altEditIndex: Int?
                 CGImageDestinationAddImage(dest, thumbnail, props)
                 guard CGImageDestinationFinalize(dest) else { break }
                 compressed = mutableData as Data
-                if compressed.count <= maxFileSize, fitsDimensions { return compressed }
+                if compressed.count <= maxFileSize, fitsDimensions {
+                    return compressed
+                }
                 quality -= 0.1
             }
 
             result = compressed
 
             let maxSide = max(tw, th)
-            if maxSide <= Int(maxDimension), compressed.count <= maxFileSize { return compressed }
-            if currentMax <= 500 { return result }
+            if maxSide <= Int(maxDimension), compressed.count <= maxFileSize {
+                return compressed
+            }
+            if currentMax <= 500 {
+                return result
+            }
             currentMax = Int(CGFloat(currentMax) * 0.85)
         }
 
@@ -369,8 +375,8 @@ var altEditIndex: Int?
     static func formatSpeed(_ bytesPerSecond: Double) -> String {
         if bytesPerSecond >= 1_000_000 {
             String(format: "\u{2191} %.1f MB/s", bytesPerSecond / 1_000_000)
-        } else if bytesPerSecond >= 1_000 {
-            String(format: "\u{2191} %.0f KB/s", bytesPerSecond / 1_000)
+        } else if bytesPerSecond >= 1000 {
+            String(format: "\u{2191} %.0f KB/s", bytesPerSecond / 1000)
         } else {
             String(format: "\u{2191} %.0f B/s", bytesPerSecond)
         }

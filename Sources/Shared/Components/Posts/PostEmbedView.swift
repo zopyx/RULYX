@@ -10,38 +10,36 @@ struct PostEmbedView: View {
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        Group {
-            if let video = embed.video {
+        if let video = embed.video {
+            Button {
+                if let onPlayVideo {
+                    onPlayVideo()
+                }
+            } label: {
+                videoEmbedCard(video)
+            }
+            .buttonStyle(.plain)
+        }
+
+        if let images = embed.images, !images.isEmpty {
+            imageGrid(images: images)
+        }
+
+        if let external = embed.external, let uri = external.uri, let url = URL(string: uri) {
+            if external.isTenorEmbed, let gifURL = external.preferredInlineMediaURL {
                 Button {
-                    if let onPlayVideo {
-                        onPlayVideo()
-                    }
+                    openURL(url)
                 } label: {
-                    videoEmbedCard(video)
+                    tenorEmbedCard(previewURL: gifURL, external: external)
                 }
                 .buttonStyle(.plain)
-            }
-
-            if let images = embed.images, !images.isEmpty {
-                imageGrid(images: images)
-            }
-
-            if let external = embed.external, let uri = external.uri, let url = URL(string: uri) {
-                if external.isTenorEmbed, let gifURL = external.preferredInlineMediaURL {
-                    Button {
-                        openURL(url)
-                    } label: {
-                        tenorEmbedCard(previewURL: gifURL, external: external)
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    Button {
-                        openURL(url)
-                    } label: {
-                        externalEmbedCard(external)
-                    }
-                    .buttonStyle(.plain)
+            } else {
+                Button {
+                    openURL(url)
+                } label: {
+                    externalEmbedCard(external)
                 }
+                .buttonStyle(.plain)
             }
         }
     }

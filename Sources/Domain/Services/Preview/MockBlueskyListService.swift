@@ -111,9 +111,13 @@ final class MockBlueskyListService: BlueskyListServicing {
         return (list, creator)
     }
 
-    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] { [] }
+    func fetchSubscribedModerationLists(account _: AppAccount, appPassword _: String?) async throws -> [SubscribedListInfo] {
+        []
+    }
 
-    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool { false }
+    func isSubscribedToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws -> Bool {
+        false
+    }
 
     func subscribeToModerationList(_: String, account _: AppAccount, appPassword _: String?) async throws {}
 

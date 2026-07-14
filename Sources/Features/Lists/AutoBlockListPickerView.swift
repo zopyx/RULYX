@@ -10,7 +10,7 @@ struct AutoBlockListPickerView: View {
     @EnvironmentObject private var internalListStore: InternalListStore
     @EnvironmentObject private var localizationManager: LocalizationManager
 
-    @AppStorage("autoBlockTargetListIDs") private var selectedIDsData: Data = Data()
+    @AppStorage("autoBlockTargetListIDs") private var selectedIDsData: Data = .init()
 
     @State private var allLists: [BlueskyList] = []
     @State private var selectedIDs: Set<String> = []
@@ -128,7 +128,8 @@ struct AutoBlockListPickerView: View {
 
         var lists: [BlueskyList] = []
         if let account = accountStore.activeAccount,
-           let appPassword = accountStore.appPassword(for: account) {
+           let appPassword = accountStore.appPassword(for: account)
+        {
             do {
                 lists = try await container.list.fetchLists(for: account, appPassword: appPassword)
             } catch {

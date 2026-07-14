@@ -36,7 +36,9 @@ struct ChatMessageBubble: View {
 
     var body: some View {
         HStack {
-            if isOutgoing { Spacer(minLength: 60) }
+            if isOutgoing {
+                Spacer(minLength: 60)
+            }
 
             VStack(alignment: isOutgoing ? .trailing : .leading, spacing: 4) {
                 Text(mentionAttributedString(from: message.text, isOutgoing: isOutgoing))
@@ -102,7 +104,9 @@ struct ChatMessageBubble: View {
                 }
             }
 
-            if !isOutgoing { Spacer(minLength: 60) }
+            if !isOutgoing {
+                Spacer(minLength: 60)
+            }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 2)

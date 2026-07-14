@@ -233,7 +233,11 @@ struct DirectRepliesView: View {
             let remainder = pendingLikerTargets.count > 5 ? "\n…and \(pendingLikerTargets.count - 5) more" : ""
             Text(verbatim: loc("post.block_likers.confirm_message").replacingOccurrences(of: "{count}", with: "\(pendingLikerTargets.count)") + "\n\n" + handles + remainder)
         }
-        .alert(loc("list.detail.alert_title"), isPresented: .init(get: { blockError != nil }, set: { if !$0 { blockError = nil } })) {
+        .alert(loc("list.detail.alert_title"), isPresented: .init(get: { blockError != nil }, set: {
+            if !$0 {
+                blockError = nil
+            }
+        })) {
             Button(loc("actions.ok")) { blockError = nil }
         } message: {
             if let error = blockError {

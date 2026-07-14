@@ -105,7 +105,9 @@ private final class MockListsClient: LiveBlueskyClient {
     var blockedActors: [BlueskyActor] = []
 
     override func fetchLists(for account: AppAccount, appPassword _: String?) async throws -> [BlueskyList] {
-        if shouldFailLists { throw BlueskyAPIError.server("Failed") }
+        if shouldFailLists {
+            throw BlueskyAPIError.server("Failed")
+        }
         return [
             makeList(id: "\(account.handle)-mod-1", name: "Spam Watch", kind: .moderation),
             makeList(id: "\(account.handle)-list-1", name: "Trusted", kind: .regular),
@@ -117,7 +119,9 @@ private final class MockListsClient: LiveBlueskyClient {
     }
 
     override func fetchBlockingCount(for _: AppAccount) async throws -> Int {
-        if shouldFailBlocking { throw BlueskyAPIError.server("Failed") }
+        if shouldFailBlocking {
+            throw BlueskyAPIError.server("Failed")
+        }
         return blockedActors.count
     }
 

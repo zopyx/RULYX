@@ -229,7 +229,8 @@ struct AccountTabView: View {
                                 } label: {
                                     HStack {
                                         Text(loc: "account.edit_label.\(option.lowercased())").foregroundStyle(.primary)
-                                        if editLabelText == option { Spacer()
+                                        if editLabelText == option {
+                                            Spacer()
                                             Image(systemName: "checkmark")
                                         }
                                     }
@@ -258,7 +259,11 @@ struct AccountTabView: View {
             ) { result in
                 handleImport(result)
             }
-            .sheet(isPresented: .init(get: { exportFileURL != nil }, set: { if !$0 { exportFileURL = nil } })) {
+            .sheet(isPresented: .init(get: { exportFileURL != nil }, set: {
+                if !$0 {
+                    exportFileURL = nil
+                }
+            })) {
                 if let url = exportFileURL {
                     ShareSheet(activityItems: [url])
                 }
@@ -336,7 +341,11 @@ struct AccountTabView: View {
                             entrywayURL: entrywayURL,
                             client: container.blueskyClient
                         )
-                        if result == .success { added += 1 } else { skipped += 1 }
+                        if result == .success {
+                            added += 1
+                        } else {
+                            skipped += 1
+                        }
                     }
                     if added > 0 {
                         importSuccess = loc("account.import.count").replacingOccurrences(of: "{n}", with: "\(added)")

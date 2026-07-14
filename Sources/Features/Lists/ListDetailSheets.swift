@@ -216,7 +216,9 @@ struct ListMetadataSheet: View {
     }
 
     private var isSaving: Bool {
-        if case let .edit(_, saving) = mode { return saving }
+        if case let .edit(_, saving) = mode {
+            return saving
+        }
         return false
     }
 
@@ -290,7 +292,9 @@ struct ListMetadataSheet: View {
     }
 
     private var isCreating: Bool {
-        if case .create = mode { return true }
+        if case .create = mode {
+            return true
+        }
         return false
     }
 

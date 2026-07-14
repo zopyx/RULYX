@@ -347,7 +347,9 @@ struct ConversationListView: View {
         }
 
         private var avatarURL: URL? {
-            if conversation.kind == .group { return nil }
+            if conversation.kind == .group {
+                return nil
+            }
             return partnerMembers.first?.avatarURL
         }
 
@@ -445,10 +447,18 @@ struct ConversationListView: View {
 
         private func formatRelativeTime(_ date: Date) -> String {
             let diff = Date().timeIntervalSince(date)
-            if diff < 60 { return loc("time.just_now") }
-            if diff < 3600 { return "\(Int(diff / 60))m" }
-            if diff < 86400 { return "\(Int(diff / 3600))h" }
-            if diff < 604_800 { return "\(Int(diff / 86400))d" }
+            if diff < 60 {
+                return loc("time.just_now")
+            }
+            if diff < 3600 {
+                return "\(Int(diff / 60))m"
+            }
+            if diff < 86400 {
+                return "\(Int(diff / 3600))h"
+            }
+            if diff < 604_800 {
+                return "\(Int(diff / 86400))d"
+            }
             return date.formatted(date: .numeric, time: .omitted)
         }
     }

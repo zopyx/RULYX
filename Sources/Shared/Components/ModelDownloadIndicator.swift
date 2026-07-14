@@ -58,7 +58,9 @@ struct ModelDownloadIndicator: View {
     }
 
     private var progress: Double {
-        if case let .downloading(p) = state { return max(p, 0.01) }
+        if case let .downloading(p) = state {
+            return max(p, 0.01)
+        }
         return 0
     }
 }

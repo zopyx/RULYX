@@ -103,8 +103,11 @@ final class AccountContextRoutingTests: XCTestCase {
 
         // Verify the ID was persisted to UserDefaults directly
         let savedIDString = UserDefaults.standard.string(forKey: "bluesky.preferredSearchAccountID")
-        XCTAssertEqual(savedIDString, first.id.uuidString,
-                       "Preferred search ID must be written to UserDefaults via didSet")
+        XCTAssertEqual(
+            savedIDString,
+            first.id.uuidString,
+            "Preferred search ID must be written to UserDefaults via didSet"
+        )
     }
 
     // MARK: - Account Removal Routing
@@ -136,11 +139,16 @@ final class AccountContextRoutingTests: XCTestCase {
         store.preferredSearchAccountID = target.id
 
         store.removeAccount(target)
-        XCTAssertNotEqual(store.preferredSearchAccountID, target.id,
-                          "Removed account must not remain preferred search")
+        XCTAssertNotEqual(
+            store.preferredSearchAccountID,
+            target.id,
+            "Removed account must not remain preferred search"
+        )
         if !store.accounts.isEmpty {
-            XCTAssertNotNil(store.preferredSearchAccountID,
-                            "Preferred search must fall back to remaining account")
+            XCTAssertNotNil(
+                store.preferredSearchAccountID,
+                "Preferred search must fall back to remaining account"
+            )
         }
     }
 
@@ -168,8 +176,11 @@ final class AccountContextRoutingTests: XCTestCase {
 
         XCTAssertEqual(store.activeAccount?.id, first.id)
         XCTAssertEqual(store.preferredSearchAccountID, second.id)
-        XCTAssertNotEqual(store.activeAccount?.id, store.preferredSearchAccountID,
-                          "Active and search accounts must be independently configurable")
+        XCTAssertNotEqual(
+            store.activeAccount?.id,
+            store.preferredSearchAccountID,
+            "Active and search accounts must be independently configurable"
+        )
     }
 
     // MARK: - Data Account Fallback

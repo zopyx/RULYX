@@ -127,7 +127,11 @@ struct ComposePostView: View {
             }
             .sheet(isPresented: .init(
                 get: { viewModel.altEditIndex != nil },
-                set: { if !$0 { viewModel.altEditIndex = nil } }
+                set: {
+                    if !$0 {
+                        viewModel.altEditIndex = nil
+                    }
+                }
             )) {
                 if let index = viewModel.altEditIndex, index < viewModel.selectedImages.count {
                     altTextEditView(index: index)
@@ -379,9 +383,15 @@ struct ComposePostView: View {
     // MARK: - Computed properties
 
     private var navigationTitleString: String {
-        if viewModel.editPost != nil { return loc("post.edit") }
-        if (viewModel.editReplyTo ?? viewModel.replyTo) != nil { return loc("compose.reply_title") }
-        if viewModel.quote != nil { return loc("compose.quote_title") }
+        if viewModel.editPost != nil {
+            return loc("post.edit")
+        }
+        if (viewModel.editReplyTo ?? viewModel.replyTo) != nil {
+            return loc("compose.reply_title")
+        }
+        if viewModel.quote != nil {
+            return loc("compose.quote_title")
+        }
         return loc("compose.title")
     }
 
@@ -396,7 +406,9 @@ struct ComposePostView: View {
     }
 
     private var replyRuleListID: String? {
-        if case let .listRule(list) = viewModel.replyRule { return list }
+        if case let .listRule(list) = viewModel.replyRule {
+            return list
+        }
         return nil
     }
 
@@ -421,7 +433,6 @@ struct ComposePostView: View {
         }
     }
 
-    @ViewBuilder
     private var uploadProgressBar: some View {
         VStack(spacing: 4) {
             ProgressView(value: viewModel.uploadProgress ?? 0, total: 1.0)
@@ -445,7 +456,11 @@ struct ComposePostView: View {
     private func altTextEditView(index: Int) -> some View {
         let altBinding = Binding(
             get: { index < viewModel.imageAlts.count ? viewModel.imageAlts[index] : "" },
-            set: { if index < viewModel.imageAlts.count { viewModel.imageAlts[index] = $0 } }
+            set: {
+                if index < viewModel.imageAlts.count {
+                    viewModel.imageAlts[index] = $0
+                }
+            }
         )
         return NavigationStack {
             VStack(spacing: 16) {

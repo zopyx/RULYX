@@ -261,7 +261,7 @@ final class ComposePostViewModelTests: XCTestCase {
     }
 
     func testFormatSpeedKilobytes() {
-        XCTAssertEqual(ComposePostViewModel.formatSpeed(50_000), "\u{2191} 50 KB/s")
+        XCTAssertEqual(ComposePostViewModel.formatSpeed(50000), "\u{2191} 50 KB/s")
     }
 
     func testFormatSpeedMegabytes() {
@@ -326,11 +326,11 @@ final class ComposePostViewModelTests: XCTestCase {
 @MainActor
 private final class FailingUploadMediaService: BlueskyMediaServicing {
     func uploadBlob(
-        data: Data,
-        mimeType: String,
-        account: AppAccount,
-        appPassword: String?,
-        progress: (@Sendable (Double) -> Void)?
+        data _: Data,
+        mimeType _: String,
+        account _: AppAccount,
+        appPassword _: String?,
+        progress _: (@Sendable (Double) -> Void)?
     ) async throws -> UploadBlobResponse {
         throw BlueskyAPIError.invalidResponse
     }
@@ -339,41 +339,49 @@ private final class FailingUploadMediaService: BlueskyMediaServicing {
 /// BlueskyPostServicing that throws on createPost; all other methods succeed.
 @MainActor
 private final class FailingCreatePostService: BlueskyPostServicing {
-    func fetchPostThread(uri: String, depth: Int?, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
+    func fetchPostThread(uri _: String, depth _: Int?, account _: AppAccount, appPassword _: String?) async throws -> GetPostThreadResponse {
         throw BlueskyAPIError.invalidResponse
     }
+
     func createPost(
-        text: String,
-        images: [PostImageAttachment]?,
-        video: PostVideoAttachment?,
-        external: PostExternalAttachment?,
-        replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
-        quote: (uri: String, cid: String)?,
-        threadGate: ThreadGateRule?,
-        allowQuoting: Bool,
-        account: AppAccount,
-        appPassword: String?
+        text _: String,
+        images _: [PostImageAttachment]?,
+        video _: PostVideoAttachment?,
+        external _: PostExternalAttachment?,
+        replyTo _: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
+        quote _: (uri: String, cid: String)?,
+        threadGate _: ThreadGateRule?,
+        allowQuoting _: Bool,
+        account _: AppAccount,
+        appPassword _: String?
     ) async throws -> CreateRecordResponse {
         throw BlueskyAPIError.invalidResponse
     }
-    func createThreadGate(postURI: String, rules: [ThreadGateRule], account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+
+    func createThreadGate(postURI _: String, rules _: [ThreadGateRule], account _: AppAccount, appPassword _: String?) async throws -> CreateRecordResponse {
         CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
     }
-    func createPostGate(postURI: String, account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+
+    func createPostGate(postURI _: String, account _: AppAccount, appPassword _: String?) async throws -> CreateRecordResponse {
         CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
     }
-    func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {
+
+    func deleteRecord(recordURI _: String, account _: AppAccount, appPassword _: String?) async throws -> EmptyResponse {
         EmptyResponse()
     }
-    func fetchPosts(uris: [String]) async throws -> [RichPost] { [] }
+
+    func fetchPosts(uris _: [String]) async throws -> [RichPost] {
+        []
+    }
+
     func searchPosts(
-        q: String,
-        mentions: String?,
-        sort: String?,
-        cursor: String?,
-        limit: Int,
-        account: AppAccount,
-        appPassword: String?
+        q _: String,
+        mentions _: String?,
+        sort _: String?,
+        cursor _: String?,
+        limit _: Int,
+        account _: AppAccount,
+        appPassword _: String?
     ) async throws -> SearchPostsResponse {
         SearchPostsResponse(cursor: nil, hitsTotal: 0, posts: [])
     }
@@ -384,41 +392,49 @@ private final class FailingCreatePostService: BlueskyPostServicing {
 /// prevent the post from completing.
 @MainActor
 private final class FailingDeleteRecordService: BlueskyPostServicing {
-    func fetchPostThread(uri: String, depth: Int?, account: AppAccount, appPassword: String?) async throws -> GetPostThreadResponse {
+    func fetchPostThread(uri _: String, depth _: Int?, account _: AppAccount, appPassword _: String?) async throws -> GetPostThreadResponse {
         throw BlueskyAPIError.invalidResponse
     }
+
     func createPost(
-        text: String,
-        images: [PostImageAttachment]?,
-        video: PostVideoAttachment?,
-        external: PostExternalAttachment?,
-        replyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
-        quote: (uri: String, cid: String)?,
-        threadGate: ThreadGateRule?,
-        allowQuoting: Bool,
-        account: AppAccount,
-        appPassword: String?
+        text _: String,
+        images _: [PostImageAttachment]?,
+        video _: PostVideoAttachment?,
+        external _: PostExternalAttachment?,
+        replyTo _: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
+        quote _: (uri: String, cid: String)?,
+        threadGate _: ThreadGateRule?,
+        allowQuoting _: Bool,
+        account _: AppAccount,
+        appPassword _: String?
     ) async throws -> CreateRecordResponse {
         CreateRecordResponse(uri: "at://mock/post", cid: "cid")
     }
-    func createThreadGate(postURI: String, rules: [ThreadGateRule], account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+
+    func createThreadGate(postURI _: String, rules _: [ThreadGateRule], account _: AppAccount, appPassword _: String?) async throws -> CreateRecordResponse {
         CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
     }
-    func createPostGate(postURI: String, account: AppAccount, appPassword: String?) async throws -> CreateRecordResponse {
+
+    func createPostGate(postURI _: String, account _: AppAccount, appPassword _: String?) async throws -> CreateRecordResponse {
         CreateRecordResponse(uri: "at://mock/gate", cid: "cid")
     }
-    func deleteRecord(recordURI: String, account: AppAccount, appPassword: String?) async throws -> EmptyResponse {
+
+    func deleteRecord(recordURI _: String, account _: AppAccount, appPassword _: String?) async throws -> EmptyResponse {
         throw BlueskyAPIError.invalidResponse
     }
-    func fetchPosts(uris: [String]) async throws -> [RichPost] { [] }
+
+    func fetchPosts(uris _: [String]) async throws -> [RichPost] {
+        []
+    }
+
     func searchPosts(
-        q: String,
-        mentions: String?,
-        sort: String?,
-        cursor: String?,
-        limit: Int,
-        account: AppAccount,
-        appPassword: String?
+        q _: String,
+        mentions _: String?,
+        sort _: String?,
+        cursor _: String?,
+        limit _: Int,
+        account _: AppAccount,
+        appPassword _: String?
     ) async throws -> SearchPostsResponse {
         SearchPostsResponse(cursor: nil, hitsTotal: 0, posts: [])
     }

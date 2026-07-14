@@ -121,19 +121,37 @@ enum PluralRules {
         case "fr":
             return (count == 0 || count == 1) ? .one : .other
         case "ru":
-            if count % 10 == 1, count % 100 != 11 { return .one }
-            if count % 10 >= 2, count % 10 <= 4, count % 100 < 10 || count % 100 >= 20 { return .few }
+            if count % 10 == 1, count % 100 != 11 {
+                return .one
+            }
+            if count % 10 >= 2, count % 10 <= 4, count % 100 < 10 || count % 100 >= 20 {
+                return .few
+            }
             return .many
         case "ar":
-            if count == 0 { return .zero }
-            if count == 1 { return .one }
-            if count == 2 { return .two }
-            if count % 100 >= 3, count % 100 <= 10 { return .few }
-            if count % 100 >= 11 { return .many }
+            if count == 0 {
+                return .zero
+            }
+            if count == 1 {
+                return .one
+            }
+            if count == 2 {
+                return .two
+            }
+            if count % 100 >= 3, count % 100 <= 10 {
+                return .few
+            }
+            if count % 100 >= 11 {
+                return .many
+            }
             return .other
         case "pl":
-            if count == 1 { return .one }
-            if count % 10 >= 2, count % 10 <= 4, count % 100 < 10 || count % 100 >= 20 { return .few }
+            if count == 1 {
+                return .one
+            }
+            if count % 10 >= 2, count % 10 <= 4, count % 100 < 10 || count % 100 >= 20 {
+                return .few
+            }
             return .many
         case "ja", "zh", "ko", "th", "vi":
             return .other
@@ -165,7 +183,9 @@ func locPlural(_ keyPrefix: String, count: Int) -> String {
     for cat in lookupOrder {
         let key = "\(keyPrefix)_\(cat.rawValue)"
         let result = LocalizationManager.shared.localized(key)
-        if result != key { return result }
+        if result != key {
+            return result
+        }
     }
     return keyPrefix
 }

@@ -19,10 +19,18 @@ struct ActionPresetsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(preset.name).font(.headline)
                     HStack(spacing: 4) {
-                        if preset.shouldBlock { Tag("Block", color: .red) }
-                        if preset.shouldMute { Tag("Mute", color: .orange) }
-                        if preset.shouldReport { Tag("Report", color: .purple) }
-                        if let list = preset.targetListName { Tag("Add to \(list)", color: .blue) }
+                        if preset.shouldBlock {
+                            Tag("Block", color: .red)
+                        }
+                        if preset.shouldMute {
+                            Tag("Mute", color: .orange)
+                        }
+                        if preset.shouldReport {
+                            Tag("Report", color: .purple)
+                        }
+                        if let list = preset.targetListName {
+                            Tag("Add to \(list)", color: .blue)
+                        }
                     }
                 }
                 .padding(.vertical, 4)

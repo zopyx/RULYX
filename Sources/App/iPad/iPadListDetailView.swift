@@ -16,6 +16,10 @@ struct iPadListDetailView: View {
     @State private var showMerge = false
     @State private var showAIScreen = false
 
+    private var listTitleWithMemberCount: String {
+        "\(list.name) (\(list.memberCount ?? detailVM.members.count))"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             listHeader
@@ -30,7 +34,7 @@ struct iPadListDetailView: View {
                 using: container.blueskyClient
             )
         }
-        .pageTitle(list.name)
+        .pageTitle(listTitleWithMemberCount)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if !detailVM.members.isEmpty {
@@ -68,7 +72,7 @@ struct iPadListDetailView: View {
                 Image(systemName: list.kind.symbolName)
                     .font(.title2)
                     .foregroundStyle(list.kind == .moderation ? Color.skyPrimary : .secondary)
-                Text(list.name)
+                Text(listTitleWithMemberCount)
                     .font(.title2.weight(.semibold))
                 Spacer()
                 Text("\(detailVM.members.count)")
@@ -123,49 +127,48 @@ struct iPadListDetailView: View {
         .hoverEffect(.highlight)
     }
 
+    @ViewBuilder
     private var memberList: some View {
-        Group {
-            if detailVM.isLoadingMembers {
-                VStack(spacing: 16) {
-                    ProgressView()
-                    Text(loc("lists.loading"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if detailVM.members.isEmpty {
-                ContentUnavailableView(
-                    loc("lists.no_members"),
-                    systemImage: "person.2.slash",
-                    description: Text(loc("lists.no_members_desc"))
-                )
-            } else {
-                List {
-                    ForEach(filteredMembers) { member in
-                        memberRow(member)
-                    }
-                    if detailVM.hasMoreMembers {
-                        HStack {
-                            Spacer()
-                            ProgressView()
-                                .onAppear {
-                                    Task {
-                                        await detailVM.loadMoreMembersIfNeeded(
-                                            currentMember: detailVM.members.last,
-                                            list: list,
-                                            account: accountStore.activeAccount!,
-                                            appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "",
-                                            using: container.blueskyClient
-                                        )
-                                    }
-                                }
-                            Spacer()
-                        }
-                    }
-                }
-                .listStyle(.inset)
-                .searchable(text: $searchQuery, prompt: loc("lists.search_members"))
+        if detailVM.isLoadingMembers {
+            VStack(spacing: 16) {
+                ProgressView()
+                Text(loc("lists.loading"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if detailVM.members.isEmpty {
+            ContentUnavailableView(
+                loc("lists.no_members"),
+                systemImage: "person.2.slash",
+                description: Text(loc("lists.no_members_desc"))
+            )
+        } else {
+            List {
+                ForEach(filteredMembers) { member in
+                    memberRow(member)
+                }
+                if detailVM.hasMoreMembers {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .onAppear {
+                                Task {
+                                    await detailVM.loadMoreMembersIfNeeded(
+                                        currentMember: detailVM.members.last,
+                                        list: list,
+                                        account: accountStore.activeAccount!,
+                                        appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "",
+                                        using: container.blueskyClient
+                                    )
+                                }
+                            }
+                        Spacer()
+                    }
+                }
+            }
+            .listStyle(.inset)
+            .searchable(text: $searchQuery, prompt: loc("lists.search_members"))
         }
     }
 

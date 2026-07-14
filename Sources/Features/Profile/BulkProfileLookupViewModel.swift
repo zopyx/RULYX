@@ -84,8 +84,12 @@ final class BulkProfileLookupViewModel {
             .flatMap { line -> [String] in
                 let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmed.isEmpty else { return [] }
-                if trimmed.contains(",") { return trimmed.split(separator: ",").map(String.init) }
-                if trimmed.contains(";") { return trimmed.split(separator: ";").map(String.init) }
+                if trimmed.contains(",") {
+                    return trimmed.split(separator: ",").map(String.init)
+                }
+                if trimmed.contains(";") {
+                    return trimmed.split(separator: ";").map(String.init)
+                }
                 return trimmed.split(whereSeparator: \.isWhitespace).map(String.init)
             }
             .map { normalizedImportedIdentifier($0) }
@@ -107,7 +111,9 @@ final class BulkProfileLookupViewModel {
         if lowercased.hasPrefix("bsky.app/profile/") {
             return extractProfileIdentifier(from: "https://\(trimmed)")
         }
-        if trimmed.hasPrefix("@") { return String(trimmed.dropFirst()) }
+        if trimmed.hasPrefix("@") {
+            return String(trimmed.dropFirst())
+        }
         return trimmed
     }
 

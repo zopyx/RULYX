@@ -125,6 +125,30 @@ struct ListItemRecordValue: Decodable {
     let subject: String
 }
 
+/// A single record entry from `com.atproto.repo.listRecords` for block records.
+struct BlockListRecordEntry: Decodable {
+    let uri: String
+    let cid: String
+    let value: BlockRecordValue
+}
+
+/// The value of an `app.bsky.graph.block` record.
+struct BlockRecordValue: Decodable {
+    let subject: String
+    let createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case subject
+        case createdAt
+    }
+}
+
+/// Response from listing `app.bsky.graph.block` records.
+struct BlockListRecordsResponse: Decodable {
+    let cursor: String?
+    let records: [BlockListRecordEntry]
+}
+
 /// Request body for `com.atproto.repo.deleteRecord`.
 struct DeleteRecordRequest: Encodable {
     let repo: String
@@ -179,7 +203,9 @@ func relativeTimeString(from date: Date) -> String {
     let hours = minutes / 60
     let days = hours / 24
 
-    if minutes < 1 { return String.localized("time.just_now") }
+    if minutes < 1 {
+        return String.localized("time.just_now")
+    }
     if minutes < 60 {
         let key = minutes == 1 ? "time.minute_ago" : "time.minutes_ago"
         return loc(key).replacingOccurrences(of: "{n}", with: "\(minutes)")

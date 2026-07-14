@@ -1,5 +1,5 @@
-@testable import RULYX
 import Foundation
+@testable import RULYX
 
 /// Mock implementation of BlueskyProfileInspecting for unit testing.
 /// All methods return default values or pre-configured results via handler closures.
@@ -9,18 +9,51 @@ final class MockProfileService: BlueskyProfileInspecting {
     var searchActorsHandler: @Sendable (String, AppAccount, String?) async throws -> [BlueskyActor] = { _, _, _ in [] }
     var searchActorsPageHandler: @Sendable (String, String?, AppAccount, String?) async throws -> PagedActorSearch = { _, _, _, _ in PagedActorSearch(actors: [], cursor: nil) }
     var fetchProfileHandler: @Sendable (String, AppAccount, String?) async throws -> BlueskyProfile = { did, _, _ in
-        BlueskyProfile(id: did, did: did, handle: "test.bsky.social", displayName: nil, description: nil,
-                       websiteURL: nil, avatarURL: nil, bannerURL: nil, followersCount: 0, followsCount: 0,
-                       postsCount: 0, listsCount: nil, starterPacksCount: nil, createdAt: nil, labels: [],
-                       viewerState: nil)
+        BlueskyProfile(
+            id: did,
+            did: did,
+            handle: "test.bsky.social",
+            displayName: nil,
+            description: nil,
+            websiteURL: nil,
+            avatarURL: nil,
+            bannerURL: nil,
+            followersCount: 0,
+            followsCount: 0,
+            postsCount: 0,
+            listsCount: nil,
+            starterPacksCount: nil,
+            createdAt: nil,
+            labels: [],
+            viewerState: nil
+        )
     }
+
     var inspectProfileHandler: @Sendable (String, AppAccount, String?) async throws -> ProfileInspection = { query, _, _ in
-        ProfileInspection(profile: BlueskyProfile(id: query, did: query, handle: query, displayName: nil,
-                                                   description: nil, websiteURL: nil, avatarURL: nil, bannerURL: nil,
-                                                   followersCount: 0, followsCount: 0, postsCount: 0, listsCount: nil,
-                                                   starterPacksCount: nil, createdAt: nil, labels: [], viewerState: nil),
-                          listMemberships: [], starterPackMemberships: [])
+        ProfileInspection(
+            profile: BlueskyProfile(
+                id: query,
+                did: query,
+                handle: query,
+                displayName: nil,
+                description: nil,
+                websiteURL: nil,
+                avatarURL: nil,
+                bannerURL: nil,
+                followersCount: 0,
+                followsCount: 0,
+                postsCount: 0,
+                listsCount: nil,
+                starterPacksCount: nil,
+                createdAt: nil,
+                labels: [],
+                viewerState: nil
+            ),
+            listMemberships: [],
+            starterPackMemberships: []
+        )
     }
+
     var blockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unblockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var followActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
@@ -35,6 +68,7 @@ final class MockProfileService: BlueskyProfileInspecting {
     var reportAccountSimpleHandler: @Sendable (String, String?, AppAccount, String?) async throws -> Void = { _, _, _, _ in }
     var reportAccountTypedHandler: @Sendable (String, ModerationReportReasonType?, String?, AppAccount, String?) async throws -> Void = { _, _, _, _, _ in }
     var putProfileRecordHandler: @Sendable (ProfileRecord, AppAccount, String?) async throws -> Void = { _, _, _ in }
+    var fetchExistingBlockedDIDsHandler: @Sendable (AppAccount, String?) async throws -> Set<String> = { _, _ in [] }
 
     func searchActors(query: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
         try await searchActorsHandler(query, account, appPassword)
@@ -92,7 +126,7 @@ final class MockProfileService: BlueskyProfileInspecting {
         try await fetchFollowingPageHandler(actorDID, cursor, account, appPassword)
     }
 
-    func reportAccount(did targetDID: String, reasonType: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
+    func reportAccount(did targetDID: String, reasonType _: String, reason: String?, account: AppAccount, appPassword: String?) async throws {
         try await reportAccountReasonHandler(targetDID, reason, account, appPassword)
     }
 
@@ -106,5 +140,9 @@ final class MockProfileService: BlueskyProfileInspecting {
 
     func putProfileRecord(_ record: ProfileRecord, account: AppAccount, appPassword: String?) async throws {
         try await putProfileRecordHandler(record, account, appPassword)
+    }
+
+    func fetchExistingBlockedDIDs(account: AppAccount, appPassword: String?) async throws -> Set<String> {
+        try await fetchExistingBlockedDIDsHandler(account, appPassword)
     }
 }

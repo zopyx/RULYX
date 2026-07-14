@@ -103,7 +103,13 @@ final class ActionQueueStore: ObservableObject {
     /// Finds the next pending action and starts processing it via `ListBatchController`.
     private func processNext() {
         guard processingTask == nil else { return }
-        guard let idx = actions.firstIndex(where: { if case .pending = $0.status { true } else { false } }) else { return }
+        guard let idx = actions.firstIndex(where: {
+            if case .pending = $0.status {
+                true
+            } else {
+                false
+            }
+        }) else { return }
 
         let action = actions[idx]
         let actionID = action.id

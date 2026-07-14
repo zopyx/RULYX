@@ -50,7 +50,9 @@ struct ListTemplatesView: View {
         .listStyle(.insetGrouped)
         .pageTitle(Text(loc: "list_templates.title"))
         .overlay {
-            if isCreating { ProgressView(loc("list_templates.creating")) }
+            if isCreating {
+                ProgressView(loc("list_templates.creating"))
+            }
         }
     }
 

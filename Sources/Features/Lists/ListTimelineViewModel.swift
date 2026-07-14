@@ -146,7 +146,9 @@ final class ListTimelineViewModel {
         } catch {
             optimisticLikes.removeValue(forKey: uri)
             optimisticLikeCounts.removeValue(forKey: uri)
-            if wasLiked { optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI }
+            if wasLiked {
+                optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI
+            }
             AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -169,7 +171,9 @@ final class ListTimelineViewModel {
         } catch {
             optimisticReposts.removeValue(forKey: uri)
             optimisticRepostCounts.removeValue(forKey: uri)
-            if wasReposted { optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI }
+            if wasReposted {
+                optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI
+            }
             AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -191,12 +195,16 @@ final class ListTimelineViewModel {
     }
 
     func effectiveLikeCount(uri: String) -> Int {
-        if let count = optimisticLikeCounts[uri] { return count }
+        if let count = optimisticLikeCounts[uri] {
+            return count
+        }
         return posts.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
     }
 
     func effectiveRepostCount(uri: String) -> Int {
-        if let count = optimisticRepostCounts[uri] { return count }
+        if let count = optimisticRepostCounts[uri] {
+            return count
+        }
         return posts.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
     }
 

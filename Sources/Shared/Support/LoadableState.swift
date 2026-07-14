@@ -21,22 +21,38 @@ enum LoadableState<Value: Sendable> {
 
     /// The loaded value, if any.
     var value: Value? {
-        if case let .loaded(v) = self { v } else { nil }
+        if case let .loaded(v) = self {
+            v
+        } else {
+            nil
+        }
     }
 
     /// Whether the state is `.loaded`.
     var isLoaded: Bool {
-        if case .loaded = self { true } else { false }
+        if case .loaded = self {
+            true
+        } else {
+            false
+        }
     }
 
     /// Whether the state is `.loading`.
     var isLoading: Bool {
-        if case .loading = self { true } else { false }
+        if case .loading = self {
+            true
+        } else {
+            false
+        }
     }
 
     /// The error if the state is `.failed`.
     var error: AppError? {
-        if case let .failed(e) = self { e } else { nil }
+        if case let .failed(e) = self {
+            e
+        } else {
+            nil
+        }
     }
 
     /// Transition to `.loading`.

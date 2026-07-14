@@ -31,7 +31,9 @@ extension ListDetailView {
 
     /// Cached temporary URL for the full-member CSV export.
     var exportFileURL: URL? {
-        if let cached = exportState.cachedExportFileURL { return cached }
+        if let cached = exportState.cachedExportFileURL {
+            return cached
+        }
         let url = fileURL(named: exportFileName, rows: ["handle,did,display_name"] + viewModel.exportRows())
         exportState.cachedExportFileURL = url
         return url
@@ -39,7 +41,9 @@ extension ListDetailView {
 
     /// Cached temporary URL for the comparison-diff CSV export.
     var diffExportFileURL: URL? {
-        if let cached = exportState.cachedDiffExportFileURL { return cached }
+        if let cached = exportState.cachedDiffExportFileURL {
+            return cached
+        }
         guard viewModel.comparisonReport != nil else { return nil }
         let url = fileURL(
             named: "\(exportFileName.replacingOccurrences(of: "-members", with: ""))-diff.csv",

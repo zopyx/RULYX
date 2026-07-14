@@ -190,7 +190,9 @@ extension View {
     /// Scroll transition for iOS 18+ that fades and slightly scales non-identity phases.
     /// Disabled entirely when Reduce Motion is active.
     func appScrollTransition() -> some View {
-        if UIAccessibility.isReduceMotionEnabled { return self }
+        if UIAccessibility.isReduceMotionEnabled {
+            return self
+        }
         if #available(iOS 18, *) {
             return scrollTransition(.interactive, axis: .vertical) { content, phase in
                 content

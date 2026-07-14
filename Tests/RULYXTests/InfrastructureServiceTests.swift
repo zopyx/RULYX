@@ -123,7 +123,11 @@ private func crc32(data: Data) -> UInt32 {
     for n in 0 ..< 256 {
         var c = UInt32(n)
         for _ in 0 ..< 8 {
-            if c & 1 != 0 { c = 0xEDB8_8320 ^ (c >> 1) } else { c >>= 1 }
+            if c & 1 != 0 {
+                c = 0xEDB8_8320 ^ (c >> 1)
+            } else {
+                c >>= 1
+            }
         }
         table[n] = c
     }

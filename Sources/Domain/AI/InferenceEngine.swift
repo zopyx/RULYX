@@ -141,8 +141,12 @@ struct InferenceEngine {
         let wordSet = Set(text.components(separatedBy: .whitespacesAndNewlines))
         let positiveCount = positiveWords.intersection(wordSet).count
         let negativeCount = negativeWords.intersection(wordSet).count
-        if positiveCount > negativeCount { return "Positive" }
-        if negativeCount > positiveCount { return "Negative" }
+        if positiveCount > negativeCount {
+            return "Positive"
+        }
+        if negativeCount > positiveCount {
+            return "Negative"
+        }
         return "Neutral"
     }
 

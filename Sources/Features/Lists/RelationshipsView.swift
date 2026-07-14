@@ -59,21 +59,28 @@ struct RelationshipsView: View {
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var batchOperationConfig: BatchOperationConfig?
 
-    // Block-all-back state — uses shared VM
-    @State private var actionsVM = BlueskyProfileActionsViewModel(
-        profileService: LiveBlueskyClient(),
-        clearskyService: LiveBlueskyClient(),
-        accountStore: AccountStore()
-    )
+    /// Block-all-back state — uses shared VM
+    @State private var actionsVM: BlueskyProfileActionsViewModel?
 
     private func wireActionsVM() {
-        actionsVM.reconfigure(
+        let vm = actionsVM ?? {
+            let v = BlueskyProfileActionsViewModel(
+                profileService: container.blueskyClient,
+                clearskyService: container.blueskyClient,
+                accountStore: accountStore
+            )
+            v.resultDisplayDuration = 0 // fast transition in list view
+            actionsVM = v
+            return v
+        }()
+        // Ensure dependencies are current (safe to call if already wired)
+        vm.reconfigure(
             profileService: container.blueskyClient,
             clearskyService: container.blueskyClient,
             accountStore: accountStore
         )
-        actionsVM.resultDisplayDuration = 0 // fast transition in list view
     }
+
     @State private var showBlockBackConfirm1 = false
     @State private var showBlockBackConfirm2 = false
     @State private var showBlockBackAllClear = false
@@ -208,33 +215,33 @@ struct RelationshipsView: View {
                 }
                 .listStyle(.insetGrouped)
                 .overlay(alignment: .bottom) {
-                    if actionsVM.isBlockingBack, actionsVM.blockBackTotal > 0 {
+                    if actionsVM?.isBlockingBack ?? false, (actionsVM?.blockBackTotal ?? 0) > 0 {
                         VStack(spacing: 6) {
-                            ProgressView(value: Double(actionsVM.blockBackCompleted), total: Double(actionsVM.blockBackTotal))
+                            ProgressView(value: Double(actionsVM?.blockBackCompleted ?? 0), total: Double(actionsVM?.blockBackTotal ?? 0))
                                 .progressViewStyle(.linear)
-                                .tint(actionsVM.blockBackFailureCount > 0 ? Color.orange : Color.skyPrimary)
+                                .tint((actionsVM?.blockBackFailureCount ?? 0) > 0 ? Color.orange : Color.skyPrimary)
                             HStack {
                                 Text(
                                     loc("profile.block_back.progress")
-                                        .replacingOccurrences(of: "{completed}", with: "\(actionsVM.blockBackCompleted)")
-                                        .replacingOccurrences(of: "{total}", with: "\(actionsVM.blockBackTotal)")
+                                        .replacingOccurrences(of: "{completed}", with: "\(actionsVM?.blockBackCompleted ?? 0)")
+                                        .replacingOccurrences(of: "{total}", with: "\(actionsVM?.blockBackTotal ?? 0)")
                                 )
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 Spacer()
                             }
                             HStack(spacing: 12) {
-                                Label("\(actionsVM.blockBackSuccessCount)", systemImage: "checkmark.circle.fill")
+                                Label("\(actionsVM?.blockBackSuccessCount ?? 0)", systemImage: "checkmark.circle.fill")
                                     .font(.caption)
                                     .foregroundStyle(.green)
-                                if actionsVM.blockBackFailureCount > 0 {
-                                    Label("\(actionsVM.blockBackFailureCount)", systemImage: "xmark.circle.fill")
+                                if (actionsVM?.blockBackFailureCount ?? 0) > 0 {
+                                    Label("\(actionsVM?.blockBackFailureCount ?? 0)", systemImage: "xmark.circle.fill")
                                         .font(.caption)
                                         .foregroundStyle(.red)
                                 }
                                 Spacer()
                             }
-                            if let handle = actionsVM.blockBackCurrentHandle {
+                            if let handle = actionsVM?.blockBackCurrentHandle {
                                 HStack(spacing: 4) {
                                     ProgressView()
                                         .scaleEffect(0.5)
@@ -253,8 +260,8 @@ struct RelationshipsView: View {
                         .background(.regularMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding()
-                        .animation(.default.speed(1.5), value: actionsVM.blockBackCurrentHandle)
-                    } else if actionsVM.isBlockingBack {
+                        .animation(.default.speed(1.5), value: actionsVM?.blockBackCurrentHandle)
+                    } else if actionsVM?.isBlockingBack ?? false {
                         HStack(spacing: 8) {
                             ProgressView()
                                 .scaleEffect(0.7)
@@ -266,9 +273,9 @@ struct RelationshipsView: View {
                         .background(.regularMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding()
-                    } else if actionsVM.showBlockBackResult {
+                    } else if actionsVM?.showBlockBackResult ?? false {
                         HStack(spacing: 8) {
-                            if actionsVM.blockBackFailureCount == 0 {
+                            if (actionsVM?.blockBackFailureCount ?? 0) == 0 {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundStyle(.green)
                             } else {
@@ -411,7 +418,7 @@ struct RelationshipsView: View {
                 showBlockBackConfirm2 = true
             }
         } message: {
-            if let count = actionsVM.unblockedBlockersCount {
+            if let count = actionsVM?.unblockedBlockersCount {
                 Text(loc("profile.block_back.confirm.first.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -419,14 +426,15 @@ struct RelationshipsView: View {
             Button(loc("actions.cancel"), role: .cancel) {}
             Button(loc("profile.block_back.action"), role: .destructive) {
                 if let account = accountStore.activeAccount,
-                   let appPassword = accountStore.appPassword(for: account) {
+                   let appPassword = accountStore.appPassword(for: account)
+                {
                     Task {
                         await blockBack(account: account, appPassword: appPassword)
                     }
                 }
             }
         } message: {
-            if let count = actionsVM.unblockedBlockersCount {
+            if let count = actionsVM?.unblockedBlockersCount {
                 Text(loc("profile.block_back.confirm.second.message").replacingOccurrences(of: "{count}", with: "\(count)"))
             }
         }
@@ -443,7 +451,11 @@ struct RelationshipsView: View {
                     .environmentObject(container.blueskyClient)
             }
         }
-        .sheet(isPresented: .init(get: { shareFileURL != nil }, set: { if !$0 { shareFileURL = nil } })) {
+        .sheet(isPresented: .init(get: { shareFileURL != nil }, set: {
+            if !$0 {
+                shareFileURL = nil
+            }
+        })) {
             if let url = shareFileURL {
                 ShareSheet(activityItems: [url])
             }
@@ -528,7 +540,7 @@ struct RelationshipsView: View {
             } label: {
                 Label(loc("rel.block_all_back"), systemImage: "hand.raised.slash.fill")
             }
-            .disabled(actionsVM.isBlockingBack)
+            .disabled(actionsVM?.isBlockingBack ?? false)
             if availableTargetLists.isEmpty {
                 Button {
                     Task { await loadAvailableTargetLists() }
@@ -573,8 +585,8 @@ struct RelationshipsView: View {
     /// Fetches the count of unblocked blockers and presents the first confirmation dialog.
     private func handleBlockAllBack() async {
         guard accountStore.activeAccount != nil else { return }
-        await actionsVM.fetchBlockCounts(isOwnProfile: true)
-        guard let count = actionsVM.unblockedBlockersCount, count > 0 else {
+        await actionsVM?.fetchBlockCounts(isOwnProfile: true)
+        guard let count = actionsVM?.unblockedBlockersCount, count > 0 else {
             showBlockBackAllClear = true
             return
         }
@@ -583,18 +595,18 @@ struct RelationshipsView: View {
 
     /// Delegates to the shared VM.
     private func blockBack(account _: AppAccount, appPassword _: String) async {
-        await actionsVM.blockBack(actors: nil)
+        await actionsVM?.blockBack(actors: nil)
     }
 
     /// A localized summary of the block-back operation result.
     private var blockBackResultSummary: String {
-        if actionsVM.blockBackFailureCount == 0 {
+        if (actionsVM?.blockBackFailureCount ?? 0) == 0 {
             loc("profile.block_back.result_success")
-                .replacingOccurrences(of: "{count}", with: "\(actionsVM.blockBackSuccessCount)")
+                .replacingOccurrences(of: "{count}", with: "\(actionsVM?.blockBackSuccessCount ?? 0)")
         } else {
             loc("profile.block_back.result")
-                .replacingOccurrences(of: "{success}", with: "\(actionsVM.blockBackSuccessCount)")
-                .replacingOccurrences(of: "{fail}", with: "\(actionsVM.blockBackFailureCount)")
+                .replacingOccurrences(of: "{success}", with: "\(actionsVM?.blockBackSuccessCount ?? 0)")
+                .replacingOccurrences(of: "{fail}", with: "\(actionsVM?.blockBackFailureCount ?? 0)")
         }
     }
 
@@ -798,12 +810,20 @@ struct RelationshipsView: View {
             case .following:
                 result = try await container.profile.fetchFollowing(actor: did, account: account, appPassword: appPassword)
             case .blocking:
-                let r = try await container.clearsky.fetchBlockedActors(account: account, appPassword: appPassword)
+                let r = try await container.clearsky.fetchBlockedActors(
+                    account: account,
+                    appPassword: appPassword,
+                    onProgress: updateClearskyCount
+                )
                 result = r.actors
                 clearskyTotal = r.totalCount
                 onCountUpdate?(mode, r.totalCount)
             case .blockedBy:
-                let r = try await container.clearsky.fetchBlockedByActors(account: account, appPassword: appPassword)
+                let r = try await container.clearsky.fetchBlockedByActors(
+                    account: account,
+                    appPassword: appPassword,
+                    onProgress: updateClearskyCount
+                )
                 result = r.actors
                 clearskyTotal = r.totalCount
                 onCountUpdate?(mode, r.totalCount)
@@ -825,6 +845,12 @@ struct RelationshipsView: View {
                 statusMessage = String.localized("rel.loaded_status", replacements: ["count": "\(actors.count)", "total": "\(initialCount ?? actors.count)"])
             }
         }
+    }
+
+    @MainActor
+    private func updateClearskyCount(_ count: Int) async {
+        clearskyTotal = count
+        onCountUpdate?(mode, count)
     }
 }
 

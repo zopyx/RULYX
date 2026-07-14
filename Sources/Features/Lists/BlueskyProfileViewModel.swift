@@ -264,6 +264,11 @@ final class BlueskyProfileViewModel {
             } else {
                 isFetchingMemberships = true
             }
+            // Clear stale pending states — fresh API data is now authoritative
+            pendingBlockState = nil
+            pendingMuteState = nil
+            pendingFollowingState = nil
+            pendingListMemberStates = [:]
         } catch {
             hasLoadedOnce = false
             errorMessage = AppError.userMessage(from: error)
@@ -364,6 +369,8 @@ final class BlueskyProfileViewModel {
     // MARK: - Moderation Actions
 
     /// Optimistically toggles the mute state for the profile.
+    /// Keeps the pending state until the next successful load() to
+    /// avoid visual revert due to PDS propagation delay.
     func toggleMute(
         account: AppAccount,
         appPassword: String,
@@ -371,12 +378,12 @@ final class BlueskyProfileViewModel {
     ) async {
         guard let profile else { return }
         let isCurrentlyMuted = pendingMuteState ?? profile.viewerState?.muted ?? false
+        let newState = !isCurrentlyMuted
 
         isUpdatingModeration = true
-        pendingMuteState = !isCurrentlyMuted
+        pendingMuteState = newState
         defer {
             isUpdatingModeration = false
-            pendingMuteState = nil
         }
 
         do {
@@ -396,16 +403,10 @@ final class BlueskyProfileViewModel {
                 statusMessage = "Account muted."
             }
 
-            await load(
-                did: profile.did,
-                account: account,
-                viewerPassword: appPassword,
-                dataAccount: account,
-                dataPassword: appPassword,
-                using: client
-            )
+            // Don't call load() here — avoids PDS propagation delay
         } catch {
             errorMessage = AppError.userMessage(from: error)
+            pendingMuteState = isCurrentlyMuted
         }
     }
 
@@ -434,6 +435,8 @@ final class BlueskyProfileViewModel {
     }
 
     /// Optimistically toggles the follow state for the profile.
+    /// Keeps the pending state until the next successful load() to
+    /// avoid visual revert due to PDS propagation delay.
     func toggleFollow(
         account: AppAccount,
         appPassword: String,
@@ -441,12 +444,14 @@ final class BlueskyProfileViewModel {
     ) async {
         guard let profile else { return }
         let isCurrentlyFollowing = pendingFollowingState ?? profile.viewerState?.isFollowing ?? false
+        let newState = !isCurrentlyFollowing
 
         isUpdatingModeration = true
-        pendingFollowingState = !isCurrentlyFollowing
+        pendingFollowingState = newState
         defer {
             isUpdatingModeration = false
-            pendingFollowingState = nil
+            // pendingFollowingState intentionally NOT cleared here —
+            // stays set until load() confirms the new state from the PDS
         }
 
         do {
@@ -467,16 +472,10 @@ final class BlueskyProfileViewModel {
             }
 
             statusMessage = nil
-            await load(
-                did: profile.did,
-                account: account,
-                viewerPassword: appPassword,
-                dataAccount: account,
-                dataPassword: appPassword,
-                using: client
-            )
+            // Don't call load() here — avoids PDS propagation delay
         } catch {
             errorMessage = AppError.userMessage(from: error)
+            pendingFollowingState = isCurrentlyFollowing
         }
     }
 
@@ -548,6 +547,8 @@ final class BlueskyProfileViewModel {
     }
 
     /// Optimistically toggles the block state for the profile.
+    /// Keeps the pending state until the next successful load() to
+    /// avoid visual revert due to PDS propagation delay.
     func toggleBlock(
         account: AppAccount,
         appPassword: String,
@@ -555,12 +556,15 @@ final class BlueskyProfileViewModel {
     ) async {
         guard let profile else { return }
         let isCurrentlyBlocking = pendingBlockState ?? profile.viewerState?.isBlocking ?? false
+        let newState = !isCurrentlyBlocking
 
         isUpdatingModeration = true
-        pendingBlockState = !isCurrentlyBlocking
+        pendingBlockState = newState
         defer {
             isUpdatingModeration = false
-            pendingBlockState = nil
+            // pendingBlockState intentionally NOT cleared here —
+            // stays set until load() confirms the new state from the PDS,
+            // avoiding visual revert due to propagation delay
         }
 
         do {
@@ -582,16 +586,13 @@ final class BlueskyProfileViewModel {
                 statusMessage = "Account blocked."
             }
 
-            await load(
-                did: profile.did,
-                account: account,
-                viewerPassword: appPassword,
-                dataAccount: account,
-                dataPassword: appPassword,
-                using: client
-            )
+            // Don't call load() here — PDS may not have indexed the new
+            // block record yet, returning stale viewerState and reverting
+            // the toggle. The pending state persists until the next
+            // explicit load() (e.g. on next profile visit).
         } catch {
             errorMessage = AppError.userMessage(from: error)
+            pendingBlockState = isCurrentlyBlocking
         }
     }
 
@@ -656,7 +657,8 @@ final class BlueskyProfileViewModel {
         pendingListMemberStates[membership.listURI] = !isCurrentlyMember
         defer {
             isUpdatingListMembership = false
-            pendingListMemberStates[membership.listURI] = nil
+            // pendingListMemberStates intentionally NOT cleared here —
+            // stays set until load() confirms the new state from the PDS
         }
 
         do {
@@ -685,16 +687,10 @@ final class BlueskyProfileViewModel {
                 statusMessage = "Added to \(membership.name)."
             }
 
-            await load(
-                did: profile.did,
-                account: account,
-                viewerPassword: appPassword,
-                dataAccount: account,
-                dataPassword: appPassword,
-                using: client
-            )
+            // Don't call load() here — avoids PDS propagation delay
         } catch {
             errorMessage = AppError.userMessage(from: error)
+            pendingListMemberStates[membership.listURI] = isCurrentlyMember
         }
     }
 

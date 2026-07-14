@@ -86,7 +86,9 @@ final class AppLockManager: ObservableObject {
     func appDidBecomeActive() {
         guard isEnabled else { return }
         guard didEnterBackground else {
-            if isLocked { Task { await authenticate() } }
+            if isLocked {
+                Task { await authenticate() }
+            }
             return
         }
         didEnterBackground = false

@@ -442,7 +442,9 @@ final class ChatStore: ObservableObject {
             guard isCurrentContext(context) else { return }
             messages[convoId] = result.messages.reversed()
         } catch {
-            if let urlError = error as? URLError, urlError.code == .cancelled { return }
+            if let urlError = error as? URLError, urlError.code == .cancelled {
+                return
+            }
         }
     }
 
@@ -482,7 +484,9 @@ final class ChatStore: ObservableObject {
             updateAppBadge()
         } catch {
             guard isCurrentContext(context) else { return }
-            if let urlError = error as? URLError, urlError.code == .cancelled { return }
+            if let urlError = error as? URLError, urlError.code == .cancelled {
+                return
+            }
             AppLogger.persistence.error("Chat processLog failed: \(error.localizedDescription, privacy: .public)")
             self.error = error
         }

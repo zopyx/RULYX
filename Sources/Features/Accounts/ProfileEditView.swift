@@ -1,5 +1,5 @@
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 /// A sheet for editing the authenticated account's profile: display name,
 /// description, avatar, and banner. Fetches the current profile record on
@@ -95,7 +95,6 @@ struct ProfileEditView: View {
 
     // MARK: - Sections
 
-    @ViewBuilder
     private var avatarSection: some View {
         Section {
             VStack(alignment: .center, spacing: 12) {
@@ -144,7 +143,7 @@ struct ProfileEditView: View {
                         Task { await loadAvatar(from: newItem) }
                     }
 
-                    if (currentAvatarBlob != nil || avatarImageData != nil), !removeAvatar {
+                    if currentAvatarBlob != nil || avatarImageData != nil, !removeAvatar {
                         Button(role: .destructive) {
                             removeAvatar = true
                             avatarImageData = nil
@@ -166,7 +165,6 @@ struct ProfileEditView: View {
         }
     }
 
-    @ViewBuilder
     private var bannerSection: some View {
         Section {
             VStack(alignment: .center, spacing: 12) {
@@ -221,7 +219,7 @@ struct ProfileEditView: View {
                         Task { await loadBanner(from: newItem) }
                     }
 
-                    if (currentBannerBlob != nil || bannerImageData != nil), !removeBanner {
+                    if currentBannerBlob != nil || bannerImageData != nil, !removeBanner {
                         Button(role: .destructive) {
                             removeBanner = true
                             bannerImageData = nil
@@ -243,7 +241,6 @@ struct ProfileEditView: View {
         }
     }
 
-    @ViewBuilder
     private var textFieldsSection: some View {
         Section {
             TextField(loc("profile.edit.display_name"), text: $displayName)
@@ -257,7 +254,6 @@ struct ProfileEditView: View {
         }
     }
 
-    @ViewBuilder
     private var saveSection: some View {
         Section {
             Button {
@@ -278,7 +274,6 @@ struct ProfileEditView: View {
 
     // MARK: - Helpers
 
-    @ViewBuilder
     private func avatarPlaceholder(size: CGFloat) -> some View {
         Circle()
             .fill(Color.skyPrimary.opacity(0.16))
@@ -290,7 +285,6 @@ struct ProfileEditView: View {
             }
     }
 
-    @ViewBuilder
     private var bannerPlaceholder: some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(Color(.systemGray5))

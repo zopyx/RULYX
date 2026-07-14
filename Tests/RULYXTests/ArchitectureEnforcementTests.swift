@@ -7,7 +7,6 @@ import XCTest
 /// These tests run as part of CI and act as guardrails preventing layer violations.
 /// Tests are structured to fail only on critical violations, reporting others as warnings.
 final class ArchitectureEnforcementTests: XCTestCase {
-
     // MARK: - Source Tree Helpers
 
     private var sourceFiles: [String] {
@@ -33,7 +32,7 @@ final class ArchitectureEnforcementTests: XCTestCase {
 
     /// All mock implementations must be classes (reference types), not structs.
     /// Struct mocks cause silent test failures because SwiftUI copies them.
-    func testMockImplementationsAreClasses() throws {
+    func testMockImplementationsAreClasses() {
         let mockFiles = sourceFiles.filter {
             ($0 as NSString).lastPathComponent.hasPrefix("Mock") && $0.contains("/Tests/")
         }
@@ -84,7 +83,7 @@ final class ArchitectureEnforcementTests: XCTestCase {
         var isDirectory: ObjCBool = false
         let exists = FileManager.default.fileExists(atPath: dtosDir.path, isDirectory: &isDirectory)
         // Not a hard failure — DTO split may not have been merged yet
-        if exists && isDirectory.boolValue {
+        if exists, isDirectory.boolValue {
             let contents = try FileManager.default.contentsOfDirectory(atPath: dtosDir.path)
             XCTAssertFalse(contents.isEmpty, "DTOs directory exists but is empty")
         }
@@ -95,7 +94,7 @@ final class ArchitectureEnforcementTests: XCTestCase {
     /// Reports how many view files still import service implementations directly.
     /// This is an informational test — it always passes but logs a warning if violations exist.
     /// After the refactoring is complete, change to a hard assertion.
-    func testViewServiceCouplingReport() throws {
+    func testViewServiceCouplingReport() {
         let viewFiles = sourceFiles.filter {
             $0.contains("/Features/") || $0.contains("/App/")
         }
@@ -107,22 +106,30 @@ final class ArchitectureEnforcementTests: XCTestCase {
         ]
 
         var violations: [(file: String, line: Int, symbol: String)] = []
-        let exemptFiles: Set<String> = [
+        let exemptFiles: Set = [
             "AppDependencies.swift", "RULYXApp.swift", "RootView.swift",
         ]
 
         for file in viewFiles {
             let fileName = (file as NSString).lastPathComponent
-            if exemptFiles.contains(fileName) { continue }
-            if fileName.contains("ViewModel") || fileName.contains("ViewModel+") { continue }
-            if fileName.hasPrefix("iPad") { continue }
+            if exemptFiles.contains(fileName) {
+                continue
+            }
+            if fileName.contains("ViewModel") || fileName.contains("ViewModel+") {
+                continue
+            }
+            if fileName.hasPrefix("iPad") {
+                continue
+            }
 
             guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }
 
             let lines = content.components(separatedBy: "\n")
             for (index, line) in lines.enumerated() {
                 let trimmed = line.trimmingCharacters(in: .whitespaces)
-                if trimmed.hasPrefix("//") || trimmed.hasPrefix("/*") || trimmed.hasPrefix("*") { continue }
+                if trimmed.hasPrefix("//") || trimmed.hasPrefix("/*") || trimmed.hasPrefix("*") {
+                    continue
+                }
                 for symbol in forbiddenImports {
                     if line.contains(symbol) {
                         violations.append((file, index + 1, symbol))

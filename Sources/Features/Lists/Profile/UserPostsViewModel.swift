@@ -14,6 +14,7 @@ final class UserPostsViewModel {
     private(set) var posts: [RichFeedEntry] = [] {
         didSet { updateFilteredPosts() }
     }
+
     /// True while the initial load is in progress.
     private(set) var isLoading = false
     /// True while loading the next page.
@@ -26,10 +27,12 @@ final class UserPostsViewModel {
     var searchText = "" {
         didSet { updateFilteredPosts() }
     }
+
     /// Inclusive start date for filtering posts.
     var fromDate: Date? {
         didSet { updateFilteredPosts() }
     }
+
     /// Inclusive end date for filtering posts.
     var toDate: Date? {
         didSet { updateFilteredPosts() }
@@ -197,7 +200,9 @@ final class UserPostsViewModel {
         } catch {
             optimisticLikes.removeValue(forKey: uri)
             optimisticLikeCounts.removeValue(forKey: uri)
-            if wasLiked { optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI }
+            if wasLiked {
+                optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI
+            }
             AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -220,7 +225,9 @@ final class UserPostsViewModel {
         } catch {
             optimisticReposts.removeValue(forKey: uri)
             optimisticRepostCounts.removeValue(forKey: uri)
-            if wasReposted { optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI }
+            if wasReposted {
+                optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI
+            }
             AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -242,12 +249,16 @@ final class UserPostsViewModel {
     }
 
     func effectiveLikeCount(uri: String) -> Int {
-        if let count = optimisticLikeCounts[uri] { return count }
+        if let count = optimisticLikeCounts[uri] {
+            return count
+        }
         return posts.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
     }
 
     func effectiveRepostCount(uri: String) -> Int {
-        if let count = optimisticRepostCounts[uri] { return count }
+        if let count = optimisticRepostCounts[uri] {
+            return count
+        }
         return posts.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
     }
 

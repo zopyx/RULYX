@@ -67,8 +67,12 @@ final class AnalyticsStore: ObservableObject {
         guard history.count >= 2 else { return "" }
         let first = history.first!.likeCount
         let last = history.last!.likeCount
-        if last > first { return "+\(last - first)" }
-        if last < first { return "\(last - first)" }
+        if last > first {
+            return "+\(last - first)"
+        }
+        if last < first {
+            return "\(last - first)"
+        }
         return "→"
     }
 

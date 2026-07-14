@@ -1,6 +1,6 @@
 import Foundation
-import SwiftUI
 import Observation
+import SwiftUI
 
 /// View model for BlueskyProfileView's block-back and moderation action logic.
 /// Extracted from the view body to enable isolated unit testing with mock services.
@@ -43,6 +43,12 @@ final class BlueskyProfileActionsViewModel {
     var blockPreviewActors: [BlueskyActor] = []
     var isFetchingBlockPreview = false
 
+    // MARK: - Recently-Blocked Tracking (PDS-level, not ClearSky)
+
+    /// Tracks DIDs we've blocked in the current session to supplement
+    /// ClearSky data that may still be stale during post-block-back refreshes.
+    private var recentlyBlockedDIDs = Set<String>()
+
     // MARK: - Init
 
     /// Duration to display the result summary after block-back completes.
@@ -83,8 +89,9 @@ final class BlueskyProfileActionsViewModel {
 
     // MARK: - Block Counts
 
-    /// Fetches blocking/blocked-by/unblocked counts from ClearSky.
-    /// Each count has its own `isFetching*` flag for per-call spinners.
+    /// Fetches all three block counts from a single pair of ClearSky reads
+    /// (blocklist + single-blocklist), then adjusts for recently-blocked DIDs
+    /// that ClearSky may not have indexed yet.
     func fetchBlockCounts(isOwnProfile: Bool) async {
         guard isOwnProfile else {
             resetBlockBackCounts()
@@ -93,37 +100,41 @@ final class BlueskyProfileActionsViewModel {
         guard let account = accountStore.activeAccount else { return }
 
         // Clear numbers, show individual spinners
-        blockingCount = nil; isFetchingBlocking = true
-        blockedByCount = nil; isFetchingBlockedBy = true
-        unblockedBlockersCount = nil; isFetchingUnblocked = true
+        blockingCount = nil
+        isFetchingBlocking = true
+        blockedByCount = nil
+        isFetchingBlockedBy = true
+        unblockedBlockersCount = nil
+        isFetchingUnblocked = true
 
-        // Fetch all three in parallel with individual progress
-        await withThrowingTaskGroup(of: Void.self) { group in
-            group.addTask {
-                do {
-                    let val = try await self.clearskyService.fetchBlockingCount(for: account)
-                    await MainActor.run { self.blockingCount = val; self.isFetchingBlocking = false }
-                } catch {
-                    await MainActor.run { self.isFetchingBlocking = false }
-                }
+        do {
+            // Fetch both endpoints in parallel (DIDs only – no profile resolution)
+            async let blockedDIDs = clearskyService.fetchClearskyBlockDIDs(
+                endpoint: "blocklist", for: account
+            )
+            async let blockedByDIDs = clearskyService.fetchClearskyBlockDIDs(
+                endpoint: "single-blocklist", for: account
+            )
+            let (blocked, blockedBy) = try await (blockedDIDs, blockedByDIDs)
+
+            // Apply our recently-blocked supplement
+            let effectiveBlocked = blocked.union(recentlyBlockedDIDs)
+            let unblockedCount = max(0, blockedBy.count - effectiveBlocked.count)
+
+            await MainActor.run {
+                self.blockingCount = blocked.count
+                self.blockedByCount = blockedBy.count
+                self.unblockedBlockersCount = unblockedCount
+                self.isFetchingBlocking = false
+                self.isFetchingBlockedBy = false
+                self.isFetchingUnblocked = false
             }
-            group.addTask {
-                do {
-                    let val = try await self.clearskyService.fetchBlockedByCount(for: account)
-                    await MainActor.run { self.blockedByCount = val; self.isFetchingBlockedBy = false }
-                } catch {
-                    await MainActor.run { self.isFetchingBlockedBy = false }
-                }
+        } catch {
+            await MainActor.run {
+                self.isFetchingBlocking = false
+                self.isFetchingBlockedBy = false
+                self.isFetchingUnblocked = false
             }
-            group.addTask {
-                do {
-                    let val = try await self.clearskyService.fetchUnblockedBlockersCount(for: account)
-                    await MainActor.run { self.unblockedBlockersCount = val; self.isFetchingUnblocked = false }
-                } catch {
-                    await MainActor.run { self.isFetchingUnblocked = false }
-                }
-            }
-            try? await group.waitForAll()
         }
     }
 
@@ -198,20 +209,38 @@ final class BlueskyProfileActionsViewModel {
             return
         }
 
-        blockBackTotal = toBlock.count
+        // P0: Pre-filter against PDS-level block records to avoid duplicates.
+        // This is a real-time check not subject to ClearSky latency.
+        let existingBlockedDIDs: Set<String>
+        do {
+            existingBlockedDIDs = try await profileService.fetchExistingBlockedDIDs(
+                account: account, appPassword: appPassword
+            )
+        } catch {
+            // If the PDS query fails, fall back to ClearSky data alone (no pre-filter)
+            existingBlockedDIDs = []
+            AppLogger.moderation.error("Failed to fetch existing blocked DIDs: \(error.localizedDescription, privacy: .public)")
+        }
+
+        let filteredToBlock = toBlock.filter { !existingBlockedDIDs.contains($0.did) }
+        guard !filteredToBlock.isEmpty else {
+            isBlockingBack = false
+            return
+        }
+
+        blockBackTotal = filteredToBlock.count
         let batchSize = 5
 
         for batchStart in stride(from: 0, to: blockBackTotal, by: batchSize) {
             let batchEnd = min(batchStart + batchSize, blockBackTotal)
-            let batch = toBlock[batchStart ..< batchEnd]
+            let batch = filteredToBlock[batchStart ..< batchEnd]
 
             await withTaskGroup(of: (Bool, String).self) { group in
                 for actor in batch {
                     group.addTask { [weak self] in
                         guard let self else { return (false, actor.handle) }
                         do {
-                            // Use profileService for blockActor (part of ProfileInspecting)
-                            try await self.profileService.blockActor(
+                            try await profileService.blockActor(
                                 did: actor.did, account: account, appPassword: appPassword
                             )
                             return (true, actor.handle)
@@ -234,6 +263,11 @@ final class BlueskyProfileActionsViewModel {
             if batchEnd < blockBackTotal {
                 try? await Task.sleep(for: .milliseconds(300))
             }
+        }
+
+        // Track successfully blocked DIDs to supplement ClearSky data
+        for actor in filteredToBlock {
+            recentlyBlockedDIDs.insert(actor.did)
         }
 
         showBlockBackResult = true

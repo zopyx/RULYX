@@ -1,5 +1,5 @@
-import SwiftUI
 import Observation
+import SwiftUI
 
 /// Displays a single post thread with ancestors (reversed), the root post,
 /// and threaded replies with depth-based indentation and connection lines.
@@ -13,6 +13,7 @@ struct ThreadView: View {
         self.postURI = postURI
         self.searchAccount = searchAccount
     }
+
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @State private var imagePreview: ImagePreviewCollection?
@@ -205,7 +206,9 @@ struct ThreadView: View {
 
     private func threadConnectorRow(node: ThreadNode, style: ConnectorStyle) -> some View {
         let depth: Int = {
-            if case let .reply(d, _) = style { return d }
+            if case let .reply(d, _) = style {
+                return d
+            }
             return 0
         }()
 
@@ -302,7 +305,11 @@ struct ThreadView: View {
             },
             onReply: { composeContext = makeReplyContext(uri: post.uri, cid: post.cid) },
             onLike: { performLike(uri: post.uri, cid: post.cid) },
-            onShowLikes: { if let uri = post.uri { showLikesForURI = uri } },
+            onShowLikes: {
+                if let uri = post.uri {
+                    showLikesForURI = uri
+                }
+            },
             onRepost: { performRepost(uri: post.uri, cid: post.cid) },
             onQuote: { composeContext = makeQuoteContext(uri: post.uri, cid: post.cid) },
             onCopy: { UIPasteboard.general.string = post.record?.text },
@@ -446,15 +453,21 @@ struct ThreadView: View {
     }
 
     private func findPost(byURI uri: String) -> ThreadPostNode? {
-        if viewModel.thread?.post.uri == uri { return viewModel.thread?.post }
+        if viewModel.thread?.post.uri == uri {
+            return viewModel.thread?.post
+        }
         return findPostInReplies(viewModel.thread?.replies, uri: uri)
     }
 
     private func findPostInReplies(_ replies: [ThreadNode]?, uri: String) -> ThreadPostNode? {
         guard let replies else { return nil }
         for reply in replies {
-            if reply.post.uri == uri { return reply.post }
-            if let found = findPostInReplies(reply.replies, uri: uri) { return found }
+            if reply.post.uri == uri {
+                return reply.post
+            }
+            if let found = findPostInReplies(reply.replies, uri: uri) {
+                return found
+            }
         }
         return nil
     }

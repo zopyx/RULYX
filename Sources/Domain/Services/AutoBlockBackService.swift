@@ -35,7 +35,9 @@ final class AutoBlockBackService: ObservableObject {
         case sixHours = 360
         case oneDay = 1440
 
-        var id: Int { rawValue }
+        var id: Int {
+            rawValue
+        }
 
         var labelKey: String {
             switch self {
@@ -132,6 +134,28 @@ final class AutoBlockBackService: ObservableObject {
                 return
             }
 
+            // P0: Pre-filter against PDS-level block records to avoid duplicates.
+            let existingBlockedDIDs: Set<String>
+            do {
+                existingBlockedDIDs = try await client.fetchExistingBlockedDIDs(
+                    account: account, appPassword: appPassword
+                )
+            } catch {
+                existingBlockedDIDs = []
+                AppLogger.moderation.error(
+                    "Auto-block-back: failed to fetch existing block DIDs, falling back to ClearSky data: \(error.localizedDescription, privacy: .public)"
+                )
+            }
+            let filteredToBlock = toBlock.filter { !existingBlockedDIDs.contains($0.did) }
+            guard !filteredToBlock.isEmpty else {
+                lastResult = Result(
+                    blockedCount: 0, failedCount: 0,
+                    addedToListCount: 0, listNames: [],
+                    timestamp: .now
+                )
+                return
+            }
+
             // Load target lists from UserDefaults
             let targetLists = await loadTargetLists(
                 account: account,
@@ -142,36 +166,61 @@ final class AutoBlockBackService: ObservableObject {
             var blocked = 0
             var failed = 0
 
-            for actor in toBlock {
-                do {
-                    try await client.blockActor(
-                        did: actor.did,
-                        account: account,
-                        appPassword: appPassword
-                    )
-                    blocked += 1
+            // Batch execution: batches of 5 with 300ms delay between batches
+            let batchSize = 5
+            for batchStart in stride(from: 0, to: filteredToBlock.count, by: batchSize) {
+                let batchEnd = min(batchStart + batchSize, filteredToBlock.count)
+                let batch = filteredToBlock[batchStart ..< batchEnd]
 
-                    // Add to configured lists
-                    for list in targetLists {
-                        try? await addActorToTargetList(
-                            did: actor.did,
-                            handle: actor.handle,
-                            list: list,
-                            account: account,
-                            appPassword: appPassword,
-                            using: client
-                        )
+                await withTaskGroup(of: (Bool, BlueskyActor).self) { group in
+                    for actor in batch {
+                        group.addTask {
+                            do {
+                                try await client.blockActor(
+                                    did: actor.did, account: account, appPassword: appPassword
+                                )
+                                return (true, actor)
+                            } catch {
+                                let errorDesc = error.localizedDescription
+                                let nsError = error as NSError
+                                let underlyingErrors = nsError.underlyingErrors.map(\.localizedDescription).joined(separator: "; ")
+                                let detail = underlyingErrors.isEmpty ? "" : " [underlying: \(underlyingErrors)]"
+                                AppLogger.moderation.error(
+                                    "Auto-block-back failed for \(actor.handle, privacy: .public): \(errorDesc, privacy: .public)\(detail, privacy: .public)"
+                                )
+                                return (false, actor)
+                            }
+                        }
                     }
-                } catch {
-                    failed += 1
-                    let errorDesc = error.localizedDescription
-                    // Log the full error chain for diagnostics
-                    let nsError = error as NSError
-                    let underlyingErrors = nsError.underlyingErrors.map(\.localizedDescription).joined(separator: "; ")
-                    let detail = underlyingErrors.isEmpty ? "" : " [underlying: \(underlyingErrors)]"
-                    AppLogger.moderation.error(
-                        "Auto-block-back failed for \(actor.handle, privacy: .public): \(errorDesc, privacy: .public)\(detail, privacy: .public)"
-                    )
+
+                    for await (success, actor) in group {
+                        if success {
+                            blocked += 1
+                            // Add to configured lists
+                            for list in targetLists {
+                                do {
+                                    try await addActorToTargetList(
+                                        did: actor.did,
+                                        handle: actor.handle,
+                                        list: list,
+                                        account: account,
+                                        appPassword: appPassword,
+                                        using: client
+                                    )
+                                } catch {
+                                    AppLogger.moderation.error(
+                                        "Auto-block-back: failed to add \(actor.handle, privacy: .public) to list \(list.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                                    )
+                                }
+                            }
+                        } else {
+                            failed += 1
+                        }
+                    }
+                }
+
+                if batchEnd < filteredToBlock.count {
+                    try? await Task.sleep(for: .milliseconds(300))
                 }
             }
 
@@ -255,8 +304,12 @@ final class AutoBlockBackService: ObservableObject {
 
         // Fetch remote lists and internal lists
         var allLists: [BlueskyList] = []
-        if let remote = try? await client.fetchLists(for: account, appPassword: appPassword) {
-            allLists = remote
+        do {
+            allLists = try await client.fetchLists(for: account, appPassword: appPassword)
+        } catch {
+            AppLogger.moderation.error(
+                "Auto-block-back: failed to fetch lists for target list matching: \(error.localizedDescription, privacy: .public)"
+            )
         }
         if let store = internalListStore {
             let internalLists = store.lists.map { il in
@@ -273,7 +326,7 @@ final class AutoBlockBackService: ObservableObject {
         }
 
         // Filter to only configured IDs, preserving selection order
-        let listMap = Dictionary(uniqueKeysWithValues: allLists.map { ($0.id, $0) })
+        let listMap = Dictionary(allLists.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         for id in ids {
             if let list = listMap[id] {
                 result.append(list)

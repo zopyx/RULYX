@@ -91,7 +91,9 @@ struct FollowerDiffView: View {
             RelationshipCache.save(followers, forKey: cacheKey)
             statusMessage = previousFollowers.isEmpty ? loc("follower_diff.baseline") : nil
         } catch {
-            if !previousFollowers.isEmpty { followers = previousFollowers }
+            if !previousFollowers.isEmpty {
+                followers = previousFollowers
+            }
             statusMessage = AppError.userMessage(from: error)
         }
         isLoading = false

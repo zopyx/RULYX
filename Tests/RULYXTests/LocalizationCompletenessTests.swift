@@ -60,13 +60,17 @@ final class LocalizationCompletenessTests: XCTestCase {
         XCTAssertGreaterThan(en.count, 900, "en.json has too few keys")
     }
 
-    func testAllLanguageFilesAreLoadable() throws {
+    func testAllLanguageFilesAreLoadable() {
         // All 16 language bundles should be loaded by setUp
         for lang in supportedLanguages {
-            XCTAssertNotNil(LocalizationManager.shared.allBundles[lang],
-                           "\(lang) bundle should be loaded")
-            XCTAssertFalse(LocalizationManager.shared.allBundles[lang]?.isEmpty ?? true,
-                           "\(lang) bundle should not be empty")
+            XCTAssertNotNil(
+                LocalizationManager.shared.allBundles[lang],
+                "\(lang) bundle should be loaded"
+            )
+            XCTAssertFalse(
+                LocalizationManager.shared.allBundles[lang]?.isEmpty ?? true,
+                "\(lang) bundle should not be empty"
+            )
         }
     }
 

@@ -53,6 +53,10 @@ struct ListDetailView: View {
         return currentList.id.hasPrefix("at://\(activeDID)")
     }
 
+    private var listTitleWithMemberCount: String {
+        "\(currentList.name) (\(currentList.memberCount ?? viewModel.members.count))"
+    }
+
     init(list: BlueskyList, onListUpdated: ((BlueskyList) -> Void)? = nil) {
         self.onListUpdated = onListUpdated
         _currentList = State(initialValue: list)
@@ -64,7 +68,7 @@ struct ListDetailView: View {
 
     var body: some View {
         rootContent
-            .pageTitle(currentList.name)
+            .pageTitle(listTitleWithMemberCount)
             .toolbar(content: toolbarContent)
             .sheet(isPresented: $showAIScreen) {
                 let actors = viewModel.members.map { member in
@@ -137,7 +141,11 @@ struct ListDetailView: View {
                     imagePreview = nil
                 }
             }
-            .sheet(isPresented: .init(get: { shareFileURL != nil }, set: { if !$0 { shareFileURL = nil } })) {
+            .sheet(isPresented: .init(get: { shareFileURL != nil }, set: {
+                if !$0 {
+                    shareFileURL = nil
+                }
+            })) {
                 if let url = shareFileURL {
                     ShareSheet(activityItems: [url])
                 }
@@ -427,6 +435,7 @@ struct ListDetailView: View {
         List {
             ListDetailHeaderSection(
                 currentList: currentList,
+                title: listTitleWithMemberCount,
                 isOwnedList: isOwnedList,
                 ownerActor: ownerActor,
                 imagePreview: $imagePreview

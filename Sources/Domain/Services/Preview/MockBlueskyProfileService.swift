@@ -107,6 +107,11 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
         try await Task.sleep(for: .milliseconds(120))
     }
 
+    func fetchExistingBlockedDIDs(account _: AppAccount, appPassword _: String?) async throws -> Set<String> {
+        try await Task.sleep(for: .milliseconds(50))
+        return []
+    }
+
     func unblockActor(recordURI _: String, account _: AppAccount, appPassword _: String?) async throws {
         try await Task.sleep(for: .milliseconds(120))
     }

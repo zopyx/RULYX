@@ -59,7 +59,9 @@ struct TrendDetectionView: View {
             let followers = try await container.profile.fetchFollowers(actor: did, account: account, appPassword: appPassword)
             for actor in followers {
                 var reasons: [String] = []
-                if actor.isNew { reasons.append(loc("trend.new_account")) }
+                if actor.isNew {
+                    reasons.append(loc("trend.new_account"))
+                }
                 if !reasons.isEmpty {
                     flaggedAccounts.append((actor, reasons.joined(separator: " · ")))
                 }

@@ -1,5 +1,5 @@
-@testable import RULYX
 import Foundation
+@testable import RULYX
 
 /// Mock implementation of BlueskyClearSkyServicing for unit testing.
 /// Uses class semantics so handlers can be overridden after VM construction.
@@ -8,14 +8,17 @@ final class MockClearSkyService: BlueskyClearSkyServicing {
     var fetchBlockedActorsHandler: @Sendable (AppAccount, String?) async throws -> ClearskyBlocklistResult = { _, _ in
         ClearskyBlocklistResult(actors: [], totalCount: 0)
     }
+
     var fetchBlockedByActorsHandler: @Sendable (AppAccount, String?) async throws -> ClearskyBlocklistResult = { _, _ in
         ClearskyBlocklistResult(actors: [], totalCount: 0)
     }
+
     var fetchBlockingCountHandler: @Sendable (AppAccount) async throws -> Int = { _ in 0 }
     var fetchBlockedByCountHandler: @Sendable (AppAccount) async throws -> Int = { _ in 0 }
     var fetchUnblockedBlockersCountHandler: @Sendable (AppAccount) async throws -> Int = { _ in 0 }
     var fetchUnblockedBlockerActorsHandler: @Sendable (AppAccount, String?) async throws -> [BlueskyActor] = { _, _ in [] }
     var fetchClearskyListsHandler: @Sendable (String) async throws -> [ClearskyListEntry] = { _ in [] }
+    var fetchClearskyBlockDIDsHandler: @Sendable (String, AppAccount) async throws -> Set<String> = { _, _ in [] }
 
     func fetchBlockedActors(account: AppAccount, appPassword: String?) async throws -> ClearskyBlocklistResult {
         try await fetchBlockedActorsHandler(account, appPassword)
@@ -43,5 +46,9 @@ final class MockClearSkyService: BlueskyClearSkyServicing {
 
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
         try await fetchClearskyListsHandler(handle)
+    }
+
+    func fetchClearskyBlockDIDs(endpoint: String, for account: AppAccount) async throws -> Set<String> {
+        try await fetchClearskyBlockDIDsHandler(endpoint, account)
     }
 }

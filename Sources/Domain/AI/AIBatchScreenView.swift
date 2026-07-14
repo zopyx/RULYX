@@ -34,15 +34,23 @@ struct ActorScreenResult: Identifiable {
     }
 
     var badgeColor: Color {
-        if isToxic { .red }
-        else if isSpam { .orange }
-        else { .green }
+        if isToxic {
+            .red
+        } else if isSpam {
+            .orange
+        } else {
+            .green
+        }
     }
 
     var badgeIcon: String {
-        if isToxic { "exclamationmark.triangle.fill" }
-        else if isSpam { "ladybug.fill" }
-        else { "checkmark.circle.fill" }
+        if isToxic {
+            "exclamationmark.triangle.fill"
+        } else if isSpam {
+            "ladybug.fill"
+        } else {
+            "checkmark.circle.fill"
+        }
     }
 }
 
@@ -119,9 +127,13 @@ struct AIBatchScreenView: View {
     }
 
     private func actorResultRow(_ result: ActorScreenResult) -> some View {
-        let label = if result.isToxic { loc("ai.screen.toxic") }
-        else if result.isSpam { loc("ai.screen.spam") }
-        else { loc("ai.screen.safe") }
+        let label = if result.isToxic {
+            loc("ai.screen.toxic")
+        } else if result.isSpam {
+            loc("ai.screen.spam")
+        } else {
+            loc("ai.screen.safe")
+        }
         return HStack(spacing: 10) {
             Image(systemName: result.badgeIcon)
                 .font(.title3)

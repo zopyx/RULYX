@@ -94,18 +94,26 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
 
     // MARK: - Block Counts
 
-    func testFetchBlockCountsSetsAllThreeValues() async throws {
+    func testFetchBlockCountsSetsAllThreeValues() async {
         // Given
-        mockClearSky.fetchBlockingCountHandler = { _ in 42 }
-        mockClearSky.fetchBlockedByCountHandler = { _ in 17 }
-        mockClearSky.fetchUnblockedBlockersCountHandler = { _ in 5 }
+        mockClearSky.fetchClearskyBlockDIDsHandler = { endpoint, _ in
+            switch endpoint {
+            case "blocklist":
+                Set((0 ..< 42).map { "did:plc:blocked_\($0)" })
+            case "single-blocklist":
+                Set((0 ..< 47).map { "did:plc:blocker_\($0)" })
+            default:
+                []
+            }
+        }
 
         // When
         await sut.fetchBlockCounts(isOwnProfile: true)
 
         // Then
         XCTAssertEqual(sut.blockingCount, 42)
-        XCTAssertEqual(sut.blockedByCount, 17)
+        XCTAssertEqual(sut.blockedByCount, 47)
+        // blockedBy (47) - blocked (42) = 5 unblocked blockers
         XCTAssertEqual(sut.unblockedBlockersCount, 5)
         XCTAssertFalse(sut.isFetchingBlocking || sut.isFetchingBlockedBy || sut.isFetchingUnblocked)
     }
@@ -188,15 +196,23 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
 
     func testFetchBlockCountsWhenProfileIsOwn() async {
         // Given: service returns specific counts for own profile
-        mockClearSky.fetchBlockingCountHandler = { _ in 25 }
-        mockClearSky.fetchBlockedByCountHandler = { _ in 15 }
+        mockClearSky.fetchClearskyBlockDIDsHandler = { endpoint, _ in
+            switch endpoint {
+            case "blocklist":
+                Set((0 ..< 25).map { "did:plc:blocked_\($0)" })
+            case "single-blocklist":
+                Set((0 ..< 40).map { "did:plc:blocker_\($0)" })
+            default:
+                []
+            }
+        }
 
         // When
         await sut.fetchBlockCounts(isOwnProfile: true)
 
         // Then: both blocking and blocked-by counts are populated
         XCTAssertEqual(sut.blockingCount, 25)
-        XCTAssertEqual(sut.blockedByCount, 15)
+        XCTAssertEqual(sut.blockedByCount, 40)
         XCTAssertFalse(sut.isFetchingBlocking || sut.isFetchingBlockedBy || sut.isFetchingUnblocked)
     }
 

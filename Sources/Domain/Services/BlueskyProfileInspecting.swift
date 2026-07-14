@@ -52,6 +52,14 @@ protocol BlueskyProfileInspecting: Sendable {
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     func blockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws
 
+    /// Fetches the set of DIDs currently blocked by the account directly from the PDS.
+    /// This is a real-time check (not subject to ClearSky latency).
+    /// - Parameters:
+    ///   - account: The account to query.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    /// - Returns: A set of DIDs that currently have an `app.bsky.graph.block` record.
+    func fetchExistingBlockedDIDs(account: AppAccount, appPassword: String?) async throws -> Set<String>
+
     /// Unblocks the specified actor using the existing block record URI.
     /// - Parameters:
     ///   - recordURI: The AT URI of the existing block record to delete.

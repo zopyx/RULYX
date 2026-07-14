@@ -11,17 +11,49 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
 
     // MARK: - Protocol Forwarding Properties
 
-    var auth: BlueskyAuthServicing           { container.auth }
-    var profile: BlueskyProfileInspecting    { container.profile }
-    var list: BlueskyListServicing           { container.list }
-    var feed: BlueskyFeedServicing           { container.feed }
-    var post: BlueskyPostServicing           { container.post }
-    var social: BlueskySocialServicing       { container.social }
-    var moderation: BlueskyModerationServicing { container.moderation }
-    var clearsky: BlueskyClearSkyServicing   { container.clearsky }
-    var notification: BlueskyNotificationServicing { container.notification }
-    var identity: BlueskyIdentityServicing   { container.identity }
-    var media: BlueskyMediaServicing         { container.media }
+    var auth: BlueskyAuthServicing {
+        container.auth
+    }
+
+    var profile: BlueskyProfileInspecting {
+        container.profile
+    }
+
+    var list: BlueskyListServicing {
+        container.list
+    }
+
+    var feed: BlueskyFeedServicing {
+        container.feed
+    }
+
+    var post: BlueskyPostServicing {
+        container.post
+    }
+
+    var social: BlueskySocialServicing {
+        container.social
+    }
+
+    var moderation: BlueskyModerationServicing {
+        container.moderation
+    }
+
+    var clearsky: BlueskyClearSkyServicing {
+        container.clearsky
+    }
+
+    var notification: BlueskyNotificationServicing {
+        container.notification
+    }
+
+    var identity: BlueskyIdentityServicing {
+        container.identity
+    }
+
+    var media: BlueskyMediaServicing {
+        container.media
+    }
 
     /// Legacy accessor for parameter passing to functions that still accept `LiveBlueskyClient`.
     /// Prefer using the individual protocol properties above for direct method calls.
@@ -33,6 +65,6 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
     // MARK: - Init
 
     init(liveClient: LiveBlueskyClient, accountStore: AccountStoreProtocol) {
-        self.container = BlueskyServiceContainer(liveClient: liveClient, accountStore: accountStore)
+        container = BlueskyServiceContainer(liveClient: liveClient, accountStore: accountStore)
     }
 }

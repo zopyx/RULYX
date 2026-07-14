@@ -420,7 +420,9 @@ struct ProfileInspectorView: View {
     private var isOwnProfile: Bool {
         guard let account = accountStore.activeAccount,
               let inspection = viewModel.inspection else { return false }
-        if let activeDID = account.did, activeDID == inspection.profile.did { return true }
+        if let activeDID = account.did, activeDID == inspection.profile.did {
+            return true
+        }
         return account.handle.lowercased() == inspection.profile.handle.lowercased()
     }
 

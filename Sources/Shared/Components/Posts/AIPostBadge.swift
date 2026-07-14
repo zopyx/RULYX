@@ -12,16 +12,25 @@ struct AIPostBadge: View {
     }
 
     private var label: String {
-        if isToxic, isSpam { loc("ai.badge.toxic_and_spam") }
-        else if isToxic { loc("ai.badge.toxic") }
-        else if isSpam { loc("ai.badge.spam") }
-        else { "" }
+        if isToxic, isSpam {
+            loc("ai.badge.toxic_and_spam")
+        } else if isToxic {
+            loc("ai.badge.toxic")
+        } else if isSpam {
+            loc("ai.badge.spam")
+        } else {
+            ""
+        }
     }
 
     private var color: Color {
-        if isToxic { .red }
-        else if isSpam { .orange }
-        else { .clear }
+        if isToxic {
+            .red
+        } else if isSpam {
+            .orange
+        } else {
+            .clear
+        }
     }
 
     var body: some View {

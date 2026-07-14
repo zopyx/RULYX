@@ -4,14 +4,13 @@ import UIKit
 /// Detects whether the current device is jailbroken by checking for common
 /// indicators: known jailbreak files, writable system paths, and suspicious URL schemes.
 enum JailbreakDetector {
-
     /// Returns `true` if the device shows signs of being jailbroken.
     /// Always returns `false` in the simulator.
     static var isJailbroken: Bool {
         #if targetEnvironment(simulator)
-        return false
+            return false
         #else
-        return hasJailbreakFiles() || canWriteToSystemPaths() || canOpenJailbreakURLSchemes()
+            return hasJailbreakFiles() || canWriteToSystemPaths() || canOpenJailbreakURLSchemes()
         #endif
     }
 

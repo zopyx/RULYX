@@ -328,19 +328,27 @@ private final class MockChatService: ChatServicing {
 
     func updateRead(convoId _: String, messageId _: String?, account _: AppAccount, appPassword _: String?) async throws {
         didUpdateRead = true
-        if let result = muteResult { try result.get() }
+        if let result = muteResult {
+            try result.get()
+        }
     }
 
     func leaveConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {
-        if let result = leaveResult { try result.get() }
+        if let result = leaveResult {
+            try result.get()
+        }
     }
 
     func muteConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {
-        if let result = muteResult { try result.get() }
+        if let result = muteResult {
+            try result.get()
+        }
     }
 
     func unmuteConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {
-        if let result = unmuteResult { try result.get() }
+        if let result = unmuteResult {
+            try result.get()
+        }
     }
 
     func getLog(cursor _: String?, account _: AppAccount, appPassword _: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {

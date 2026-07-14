@@ -156,7 +156,11 @@ struct InternalListDetailView: View {
         } message: {
             Text(loc("internal.list.delete_message"))
         }
-        .sheet(isPresented: .init(get: { exportFileURL != nil }, set: { if !$0 { exportFileURL = nil } })) {
+        .sheet(isPresented: .init(get: { exportFileURL != nil }, set: {
+            if !$0 {
+                exportFileURL = nil
+            }
+        })) {
             if let url = exportFileURL {
                 ShareSheet(activityItems: [url])
             }

@@ -97,7 +97,9 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             all.append(contentsOf: page.actors)
             cursor = page.cursor
             pageCount += 1
-            if pageCount >= maxPages { break }
+            if pageCount >= maxPages {
+                break
+            }
         } while cursor != nil
         return all
     }
@@ -290,7 +292,9 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             all.append(contentsOf: page.actors)
             cursor = page.cursor
             pageCount += 1
-            if pageCount >= maxPages { break }
+            if pageCount >= maxPages {
+                break
+            }
         } while cursor != nil
         return all
     }
@@ -355,6 +359,43 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
             )
 
             return EmptyResponse()
+        }
+    }
+
+    /// Fetches all currently blocked DIDs directly from the authenticated user's PDS.
+    func fetchExistingBlockedDIDs(account: AppAccount, appPassword: String?) async throws -> Set<String> {
+        try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            var allDIDs = Set<String>()
+            var cursor: String?
+
+            repeat {
+                var queryItems: [URLQueryItem] = [
+                    URLQueryItem(name: "repo", value: authSession.did),
+                    URLQueryItem(name: "collection", value: "app.bsky.graph.block"),
+                    URLQueryItem(name: "limit", value: "100"),
+                ]
+                if let cursor {
+                    queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+                }
+
+                let response: BlockListRecordsResponse = try await requestExecutor.send(
+                    path: "com.atproto.repo.listRecords",
+                    method: "GET",
+                    queryItems: queryItems,
+                    accessToken: authSession.accessJWT,
+                    hostURL: authSession.pdsURL
+                )
+
+                for entry in response.records {
+                    allDIDs.insert(entry.value.subject)
+                }
+                cursor = response.cursor
+            } while cursor != nil
+
+            return allDIDs
         }
     }
 

@@ -162,7 +162,9 @@ final class PushNotificationCoordinator: ObservableObject {
             if let conversationID = route.conversationID {
                 workspaceStore.pendingChatConversationID = conversationID
                 workspaceStore.selectedTab = .chat
-                if shouldNavigate { return }
+                if shouldNavigate {
+                    return
+                }
             }
 
             if let memberDID = route.memberDID,

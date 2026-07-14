@@ -1,5 +1,5 @@
-@testable import RULYX
 import Foundation
+@testable import RULYX
 
 /// Mock implementation of BlueskySocialServicing for unit testing.
 /// Uses class semantics so handlers can be overridden after VM construction.
@@ -8,12 +8,15 @@ final class MockSocialService: BlueskySocialServicing {
     var createLikeHandler: @Sendable (String, String, AppAccount, String?) async throws -> CreateRecordResponse = { _, _, _, _ in
         CreateRecordResponse(uri: "at://mock/like/1", cid: "mock-cid")
     }
+
     var createRepostHandler: @Sendable (String, String, AppAccount, String?) async throws -> CreateRecordResponse = { _, _, _, _ in
         CreateRecordResponse(uri: "at://mock/repost/1", cid: "mock-cid")
     }
+
     var fetchLikesHandler: @Sendable (String, String?, AppAccount, String?) async throws -> GetLikesResponse = { _, _, _, _ in
         GetLikesResponse(cursor: nil, likes: [])
     }
+
     var blockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unblockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var followActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }

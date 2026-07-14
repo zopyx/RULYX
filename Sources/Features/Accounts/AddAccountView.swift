@@ -179,7 +179,6 @@ struct AddAccountView: View {
             }
         }
     }
-
 }
 
 #Preview {
