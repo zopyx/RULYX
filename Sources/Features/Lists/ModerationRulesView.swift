@@ -5,7 +5,7 @@ import SwiftUI
 /// Lists saved moderation rules with toggle enable/disable and swipe-to-delete,
 /// plus a sheet for creating new rules (trigger + action).
 struct ModerationRulesView: View {
-    @StateObject private var store = ModerationRuleStore()
+    @State private var store = ModerationRuleStore()
     @State private var isCreating = false
     @EnvironmentObject private var localizationManager: LocalizationManager
 
@@ -67,7 +67,7 @@ private func actionLocalized(_ action: ModerationRule.Action) -> String {
 
 /// Form for creating a new moderation rule with trigger and action selection.
 private struct EditRuleView: View {
-    @ObservedObject var store: ModerationRuleStore
+    var store: ModerationRuleStore
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var trigger: ModerationRule.Trigger = .handleContains

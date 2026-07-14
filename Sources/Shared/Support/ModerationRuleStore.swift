@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 // MARK: - ModerationRule
 
@@ -60,9 +61,10 @@ struct ModerationRule: Identifiable, Codable, Hashable {
 /// Persisted store for auto-moderation rules. Evaluates rules against profiles
 /// and returns the matching actions. Backed by `UserDefaults`.
 @MainActor
-final class ModerationRuleStore: ObservableObject {
+@Observable
+final class ModerationRuleStore {
     /// All stored rules.
-    @Published private(set) var rules: [ModerationRule] = []
+    private(set) var rules: [ModerationRule] = []
 
     private let defaults: UserDefaults
     private let storageKey = "moderationRules"
