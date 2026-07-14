@@ -2,7 +2,7 @@ import Foundation
 
 /// Represents a single actor who is a member of a Bluesky list.
 /// Tracks the membership record URI and the associated actor profile.
-struct BlueskyListMember: Identifiable, Hashable {
+struct BlueskyListMember: Identifiable, Hashable, Sendable {
     // MARK: - Properties
 
     /// The AT URI of the list membership record (also used as the unique identifier).

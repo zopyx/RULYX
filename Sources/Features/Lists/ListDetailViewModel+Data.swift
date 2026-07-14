@@ -172,7 +172,7 @@ extension ListDetailViewModel {
         }
 
         guard !actorsToImport.isEmpty else {
-            errorMessage = "Nothing is eligible for import."
+            errorMessage = String.localized("list_import.status.nothing_eligible")
             return
         }
 
@@ -283,7 +283,7 @@ extension ListDetailViewModel {
         let trimmedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedTitle.isEmpty else {
-            errorMessage = "List title is required."
+            errorMessage = String.localized("list_import.status.title_required")
             return nil
         }
 

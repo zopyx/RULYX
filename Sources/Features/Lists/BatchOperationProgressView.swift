@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Types
 
 /// A single target identified by DID and optional handle for batch operations.
-struct PendingLikerTarget: Identifiable {
+struct PendingLikerTarget: Identifiable, Sendable {
     let did: String
     let handle: String?
 
@@ -13,7 +13,7 @@ struct PendingLikerTarget: Identifiable {
 }
 
 /// Configuration for a batch operation (block or add-to-list) with targets and mode.
-struct BatchOperationConfig: Identifiable {
+struct BatchOperationConfig: Identifiable, Sendable {
     let id = UUID()
     let targets: [PendingLikerTarget]
     let mode: Mode

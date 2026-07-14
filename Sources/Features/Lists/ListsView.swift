@@ -596,9 +596,9 @@ struct ListsView: View {
         )
         .overlay {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
+                .stroke(Color.skyPrimary.opacity(0.10), lineWidth: 1)
         }
-        .appButtonAccessibility(label: label, hint: loc("rel.view.hint"))
+        .appButtonAccessibility(label: "\(label), \(count.map { "\($0)" } ?? "-")", hint: loc("rel.view.hint"))
     }
 
     private func activeAccountMember(_ account: AppAccount) -> BlueskyListMember {

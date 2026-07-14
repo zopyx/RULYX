@@ -45,6 +45,9 @@ struct AccountSummaryCard: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.skyPrimary.opacity(0.14), lineWidth: 1)
         }
+        .accessibilityLabel("\(account.displayName), \(account.handle)")
+        .accessibilityHint(loc("lists.account_summary.hint"))
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Private Helpers

@@ -38,15 +38,15 @@ final class BulkProfileLookupViewModel {
     func lookup(account: AppAccount?, appPassword: String?, using client: LiveBlueskyClient) async {
         let tokens = parsedIdentifiers(from: rawInput)
         guard !tokens.isEmpty else {
-            errorMessage = "Paste at least one handle, DID, or profile URL."
+            errorMessage = String.localized("bulk.status.paste_hint")
             return
         }
         guard let account else {
-            errorMessage = "Select an active account first."
+            errorMessage = String.localized("global.status.select_account")
             return
         }
         guard let appPassword, !appPassword.isEmpty else {
-            errorMessage = "No saved app password found."
+            errorMessage = String.localized("global.status.no_password")
             return
         }
 

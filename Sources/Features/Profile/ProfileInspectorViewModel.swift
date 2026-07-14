@@ -37,11 +37,11 @@ final class ProfileInspectorViewModel {
     ) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            errorMessage = "Enter a Bluesky handle or DID."
+            errorMessage = String.localized("inspector.status.enter_handle")
             return
         }
         guard let account else {
-            errorMessage = "Select an active account first."
+            errorMessage = String.localized("global.status.select_account")
             return
         }
         guard let appPassword, !appPassword.isEmpty else {
@@ -163,7 +163,7 @@ final class ProfileInspectorViewModel {
         using client: BlueskyProfileInspecting
     ) async {
         guard let account else {
-            errorMessage = "Select an active account first."
+            errorMessage = String.localized("global.status.select_account")
             return
         }
         guard let appPassword, !appPassword.isEmpty else {

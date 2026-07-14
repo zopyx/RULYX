@@ -2,7 +2,7 @@ import Foundation
 
 /// Represents a Bluesky account stored in the app.
 /// Persisted via Codable; secrets (password/session) are stored separately in the keychain.
-struct AppAccount: Identifiable, Codable, Hashable {
+struct AppAccount: Identifiable, Codable, Hashable, Sendable {
     // MARK: - Properties
 
     /// A unique identifier for this stored account.

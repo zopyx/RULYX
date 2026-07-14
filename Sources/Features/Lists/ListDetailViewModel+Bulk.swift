@@ -426,11 +426,11 @@ extension ListDetailViewModel {
             bulkActionResult = retryResult
 
         case .report:
-            errorMessage = "Cannot retry reports automatically."
+            errorMessage = String.localized("list_bulk.status.cannot_retry")
 
         case .copy, .move:
             guard let comparisonList else {
-                errorMessage = "Select a comparison list before retrying this action."
+                errorMessage = String.localized("list_bulk.status.select_comparison")
                 return
             }
             let failedMembers = members.filter { member in

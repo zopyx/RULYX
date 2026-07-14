@@ -943,7 +943,7 @@ struct BlueskyProfileView: View {
                                 .lineLimit(1)
                             Button {
                                 UIPasteboard.general.string = profile.handle
-                                viewModel.statusMessage = "Handle copied"
+                                viewModel.statusMessage = String.localized("profile.status.handle_copied")
                             } label: {
                                 Image(systemName: "doc.on.doc")
                                     .font(.caption)
@@ -961,7 +961,7 @@ struct BlueskyProfileView: View {
                                 .font(.caption.monospaced())
                             Button {
                                 UIPasteboard.general.string = profile.did
-                                viewModel.statusMessage = "DID copied"
+                                viewModel.statusMessage = String.localized("profile.status.did_copied")
                             } label: {
                                 Image(systemName: "doc.on.doc")
                                     .font(.caption)

@@ -158,10 +158,16 @@ final class BlueskyProfileViewModel {
                     )
                     // Check up to 2 pages of each list to find the target
                     while !found, pagesChecked < 2 {
-                        guard let page = try? await client.fetchListMembersPage(
-                            list: bskyList, cursor: cursor,
-                            account: account, appPassword: appPassword
-                        ) else { break }
+                        let page: PagedListMembers
+                        do {
+                            page = try await client.fetchListMembersPage(
+                                list: bskyList, cursor: cursor,
+                                account: account, appPassword: appPassword
+                            )
+                        } catch {
+                            AppLogger.moderation.error("Failed to fetch list members page: \(error.localizedDescription, privacy: .public)")
+                            break
+                        }
                         found = page.members.contains(where: { $0.actor.did == targetDID })
                         cursor = page.cursor
                         pagesChecked += 1
@@ -393,14 +399,14 @@ final class BlueskyProfileViewModel {
                     account: account,
                     appPassword: appPassword
                 )
-                statusMessage = "Account unmuted."
+                statusMessage = String.localized("profile.status.unmuted")
             } else {
                 try await client.muteActor(
                     did: profile.did,
                     account: account,
                     appPassword: appPassword
                 )
-                statusMessage = "Account muted."
+                statusMessage = String.localized("profile.status.muted")
             }
 
             // Don't call load() here — avoids PDS propagation delay
@@ -493,7 +499,11 @@ final class BlueskyProfileViewModel {
         defer { isDownloadingImages = false }
 
         let targetDir = directory.appendingPathComponent(profile.handle, isDirectory: true)
-        try? FileManager.default.createDirectory(at: targetDir, withIntermediateDirectories: true)
+        do {
+            try FileManager.default.createDirectory(at: targetDir, withIntermediateDirectories: true)
+        } catch {
+            AppLogger.moderation.error("Failed to create image download directory: \(error.localizedDescription, privacy: .public)")
+        }
 
         var allImageURLs: [String] = []
         var cursor: String?
@@ -519,7 +529,7 @@ final class BlueskyProfileViewModel {
         }
 
         guard !allImageURLs.isEmpty else {
-            statusMessage = "No images found in recent posts."
+            statusMessage = String.localized("profile.status.no_images")
             return
         }
 
@@ -543,7 +553,7 @@ final class BlueskyProfileViewModel {
         guard !Task.isCancelled else { return }
 
         let succeeded = results.count(where: { $0.savedFilename != nil })
-        statusMessage = "Downloaded \(succeeded) images to \(profile.handle)/."
+        statusMessage = String.localized("profile.status.images_downloaded", replacements: ["count": "\(succeeded)", "handle": profile.handle])
     }
 
     /// Optimistically toggles the block state for the profile.
@@ -576,14 +586,14 @@ final class BlueskyProfileViewModel {
                     account: account,
                     appPassword: appPassword
                 )
-                statusMessage = "Account unblocked."
+                statusMessage = String.localized("profile.status.unblocked")
             } else {
                 try await client.blockActor(
                     did: profile.did,
                     account: account,
                     appPassword: appPassword
                 )
-                statusMessage = "Account blocked."
+                statusMessage = String.localized("profile.status.blocked")
             }
 
             // Don't call load() here — PDS may not have indexed the new
@@ -621,11 +631,11 @@ final class BlueskyProfileViewModel {
             )
 
             guard !followers.isEmpty else {
-                statusMessage = "No followers to block."
+                statusMessage = String.localized("profile.status.no_followers")
                 return
             }
 
-            statusMessage = "Queued \(followers.count) followers for blocking."
+            statusMessage = String.localized("profile.status.queued_followers", replacements: ["count": "\(followers.count)"])
 
             queue.enqueue(QueuedAction(
                 title: "Block followers of \(profile.handle)",
@@ -668,7 +678,7 @@ final class BlueskyProfileViewModel {
                     account: account,
                     appPassword: appPassword
                 )
-                statusMessage = "Removed from \(membership.name)."
+                statusMessage = String.localized("profile.status.removed_from_list", replacements: ["name": membership.name])
             } else {
                 guard let list = try await client.fetchList(
                     uri: membership.listURI,
@@ -684,7 +694,7 @@ final class BlueskyProfileViewModel {
                     account: account,
                     appPassword: appPassword
                 )
-                statusMessage = "Added to \(membership.name)."
+                statusMessage = String.localized("profile.status.added_to_list", replacements: ["name": membership.name])
             }
 
             // Don't call load() here — avoids PDS propagation delay
@@ -724,7 +734,7 @@ final class BlueskyProfileViewModel {
                 appPassword: appPassword
             )
 
-            statusMessage = "Created \"\(name)\" and added \(profile.handle)."
+            statusMessage = String.localized("profile.status.list_created", replacements: ["name": name, "handle": profile.handle])
 
             await load(
                 did: profile.did,

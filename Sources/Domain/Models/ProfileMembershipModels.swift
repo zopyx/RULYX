@@ -2,7 +2,7 @@ import Foundation
 
 /// Represents a Bluesky list and whether the inspected profile is a member of it.
 /// Used on the profile inspection screen to show which lists contain the profile.
-struct ProfileListMembership: Identifiable, Hashable {
+struct ProfileListMembership: Identifiable, Hashable, Sendable {
     // MARK: - Properties
 
     /// The AT URI of the list (used as the unique identifier).
@@ -72,7 +72,7 @@ struct ProfileStarterPackMembership: Identifiable, Hashable {
 
 /// Aggregates a profile's inspection data, including its Bluesky profile,
 /// list memberships, and starter pack memberships.
-struct ProfileInspection: Hashable {
+struct ProfileInspection: Hashable, Sendable {
     // MARK: - Properties
 
     /// The full Bluesky profile for the inspected account.

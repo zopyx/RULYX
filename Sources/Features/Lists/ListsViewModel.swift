@@ -96,28 +96,47 @@ final class ListsViewModel {
         }
         errorMessage = nil
 
-        // Fire all four fetches in parallel
-        async let listsTask = client.fetchLists(for: account, appPassword: appPassword)
-        async let profileTask = client.fetchProfile(
-            did: account.did ?? account.handle,
-            account: account,
-            appPassword: appPassword
-        )
-        async let blockingTask = client.fetchBlockingCount(for: account)
-        async let blockedByTask = client.fetchBlockedByCount(for: account)
-        do {
-            listsByKind = try await Dictionary(grouping: listsTask, by: \.kind)
-        } catch {
-            guard !AppError.isCancellation(error) else { return }
-            if listsByKind.isEmpty {
-                listsByKind = [:]
-                errorMessage = AppError.userMessage(from: error)
+        // Fire all four fetches in parallel with cooperative cancellation.
+        // If fetchLists throws, the group cancels the remaining tasks.
+        let clientRef = client
+        try? await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                let lists = try await clientRef.fetchLists(for: account, appPassword: appPassword)
+                try Task.checkCancellation()
+                await MainActor.run { self.listsByKind = Dictionary(grouping: lists, by: \.kind) }
+            }
+            group.addTask {
+                guard let result = try? await clientRef.fetchProfile(
+                    did: account.did ?? account.handle,
+                    account: account,
+                    appPassword: appPassword
+                ) else { return }
+                guard !Task.isCancelled else { return }
+                await MainActor.run { self.activeProfile = result }
+            }
+            group.addTask {
+                guard let count = try? await clientRef.fetchBlockingCount(for: account) else { return }
+                guard !Task.isCancelled else { return }
+                await MainActor.run { self.blockingCount = count }
+            }
+            group.addTask {
+                guard let count = try? await clientRef.fetchBlockedByCount(for: account) else { return }
+                guard !Task.isCancelled else { return }
+                await MainActor.run { self.blockedByCount = count }
+            }
+
+            do {
+                try await group.waitForAll()
+            } catch {
+                guard !AppError.isCancellation(error) else { return }
+                if self.listsByKind.isEmpty {
+                    await MainActor.run {
+                        self.listsByKind = [:]
+                        self.errorMessage = AppError.userMessage(from: error)
+                    }
+                }
             }
         }
-
-        activeProfile = try? await profileTask
-        blockingCount = try? await blockingTask
-        blockedByCount = try? await blockedByTask
 
         persistCache(forKey: cacheKey)
         isFromCache = false

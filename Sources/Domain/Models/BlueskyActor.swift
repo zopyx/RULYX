@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 
 /// Represents a minimal Bluesky actor with core profile information.
 /// Used as a lightweight representation of a user in contexts like list memberships and block lists.
-struct BlueskyActor: Identifiable, Hashable, Codable {
+struct BlueskyActor: Identifiable, Hashable, Codable, Sendable {
     // MARK: - Properties
 
     /// The unique identifier for this actor. When `id` is not provided during init, it defaults to the DID.

@@ -2,7 +2,7 @@ import Foundation
 
 /// Represents a Bluesky user profile fetched from the AT Protocol.
 /// Contains profile metadata, social statistics, and viewer state.
-struct BlueskyProfile: Identifiable, Hashable, Codable {
+struct BlueskyProfile: Identifiable, Hashable, Codable, Sendable {
     // MARK: - Properties
 
     /// The profile's AT URI (e.g., `at://did:plc:.../app.bsky.actor.profile/self`).
@@ -57,7 +57,7 @@ struct BlueskyProfile: Identifiable, Hashable, Codable {
 
 /// Represents the authenticated viewer's relationship with a profile.
 /// Provides blocking, muting, and following state from the viewer's perspective.
-struct BlueskyViewerState: Hashable, Codable {
+struct BlueskyViewerState: Hashable, Codable, Sendable {
     // MARK: - Properties
 
     /// Whether the viewer has muted this profile.

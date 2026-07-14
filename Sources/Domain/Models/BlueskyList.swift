@@ -2,7 +2,7 @@ import Foundation
 
 /// Represents a Bluesky moderation or curation list fetched from the AT Protocol.
 /// Lists can group actors for bulk moderation or organizational purposes.
-struct BlueskyList: Identifiable, Hashable, Codable {
+struct BlueskyList: Identifiable, Hashable, Codable, Sendable {
     // MARK: - Enums
 
     /// Categorizes the list type based on its Bluesky purpose identifier.
