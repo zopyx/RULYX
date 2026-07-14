@@ -83,6 +83,56 @@ struct RootView: View {
         }
     }
 
+    /// The account switcher button in the bottom tab bar.
+    /// Uses ExclusiveGesture: double-tap switches to previous account (takes priority);
+    /// single-tap opens the account switcher sheet.
+    private var accountSwitcherButton: some View {
+        let buttonTint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
+        return VStack(spacing: 4) {
+            if let account = accountStore.activeAccount {
+                AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 24)
+                    .overlay {
+                        Circle()
+                            .stroke(buttonTint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
+                    }
+                    // Visual indicator: small chevron when quick-switch is available
+                    .overlay(alignment: .bottomTrailing) {
+                        if accountStore.previousActiveAccountID != nil {
+                            Image(systemName: "chevron.left.2")
+                                .font(.system(size: 7, weight: .bold))
+                                .foregroundStyle(.secondary)
+                                .padding(2)
+                                .background(Circle().fill(.bar))
+                                .offset(x: 4, y: 4)
+                        }
+                    }
+            } else {
+                Image(systemName: "person.crop.circle")
+                    .font(.system(size: 22))
+            }
+            Text(localizationManager.localized("tab.accounts"))
+                .font(.caption2)
+                .lineLimit(1)
+        }
+        .foregroundStyle(workspaceStore.selectedTab == .account ? buttonTint : .secondary)
+        // ExclusiveGesture: double-tap takes priority; single-tap only fires if no second tap follows
+        .gesture(
+            TapGesture(count: 2)
+                .onEnded {
+                    guard let prevID = accountStore.previousActiveAccountID,
+                          let prevAccount = accountStore.accounts.first(where: { $0.id == prevID })
+                    else { return }
+                    let generator = UIImpactFeedbackGenerator(style: .rigid)
+                    generator.prepare()
+                    generator.impactOccurred()
+                    switchAccount(prevAccount)
+                }
+                .exclusively(before: TapGesture(count: 1).onEnded {
+                    showAccountSwitcher = true
+                })
+        )
+    }
+
     private func switchAccount(_ account: AppAccount) {
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
@@ -162,51 +212,11 @@ struct RootView: View {
                     .accessibilityIdentifier("tab-\(item.tab.rawValue)")
                 }
 
-                Button {
-                    showAccountSwitcher = true
-                } label: {
-                    VStack(spacing: 4) {
-                        if let account = accountStore.activeAccount {
-                            AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 24)
-                                .overlay {
-                                    Circle()
-                                        .stroke(tint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
-                                }
-                                // Visual indicator: small chevron when quick-switch is available
-                                .overlay(alignment: .bottomTrailing) {
-                                    if accountStore.previousActiveAccountID != nil {
-                                        Image(systemName: "chevron.left.2")
-                                            .font(.system(size: 7, weight: .bold))
-                                            .foregroundStyle(.secondary)
-                                            .padding(2)
-                                            .background(Circle().fill(.bar))
-                                            .offset(x: 4, y: 4)
-                                    }
-                                }
-                        } else {
-                            Image(systemName: "person.crop.circle")
-                                .font(.system(size: 22))
-                        }
-                        Text(localizationManager.localized("tab.accounts"))
-                            .font(.caption2)
-                            .lineLimit(1)
-                    }
-                    .foregroundStyle(workspaceStore.selectedTab == .account ? tint : .secondary)
-                }
-                // Double-tap: switch to previous account
-                .simultaneousGesture(TapGesture(count: 2).onEnded {
-                    guard let prevID = accountStore.previousActiveAccountID,
-                          let prevAccount = accountStore.accounts.first(where: { $0.id == prevID })
-                    else { return }
-                    let generator = UIImpactFeedbackGenerator(style: .rigid)
-                    generator.prepare()
-                    generator.impactOccurred()
-                    switchAccount(prevAccount)
-                })
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())
-                .accessibilityIdentifier("tab-accounts")
+                accountSwitcherButton
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .accessibilityIdentifier("tab-accounts")
             }
             .padding(.horizontal, 4)
             .padding(.top, 6)
