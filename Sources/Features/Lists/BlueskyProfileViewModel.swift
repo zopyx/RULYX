@@ -298,17 +298,39 @@ final class BlueskyProfileViewModel {
 
     // MARK: - Private Helpers
 
-    /// Scans the user's feed counting images and videos. Stops when all pages are exhausted or cancelled.
+    /// Scans the user's feed counting images and videos.
+    ///
+    /// Optimizations:
+    /// - Caps at 1000 posts (10 pages of 100) to bound execution time
+    /// - Caches results in `BlueskyAPICache` with 5-minute TTL
+    /// - Checks cache before scanning; skips entirely on cache hit
     private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        let cacheKey = "mediaScan_\(did)"
+
+        // Check cache first
+        let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.member)
+        if let cachedData = cached, !cachedData.isStale {
+            if let counts = try? JSONDecoder().decode(MediaScanResult.self, from: cachedData.data) {
+                mediaImageCount = counts.images
+                mediaVideoCount = counts.videos
+                return
+            }
+        }
+
         isScanningMedia = true
         defer { isScanningMedia = false }
+
+        let maxPages = 10 // 1000 posts max
         var cursor: String?
         var images = 0
         var videos = 0
-        while true {
+        var pagesFetched = 0
+
+        while pagesFetched < maxPages {
+            guard !Task.isCancelled else { return }
             do {
-                guard !Task.isCancelled else { return }
                 let response = try await client.fetchRichFeed(did: did, cursor: cursor, account: account, appPassword: appPassword)
+                pagesFetched += 1
                 for entry in response.feed {
                     guard !Task.isCancelled else { return }
                     if let embed = entry.post.embed {
@@ -318,16 +340,25 @@ final class BlueskyProfileViewModel {
                         }
                     }
                 }
-                guard let next = response.cursor else { break }
-                cursor = next
+                cursor = response.cursor
+                if cursor == nil {
+                    break
+                }
             } catch is CancellationError {
                 return
             } catch {
                 break
             }
         }
+
         mediaImageCount = images
         mediaVideoCount = videos
+
+        // Write to cache
+        let result = MediaScanResult(images: images, videos: videos)
+        if let encoded = try? JSONEncoder().encode(result) {
+            await BlueskyAPICache.shared.write(accountDID: did, url: cacheKey, data: encoded)
+        }
     }
 
     // MARK: - Moderation Actions
@@ -815,4 +846,10 @@ enum ExportFileFormat: String, CaseIterable {
     case csv
     /// Pretty-printed JSON array of post objects.
     case json
+}
+
+/// Cached result of a media scan for a profile.
+private struct MediaScanResult: Codable {
+    let images: Int
+    let videos: Int
 }
