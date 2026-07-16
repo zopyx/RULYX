@@ -53,12 +53,12 @@ struct BlueskyActorRow<Extra: View>: View {
                 }
                 Text(actor.handle)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                 if let description = actor.description, !description.isEmpty {
                     if showActorDescriptions {
                         Text(description)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                             .lineLimit(3)
                     }
                 }
