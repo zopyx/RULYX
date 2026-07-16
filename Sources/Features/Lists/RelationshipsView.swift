@@ -321,10 +321,12 @@ struct RelationshipsView: View {
 
                         Divider()
 
-                        Button {
-                            isShowingJSONImportPicker = true
-                        } label: {
-                            Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
+                        if mode == .following {
+                            Button {
+                                isShowingJSONImportPicker = true
+                            } label: {
+                                Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
+                            }
                         }
 
                         Button {
