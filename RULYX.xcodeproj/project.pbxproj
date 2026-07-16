@@ -139,7 +139,6 @@
 		5B4C23380734C07FA3F6D87F /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C653D72FC931E1C3CCFE6 /* SnapshotHelper.swift */; };
 		5C98188CF411ABB9EBC2E739 /* BlueskyModerationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE36799F5E7CF051ED4E65E /* BlueskyModerationServicing.swift */; };
 		5CE364B178AB794B461C5F99 /* NewConversationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D74D2314222D92AA8ED0E4 /* NewConversationSheet.swift */; };
-		5CE8DDD51EF703D3FD66A4A9 /* iPadDragDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97730E70ACB6A0120946A2AF /* iPadDragDrop.swift */; };
 		5F13A54CFA97C76A18D2FDF3 /* HTTPRequestDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2BA4F453710A4F661A13B6 /* HTTPRequestDebugView.swift */; };
 		60818976997EB79EF0F84EC2 /* ListsView+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AB5243A902E67DBF19206E /* ListsView+Presentation.swift */; };
 		6189FDB4C365D3F714C92277 /* ListTimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96219F3100D954B9C36729AD /* ListTimelineViewModel.swift */; };
@@ -547,7 +546,6 @@
 		961692AE7CB3E6367FB4AE60 /* ThumbnailImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailImageView.swift; sourceTree = "<group>"; };
 		96219F3100D954B9C36729AD /* ListTimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTimelineViewModel.swift; sourceTree = "<group>"; };
 		97444FC4D28FC65FB64F4BC5 /* ChatAPIDTOsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAPIDTOsTests.swift; sourceTree = "<group>"; };
-		97730E70ACB6A0120946A2AF /* iPadDragDrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadDragDrop.swift; sourceTree = "<group>"; };
 		97E9357873CE27FA245BA37D /* es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = es.json; sourceTree = "<group>"; };
 		99DCCD6F249A47E302111597 /* LiveBlueskyClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBlueskyClient.swift; sourceTree = "<group>"; };
 		9A496F6B4F8249E96607630D /* ActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLogView.swift; sourceTree = "<group>"; };
@@ -879,7 +877,6 @@
 			isa = PBXGroup;
 			children = (
 				4C3EF754BC5D4E5AF172EDE6 /* iPadCommandPalette.swift */,
-				97730E70ACB6A0120946A2AF /* iPadDragDrop.swift */,
 				32FF654D6CFEB23F9D0B6444 /* iPadKeyboardShortcuts.swift */,
 				6C61C1F5DCFF97D5D218B637 /* SidebarItem.swift */,
 			);
@@ -1735,7 +1732,6 @@
 				0014B27F495A2E22A7399DB1 /* WorkspacePreferencesStore.swift in Sources */,
 				7B0F186C83A1DC8EACEA1E21 /* iCloudAccountSync.swift in Sources */,
 				85B737C9E3C3E767590B329C /* iPadCommandPalette.swift in Sources */,
-				5CE8DDD51EF703D3FD66A4A9 /* iPadDragDrop.swift in Sources */,
 				F0116C1832035706745C347D /* iPadKeyboardShortcuts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
