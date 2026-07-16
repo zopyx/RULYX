@@ -80,6 +80,7 @@
 		2D62F0DC9DC51FFDC4B29ED3 /* TimelineTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9BA969D52386356D4AD1C /* TimelineTab.swift */; };
 		2DF00A71562D916B2C7CADC0 /* TimelineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DC5D9D6263FDF264240662 /* TimelineState.swift */; };
 		30C6532847608A3368F1EF6D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8919369DD4F6A15D621740D0 /* AppLogger.swift */; };
+		32C174CC720F18E8911AF822 /* AddMemberSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8EBCADB8C7CB52FB195329C /* AddMemberSheet.swift */; };
 		339AA5C3F49E505FF803E3A6 /* ListDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B71515BB0ED6F71B12B6A1 /* ListDTOs.swift */; };
 		33B496A58DA931824C864548 /* ClearskyHeartbeatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0230DA7EE94FF126CB5EF0B /* ClearskyHeartbeatService.swift */; };
 		34400D24383390F3F173D351 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6E935CDEF1D4A0995B5A76 /* TestHelpers.swift */; };
@@ -207,6 +208,7 @@
 		83DB81FCAD1811D068953F6D /* URL+Bluesky.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80B49D55FF573559AF722A3 /* URL+Bluesky.swift */; };
 		85B737C9E3C3E767590B329C /* iPadCommandPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3EF754BC5D4E5AF172EDE6 /* iPadCommandPalette.swift */; };
 		86FD2853541E343BDCB828E2 /* ChatAPIDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38504B3CEACB3AFD61DBC65C /* ChatAPIDTOs.swift */; };
+		8744429736078DC92B36C3A3 /* GroupInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2627A805CA68F6A65C25CB5 /* GroupInfoSheet.swift */; };
 		87E8DCAEA7849A11F2BFCAC1 /* iPadProfileInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D418CEB548F2449C21DC18C /* iPadProfileInspector.swift */; };
 		886DEA0334FF68AFAB2002F5 /* BlueskySessionService401RetryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94186D084104DD1FB229672 /* BlueskySessionService401RetryTests.swift */; };
 		89819DA7B2B18420F4A09120 /* String+CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = D495EFD4FEF70FB5C0D7BA2B /* String+CSV.swift */; };
@@ -645,6 +647,7 @@
 		D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
 		D19F8289064A8E2ED734F301 /* AccountSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSummaryCard.swift; sourceTree = "<group>"; };
 		D258AE6157132481DC5BCF92 /* RULYX.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RULYX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2627A805CA68F6A65C25CB5 /* GroupInfoSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupInfoSheet.swift; sourceTree = "<group>"; };
 		D2AA2C4EF26C742918C3B0D4 /* AnalyticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsStore.swift; sourceTree = "<group>"; };
 		D307EFDD21371973BD712894 /* SubscribedListInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribedListInfo.swift; sourceTree = "<group>"; };
 		D39841C5A6B9321BBA15AC75 /* BatchOperationProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchOperationProgressView.swift; sourceTree = "<group>"; };
@@ -658,6 +661,7 @@
 		D7BFB1D29D75F3D69ABA8FEB /* ChatStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStatusBanner.swift; sourceTree = "<group>"; };
 		D87E4164F1065B2DEB4B0AF8 /* ClearskyDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearskyDTOs.swift; sourceTree = "<group>"; };
 		D8BD2A0F847488D0E669E7DD /* CommonDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonDTOs.swift; sourceTree = "<group>"; };
+		D8EBCADB8C7CB52FB195329C /* AddMemberSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMemberSheet.swift; sourceTree = "<group>"; };
 		D9247E08E5551755A2ED991A /* BlueskySessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskySessionService.swift; sourceTree = "<group>"; };
 		DC0ECA2AA45475B39419E281 /* BlueskyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyList.swift; sourceTree = "<group>"; };
 		DE87495FA903F80E0F00020A /* ServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceIntegrationTests.swift; sourceTree = "<group>"; };
@@ -932,10 +936,12 @@
 		8440571AAD0B08384F3C3F7E /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				D8EBCADB8C7CB52FB195329C /* AddMemberSheet.swift */,
 				69F8F1371F6F8074F5048F5A /* ChatMessageBubble.swift */,
 				F7C241FAFB80EED8C1FA6A4E /* ChatTab.swift */,
 				C191635343E81BCF211C8A2E /* ConversationDetailView.swift */,
 				BC510A8C26A27895D9F18C91 /* ConversationListView.swift */,
+				D2627A805CA68F6A65C25CB5 /* GroupInfoSheet.swift */,
 				46D74D2314222D92AA8ED0E4 /* NewConversationSheet.swift */,
 			);
 			path = Chat;
@@ -1549,6 +1555,7 @@
 				EC878F5396662EFD785AD019 /* ActivityLogView.swift in Sources */,
 				0C1ADEB015AFB30FB73A88CE /* ActorSearchResultRow.swift in Sources */,
 				16E9B9F84C588B9699BF83D7 /* AddAccountView.swift in Sources */,
+				32C174CC720F18E8911AF822 /* AddMemberSheet.swift in Sources */,
 				D43E73CA36B85BF21D00F094 /* AnalyticsStore.swift in Sources */,
 				FE8477B7DBEAF316FCE639B0 /* AppAccount.swift in Sources */,
 				1B9FB40632CE42DB9FE3D9F2 /* AppDependencies.swift in Sources */,
@@ -1632,6 +1639,7 @@
 				3DB486679FEFC46E16A11AE7 /* GIFService.swift in Sources */,
 				2951ED986F755DF6DEB781C6 /* GlassSupport.swift in Sources */,
 				5186EDDF2BAE8A89B179460C /* GroupAvatarView.swift in Sources */,
+				8744429736078DC92B36C3A3 /* GroupInfoSheet.swift in Sources */,
 				4F4E4FFE865AF3A433374141 /* HTTPClient.swift in Sources */,
 				A2FBC545A34138B4A92FC400 /* HTTPDebugStatsView.swift in Sources */,
 				69B17398F0FF053A52EF91AB /* HTTPRequestDebugStore.swift in Sources */,

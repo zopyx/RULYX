@@ -1,7 +1,10 @@
 import SwiftUI
 
-/// Sheet for starting a new chat conversation — search for a user by
-/// handle/display name, select them, and create (or get existing) conversation.
+/// Sheet for starting a new chat conversation — search for users by
+/// handle/display name, select one or more, and create a DM or group.
+///
+/// Single selection → 1:1 DM via `getOrCreateConvo`
+/// Multi selection (2+) → Group via `getOrCreateGroupConvo`
 struct NewConversationSheet: View {
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
@@ -10,11 +13,16 @@ struct NewConversationSheet: View {
     @State private var searchQuery = ""
     @State private var searchResults: [BlueskyActor] = []
     @State private var isSearching = false
-    @State private var selectedActor: BlueskyActor?
+    @State private var selectedActors: Set<BlueskyActor> = []
     @State private var isCreating = false
 
     let onComplete: (ChatConversation?) -> Void
     @EnvironmentObject private var localizationManager: LocalizationManager
+
+    private var isMultiSelect: Bool { selectedActors.count >= 2 }
+    private var confirmationTitle: String {
+        isMultiSelect ? loc("chat.group.create") : loc("chat.new.start")
+    }
 
     var body: some View {
         NavigationStack {
@@ -30,6 +38,31 @@ struct NewConversationSheet: View {
                     }
                 }
 
+                if !selectedActors.isEmpty {
+                    Section(loc("chat.new.selected")) {
+                        ForEach(Array(selectedActors)) { actor in
+                            HStack {
+                                actorAvatar(actor, size: 32)
+                                VStack(alignment: .leading) {
+                                    Text(actor.displayName ?? actor.handle)
+                                        .font(.subheadline.weight(.semibold))
+                                    Text("@\(actor.handle)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Button {
+                                    selectedActors.remove(actor)
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                }
+
                 if isSearching {
                     Section {
                         HStack {
@@ -41,16 +74,27 @@ struct NewConversationSheet: View {
                 }
 
                 if !searchResults.isEmpty {
-                    Section("chat.new.results") {
+                    Section(loc("chat.new.results")) {
                         ForEach(searchResults) { actor in
-                            ActorSearchRow(actor: actor, isSelected: selectedActor?.did == actor.did)
-                                .contentShape(Rectangle())
-                                .onTapGesture { selectedActor = actor }
+                            ActorSearchRow(
+                                actor: actor,
+                                isSelected: selectedActors.contains(actor)
+                            )
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if selectedActors.contains(actor) {
+                                    selectedActors.remove(actor)
+                                } else {
+                                    selectedActors.insert(actor)
+                                }
+                            }
                         }
                     }
                 }
             }
-            .pageTitle(loc("chat.new.title"))
+            .pageTitle(isMultiSelect
+                ? String.localized("chat.group.create.title", replacements: ["n": "\(selectedActors.count)"])
+                : loc("chat.new.title"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(loc("actions.cancel")) {
@@ -59,9 +103,9 @@ struct NewConversationSheet: View {
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    if let selectedActor {
-                        Button(loc("chat.new.start")) {
-                            Task { await startConversation(actor: selectedActor) }
+                    if !selectedActors.isEmpty {
+                        Button(confirmationTitle) {
+                            Task { await startConversation() }
                         }
                         .disabled(isCreating)
                     }
@@ -85,7 +129,7 @@ struct NewConversationSheet: View {
         }
     }
 
-    private func startConversation(actor: BlueskyActor) async {
+    private func startConversation() async {
         guard let account = accountStore.activeAccount else {
             dismiss()
             onComplete(nil)
@@ -95,10 +139,42 @@ struct NewConversationSheet: View {
         let appPassword = accountStore.appPassword(for: account)
         chatStore.setAccount(account, appPassword: appPassword)
         isCreating = true
-        let convo = await chatStore.getOrCreateConvo(memberDID: actor.did)
+
+        let convo: ChatConversation?
+        if isMultiSelect {
+            let dids = selectedActors.map(\.did)
+            convo = await chatStore.getOrCreateGroupConvo(memberDIDs: dids)
+        } else if let actor = selectedActors.first {
+            convo = await chatStore.getOrCreateConvo(memberDID: actor.did)
+        } else {
+            convo = nil
+        }
+
         isCreating = false
         dismiss()
         onComplete(convo)
+    }
+
+    @ViewBuilder
+    private func actorAvatar(_ actor: BlueskyActor, size: CGFloat) -> some View {
+        if let url = actor.avatarURL {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case let .success(image):
+                    image.resizable().scaledToFill()
+                default:
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                }
+            }
+            .frame(width: size, height: size)
+            .clipShape(Circle())
+        } else {
+            Image(systemName: "person.circle.fill")
+                .resizable()
+                .frame(width: size, height: size)
+                .foregroundStyle(.tertiary)
+        }
     }
 }
 

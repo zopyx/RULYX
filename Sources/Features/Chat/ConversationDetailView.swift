@@ -14,6 +14,8 @@ struct ConversationDetailView: View {
     @State private var showProfile = false
     @State private var mentionProfileHandle: String?
     @State private var showScrollToBottom = false
+    @State private var showGroupInfo = false
+    @State private var showAddMember = false
     @FocusState private var isFocused: Bool
 
     let conversation: ChatConversation
@@ -84,7 +86,30 @@ struct ConversationDetailView: View {
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                if let member = otherMember {
+                if conversation.kind == .group {
+                    Button {
+                        showGroupInfo = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            GroupAvatarView(
+                                members: conversation.members,
+                                groupName: conversation.groupInfo?.name ?? "",
+                                size: 32
+                            )
+                            .frame(width: 32, height: 32)
+
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(displayName)
+                                    .font(.headline)
+                                    .lineLimit(1)
+                                Text(String.localized("chat.group_info.members", replacements: ["n": "\(conversation.groupInfo?.memberCount ?? conversation.members.count)"]))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                } else if let member = otherMember {
                     Button {
                         showProfile = true
                     } label: {
@@ -103,35 +128,92 @@ struct ConversationDetailView: View {
             }
 
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    if conversation.muted {
+                if conversation.kind == .group {
+                    Menu {
                         Button {
-                            Task { await chatStore.unmute(convoId: conversation.id) }
+                            showGroupInfo = true
                         } label: {
-                            Label(loc("chat.unmute"), systemImage: "bell")
+                            Label(loc("chat.group_info.title"), systemImage: "info.circle")
                         }
-                    } else {
                         Button {
-                            Task { await chatStore.mute(convoId: conversation.id) }
+                            showAddMember = true
                         } label: {
-                            Label(loc("chat.mute"), systemImage: "bell.slash")
+                            Label(loc("chat.add_member.title"), systemImage: "person.badge.plus")
                         }
-                    }
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        Task { await chatStore.loadMessages(convoId: conversation.id) }
+                        Divider()
+                        if conversation.muted {
+                            Button {
+                                Task { await chatStore.unmute(convoId: conversation.id) }
+                            } label: {
+                                Label(loc("chat.unmute"), systemImage: "bell")
+                            }
+                        } else {
+                            Button {
+                                Task { await chatStore.mute(convoId: conversation.id) }
+                            } label: {
+                                Label(loc("chat.mute"), systemImage: "bell.slash")
+                            }
+                        }
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            Task { await chatStore.loadMessages(convoId: conversation.id) }
+                        } label: {
+                            Label(loc("chat.reload"), systemImage: "arrow.clockwise")
+                        }
+                        Divider()
+                        Button(role: .destructive) {
+                            Task { await chatStore.leave(convoId: conversation.id) }
+                        } label: {
+                            Label(loc("chat.delete"), systemImage: "trash")
+                        }
                     } label: {
-                        Label(loc("chat.reload"), systemImage: "arrow.clockwise")
+                        Image(systemName: "ellipsis.circle")
                     }
-                    Button(role: .destructive) {
-                        Task { await chatStore.leave(convoId: conversation.id) }
+                } else {
+                    Menu {
+                        if conversation.muted {
+                            Button {
+                                Task { await chatStore.unmute(convoId: conversation.id) }
+                            } label: {
+                                Label(loc("chat.unmute"), systemImage: "bell")
+                            }
+                        } else {
+                            Button {
+                                Task { await chatStore.mute(convoId: conversation.id) }
+                            } label: {
+                                Label(loc("chat.mute"), systemImage: "bell.slash")
+                            }
+                        }
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            Task { await chatStore.loadMessages(convoId: conversation.id) }
+                        } label: {
+                            Label(loc("chat.reload"), systemImage: "arrow.clockwise")
+                        }
+                        Button(role: .destructive) {
+                            Task { await chatStore.leave(convoId: conversation.id) }
+                        } label: {
+                            Label(loc("chat.delete"), systemImage: "trash")
+                        }
                     } label: {
-                        Label(loc("chat.delete"), systemImage: "trash")
+                        Image(systemName: "ellipsis.circle")
                     }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
                 }
             }
+        }
+        .sheet(isPresented: $showGroupInfo) {
+            GroupInfoSheet(conversation: conversation)
+                .environmentObject(chatStore)
+                .environmentObject(accountStore)
+                .environmentObject(container)
+                .environmentObject(localizationManager)
+        }
+        .sheet(isPresented: $showAddMember) {
+            AddMemberSheet(conversation: conversation)
+                .environmentObject(chatStore)
+                .environmentObject(accountStore)
+                .environmentObject(container)
+                .environmentObject(localizationManager)
         }
         .sheet(isPresented: $showProfile) {
             if let member = otherMember {
