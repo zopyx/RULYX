@@ -83,7 +83,7 @@ struct AutoBlockListPickerView: View {
                 if let count = list.memberCount {
                     Text(loc("internal.list.member_count").replacingOccurrences(of: "{n}", with: "\(count)"))
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
             Spacer()
@@ -93,7 +93,7 @@ struct AutoBlockListPickerView: View {
                     .font(.title3)
             } else {
                 Image(systemName: "circle")
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .font(.title3)
             }
         }

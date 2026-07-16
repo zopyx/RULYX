@@ -38,7 +38,7 @@ struct InlineReplyRow: View {
                         if let handle = author.handle {
                             Text("@\(handle)")
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                         Spacer()
@@ -49,7 +49,7 @@ struct InlineReplyRow: View {
                                 Text("\(likeCount)")
                                     .font(.caption2)
                             }
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                         }
                     }
                     if let text = record.text, !text.isEmpty {

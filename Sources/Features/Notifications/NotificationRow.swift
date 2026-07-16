@@ -39,7 +39,7 @@ struct NotificationRow: View {
                     }
                     Text(relativeTime)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .contentShape(Rectangle())

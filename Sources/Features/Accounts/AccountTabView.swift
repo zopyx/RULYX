@@ -115,7 +115,7 @@ struct AccountTabView: View {
 
                             Text("·")
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
 
                             Button {
                                 presentImportPicker()

@@ -193,7 +193,7 @@ struct UserPostsView: View {
             if !viewModel.hasMore, !viewModel.posts.isEmpty {
                 Text(loc("profile.posts.end"))
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }
@@ -372,7 +372,7 @@ struct UserPostsView: View {
                                 Spacer()
                                 Text("+\((thread.replies?.count ?? 0) - 3)")
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
@@ -412,7 +412,7 @@ struct UserPostsView: View {
         Section {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .font(.subheadline)
                 TextField(loc("profile.posts.search"), text: $viewModel.searchText)
                     .textFieldStyle(.plain)
@@ -422,7 +422,7 @@ struct UserPostsView: View {
                         viewModel.searchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -461,7 +461,7 @@ struct UserPostsView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(loc("profile.posts.from_date"))
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 DatePicker(
                     "",
                     selection: Binding(
@@ -477,7 +477,7 @@ struct UserPostsView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(loc("profile.posts.to_date"))
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 DatePicker(
                     "",
                     selection: Binding(

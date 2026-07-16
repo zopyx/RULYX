@@ -56,7 +56,7 @@ struct ChatMessageBubble: View {
                     if isPending {
                         Image(systemName: "clock")
                             .font(.caption2)
-                            .foregroundStyle(isOutgoing ? .white.opacity(0.5) : Color(.tertiaryLabel))
+                            .foregroundStyle(isOutgoing ? .white.opacity(0.6) : Color(.secondaryLabel))
                     }
 
                     if hasFailed {
@@ -88,7 +88,7 @@ struct ChatMessageBubble: View {
 
                     Text(timeString)
                         .font(.caption2)
-                        .foregroundStyle(isOutgoing ? .white.opacity(0.7) : Color(.tertiaryLabel))
+                        .foregroundStyle(isOutgoing ? .white.opacity(0.8) : Color(.secondaryLabel))
                 }
             }
             .padding(.horizontal, 12)

@@ -122,7 +122,7 @@ struct BatchOperationProgressView: View {
                                 if let handle = currentHandle {
                                     Text(verbatim: handle)
                                         .font(.caption.monospaced())
-                                        .foregroundStyle(.tertiary)
+                                        .foregroundStyle(.secondary)
                                         .lineLimit(1)
                                 }
                             }

@@ -75,7 +75,7 @@ struct PostAuthorHeader: View {
             if let created = createdAt, let date = parseDate(created) {
                 Text(relativeTimeString(from: date))
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
             }
         }
     }

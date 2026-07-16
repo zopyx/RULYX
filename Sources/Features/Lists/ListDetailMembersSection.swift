@@ -90,7 +90,7 @@ extension ListDetailView {
                                 if let createdAt = member.createdAt {
                                     Text(relativeTimeString(from: createdAt))
                                         .font(.caption)
-                                        .foregroundStyle(.tertiary)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
                         }

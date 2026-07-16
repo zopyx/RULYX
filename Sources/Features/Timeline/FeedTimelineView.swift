@@ -235,7 +235,7 @@ struct FeedTimelineView: View {
             if viewModel.state == .exhausted {
                 Text(loc: "timeline.end")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }

@@ -29,7 +29,7 @@ struct ComposePostView: View {
                                     .scaleEffect(0.8)
                                 Text(loc: "timeline.loading")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     } header: {
@@ -289,7 +289,7 @@ struct ComposePostView: View {
                                 } else {
                                     Text(loc("compose.alt_placeholder"))
                                         .font(.caption2)
-                                        .foregroundStyle(.tertiary)
+                                        .foregroundStyle(.secondary)
                                         .frame(width: 100)
                                         .onTapGesture { viewModel.altEditIndex = index }
                                 }
@@ -322,7 +322,7 @@ struct ComposePostView: View {
                         .foregroundStyle(.secondary)
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             } icon: {
                 Image(systemName: "arrowshape.turn.up.right.circle")

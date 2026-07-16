@@ -152,7 +152,7 @@ struct MentionsSearchView: View {
                 if !viewModel.hasMore, !viewModel.entries.isEmpty {
                     Text(loc: "mentions.end")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
                         .listRowSeparator(.hidden)
                 }

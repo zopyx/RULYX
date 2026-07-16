@@ -75,7 +75,7 @@ struct PerformanceMonitorOverlay: View {
         VStack(spacing: 1) {
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
             Text(value)
                 .font(.caption.monospacedDigit().weight(.semibold))
                 .foregroundStyle(.primary)

@@ -163,7 +163,7 @@ struct DirectRepliesView: View {
                 if !viewModel.hasMore, !viewModel.entries.isEmpty {
                     Text(loc: "directreplies.end")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
                         .listRowSeparator(.hidden)
                 }

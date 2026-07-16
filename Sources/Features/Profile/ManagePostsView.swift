@@ -273,7 +273,7 @@ struct ManagePostsView: View {
             if !viewModel.hasMore, !viewModel.posts.isEmpty {
                 Text(loc: "profile.posts.end")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }
@@ -292,7 +292,7 @@ struct ManagePostsView: View {
         Section {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .font(.subheadline)
                 TextField(loc("profile.manage_posts.search"), text: $viewModel.searchText)
                     .textFieldStyle(.plain)
@@ -302,7 +302,7 @@ struct ManagePostsView: View {
                         viewModel.searchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -365,7 +365,7 @@ struct ManagePostsView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(loc("profile.posts.from_date"))
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 DatePicker(
                     "",
                     selection: Binding(
@@ -384,7 +384,7 @@ struct ManagePostsView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(loc("profile.posts.to_date"))
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 DatePicker(
                     "",
                     selection: Binding(

@@ -295,7 +295,7 @@ struct ConversationDetailView: View {
                 } else {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
-                        .foregroundStyle(messageText.trimmingCharacters(in: .whitespaces).isEmpty ? Color(.tertiaryLabel) : Color.skyPrimary)
+                        .foregroundStyle(messageText.trimmingCharacters(in: .whitespaces).isEmpty ? Color(.secondaryLabel) : Color.skyPrimary)
                 }
             }
             .disabled(messageText.trimmingCharacters(in: .whitespaces).isEmpty || chatStore.isSendingMessage)
@@ -325,7 +325,7 @@ struct ConversationDetailView: View {
             Image(systemName: "person.circle.fill")
                 .resizable()
                 .frame(width: size, height: size)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -355,7 +355,7 @@ struct ConversationDetailView: View {
             Spacer()
             Text(loc: "chat.message.deleted")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
                 .padding(.vertical, 8)
             Spacer()
         }
@@ -367,7 +367,7 @@ struct ConversationDetailView: View {
             Spacer()
             Text(systemText(msg.data))
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
                 .padding(.vertical, 4)
                 .padding(.horizontal, 12)
                 .background(.ultraThinMaterial, in: Capsule())

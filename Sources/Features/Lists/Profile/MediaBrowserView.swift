@@ -41,7 +41,7 @@ struct MediaBrowserView: View {
                             if let detail = viewModel.downloadStatusDetail, !detail.isEmpty {
                                 Text(detail)
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             }
                         }
@@ -72,7 +72,7 @@ struct MediaBrowserView: View {
                                     .scaleEffect(0.6)
                                 Text(loc: "profile.media.scanning")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                         .padding(.horizontal)
@@ -88,7 +88,7 @@ struct MediaBrowserView: View {
                                     .scaleEffect(0.6)
                                 Text(loc: "profile.media.scanning")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
                         }

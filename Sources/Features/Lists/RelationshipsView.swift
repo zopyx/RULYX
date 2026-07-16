@@ -142,7 +142,7 @@ struct RelationshipsView: View {
                             if let statusMessage {
                                 Text(statusMessage)
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -237,7 +237,7 @@ struct RelationshipsView: View {
                                             .replacingOccurrences(of: "{handle}", with: handle)
                                     )
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                                     Spacer()
                                 }
                                 .transition(.opacity)
@@ -893,7 +893,7 @@ struct RelationshipsView: View {
             if debugMode {
                 Text("\(index + 1)")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
             }
         }
     }

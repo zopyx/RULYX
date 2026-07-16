@@ -91,7 +91,7 @@ struct ConversationListView: View {
                         Spacer()
                         Image(systemName: "bubble.left.and.bubble.right")
                             .font(.system(size: 48))
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                         Text(loc: "chat.empty.title")
                             .font(.headline)
                         Text(loc: "chat.empty.desc")
@@ -390,7 +390,7 @@ struct ConversationListView: View {
                     Image(systemName: conversation.kind == .group ? "person.3.fill" : "person.circle.fill")
                         .resizable()
                         .frame(width: 48, height: 48)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -424,7 +424,7 @@ struct ConversationListView: View {
                     if conversation.muted {
                         Image(systemName: "bell.slash.fill")
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }

@@ -166,7 +166,7 @@ struct PostEmbedView: View {
                 if let host = external.uri.flatMap(URL.init)?.host, !host.isEmpty {
                     Label(host, systemImage: "link")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
 

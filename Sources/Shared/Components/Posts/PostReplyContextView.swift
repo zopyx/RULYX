@@ -29,7 +29,7 @@ struct PostReplyContextView: View {
                         if let handle = parentAuthor.handle {
                             Text("@\(handle)")
                                 .font(.caption)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                     }
@@ -44,7 +44,7 @@ struct PostReplyContextView: View {
 
             Text(verbatim: "\(loc("profile.posts.replying_to")) \(parentAuthor.displayName ?? parentAuthor.handle ?? "")")
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
     }

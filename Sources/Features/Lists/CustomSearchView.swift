@@ -146,7 +146,7 @@ struct CustomSearchView: View {
         Section {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 TextField(loc("customsearch.placeholder"), text: $viewModel.query)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
@@ -160,7 +160,7 @@ struct CustomSearchView: View {
                         viewModel.reset()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -184,7 +184,7 @@ struct CustomSearchView: View {
                     } label: {
                         HStack {
                             Image(systemName: "clock.arrow.circlepath")
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                             Text(query)
                                 .lineLimit(1)
                                 .foregroundStyle(.primary)
@@ -199,7 +199,7 @@ struct CustomSearchView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -324,7 +324,7 @@ struct CustomSearchView: View {
         if !hasMore, !entries.isEmpty {
             Text(loc: "customsearch.end")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
                 .listRowSeparator(.hidden)
         }

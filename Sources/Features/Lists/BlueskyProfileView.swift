@@ -592,7 +592,7 @@ struct BlueskyProfileView: View {
                             Image(systemName: "chevron.right")
                                 .flipsForRightToLeftLayoutDirection(true)
                                 .appFont(.subheading)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .buttonStyle(.plain)
@@ -624,7 +624,7 @@ struct BlueskyProfileView: View {
                             Image(systemName: "chevron.right")
                                 .flipsForRightToLeftLayoutDirection(true)
                                 .appFont(.subheading)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .buttonStyle(.plain)
@@ -655,7 +655,7 @@ struct BlueskyProfileView: View {
                                 Image(systemName: "chevron.right")
                                     .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             } else if !viewModel.isScanningMedia {
                                 Text(loc: "profile.media.empty")
                                     .foregroundStyle(.secondary)
@@ -678,7 +678,7 @@ struct BlueskyProfileView: View {
                                 Image(systemName: "chevron.right")
                                     .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             } else if viewModel.listError == nil, !viewModel.isLoading {
                                 ProgressView()
                                     .scaleEffect(0.6)
@@ -701,7 +701,7 @@ struct BlueskyProfileView: View {
                                 Image(systemName: "chevron.right")
                                     .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             } else if !viewModel.isLoading {
                                 ProgressView()
                                     .scaleEffect(0.6)
@@ -949,7 +949,7 @@ struct BlueskyProfileView: View {
                                     .font(.caption)
                             }
                             .buttonStyle(.plain)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                         }
                     } label: {
                         Text(loc: "profile.stats.handle")
@@ -967,7 +967,7 @@ struct BlueskyProfileView: View {
                                     .font(.caption)
                             }
                             .buttonStyle(.plain)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                         }
                     } label: {
                         Text(loc: "profile.stats.did")
@@ -999,7 +999,7 @@ struct BlueskyProfileView: View {
                                 Spacer()
                                 Text(entry.date.formatted(date: .abbreviated, time: .omitted))
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     } header: {
@@ -1157,7 +1157,7 @@ struct BlueskyProfileView: View {
                                                     .replacingOccurrences(of: "{handle}", with: handle)
                                             )
                                             .font(.caption2)
-                                            .foregroundStyle(.tertiary)
+                                            .foregroundStyle(.secondary)
                                             Spacer()
                                         }
                                         .transition(.opacity)
@@ -1252,13 +1252,13 @@ struct BlueskyProfileView: View {
                                             if let subscribedAt = sub.subscribedAt {
                                                 Text(formatDateRelative(dateString: subscribedAt))
                                                     .font(.caption)
-                                                    .foregroundStyle(.tertiary)
+                                                    .foregroundStyle(.secondary)
                                             }
                                         }
                                         if let desc = sub.description, !desc.isEmpty {
                                             Text(desc)
                                                 .font(.caption)
-                                                .foregroundStyle(.tertiary)
+                                                .foregroundStyle(.secondary)
                                                 .lineLimit(2)
                                         }
                                         HStack(spacing: 4) {
@@ -1268,10 +1268,10 @@ struct BlueskyProfileView: View {
                                             if let count = sub.memberCount {
                                                 Text("·")
                                                     .font(.caption)
-                                                    .foregroundStyle(.tertiary)
+                                                    .foregroundStyle(.secondary)
                                                 Text(loc("profile.subscribed_lists.member_count").replacingOccurrences(of: "{count}", with: "\(count)"))
                                                     .font(.caption)
-                                                    .foregroundStyle(.tertiary)
+                                                    .foregroundStyle(.secondary)
                                             }
                                         }
                                     }

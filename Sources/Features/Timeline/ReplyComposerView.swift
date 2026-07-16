@@ -42,7 +42,7 @@ struct ReplyComposerView: View {
                         if postText.isEmpty {
                             Text(loc("compose.placeholder"))
                                 .font(.body)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 14)
                                 .allowsHitTesting(false)
@@ -58,7 +58,7 @@ struct ReplyComposerView: View {
                             .foregroundStyle(postText.count > maxChars ? .red : postText.count > maxChars - 40 ? .orange : .secondary)
                         Text("/ \(maxChars)")
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
 
                     Spacer()
@@ -138,7 +138,7 @@ struct ReplyComposerView: View {
                     if let handle = author.handle {
                         Text("@\(handle)")
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                 }

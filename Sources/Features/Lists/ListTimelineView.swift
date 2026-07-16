@@ -240,7 +240,7 @@ struct ListTimelineView: View {
             if !viewModel.state.hasMore, !viewModel.entries.isEmpty {
                 Text(loc("timeline.end"))
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }

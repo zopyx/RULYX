@@ -166,7 +166,7 @@ private struct HTTPRequestDebugRow: View {
                 } else {
                     Text("---")
                         .font(.caption2.monospacedDigit())
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
 
                 Text(entry.startedAt, formatter: iso8601)
@@ -180,7 +180,7 @@ private struct HTTPRequestDebugRow: View {
                 } else {
                     Text("running…")
                         .font(.caption2.monospacedDigit())
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
 
@@ -188,7 +188,7 @@ private struct HTTPRequestDebugRow: View {
             if let source = entry.source {
                 Text(source)
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
             }
 
             // Line 4: Response button (failed only)

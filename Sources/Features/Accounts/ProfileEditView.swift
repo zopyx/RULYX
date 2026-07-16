@@ -293,7 +293,7 @@ struct ProfileEditView: View {
             .overlay {
                 Image(systemName: "photo.badge.plus")
                     .font(.title2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
             }
     }
 

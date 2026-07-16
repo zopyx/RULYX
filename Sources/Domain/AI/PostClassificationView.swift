@@ -217,7 +217,7 @@ private struct ModelSelectionRow: View {
                             if state != .ready {
                                 Text("·")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                                 Text(stateLabel)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -233,7 +233,7 @@ private struct ModelSelectionRow: View {
                                 .foregroundStyle(.blue)
                         } else {
                             Image(systemName: "circle")
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }

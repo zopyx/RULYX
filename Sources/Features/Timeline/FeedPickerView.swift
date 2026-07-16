@@ -64,7 +64,7 @@ struct FeedPickerView: View {
                                             .foregroundStyle(.primary)
                                         Text(recent.uri)
                                             .font(.caption.monospaced())
-                                            .foregroundStyle(.tertiary)
+                                            .foregroundStyle(.secondary)
                                     }
                                     Spacer()
                                     if feedStore.customFeedURI == recent.uri {
@@ -89,7 +89,7 @@ struct FeedPickerView: View {
                         }
                         Text(feedStore.customFeedURI ?? "")
                             .font(.caption.monospaced())
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }

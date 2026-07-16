@@ -74,7 +74,7 @@ struct ClearskyListsView: View {
                 if let desc = entry.description, !desc.isEmpty {
                     Text(desc)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
                 if let handle = ownerHandles[entry.url] {

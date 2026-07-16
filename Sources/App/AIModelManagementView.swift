@@ -127,7 +127,7 @@ private struct ModelCard: View {
                             .foregroundStyle(.secondary)
                         Text("\u{00B7}")
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                         Text(roleLabel)
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -144,7 +144,7 @@ private struct ModelCard: View {
             if !model.description.isEmpty {
                 Text(model.description)
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 10)
