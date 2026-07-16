@@ -434,6 +434,67 @@ final class ChatStore: ObservableObject {
         }
     }
 
+    /// Creates or retrieves a group conversation for multiple member DIDs.
+    func getOrCreateGroupConvo(memberDIDs: [String]) async -> ChatConversation? {
+        guard let account = activeAccount, let context = activeContext else { return nil }
+        do {
+            let conversation = try await chatService.getConvoForMembers(members: memberDIDs, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return nil }
+            upsertConversation(conversation)
+            return conversation
+        } catch {
+            guard isCurrentContext(context) else { return nil }
+            self.error = error
+            return nil
+        }
+    }
+
+    /// Adds a member to a group conversation.
+    func addMember(convoId: String, memberDID: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        error = nil
+        do {
+            let updated = try await chatService.addMember(convoId: convoId, memberDID: memberDID, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            upsertConversation(updated)
+            // Reload messages to show the system message
+            await refreshMessages(convoId: convoId)
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Removes a member from a group conversation.
+    func removeMember(convoId: String, memberDID: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        error = nil
+        do {
+            let updated = try await chatService.removeMember(convoId: convoId, memberDID: memberDID, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            upsertConversation(updated)
+            await refreshMessages(convoId: convoId)
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
+    /// Updates the name of a group conversation.
+    func updateGroupName(convoId: String, name: String) async {
+        guard let account = activeAccount, let context = activeContext else { return }
+        error = nil
+        do {
+            let updated = try await chatService.updateGroupName(convoId: convoId, name: name, account: account, appPassword: activeAppPassword)
+            guard isCurrentContext(context) else { return }
+            upsertConversation(updated)
+            await refreshMessages(convoId: convoId)
+        } catch {
+            guard isCurrentContext(context) else { return }
+            self.error = error
+        }
+    }
+
     /// Refreshes messages for a conversation (replaces the full message list).
     private func refreshMessages(convoId: String) async {
         guard let account = activeAccount, let context = activeContext else { return }
