@@ -75,7 +75,7 @@ final class BlueskyProfileServiceTests: XCTestCase {
     func testSearchActorsSuccess() async throws {
         sessionService.onAuthenticatedRequest = { _, _ in
             let json = """
-            {"actors": [{"did": "did:plc:1", "handle": "alice.bsky.social"}, {"did": "did:plc:2", "handle": "bob.bsky.social"}]}
+            {"actors": [{"did": "did:plc:1", "handle": "alice.bsky.social", "description": "Alice bio"}, {"did": "did:plc:2", "handle": "bob.bsky.social"}]}
             """.data(using: .utf8)!
             return try JSONDecoder().decode(SearchActorsResponse.self, from: json)
         }
@@ -83,6 +83,7 @@ final class BlueskyProfileServiceTests: XCTestCase {
         let actors = try await service.searchActors(query: "alice", account: makeAccount(), appPassword: "pass")
         XCTAssertEqual(actors.count, 2)
         XCTAssertEqual(actors[0].handle, "alice.bsky.social")
+        XCTAssertEqual(actors[0].description, "Alice bio")
     }
 
     func testSearchActorsEmptyQuery() async throws {
@@ -126,7 +127,11 @@ final class BlueskyProfileServiceTests: XCTestCase {
         var pageCount = 0
         sessionService.onAuthenticatedRequest = { _, _ in
             pageCount += 1
-            let actors = [["did": "did:plc:f\(pageCount)", "handle": "f\(pageCount).bsky.social"]]
+            let actors = [[
+                "did": "did:plc:f\(pageCount)",
+                "handle": "f\(pageCount).bsky.social",
+                "description": "Follower bio \(pageCount)",
+            ]]
             let json = pageCount <= 2
                 ? try JSONSerialization.data(withJSONObject: ["cursor": "page\(pageCount)", "followers": actors])
                 : try JSONSerialization.data(withJSONObject: ["followers": actors])
@@ -135,13 +140,18 @@ final class BlueskyProfileServiceTests: XCTestCase {
 
         let followers = try await service.fetchFollowers(actor: "did:plc:target", account: makeAccount(), appPassword: "pass")
         XCTAssertEqual(followers.count, 3)
+        XCTAssertEqual(followers[0].description, "Follower bio 1")
     }
 
     func testFetchFollowingSuccess() async throws {
         var pageCount = 0
         sessionService.onAuthenticatedRequest = { _, _ in
             pageCount += 1
-            let actors = [["did": "did:plc:f\(pageCount)", "handle": "f\(pageCount).bsky.social"]]
+            let actors = [[
+                "did": "did:plc:f\(pageCount)",
+                "handle": "f\(pageCount).bsky.social",
+                "description": "Following bio \(pageCount)",
+            ]]
             let json = pageCount <= 1
                 ? try JSONSerialization.data(withJSONObject: ["cursor": "page\(pageCount)", "follows": actors])
                 : try JSONSerialization.data(withJSONObject: ["follows": actors])
@@ -150,6 +160,7 @@ final class BlueskyProfileServiceTests: XCTestCase {
 
         let following = try await service.fetchFollowing(actor: "did:plc:target", account: makeAccount(), appPassword: "pass")
         XCTAssertEqual(following.count, 2)
+        XCTAssertEqual(following[0].description, "Following bio 1")
     }
 
     func testInspectProfileSuccess() {

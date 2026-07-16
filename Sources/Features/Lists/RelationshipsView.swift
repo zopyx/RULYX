@@ -1,5 +1,6 @@
 import Observation
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - RelationshipMode
 
@@ -61,6 +62,10 @@ struct RelationshipsView: View {
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var batchOperationConfig: BatchOperationConfig?
     @State private var listsLoaded = false
+    @State private var isShowingJSONImportPicker = false
+    @State private var importedJSONTargets: [PendingLikerTarget] = []
+    @State private var isChoosingJSONImportList = false
+    @State private var jsonImportError: String?
 
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
@@ -306,70 +311,103 @@ struct RelationshipsView: View {
                         bulkAddToListsMenu
                     }
                     Menu {
-                            Toggle(isOn: $showActorDescriptions) {
-                                Label {
-                                    Text(loc("rel.show_descriptions"))
-                                } icon: {
-                                    Image(systemName: "text.alignleft")
-                                }
-                            }
-
-                            Divider()
-
-                            Button {
-                                isExporting = true
-                                Task { await exportAll(format: .csv) }
-                            } label: {
-                                Label { Text(loc: "list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
-                            }
-
-                            Button {
-                                isExporting = true
-                                Task { await exportAll(format: .json) }
-                            } label: {
-                                Label { Text(loc: "list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
-                            }
-
-                            Button {
-                                isExporting = true
-                                Task { await exportAll(format: .xlsx) }
-                            } label: {
-                                Label { Text(loc: "list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
-                            }
-
-                            Button {
-                                isExporting = true
-                                Task { await exportAll(format: .ods) }
-                            } label: {
-                                Label { Text(loc: "list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
-                            }
-                        } label: {
-                            if isExporting {
-                                HStack(spacing: 6) {
-                                    if let fraction = exportProgressFraction {
-                                        ProgressView(value: fraction)
-                                            .frame(width: 40)
-                                            .scaleEffect(x: 1, y: 0.6)
-                                    } else {
-                                        ProgressView()
-                                            .scaleEffect(0.8)
-                                    }
-                                    if let msg = exportProgressMessage {
-                                        Text(msg)
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            } else {
-                                Image(systemName: "arrow.down.doc")
+                        Toggle(isOn: $showActorDescriptions) {
+                            Label {
+                                Text(loc("rel.show_descriptions"))
+                            } icon: {
+                                Image(systemName: "text.alignleft")
                             }
                         }
-                        .disabled(isExporting)
+
+                        Divider()
+
+                        Button {
+                            isShowingJSONImportPicker = true
+                        } label: {
+                            Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
+                        }
+
+                        Button {
+                            isExporting = true
+                            Task { await exportAll(format: .csv) }
+                        } label: {
+                            Label { Text(loc: "list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
+                        }
+
+                        Button {
+                            isExporting = true
+                            Task { await exportAll(format: .json) }
+                        } label: {
+                            Label { Text(loc: "list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
+                        }
+
+                        Button {
+                            isExporting = true
+                            Task { await exportAll(format: .xlsx) }
+                        } label: {
+                            Label { Text(loc: "list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
+                        }
+
+                        Button {
+                            isExporting = true
+                            Task { await exportAll(format: .ods) }
+                        } label: {
+                            Label { Text(loc: "list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
+                        }
+                    } label: {
+                        if isExporting {
+                            HStack(spacing: 6) {
+                                if let fraction = exportProgressFraction {
+                                    ProgressView(value: fraction)
+                                        .frame(width: 40)
+                                        .scaleEffect(x: 1, y: 0.6)
+                                } else {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                }
+                                if let msg = exportProgressMessage {
+                                    Text(msg)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        } else {
+                            Image(systemName: "arrow.down.doc")
+                        }
+                    }
+                    .disabled(isExporting)
                 }
             }
         }
         .refreshable {
             await refresh()
+        }
+        .fileImporter(
+            isPresented: $isShowingJSONImportPicker,
+            allowedContentTypes: [.json]
+        ) { result in
+            handleJSONImport(result)
+        }
+        .confirmationDialog(
+            loc("rel.add_all_to_list"),
+            isPresented: $isChoosingJSONImportList,
+            titleVisibility: .visible
+        ) {
+            ForEach(availableTargetLists) { list in
+                Button {
+                    importJSONTargets(to: list)
+                } label: {
+                    Label(list.name, systemImage: list.kind.symbolName)
+                }
+            }
+            Button(loc("actions.cancel"), role: .cancel) {}
+        } message: {
+            Text("\(importedJSONTargets.count)")
+        }
+        .alert(loc("rel.import_json.import_error"), isPresented: .constant(jsonImportError != nil)) {
+            Button(loc("actions.ok")) { jsonImportError = nil }
+        } message: {
+            Text(jsonImportError ?? "")
         }
         .task(id: accountStore.activeAccountID) {
             await load()
@@ -579,6 +617,87 @@ struct RelationshipsView: View {
         }
     }
 
+    /// Reads a relationship JSON export and prepares its actors for add-to-list import.
+    private func handleJSONImport(_ result: Result<URL, Error>) {
+        switch result {
+        case let .success(url):
+            do {
+                guard url.startAccessingSecurityScopedResource() else {
+                    jsonImportError = loc("account.import.access_error")
+                    return
+                }
+                defer { url.stopAccessingSecurityScopedResource() }
+
+                let data = try Data(contentsOf: url)
+                let object = try JSONSerialization.jsonObject(with: data)
+                guard let rows = object as? [[String: Any]] else {
+                    jsonImportError = loc("account.import.invalid_format")
+                    return
+                }
+
+                var seenDIDs: Set<String> = []
+                let targets = rows.compactMap { row -> PendingLikerTarget? in
+                    guard let did = (row["did"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                          !did.isEmpty,
+                          seenDIDs.insert(did).inserted
+                    else {
+                        return nil
+                    }
+                    let handle = (row["handle"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+                    return PendingLikerTarget(did: did, handle: handle?.isEmpty == false ? handle : nil)
+                }
+
+                guard !targets.isEmpty else {
+                    jsonImportError = loc("rel.import_json.empty")
+                    return
+                }
+
+                importedJSONTargets = targets
+                if availableTargetLists.isEmpty {
+                    Task {
+                        await loadAvailableTargetLists()
+                        if availableTargetLists.isEmpty {
+                            jsonImportError = loc("rel.no_lists_desc")
+                        } else {
+                            isChoosingJSONImportList = true
+                        }
+                    }
+                } else {
+                    isChoosingJSONImportList = true
+                }
+            } catch {
+                jsonImportError = error.localizedDescription
+            }
+        case let .failure(error):
+            jsonImportError = error.localizedDescription
+        }
+    }
+
+    /// Adds JSON-imported relationship targets to the selected destination list.
+    private func importJSONTargets(to list: BlueskyList) {
+        let targets = importedJSONTargets
+        guard !targets.isEmpty else { return }
+
+        if list.kind == .internal {
+            for target in targets {
+                internalListStore.addMember(
+                    did: target.did,
+                    handle: target.handle ?? target.did,
+                    to: internalListStore.listID(from: list.id)
+                )
+            }
+            importedJSONTargets = []
+        } else {
+            guard let account = accountStore.activeAccount,
+                  let appPassword = accountStore.appPassword(for: account) else { return }
+            batchOperationConfig = BatchOperationConfig(
+                targets: targets,
+                mode: .addToList(list: list, account: account, appPassword: appPassword)
+            )
+            importedJSONTargets = []
+        }
+    }
+
     /// Fetches the count of unblocked blockers and presents the first confirmation dialog.
     private func handleBlockAllBack() async {
         guard accountStore.activeAccount != nil else { return }
@@ -751,7 +870,6 @@ struct RelationshipsView: View {
 
     /// Computes a cache key from the mode and subject DID.
     /// Row label for the actor list, extracted for type-check performance.
-    @ViewBuilder
     private func actorRowLabel(actor: BlueskyActor, index: Int) -> some View {
         HStack(spacing: 0) {
             BlueskyActorRow(actor: actor) {

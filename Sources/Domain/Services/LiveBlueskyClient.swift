@@ -469,7 +469,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
 
         return PagedActorSearch(
-            actors: response.actors.map { BlueskyActor(did: $0.did, handle: $0.handle, displayName: $0.displayName, avatarURL: URL(string: $0.avatar ?? "")) },
+            actors: response.actors.map {
+                BlueskyActor(
+                    did: $0.did,
+                    handle: $0.handle,
+                    displayName: $0.displayName,
+                    avatarURL: URL(string: $0.avatar ?? ""),
+                    description: $0.description
+                )
+            },
             cursor: response.cursor
         )
     }
@@ -1405,7 +1413,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
         let decoded = try JSONDecoder().decode(GetProfilesResponse.self, from: data)
         return decoded.profiles.map {
-            BlueskyActor(did: $0.did, handle: $0.handle, displayName: $0.displayName, avatarURL: URL(string: $0.avatar ?? ""))
+            BlueskyActor(
+                did: $0.did,
+                handle: $0.handle,
+                displayName: $0.displayName,
+                avatarURL: URL(string: $0.avatar ?? ""),
+                description: $0.description
+            )
         }
     }
 
@@ -1681,7 +1695,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
         return PagedActorSearch(
             actors: response.followers.map {
-                BlueskyActor(did: $0.did, handle: $0.handle, displayName: $0.displayName, avatarURL: URL(string: $0.avatar ?? ""), createdAt: parseDate($0.createdAt))
+                BlueskyActor(
+                    did: $0.did,
+                    handle: $0.handle,
+                    displayName: $0.displayName,
+                    avatarURL: URL(string: $0.avatar ?? ""),
+                    createdAt: parseDate($0.createdAt),
+                    description: $0.description
+                )
             },
             cursor: response.cursor
         )
@@ -1741,7 +1762,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
         return PagedActorSearch(
             actors: response.follows.map {
-                BlueskyActor(did: $0.did, handle: $0.handle, displayName: $0.displayName, avatarURL: URL(string: $0.avatar ?? ""), createdAt: parseDate($0.createdAt))
+                BlueskyActor(
+                    did: $0.did,
+                    handle: $0.handle,
+                    displayName: $0.displayName,
+                    avatarURL: URL(string: $0.avatar ?? ""),
+                    createdAt: parseDate($0.createdAt),
+                    description: $0.description
+                )
             },
             cursor: response.cursor
         )

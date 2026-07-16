@@ -40,10 +40,7 @@ struct AccountTabView: View {
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
                         Button {
-                            Task {
-                                guard await AppLockManager.shared.authenticateSensitive() else { return }
-                                showImportPicker = true
-                            }
+                            presentImportPicker()
                         } label: {
                             Label(loc("account.import"), systemImage: "square.and.arrow.down")
                                 .frame(maxWidth: 200)
@@ -121,10 +118,7 @@ struct AccountTabView: View {
                                 .foregroundStyle(.tertiary)
 
                             Button {
-                                Task {
-                                    guard await AppLockManager.shared.authenticateSensitive() else { return }
-                                    showImportPicker = true
-                                }
+                                presentImportPicker()
                             } label: {
                                 Text(loc("account.import"))
                                     .font(.caption2)
@@ -174,6 +168,27 @@ struct AccountTabView: View {
             }
             .pageTitle(loc("account.manage.title"))
             .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            Task { await exportAccounts() }
+                        } label: {
+                            Label(loc("account.export"), systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(accountStore.accounts.isEmpty)
+
+                        Button {
+                            presentImportPicker()
+                        } label: {
+                            Label(loc("account.import"), systemImage: "square.and.arrow.down")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .accessibilityLabel(loc("account.manage.more"))
+                }
+            }
             .task {
                 await accountStore.refreshAccountProfiles(using: container.blueskyClient)
             }
@@ -282,6 +297,13 @@ struct AccountTabView: View {
     }
 
     // MARK: - Import / Export
+
+    private func presentImportPicker() {
+        Task {
+            guard await AppLockManager.shared.authenticateSensitive() else { return }
+            showImportPicker = true
+        }
+    }
 
     private func exportAccounts() async {
         guard await AppLockManager.shared.authenticateSensitive() else { return }

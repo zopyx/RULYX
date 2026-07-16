@@ -75,7 +75,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     did: $0.did,
                     handle: $0.handle,
                     displayName: $0.displayName,
-                    avatarURL: URL(string: $0.avatar ?? "")
+                    avatarURL: URL(string: $0.avatar ?? ""),
+                    description: $0.description
                 )
             },
             cursor: response.cursor
@@ -137,7 +138,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     handle: $0.handle,
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
-                    createdAt: parseDate($0.createdAt)
+                    createdAt: parseDate($0.createdAt),
+                    description: $0.description
                 )
             },
             cursor: response.cursor
@@ -327,7 +329,14 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
         return PagedActorSearch(
             actors: response.follows.map {
-                BlueskyActor(did: $0.did, handle: $0.handle, displayName: $0.displayName, avatarURL: URL(string: $0.avatar ?? ""), createdAt: parseDate($0.createdAt))
+                BlueskyActor(
+                    did: $0.did,
+                    handle: $0.handle,
+                    displayName: $0.displayName,
+                    avatarURL: URL(string: $0.avatar ?? ""),
+                    createdAt: parseDate($0.createdAt),
+                    description: $0.description
+                )
             },
             cursor: response.cursor
         )

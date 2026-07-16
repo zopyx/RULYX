@@ -94,9 +94,28 @@ struct ActorView: Decodable {
     let did: String
     let handle: String
     let displayName: String?
+    let description: String?
     let avatar: String?
     let createdAt: String?
     let viewer: ProfileViewerState?
+
+    init(
+        did: String,
+        handle: String,
+        displayName: String?,
+        description: String? = nil,
+        avatar: String?,
+        createdAt: String?,
+        viewer: ProfileViewerState?
+    ) {
+        self.did = did
+        self.handle = handle
+        self.displayName = displayName
+        self.description = description
+        self.avatar = avatar
+        self.createdAt = createdAt
+        self.viewer = viewer
+    }
 }
 
 /// Response from `app.bsky.graph.getBlocks`.
