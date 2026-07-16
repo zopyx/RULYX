@@ -41,15 +41,15 @@ struct ListTimelineView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             Group {
-                if viewModel.isLoading, viewModel.posts.isEmpty {
+                if viewModel.state == .initialLoading {
                     skeletonContent
-                } else if let error = viewModel.errorMessage, viewModel.posts.isEmpty {
+                } else if case let .failed(msg) = viewModel.state, viewModel.entries.isEmpty {
                     ContentUnavailableView(
                         loc("list.detail.alert_title"),
                         systemImage: "exclamationmark.bubble",
-                        description: Text(error)
+                        description: Text(msg)
                     )
-                } else if viewModel.posts.isEmpty {
+                } else if viewModel.entries.isEmpty {
                     ContentUnavailableView(
                         loc("list.timeline.empty"),
                         systemImage: "bubble.left.and.bubble.right",
@@ -61,8 +61,8 @@ struct ListTimelineView: View {
             }
             .pageTitle("\(loc("list.timeline.title")) — \(list.name)")
             .overlay(alignment: .bottomTrailing) {
-                if !viewModel.posts.isEmpty {
-                    composeFAB
+                TimelineComposeFAB(isVisible: !viewModel.entries.isEmpty) {
+                    showNewPostComposer = true
                 }
             }
             .sheet(item: $selectedPostURI) { uri in
@@ -201,7 +201,7 @@ struct ListTimelineView: View {
                 await likerActions.loadAvailableTargetLists(using: container.blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
             }
             .postLikerActions(manager: likerActions)
-            .task(id: viewModel.posts.count) {
+            .task(id: viewModel.entries.count) {
                 await classifyVisiblePosts()
             }
         }
@@ -223,10 +223,10 @@ struct ListTimelineView: View {
                 .listRowBackground(Color.clear)
             }
 
-            ForEach(viewModel.posts, id: \.post.uri) { entry in
+            ForEach(viewModel.entries, id: \.post.uri) { entry in
                 postRowView(for: entry)
             }
-            if viewModel.isLoadingMore {
+            if viewModel.state == .loadingMore {
                 HStack {
                     Spacer()
                     ProgressView()
@@ -235,14 +235,14 @@ struct ListTimelineView: View {
                 }
                 .listRowSeparator(.hidden)
             }
-            if !viewModel.hasMore, !viewModel.posts.isEmpty {
+            if !viewModel.state.hasMore, !viewModel.entries.isEmpty {
                 Text(loc("timeline.end"))
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
             }
-            if !viewModel.posts.isEmpty, viewModel.hasMore {
+            if !viewModel.entries.isEmpty, viewModel.state.hasMore {
                 Color.clear
                     .frame(height: 1)
                     .listRowSeparator(.hidden)
@@ -250,12 +250,12 @@ struct ListTimelineView: View {
                         Task { await loadMore() }
                     }
             }
-            if let error = viewModel.errorMessage, !error.isEmpty {
+            if case let .loadMoreFailed(msg) = viewModel.state {
                 VStack(spacing: 8) {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle")
                             .foregroundStyle(.orange)
-                        Text(error)
+                        Text(msg)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -279,76 +279,8 @@ struct ListTimelineView: View {
     // MARK: - Post row
 
     private func postRowView(for entry: RichFeedEntry) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            PostRowView(
-                entry: entry,
-                style: .full,
-                callbacks: postRowCallbacks(for: entry)
-            )
-            .contextMenu {
-                if let text = entry.post.safeRecord.text {
-                    Button { UIPasteboard.general.string = text } label: {
-                        Label(loc("post.copy"), systemImage: "doc.on.doc")
-                    }
-                }
-                Button { postToShare = entry } label: {
-                    Label(loc("post.share"), systemImage: "square.and.arrow.up")
-                }
-                Divider()
-                if let handle = entry.post.author?.handle {
-                    Button {
-                        Task { await muteUser(handle: handle, did: entry.post.author?.did) }
-                    } label: {
-                        Label(String(format: loc("post.mute_user"), "@\(handle)"), systemImage: "eye.slash")
-                    }
-                    Button {
-                        Task { await blockUser(handle: handle, did: entry.post.author?.did) }
-                    } label: {
-                        Label(String(format: loc("post.block_user"), "@\(handle)"), systemImage: "hand.raised")
-                    }
-                }
-                Divider()
-                if !isOwnPost(entry) {
-                    Button { likerActions.postToReport = entry } label: {
-                        Label(loc("post.report"), systemImage: "exclamationmark.bubble")
-                    }
-                }
-                if let text = entry.post.safeRecord.text {
-                    Button { translateText(text) } label: {
-                        Label(loc("post.translate"), systemImage: "globe")
-                    }
-                }
-            }
-
-            if let scores = aiClassifications[entry.post.uri], !scores.isEmpty {
-                AIPostBadge(scores: scores)
-                    .padding(.leading, 12)
-                    .padding(.bottom, 4)
-            }
-
-            inlineThreadSection(for: entry)
-        }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            Button {
-                handleLike(entry)
-            } label: {
-                Image(systemName: viewModel.effectiveIsLiked(uri: entry.post.uri) ? "heart.slash" : "heart")
-            }
-            .tint(viewModel.effectiveIsLiked(uri: entry.post.uri) ? .gray : .pink)
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-            Button {
-                handleReply(entry)
-            } label: {
-                Image(systemName: "arrowshape.turn.up.left")
-            }
-            .tint(.blue)
-        }
-    }
-
-    private func postRowCallbacks(for entry: RichFeedEntry) -> PostRowCallbacks {
         let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
-        return PostRowCallbacks(
+        let postCallbacks = PostRowCallbacks(
             onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
             onTapImage: { index in
                 let allImages = entry.post.embed?.images ?? []
@@ -398,64 +330,32 @@ struct ListTimelineView: View {
             overrideRepostCount: viewModel.effectiveRepostCount(uri: entry.post.uri),
             availableLikerTargetLists: likerActions.availableTargetLists
         )
-    }
 
-    @ViewBuilder
-    private func inlineThreadSection(for entry: RichFeedEntry) -> some View {
-        let uri = entry.post.uri
-        let replyCount = entry.post.replyCount ?? 0
-        if replyCount > 0 {
-            if viewModel.expandedThreadURIs.contains(uri), let thread = viewModel.inlineThreads[uri] {
-                VStack(spacing: 0) {
-                    ForEach(Array((thread.replies ?? []).prefix(3).enumerated()), id: \.offset) { _, reply in
-                        InlineReplyRow(node: reply, onNavigateToThread: {
-                            navigationPath.append(TimelineRoute.thread(postURI: reply.post.uri ?? uri))
-                        })
-                        .padding(.leading, 16)
-                    }
-                    if (thread.replies?.count ?? 0) > 3 {
-                        Button {
-                            navigationPath.append(TimelineRoute.thread(postURI: uri))
-                        } label: {
-                            HStack {
-                                Text(loc("timeline.view_all_replies"))
-                                    .font(.caption.weight(.medium))
-                                Spacer()
-                                Text("+\((thread.replies?.count ?? 0) - 3)")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            } else {
-                Button {
-                    Task {
-                        guard let account = accountStore.activeAccount,
-                              let appPassword = accountStore.appPassword(for: account) else { return }
-                        await viewModel.toggleInlineThread(uri: uri, account: account, appPassword: appPassword, using: container.blueskyClient)
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "bubble.left")
-                            .font(.caption)
-                        Text(loc("timeline.show_replies").replacingOccurrences(of: "{n}", with: "\(replyCount)"))
-                            .font(.caption.weight(.medium))
-                        Spacer()
-                        Image(systemName: "chevron.down")
-                            .font(.caption2)
-                    }
-                    .foregroundStyle(Color.skyPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.skyPrimary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-                }
-                .buttonStyle(.plain)
+        let context = TimelinePostRowContext(
+            onCopyText: entry.post.safeRecord.text != nil ? { UIPasteboard.general.string = entry.post.safeRecord.text } : nil,
+            onShare: { postToShare = entry },
+            onMuteUser: entry.post.author?.handle != nil ? { Task { await muteUser(handle: entry.post.author!.handle!, did: entry.post.author?.did) } } : nil,
+            onBlockUser: entry.post.author?.handle != nil ? { Task { await blockUser(handle: entry.post.author!.handle!, did: entry.post.author?.did) } } : nil,
+            onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
+            onTranslate: entry.post.safeRecord.text != nil ? { translateText(entry.post.safeRecord.text ?? "") } : nil,
+            onMuteWord: nil,
+            muteWordLabel: nil,
+            onToggleInlineThread: {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                Task { await viewModel.toggleInlineThread(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient) }
             }
-        }
+        )
+
+        return TimelinePostRow(
+            entry: entry,
+            callbacks: postCallbacks,
+            context: context,
+            viewModel: viewModel,
+            navigationPath: $navigationPath,
+            aiClassifications: aiClassifications,
+            isOwnPost: isOwnPost(entry)
+        )
     }
 
     // MARK: - State views
@@ -468,23 +368,6 @@ struct ListTimelineView: View {
             }
         }
         .listStyle(.plain)
-    }
-
-    private var composeFAB: some View {
-        Button {
-            showNewPostComposer = true
-        } label: {
-            Image(systemName: "square.and.pencil")
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
-                .background(Circle().fill(Color.skyPrimary))
-                .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
-        }
-        .accessibilityLabel(loc("timeline.new_post"))
-        .padding(.trailing, 16)
-        .padding(.bottom, 16)
-        .transition(.scale.combined(with: .opacity))
     }
 
     // MARK: - Actions
@@ -582,7 +465,7 @@ struct ListTimelineView: View {
     }
 
     private func openProfile(_ handle: String) {
-        guard let entry = viewModel.posts.first(where: { $0.post.author?.handle == handle || $0.post.author?.did == handle }),
+        guard let entry = viewModel.entries.first(where: { $0.post.author?.handle == handle || $0.post.author?.did == handle }),
               let author = entry.post.author else { return }
         profileToShow = BlueskyActor(did: author.did ?? handle, handle: author.handle ?? handle, displayName: author.displayName)
     }
@@ -618,7 +501,7 @@ struct ListTimelineView: View {
     }
 
     private func classifyVisiblePosts() async {
-        let posts = viewModel.posts
+        let posts = viewModel.entries
         let uncached = posts.filter { aiClassifications[$0.post.uri] == nil }
         guard !uncached.isEmpty else { return }
         let engine = InferenceEngine()

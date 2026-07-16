@@ -7,16 +7,14 @@ import Observation
 /// filtered to posts authored by the member being scanned.
 @MainActor
 @Observable
-final class ListTimelineViewModel {
+final class ListTimelineViewModel: TimelineViewModelProtocol {
     let list: BlueskyList
 
     // MARK: - Published State
 
-    private(set) var posts: [RichFeedEntry] = []
-    private(set) var isLoading = false
-    private(set) var isLoadingMore = false
-    private(set) var hasMore = true
-    var errorMessage: String?
+    private(set) var entries: [RichFeedEntry] = []
+    private(set) var state: TimelineState = .initialLoading
+    var newPostCount = 0
     private(set) var scanProgressLabel: String?
 
     // MARK: - Optimistic Interactions
@@ -57,79 +55,82 @@ final class ListTimelineViewModel {
 
     // MARK: - Loading
 
-    /// Performs the initial list-feed load.
     func loadTimeline(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        guard !isLoading else { return }
-        isLoading = true
-        errorMessage = nil
+        guard state == .initialLoading else { return }
+        state = .initialLoading
         cursor = nil
         sourceMode = .appViewListFeed
         resetFallbackPagination()
-        defer {
-            isLoading = false
-            scanProgressLabel = nil
-        }
+        defer { scanProgressLabel = nil }
         do {
             guard !Task.isCancelled else { return }
             scanProgressLabel = loc("list.timeline.fetching_posts")
             let response = try await client.fetchListFeed(listURI: list.id, cursor: nil, account: account, appPassword: appPassword)
-            posts = response.feed
+            entries = response.feed
             cursor = response.cursor
-            hasMore = response.cursor != nil
-            if posts.isEmpty {
+            state = entries.isEmpty ? .empty : (response.cursor == nil ? .exhausted : .loaded)
+            if entries.isEmpty {
                 await loadMemberOwnPostsFallback(account: account, appPassword: appPassword, using: client)
             }
         } catch {
             guard !AppError.isCancellation(error) else { return }
+            state = .failed(AppError.userMessage(from: error))
             AppLogger.moderation.error("Failed to load list timeline: \(error.localizedDescription, privacy: .public)")
             await loadMemberOwnPostsFallback(account: account, appPassword: appPassword, using: client)
         }
     }
 
-    /// Loads the next page of the server-provided list feed.
     func loadMore(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        guard !isLoadingMore, hasMore else { return }
-        isLoadingMore = true
+        guard state != .loadingMore, state.hasMore else { return }
+        state = .loadingMore
         scanProgressLabel = loc("list.timeline.loading_more")
-        defer {
-            isLoadingMore = false
-            scanProgressLabel = nil
-        }
+        defer { scanProgressLabel = nil }
         do {
             guard !Task.isCancelled else { return }
             switch sourceMode {
             case .appViewListFeed:
                 guard let cursor else {
-                    hasMore = false
+                    state = .exhausted
                     return
                 }
                 let response = try await client.fetchListFeed(listURI: list.id, cursor: cursor, account: account, appPassword: appPassword)
-                posts += response.feed
+                entries += response.feed
                 self.cursor = response.cursor
-                hasMore = response.cursor != nil
+                state = response.cursor == nil ? .exhausted : .loaded
             case .memberOwnPosts:
                 let newPosts = try await loadMoreMemberOwnPosts(account: account, appPassword: appPassword, using: client)
-                posts = deduplicateAndSort(posts + newPosts)
-                hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
+                entries = deduplicateAndSort(entries + newPosts)
+                let hasMorePosts = nextMemberIndex < members.count || !memberHasMore.isEmpty
+                state = hasMorePosts ? .loaded : .exhausted
             }
         } catch {
             guard !AppError.isCancellation(error) else { return }
-            errorMessage = AppError.userMessage(from: error)
+            state = .loadMoreFailed(AppError.userMessage(from: error))
             AppLogger.moderation.error("Failed to load more list timeline: \(error.localizedDescription, privacy: .public)")
         }
     }
 
-    /// Pull-to-refresh: reloads everything from scratch.
     func refresh(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        guard !isLoading else { return }
+        guard state != .initialLoading else { return }
         resetOptimisticState()
+        state = .initialLoading
         await loadTimeline(account: account, appPassword: appPassword, using: client)
     }
+
+    // MARK: - Polling
+
+    func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 15) {
+        // Polling not yet implemented for list timelines — deferred to Phase 4.
+    }
+
+    func stopPolling() {}
+
+    func userDidInteract() {}
 
     // MARK: - Optimistic Interactions
 
     func toggleLike(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        guard let entry = posts.first(where: { $0.post.uri == uri }),
+        guard let entry = entries.first(where: { $0.post.uri == uri }),
               let cid = entry.post.cid else { return }
         let wasLiked = effectiveIsLiked(uri: uri)
         let oldCount = effectiveLikeCount(uri: uri)
@@ -147,14 +148,14 @@ final class ListTimelineViewModel {
             optimisticLikes.removeValue(forKey: uri)
             optimisticLikeCounts.removeValue(forKey: uri)
             if wasLiked {
-                optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI
+                optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
             }
             AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func toggleRepost(uri: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        guard let entry = posts.first(where: { $0.post.uri == uri }),
+        guard let entry = entries.first(where: { $0.post.uri == uri }),
               let cid = entry.post.cid else { return }
         let wasReposted = effectiveIsReposted(uri: uri)
         let oldCount = effectiveRepostCount(uri: uri)
@@ -172,40 +173,40 @@ final class ListTimelineViewModel {
             optimisticReposts.removeValue(forKey: uri)
             optimisticRepostCounts.removeValue(forKey: uri)
             if wasReposted {
-                optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI
+                optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
             }
             AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func effectiveIsLiked(uri: String) -> Bool {
-        optimisticLikes[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.isLikedByMe ?? false
+        optimisticLikes[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isLikedByMe ?? false
     }
 
     func effectiveIsReposted(uri: String) -> Bool {
-        optimisticReposts[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.isRepostedByMe ?? false
+        optimisticReposts[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.isRepostedByMe ?? false
     }
 
     func effectiveMyLikeURI(uri: String) -> String? {
-        optimisticLikeURIs[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.myLikeURI
+        optimisticLikeURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
     }
 
     func effectiveMyRepostURI(uri: String) -> String? {
-        optimisticRepostURIs[uri] ?? posts.first(where: { $0.post.uri == uri })?.post.myRepostURI
+        optimisticRepostURIs[uri] ?? entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
     }
 
     func effectiveLikeCount(uri: String) -> Int {
         if let count = optimisticLikeCounts[uri] {
             return count
         }
-        return posts.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
+        return entries.first(where: { $0.post.uri == uri })?.post.likeCount ?? 0
     }
 
     func effectiveRepostCount(uri: String) -> Int {
         if let count = optimisticRepostCounts[uri] {
             return count
         }
-        return posts.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
+        return entries.first(where: { $0.post.uri == uri })?.post.repostCount ?? 0
     }
 
     // MARK: - Inline Threads
@@ -234,11 +235,19 @@ final class ListTimelineViewModel {
     // MARK: - Entry Management
 
     func removeEntry(uri: String) {
-        posts.removeAll { $0.post.uri == uri }
+        entries.removeAll { $0.post.uri == uri }
     }
 
     func insertEntry(_ entry: RichFeedEntry, at index: Int) {
-        posts.insert(entry, at: min(index, posts.count))
+        entries.insert(entry, at: min(index, entries.count))
+    }
+
+    func prepareForAccountChange() {
+        entries = []
+        cursor = nil
+        newPostCount = 0
+        state = .initialLoading
+        resetOptimisticState()
     }
 
     // MARK: - Private Helpers
@@ -247,23 +256,26 @@ final class ListTimelineViewModel {
         sourceMode = .memberOwnPosts
         cursor = nil
         resetFallbackPagination()
-        errorMessage = nil
 
         do {
             members = try await client.fetchListMembers(list: list, account: account, appPassword: appPassword)
             let firstBatch = Array(members.prefix(initialMemberBatchSize))
             nextMemberIndex = firstBatch.count
             scanProgressLabel = loc("list.timeline.fetching_posts")
-            posts = try await deduplicateAndSort(fetchMemberOwnPosts(for: firstBatch, account: account, appPassword: appPassword, using: client))
-            hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
-            while posts.isEmpty, hasMore, !Task.isCancelled {
+            entries = try await deduplicateAndSort(fetchMemberOwnPosts(for: firstBatch, account: account, appPassword: appPassword, using: client))
+            let hasMorePosts = nextMemberIndex < members.count || !memberHasMore.isEmpty
+            state = entries.isEmpty ? .empty : (hasMorePosts ? .loaded : .exhausted)
+            while entries.isEmpty, hasMorePosts, !Task.isCancelled {
                 let morePosts = try await loadMoreMemberOwnPosts(account: account, appPassword: appPassword, using: client)
-                posts = deduplicateAndSort(posts + morePosts)
-                hasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
+                entries = deduplicateAndSort(entries + morePosts)
+                let stillHasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
+                state = entries.isEmpty ? .empty : (stillHasMore ? .loaded : .exhausted)
             }
         } catch {
             guard !AppError.isCancellation(error) else { return }
-            errorMessage = AppError.userMessage(from: error)
+            if state != .failed("") { // Don't overwrite a specific error with fallback error
+                state = .failed(AppError.userMessage(from: error))
+            }
             AppLogger.moderation.error("Failed to load fallback list timeline: \(error.localizedDescription, privacy: .public)")
         }
     }

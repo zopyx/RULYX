@@ -7,7 +7,7 @@ import Observation
 /// Supports periodic polling for new post count, optimistic interaction toggles, and account/feed switching.
 @MainActor
 @Observable
-final class FeedTimelineViewModel {
+final class FeedTimelineViewModel: TimelineViewModelProtocol {
     // MARK: - Properties
 
     /// Store of muted words used to filter visible entries.

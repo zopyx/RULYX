@@ -53,20 +53,9 @@ struct FeedTimelineView: View {
         }
         .pageTitle(loc("timeline.title"))
         .overlay(alignment: .bottomTrailing) {
-            Button {
+            TimelineComposeFAB(isVisible: true) {
                 showNewPostComposer = true
-            } label: {
-                Image(systemName: "square.and.pencil")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 56, height: 56)
-                    .background(Circle().fill(Color.skyPrimary))
-                    .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
             }
-            .accessibilityLabel(loc("timeline.new_post"))
-            .padding(.trailing, 16)
-            .padding(.bottom, 16)
-            .transition(.scale.combined(with: .opacity))
         }
         .fullScreenCover(item: $imagePreview) { preview in
             ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {
@@ -289,183 +278,80 @@ struct FeedTimelineView: View {
 
     private func postRowView(for entry: RichFeedEntry) -> some View {
         let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
-        return VStack(alignment: .leading, spacing: 0) {
-            PostRowView(
-                entry: entry,
-                style: .full,
-                callbacks: PostRowCallbacks(
-                    onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
-                    onTapImage: { index in
-                        let allImages = entry.post.embed?.images ?? []
-                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
-                        guard index < urls.count else { return }
-                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
-                    },
-                    onPlayVideo: {
-                        if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
-                            videoPreviewURL = url
-                        }
-                    },
-                    onOpenProfile: { handle in openProfile(handle) },
-                    onReply: { handleReply(entry) },
-                    onLike: { handleLike(entry) },
-                    onShowLikes: { showLikesForURI = entry.post.uri },
-                    onRepost: { handleRepost(entry) },
-                    onQuote: { handleQuote(entry) },
-                    onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
-                    onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
-                    onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
-                    onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
-                    onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
-                    onBlockAllLikers: {
-                        guard let account = accountStore.activeAccount,
-                              let appPassword = accountStore.appPassword(for: account) else { return }
-                        likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword)
-                    },
-                    onAddAllLikersToList: { list in
-                        guard let fetchAccount = accountStore.activeAccount,
-                              let fetchPassword = accountStore.appPassword(for: fetchAccount),
-                              let activeAccount = accountStore.activeAccount,
-                              let activePassword = accountStore.appPassword(for: activeAccount) else { return }
-                        likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
-                    },
-                    onClassify: { likerActions.postToClassify = entry },
-                    onBlockAuthor: authorCB.onBlock,
-                    onAddAuthorToList: authorCB.onAddToList,
-                    isLiked: viewModel.effectiveIsLiked(uri: entry.post.uri),
-                    isReposted: viewModel.effectiveIsReposted(uri: entry.post.uri),
-                    overrideLikeCount: viewModel.effectiveLikeCount(uri: entry.post.uri),
-                    overrideRepostCount: viewModel.effectiveRepostCount(uri: entry.post.uri),
-                    availableLikerTargetLists: likerActions.availableTargetLists
-                )
-            )
-            .contextMenu {
-                if let text = entry.post.safeRecord.text {
-                    Button { UIPasteboard.general.string = text } label: {
-                        Label(loc("post.copy"), systemImage: "doc.on.doc")
-                    }
+        let postCallbacks = PostRowCallbacks(
+            onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
+            onTapImage: { index in
+                let allImages = entry.post.embed?.images ?? []
+                let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                guard index < urls.count else { return }
+                imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+            },
+            onPlayVideo: {
+                if let playlist = entry.post.embed?.video?.playlist, let url = URL(string: playlist) {
+                    videoPreviewURL = url
                 }
-                Button { postToShare = entry } label: {
-                    Label(loc("post.share"), systemImage: "square.and.arrow.up")
-                }
-                Divider()
-                if let handle = entry.post.author?.handle {
-                    Button {
-                        Task { await muteUser(handle: handle, did: entry.post.author?.did) }
-                    } label: {
-                        Label(String(format: loc("post.mute_user"), "@\(handle)"), systemImage: "eye.slash")
-                    }
-                    Button {
-                        Task { await blockUser(handle: handle, did: entry.post.author?.did) }
-                    } label: {
-                        Label(String(format: loc("post.block_user"), "@\(handle)"), systemImage: "hand.raised")
-                    }
-                }
-                Divider()
-                if !isOwnPost(entry) {
-                    Button { likerActions.postToReport = entry } label: {
-                        Label(loc("post.report"), systemImage: "exclamationmark.bubble")
-                    }
-                }
-                if let text = entry.post.safeRecord.text {
-                    Button { translateText(text) } label: {
-                        Label(loc("post.translate"), systemImage: "globe")
-                    }
-                }
-                if let word = muteWord(from: entry) {
-                    Divider()
-                    Button {
-                        viewModel.mutedWords.add(word)
-                    } label: {
-                        Label(loc("timeline.mute_word").replacingOccurrences(of: "{word}", with: word), systemImage: "textformat.subscript")
-                    }
-                }
-            }
+            },
+            onOpenProfile: { handle in openProfile(handle) },
+            onReply: { handleReply(entry) },
+            onLike: { handleLike(entry) },
+            onShowLikes: { showLikesForURI = entry.post.uri },
+            onRepost: { handleRepost(entry) },
+            onQuote: { handleQuote(entry) },
+            onCopy: { UIPasteboard.general.string = entry.post.safeRecord.text },
+            onTranslate: { translateText(entry.post.safeRecord.text ?? "") },
+            onDeletePost: isOwnPost(entry) ? { postToDelete = entry } : nil,
+            onEditPost: isOwnPost(entry) ? { editPostEntry = entry } : nil,
+            onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
+            onBlockAllLikers: {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+            },
+            onAddAllLikersToList: { list in
+                guard let fetchAccount = accountStore.activeAccount,
+                      let fetchPassword = accountStore.appPassword(for: fetchAccount),
+                      let activeAccount = accountStore.activeAccount,
+                      let activePassword = accountStore.appPassword(for: activeAccount) else { return }
+                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+            },
+            onClassify: { likerActions.postToClassify = entry },
+            onBlockAuthor: authorCB.onBlock,
+            onAddAuthorToList: authorCB.onAddToList,
+            isLiked: viewModel.effectiveIsLiked(uri: entry.post.uri),
+            isReposted: viewModel.effectiveIsReposted(uri: entry.post.uri),
+            overrideLikeCount: viewModel.effectiveLikeCount(uri: entry.post.uri),
+            overrideRepostCount: viewModel.effectiveRepostCount(uri: entry.post.uri),
+            availableLikerTargetLists: likerActions.availableTargetLists
+        )
 
-            if let scores = aiClassifications[entry.post.uri], !scores.isEmpty {
-                AIPostBadge(scores: scores)
-                    .padding(.leading, 12)
-                    .padding(.bottom, 4)
+        let context = TimelinePostRowContext(
+            onCopyText: entry.post.safeRecord.text != nil ? { UIPasteboard.general.string = entry.post.safeRecord.text } : nil,
+            onShare: { postToShare = entry },
+            onMuteUser: entry.post.author?.handle != nil ? { Task { await muteUser(handle: entry.post.author!.handle!, did: entry.post.author?.did) } } : nil,
+            onBlockUser: entry.post.author?.handle != nil ? { Task { await blockUser(handle: entry.post.author!.handle!, did: entry.post.author?.did) } } : nil,
+            onReportPost: isOwnPost(entry) ? nil : { likerActions.postToReport = entry },
+            onTranslate: entry.post.safeRecord.text != nil ? { translateText(entry.post.safeRecord.text ?? "") } : nil,
+            onMuteWord: muteWord(from: entry) != nil ? { viewModel.mutedWords.add(muteWord(from: entry)!) } : nil,
+            muteWordLabel: muteWord(from: entry),
+            onToggleInlineThread: {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                Task { await viewModel.toggleInlineThread(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient) }
             }
+        )
 
-            inlineThreadSection(for: entry)
-        }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            Button {
-                handleLike(entry)
-            } label: {
-                Image(systemName: viewModel.effectiveIsLiked(uri: entry.post.uri) ? "heart.slash" : "heart")
-            }
-            .tint(viewModel.effectiveIsLiked(uri: entry.post.uri) ? .gray : .pink)
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-            Button {
-                handleReply(entry)
-            } label: {
-                Image(systemName: "arrowshape.turn.up.left")
-            }
-            .tint(.blue)
-        }
+        return TimelinePostRow(
+            entry: entry,
+            callbacks: postCallbacks,
+            context: context,
+            viewModel: viewModel,
+            navigationPath: $navigationPath,
+            aiClassifications: aiClassifications,
+            isOwnPost: isOwnPost(entry)
+        )
     }
 
     @ViewBuilder
-    private func inlineThreadSection(for entry: RichFeedEntry) -> some View {
-        let uri = entry.post.uri
-        let replyCount = entry.post.replyCount ?? 0
-        if replyCount > 0 {
-            if viewModel.expandedThreadURIs.contains(uri), let thread = viewModel.inlineThreads[uri] {
-                VStack(spacing: 0) {
-                    ForEach(Array((thread.replies ?? []).prefix(3).enumerated()), id: \.offset) { _, reply in
-                        InlineReplyRow(node: reply, onNavigateToThread: {
-                            navigationPath.append(TimelineRoute.thread(postURI: reply.post.uri ?? uri))
-                        })
-                        .padding(.leading, 16)
-                    }
-                    if (thread.replies?.count ?? 0) > 3 {
-                        Button {
-                            navigationPath.append(TimelineRoute.thread(postURI: uri))
-                        } label: {
-                            HStack {
-                                Text(loc("timeline.view_all_replies"))
-                                    .font(.caption.weight(.medium))
-                                Spacer()
-                                Text("+\((thread.replies?.count ?? 0) - 3)")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            } else {
-                Button {
-                    Task {
-                        guard let account = accountStore.activeAccount,
-                              let appPassword = accountStore.appPassword(for: account) else { return }
-                        await viewModel.toggleInlineThread(uri: uri, account: account, appPassword: appPassword, using: container.blueskyClient)
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "bubble.left")
-                            .font(.caption)
-                        Text(loc("timeline.show_replies").replacingOccurrences(of: "{n}", with: "\(replyCount)"))
-                            .font(.caption.weight(.medium))
-                        Spacer()
-                        Image(systemName: "chevron.down")
-                            .font(.caption2)
-                    }
-                    .foregroundStyle(Color.skyPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.skyPrimary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
     // MARK: - State views
 
     private var skeletonContent: some View {
