@@ -41,6 +41,8 @@ struct RelationshipsView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
     @AppStorage("debugMode") private var debugMode = false
+    @AppStorage("showDangerousOperations") private var showDangerousOperations = false
+    @AppStorage("showActorDescriptions") private var showActorDescriptions = false
     @State private var actors: [BlueskyActor] = []
     @State private var isLoading = true
     @State private var isRefreshing = false
@@ -58,6 +60,7 @@ struct RelationshipsView: View {
     @State private var clearskyTotal: Int?
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var batchOperationConfig: BatchOperationConfig?
+    @State private var listsLoaded = false
 
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
@@ -153,29 +156,7 @@ struct RelationshipsView: View {
                                     list: nil
                                 )
                             } label: {
-                                HStack(spacing: 0) {
-                                    BlueskyActorRow(actor: actor) {
-                                        if actor.isNew {
-                                            Text(loc: "rel.new_badge")
-                                                .font(.caption2.weight(.semibold))
-                                                .foregroundStyle(.orange)
-                                                .padding(.horizontal, 5)
-                                                .padding(.vertical, 1)
-                                                .background(Color.orange.opacity(0.12), in: Capsule())
-                                        }
-                                        Spacer(minLength: 0)
-                                        if let blockedDate = actor.blockedDate {
-                                            Text(blockedDateDisplay(blockedDate))
-                                                .font(.caption2.weight(.regular))
-                                                .foregroundStyle(.primary)
-                                        }
-                                    }
-                                    if debugMode {
-                                        Text("\(index + 1)")
-                                            .font(.caption2)
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                }
+                                actorRowLabel(actor: actor, index: index)
                             }
                             .appScrollTransition()
                             .contextMenu {
@@ -214,6 +195,7 @@ struct RelationshipsView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                .environment(\.showActorDescriptions, showActorDescriptions)
                 .overlay(alignment: .bottom) {
                     if actionsVM?.isBlockingBack ?? false, (actionsVM?.blockBackTotal ?? 0) > 0 {
                         VStack(spacing: 6) {
@@ -323,8 +305,17 @@ struct RelationshipsView: View {
                     if !actors.isEmpty, mode == .blockedBy {
                         bulkAddToListsMenu
                     }
-                    if !actors.isEmpty {
-                        Menu {
+                    Menu {
+                            Toggle(isOn: $showActorDescriptions) {
+                                Label {
+                                    Text(loc("rel.show_descriptions"))
+                                } icon: {
+                                    Image(systemName: "text.alignleft")
+                                }
+                            }
+
+                            Divider()
+
                             Button {
                                 isExporting = true
                                 Task { await exportAll(format: .csv) }
@@ -374,7 +365,6 @@ struct RelationshipsView: View {
                             }
                         }
                         .disabled(isExporting)
-                    }
                 }
             }
         }
@@ -542,12 +532,19 @@ struct RelationshipsView: View {
             }
             .disabled(actionsVM?.isBlockingBack ?? false)
             if availableTargetLists.isEmpty {
-                Button {
-                    Task { await loadAvailableTargetLists() }
-                } label: {
-                    Label(loc("rel.loading_lists"), systemImage: "arrow.triangle.2.circlepath")
+                if listsLoaded {
+                    Button {} label: {
+                        Label(loc("rel.no_lists_available"), systemImage: "tray")
+                    }
+                    .disabled(true)
+                } else {
+                    Button {
+                        Task { await loadAvailableTargetLists() }
+                    } label: {
+                        Label(loc("rel.loading_lists"), systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .disabled(true)
                 }
-                .disabled(true)
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -639,6 +636,7 @@ struct RelationshipsView: View {
             }
             return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
         }
+        listsLoaded = true
     }
 
     /// Formats a blocked date as relative (< 30 days) or abbreviated.
@@ -752,6 +750,34 @@ struct RelationshipsView: View {
     }
 
     /// Computes a cache key from the mode and subject DID.
+    /// Row label for the actor list, extracted for type-check performance.
+    @ViewBuilder
+    private func actorRowLabel(actor: BlueskyActor, index: Int) -> some View {
+        HStack(spacing: 0) {
+            BlueskyActorRow(actor: actor) {
+                if actor.isNew {
+                    Text(loc("rel.new_badge"))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.orange)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .background(Color.orange.opacity(0.12), in: Capsule())
+                }
+                Spacer(minLength: 0)
+                if let blockedDate = actor.blockedDate {
+                    Text(blockedDateDisplay(blockedDate))
+                        .font(.caption2.weight(.regular))
+                        .foregroundStyle(.primary)
+                }
+            }
+            if debugMode {
+                Text("\(index + 1)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+    }
+
     private var cacheKey: String? {
         guard let accountDID = accountStore.activeAccount?.did else { return nil }
         let subject = profileDID ?? accountDID

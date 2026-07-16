@@ -42,6 +42,12 @@ struct SettingsView: View {
     /// Controls the HTTP request debug view sheet.
     @State private var isShowingHTTPRequestDebugView = false
 
+    /// When enabled, destructive operations (block, unfollow, etc.) are shown.
+    @AppStorage("showDangerousOperations") private var showDangerousOperations = false
+
+    /// When enabled, the performance monitor overlay is shown at the top of the screen.
+    @AppStorage("performanceOverlayEnabled") private var performanceOverlayEnabled = false
+
     /// Transient status message shown after clearing the cache (e.g. "Cache cleared").
     @State private var cacheStatusMessage: String?
 
@@ -201,13 +207,22 @@ struct SettingsView: View {
                     .accessibilityHint(loc: "settings.debug_tools.hint")
 
                     if debugMode {
-                        Toggle(isOn: .init(get: { UserDefaults.standard.bool(forKey: "performanceOverlayEnabled") }, set: { UserDefaults.standard.set($0, forKey: "performanceOverlayEnabled") })) {
+                        Toggle(isOn: $performanceOverlayEnabled) {
                             Label {
                                 Text("Performance Overlay")
                             } icon: {
                                 Image(systemName: "chart.bar.fill")
                             }
                         }
+
+                        Toggle(isOn: $showDangerousOperations) {
+                            Label {
+                                Text(localizationManager.localized("settings.dangerous_operations"))
+                            } icon: {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                            }
+                        }
+                        .accessibilityHint(loc: "settings.dangerous_operations.hint")
 
                         Button {
                             isShowingHTTPRequestDebugView = true
@@ -235,20 +250,6 @@ struct SettingsView: View {
                         Text(cacheStatusMessage)
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                    }
-
-                    // MARK: Performance & HTTP Debug (debug mode only)
-
-                    if debugMode {
-                        Button {
-                            isShowingHTTPRequestDebugView = true
-                        } label: {
-                            Label {
-                                Text(localizationManager.localized("debug.http.title"))
-                            } icon: {
-                                Image(systemName: "antenna.radiowaves.left.and.right")
-                            }
-                        }
                     }
                 } header: {
                     HStack {

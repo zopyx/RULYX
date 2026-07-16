@@ -79,7 +79,7 @@ struct ListsView: View {
                                 } label: {
                                     relationshipRow(
                                         label: loc("lists.following"),
-                                        count: viewModel.activeProfile?.followsCount
+                                        count: viewModel.followingCount ?? viewModel.activeProfile?.followsCount
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -459,9 +459,13 @@ struct ListsView: View {
                     .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showFollowing) {
-                RelationshipsView(mode: .following, initialCount: viewModel.activeProfile?.followsCount)
-                    .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
+                RelationshipsView(
+                    mode: .following,
+                    initialCount: viewModel.activeProfile?.followsCount,
+                    onCountUpdate: updateRelationshipCount
+                )
+                .environmentObject(accountStore)
+                .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlocking) {
                 RelationshipsView(

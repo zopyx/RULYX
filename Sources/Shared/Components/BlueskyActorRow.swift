@@ -1,5 +1,18 @@
 import SwiftUI
 
+// MARK: - Environment Key
+
+private struct ShowActorDescriptionsKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var showActorDescriptions: Bool {
+        get { self[ShowActorDescriptionsKey.self] }
+        set { self[ShowActorDescriptionsKey.self] = newValue }
+    }
+}
+
 // MARK: - BlueskyActorRow
 
 /// A standard row displaying a Bluesky actor: avatar, title (display name), handle,
@@ -23,6 +36,7 @@ struct BlueskyActorRow<Extra: View>: View {
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @Environment(\.showActorDescriptions) private var showActorDescriptions
 
     // MARK: - Body
 
@@ -41,10 +55,12 @@ struct BlueskyActorRow<Extra: View>: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 if let description = actor.description, !description.isEmpty {
-                    Text(description)
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
+                    if showActorDescriptions {
+                        Text(description)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                            .lineLimit(3)
+                    }
                 }
             }
 

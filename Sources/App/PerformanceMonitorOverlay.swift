@@ -17,7 +17,6 @@ import SwiftUI
 struct PerformanceMonitorOverlay: View {
     @EnvironmentObject private var debugStore: HTTPRequestDebugStore
     @State private var isExpanded = false
-    @State private var isVisible = false
     /// Polling timer for live updates.
     @State private var refreshTimer: Timer?
     /// Incremented on each tick to force view refresh.
@@ -29,35 +28,22 @@ struct PerformanceMonitorOverlay: View {
 
     var body: some View {
         Group {
-            if isVisible {
-                VStack(spacing: 0) {
-                    compactHUD
-                        .onTapGesture { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }
+            VStack(spacing: 0) {
+                compactHUD
+                    .onTapGesture { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }
 
-                    if isExpanded {
-                        expandedDetail
-                    }
+                if isExpanded {
+                    expandedDetail
                 }
-                .background {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-                }
-                .overlay(alignment: .topTrailing) {
-                    Button {
-                        withAnimation { isVisible = false }
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(4)
-                    }
-                    .accessibilityLabel("Close performance overlay")
-                }
-                .padding(.horizontal, 8)
-                .padding(.top, 4)
-                .transition(.move(edge: .top).combined(with: .opacity))
             }
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.ultraThinMaterial)
+                    .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+            }
+            .padding(.horizontal, 8)
+            .padding(.top, 4)
+            .transition(.move(edge: .top).combined(with: .opacity))
         }
         .onAppear {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in

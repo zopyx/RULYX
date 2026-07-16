@@ -353,6 +353,218 @@ final class AccountStoreTests: XCTestCase {
         XCTAssertFalse(flagsDuringAdd)
         XCTAssertFalse(store.isAddingAccount)
     }
+
+    // MARK: - Refresh Account Profiles
+
+    func testRefreshAccountProfilesUpdatesHandleWhenChanged() async {
+        let (store, _) = makeStore()
+        let authClient = MockAuthenticatingClient()
+        let profileService = MockProfileService()
+
+        await addTestAccount(store: store, client: authClient, handle: "old-handle.bsky.social")
+        guard let account = store.activeAccount else { return XCTFail() }
+        XCTAssertEqual(account.handle, "old-handle.bsky.social")
+
+        profileService.fetchProfileHandler = { did, _, _ in
+            BlueskyProfile(
+                id: did,
+                did: did,
+                handle: "new-handle.bsky.social",
+                displayName: "old-handle.bsky.social",
+                description: nil,
+                websiteURL: nil,
+                avatarURL: nil,
+                bannerURL: nil,
+                followersCount: 0,
+                followsCount: 0,
+                postsCount: 0,
+                listsCount: nil,
+                starterPacksCount: nil,
+                createdAt: nil,
+                labels: [],
+                viewerState: nil
+            )
+        }
+
+        await store.refreshAccountProfiles(using: profileService)
+
+        XCTAssertEqual(store.activeAccount?.handle, "new-handle.bsky.social")
+    }
+
+    func testRefreshAccountProfilesUpdatesDisplayNameAndHandle() async {
+        let (store, _) = makeStore()
+        let authClient = MockAuthenticatingClient()
+        let profileService = MockProfileService()
+
+        await addTestAccount(store: store, client: authClient, handle: "old.bsky.social")
+        XCTAssertEqual(store.activeAccount?.displayName, "old.bsky.social")
+
+        profileService.fetchProfileHandler = { did, _, _ in
+            BlueskyProfile(
+                id: did,
+                did: did,
+                handle: "renamed.bsky.social",
+                displayName: "Renamed User",
+                description: nil,
+                websiteURL: nil,
+                avatarURL: nil,
+                bannerURL: nil,
+                followersCount: 0,
+                followsCount: 0,
+                postsCount: 0,
+                listsCount: nil,
+                starterPacksCount: nil,
+                createdAt: nil,
+                labels: [],
+                viewerState: nil
+            )
+        }
+
+        await store.refreshAccountProfiles(using: profileService)
+
+        XCTAssertEqual(store.activeAccount?.handle, "renamed.bsky.social")
+        XCTAssertEqual(store.activeAccount?.displayName, "Renamed User")
+    }
+
+    func testRefreshAccountProfilesPersistsHandleAcrossStoreRecreation() async throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let keychain = MockKeychainService()
+
+        let store1 = AccountStore(defaults: defaults, keychain: keychain)
+        let authClient = MockAuthenticatingClient()
+        let profileService = MockProfileService()
+
+        await addTestAccount(store: store1, client: authClient, handle: "old.bsky.social")
+
+        profileService.fetchProfileHandler = { did, _, _ in
+            BlueskyProfile(
+                id: did,
+                did: did,
+                handle: "persisted.bsky.social",
+                displayName: "old.bsky.social",
+                description: nil,
+                websiteURL: nil,
+                avatarURL: nil,
+                bannerURL: nil,
+                followersCount: 0,
+                followsCount: 0,
+                postsCount: 0,
+                listsCount: nil,
+                starterPacksCount: nil,
+                createdAt: nil,
+                labels: [],
+                viewerState: nil
+            )
+        }
+
+        await store1.refreshAccountProfiles(using: profileService)
+        XCTAssertEqual(store1.activeAccount?.handle, "persisted.bsky.social")
+
+        let store2 = AccountStore(defaults: defaults, keychain: keychain)
+        XCTAssertEqual(store2.activeAccount?.handle, "persisted.bsky.social")
+    }
+
+    func testRefreshAccountProfilesHandlesNetworkErrorGracefully() async {
+        let (store, _) = makeStore()
+        let authClient = MockAuthenticatingClient()
+        let profileService = MockProfileService()
+
+        await addTestAccount(store: store, client: authClient, handle: "unchanged.bsky.social")
+        XCTAssertEqual(store.activeAccount?.handle, "unchanged.bsky.social")
+
+        // Simulate a network error
+        profileService.fetchProfileHandler = { _, _, _ in
+            throw BlueskyAPIError.server("Network error")
+        }
+
+        await store.refreshAccountProfiles(using: profileService)
+
+        // Account unchanged after error
+        XCTAssertEqual(store.activeAccount?.handle, "unchanged.bsky.social")
+    }
+
+    func testRefreshAccountProfilesUpdatesDidWhenChanged() async {
+        let (store, _) = makeStore()
+        let authClient = MockAuthenticatingClient()
+        let profileService = MockProfileService()
+
+        await addTestAccount(store: store, client: authClient, handle: "did-test.bsky.social")
+        XCTAssertEqual(store.activeAccount?.did, "did:plc:test")
+
+        profileService.fetchProfileHandler = { did, _, _ in
+            BlueskyProfile(
+                id: did,
+                did: "did:plc:updated",
+                handle: "did-test.bsky.social",
+                displayName: "did-test.bsky.social",
+                description: nil,
+                websiteURL: nil,
+                avatarURL: nil,
+                bannerURL: nil,
+                followersCount: 0,
+                followsCount: 0,
+                postsCount: 0,
+                listsCount: nil,
+                starterPacksCount: nil,
+                createdAt: nil,
+                labels: [],
+                viewerState: nil
+            )
+        }
+
+        await store.refreshAccountProfiles(using: profileService)
+
+        XCTAssertEqual(store.activeAccount?.did, "did:plc:updated")
+    }
+
+    func testRefreshAccountProfilesUpdatesMultipleAccounts() async {
+        let (store, _) = makeStore()
+        let authClient = MockAuthenticatingClient()
+        let profileService = MockProfileService()
+
+        await addTestAccount(store: store, client: authClient, handle: "alpha.bsky.social")
+        await addTestAccount(store: store, client: authClient, handle: "beta.bsky.social")
+
+        final class FetchCounter: @unchecked Sendable {
+            var value = 0
+        }
+        let counter = FetchCounter()
+
+        profileService.fetchProfileHandler = { [counter] did, _, _ in
+            counter.value += 1
+            if counter.value == 1 {
+                return BlueskyProfile(
+                    id: did, did: did, handle: "alpha-renamed.bsky.social",
+                    displayName: "Alpha Renamed", description: nil,
+                    websiteURL: nil, avatarURL: nil, bannerURL: nil,
+                    followersCount: 0, followsCount: 0, postsCount: 0,
+                    listsCount: nil, starterPacksCount: nil,
+                    createdAt: nil, labels: [], viewerState: nil
+                )
+            }
+            return BlueskyProfile(
+                id: did, did: did, handle: "beta-renamed.bsky.social",
+                displayName: "Beta Renamed", description: nil,
+                websiteURL: nil, avatarURL: nil, bannerURL: nil,
+                followersCount: 0, followsCount: 0, postsCount: 0,
+                listsCount: nil, starterPacksCount: nil,
+                createdAt: nil, labels: [], viewerState: nil
+            )
+        }
+
+        await store.refreshAccountProfiles(using: profileService)
+
+        XCTAssertEqual(counter.value, 2)
+        XCTAssertEqual(store.accounts.count, 2)
+
+        let alpha = store.accounts.first { $0.handle == "alpha-renamed.bsky.social" }
+        let beta = store.accounts.first { $0.handle == "beta-renamed.bsky.social" }
+        XCTAssertNotNil(alpha)
+        XCTAssertNotNil(beta)
+        XCTAssertEqual(alpha?.displayName, "Alpha Renamed")
+        XCTAssertEqual(beta?.displayName, "Beta Renamed")
+    }
 }
 
 private final class MockKeychainService: KeychainServicing, @unchecked Sendable {

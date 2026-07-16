@@ -1472,6 +1472,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return decoded.data.didIdentifier
     }
 
+    /// Public wrapper to resolve a handle to a DID.
+    func resolveHandle(_ handle: String) async throws -> String {
+        try await resolveHandleToDID(handle: handle)
+    }
+
     // MARK: - Author Feed
 
     /// Fetches an author's feed (used for image/media downloads).

@@ -14,10 +14,14 @@ final class ListsViewModel {
     private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     /// Profile of the currently active account.
     private(set) var activeProfile: BlueskyProfile?
-    /// Number of accounts this user is blocking.
+    /// The relationship count for blocking, populated on first load.
     private(set) var blockingCount: Int?
-    /// Number of accounts blocking this user.
+    /// The relationship count for blocked-by, populated on first load.
     private(set) var blockedByCount: Int?
+    /// The relationship count for following, updated when accounts are unfollowed.
+    private(set) var followingCount: Int?
+    /// The relationship count for followers, populated on first load.
+    private(set) var followersCount: Int?
     /// True while the initial load is in progress (no cache).
     private(set) var isLoading = false
     /// True while a manual refresh is in progress.
@@ -194,8 +198,10 @@ final class ListsViewModel {
             blockingCount = count
         case .blockedBy:
             blockedByCount = count
-        case .followers, .following:
-            return
+        case .following:
+            followingCount = count
+        case .followers:
+            followersCount = count
         }
 
         let cacheKey = account?.did ?? account?.handle ?? didCacheKey

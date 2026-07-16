@@ -362,6 +362,11 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
                     updatedAccounts[index].avatarURL = profile.avatarURL
                     didChange = true
                 }
+                // Update the handle if it changed on the server (e.g. user renamed via web).
+                if updatedAccounts[index].handle != profile.handle {
+                    updatedAccounts[index].handle = profile.handle
+                    didChange = true
+                }
                 // Always invalidate cached avatar so AsyncImage re-fetches
                 // (Bluesky may reuse the same CDN URL after avatar changes)
                 if let url = updatedAccounts[index].avatarURL {
