@@ -197,6 +197,50 @@ final class ChatService: ChatServicing {
         return (events, response.cursor)
     }
 
+    // MARK: - Group Management
+
+    /// Adds a member to a group conversation.
+    func addMember(convoId: String, memberDID: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+        let request = AddMemberRequest(convoId: convoId, memberDID: memberDID)
+        let response: AddMemberResponse = try await chatRequest(
+            path: "chat.bsky.convo.addMember",
+            method: "POST",
+            queryItems: [],
+            body: request,
+            account: account,
+            appPassword: appPassword
+        )
+        return response.convo.toDomain()
+    }
+
+    /// Removes a member from a group conversation.
+    func removeMember(convoId: String, memberDID: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+        let request = RemoveMemberRequest(convoId: convoId, memberDID: memberDID)
+        let response: RemoveMemberResponse = try await chatRequest(
+            path: "chat.bsky.convo.removeMember",
+            method: "POST",
+            queryItems: [],
+            body: request,
+            account: account,
+            appPassword: appPassword
+        )
+        return response.convo.toDomain()
+    }
+
+    /// Updates the name of a group conversation.
+    func updateGroupName(convoId: String, name: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+        let request = UpdateGroupNameRequest(convoId: convoId, name: name)
+        let response: UpdateGroupNameResponse = try await chatRequest(
+            path: "chat.bsky.convo.updateName",
+            method: "POST",
+            queryItems: [],
+            body: request,
+            account: account,
+            appPassword: appPassword
+        )
+        return response.convo.toDomain()
+    }
+
     // MARK: - Chat HTTP Helper
 
     private func chatRequest<Response: Decodable>(

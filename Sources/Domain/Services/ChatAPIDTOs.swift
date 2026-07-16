@@ -286,6 +286,52 @@ struct MuteConvoResponse: Decodable {
 
 // MARK: - Get Log
 
+// MARK: - Add Member
+
+/// Request body for `chat.bsky.convo.addMember`.
+struct AddMemberRequest: Encodable {
+    let convoId: String
+    let memberDID: String
+
+    enum CodingKeys: String, CodingKey {
+        case convoId
+        case memberDID = "member"
+    }
+}
+
+struct AddMemberResponse: Decodable {
+    let convo: ConvoViewDTO
+}
+
+// MARK: - Remove Member
+
+/// Request body for `chat.bsky.convo.removeMember`.
+struct RemoveMemberRequest: Encodable {
+    let convoId: String
+    let memberDID: String
+
+    enum CodingKeys: String, CodingKey {
+        case convoId
+        case memberDID = "member"
+    }
+}
+
+struct RemoveMemberResponse: Decodable {
+    let convo: ConvoViewDTO
+}
+
+// MARK: - Update Name
+
+/// Request body for `chat.bsky.convo.updateName` (if it exists).
+struct UpdateGroupNameRequest: Encodable {
+    let convoId: String
+    let name: String
+}
+
+struct UpdateGroupNameResponse: Decodable {
+    let convo: ConvoViewDTO
+}
+
 /// Response from `chat.bsky.convo.getLog`.
 struct GetLogResponse: Decodable {
     let cursor: String?

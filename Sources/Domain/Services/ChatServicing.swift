@@ -96,4 +96,15 @@ protocol ChatServicing {
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     /// - Returns: A tuple containing an array of `ChatLogEvent` and an optional next cursor.
     func getLog(cursor: String?, account: AppAccount, appPassword: String?) async throws -> (events: [ChatLogEvent], cursor: String?)
+
+    // MARK: - Group Management
+
+    /// Adds a member to a group conversation.
+    func addMember(convoId: String, memberDID: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation
+
+    /// Removes a member from a group conversation.
+    func removeMember(convoId: String, memberDID: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation
+
+    /// Updates the name of a group conversation.
+    func updateGroupName(convoId: String, name: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation
 }
