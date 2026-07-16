@@ -169,7 +169,15 @@ extension ListDetailView {
         switch result {
         case let .success(url):
             do {
-                let content = try String(contentsOf: url, encoding: .utf8)
+                let didAccess = url.startAccessingSecurityScopedResource()
+                defer {
+                    if didAccess {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+
+                let data = try Data(contentsOf: url)
+                let content = try importContent(from: data, filename: url.lastPathComponent)
                 if let account = accountStore.activeAccount,
                    let appPassword = accountStore.appPassword(for: account)
                 {
@@ -189,6 +197,37 @@ extension ListDetailView {
         case let .failure(error):
             viewModel.errorMessage = error.localizedDescription
         }
+    }
+
+    private func importContent(from data: Data, filename: String) throws -> String {
+        guard filename.lowercased().hasSuffix(".json") else {
+            return String(decoding: data, as: UTF8.self)
+        }
+
+        let object = try JSONSerialization.jsonObject(with: data)
+        guard let rows = object as? [[String: Any]] else {
+            throw AppError(category: .validation, message: loc("account.import.invalid_format"))
+        }
+
+        let identifiers = rows.compactMap { row -> String? in
+            if let did = (row["did"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !did.isEmpty
+            {
+                return did
+            }
+            if let handle = (row["handle"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !handle.isEmpty
+            {
+                return handle
+            }
+            return nil
+        }
+
+        guard !identifiers.isEmpty else {
+            throw AppError(category: .validation, message: loc("rel.import_json.empty"))
+        }
+
+        return identifiers.joined(separator: "\n")
     }
 
     func bulkActionMessage(for result: ListBulkActionResult) -> String {

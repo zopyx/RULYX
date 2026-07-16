@@ -132,7 +132,7 @@ struct ListDetailView: View {
             }
             .fileImporter(
                 isPresented: $importState.isShowingImportFilePicker,
-                allowedContentTypes: [.plainText, .commaSeparatedText]
+                allowedContentTypes: [.plainText, .commaSeparatedText, .json]
             ) { result in
                 handleImportedFile(result)
             }
@@ -320,6 +320,16 @@ struct ListDetailView: View {
         ToolbarItem(placement: .topBarTrailing) {
             HStack(spacing: 16) {
                 Menu {
+                    if isOwnedList {
+                        Button {
+                            importState.isShowingImportFilePicker = true
+                        } label: {
+                            Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
+                        }
+
+                        Divider()
+                    }
+
                     Button {
                         isExporting = true
                         Task { await exportList(format: .csv) }
