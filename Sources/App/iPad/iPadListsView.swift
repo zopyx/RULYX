@@ -5,10 +5,10 @@ struct iPadListsView: View {
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @EnvironmentObject private var navState: iPadNavigationState
     @EnvironmentObject var internalListStore: InternalListStore
 
     @State private var viewModel = ListsViewModel()
+    @State private var selectedList: BlueskyList?
 
     @State private var showCreateList = false
     @State private var showInternalListCreate = false
@@ -39,7 +39,7 @@ struct iPadListsView: View {
     }
 
     private var listSelectionView: some View {
-        List(selection: $navState.selectedList) {
+        List(selection: $selectedList) {
             if let activeAccount = accountStore.activeAccount {
                 Section {
                     AccountSummaryCard(
@@ -93,7 +93,7 @@ struct iPadListsView: View {
         .sheet(isPresented: $showCreateList) {
             ListTemplatesView(onListCreated: { list in
                 viewModel.addList(list)
-                navState.selectedList = list
+                selectedList = list
             })
             .environmentObject(accountStore)
             .environmentObject(container.blueskyClient)

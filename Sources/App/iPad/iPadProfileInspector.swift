@@ -6,8 +6,7 @@ struct iPadProfileInspector: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @EnvironmentObject private var navState: iPadNavigationState
-
+    @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @State private var profileVM = BlueskyProfileViewModel()
 
     @State private var selectedTab: ProfileTab = .profile

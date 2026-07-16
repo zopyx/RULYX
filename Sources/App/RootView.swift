@@ -28,8 +28,6 @@ struct RootView: View {
     @EnvironmentObject private var chatStore: ChatStore
     @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
 
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
     /// UserDefaults key `"hasSeenOnboarding"`: whether the first-launch onboarding
     /// has been shown. Suppresses the onboarding sheet on subsequent launches.
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
@@ -45,6 +43,7 @@ struct RootView: View {
     @AppStorage("performanceOverlayEnabled") private var performanceOverlayEnabled = false
     /// Tracks three-finger triple-tap to toggle overlay visibility.
     @State private var overlayVisible = false
+    @State private var showCommandPalette = false
 
     /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
     /// Returns `.light`, `.dark`, or `nil` for system-following mode.
@@ -146,22 +145,69 @@ struct RootView: View {
     // MARK: - Body
 
     var body: some View {
-        if horizontalSizeClass == .regular {
-            iPadRootView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
-                .environmentObject(mutedWordsStore)
-                .environmentObject(analyticsStore)
-                .environmentObject(chatStore)
-                .environmentObject(clearskyHeartbeat)
-        } else {
-            compactBody
+        tabBody
+            .overlay {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    commandPaletteOverlay
+                }
+            }
+            .background {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    keyboardShortcutButtons
+                }
+            }
+    }
+
+    // MARK: - iPad-specific enhancements
+
+    @ViewBuilder
+    private var commandPaletteOverlay: some View {
+        if showCommandPalette {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { showCommandPalette = false }
+            iPadCommandPalette(
+                isPresented: $showCommandPalette,
+                onNavigate: { item in
+                    navigateToSidebarItem(item)
+                }
+            )
+            .environmentObject(localizationManager)
+            .transition(AnyTransition.scale.combined(with: .opacity))
         }
     }
 
-    private var compactBody: some View {
+    @ViewBuilder
+    private var keyboardShortcutButtons: some View {
+        Button("") { showCommandPalette.toggle() }
+            .keyboardShortcut("k", modifiers: .command)
+            .opacity(0)
+    }
+
+    /// Maps SidebarItem commands to tab navigation.
+    private func navigateToSidebarItem(_ item: SidebarItem) {
+        showCommandPalette = false
+        switch item {
+        case .allLists, .templates, .rules, .dashboard, .relationships:
+            workspaceStore.selectedTab = .moderation
+        case .customSearch, .mentionsSearch, .bulkLookup, .networkGraph:
+            workspaceStore.selectedTab = .moderation
+        case .timeline:
+            workspaceStore.selectedTab = .timeline
+        case .notifications:
+            workspaceStore.selectedTab = .notifications
+        case .chat:
+            workspaceStore.selectedTab = .chat
+        case .settings:
+            workspaceStore.selectedTab = .settings
+        case .accounts:
+            workspaceStore.selectedTab = .account
+        case .info:
+            workspaceStore.selectedTab = .info
+        }
+    }
+
+    private var tabBody: some View {
         let tint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
 
         return VStack(spacing: 0) {
@@ -244,6 +290,12 @@ struct RootView: View {
             }
         }
         .highPriorityGesture(threeFingerGesture)
+        .animation(.spring(response: 0.35), value: showCommandPalette)
+        .onReceive(NotificationCenter.default.publisher(for: .iPadNavigateTo)) { notification in
+            if let item = notification.object as? SidebarItem {
+                navigateToSidebarItem(item)
+            }
+        }
     }
 
     /// Three-finger triple-tap gesture that toggles the performance overlay.

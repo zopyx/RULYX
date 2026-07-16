@@ -7,7 +7,7 @@ struct iPadListDetailView: View {
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
-    @EnvironmentObject private var navState: iPadNavigationState
+    var onClose: (() -> Void)?
 
     @StateObject private var detailVM = ListDetailViewModel()
 
@@ -92,13 +92,13 @@ struct iPadListDetailView: View {
 
             HStack(spacing: 12) {
                 listActionButton(loc("lists.add_actor"), icon: "person.badge.plus") {
-                    navState.selectedList = nil
+                    onClose?()
                 }
                 listActionButton(loc("lists.remove"), icon: "person.fill.badge.minus") {
-                    navState.selectedList = nil
+                    onClose?()
                 }
                 listActionButton(loc("lists.import"), icon: "square.and.arrow.down") {
-                    navState.selectedList = nil
+                    onClose?()
                 }
                 listActionButton(loc("lists.export"), icon: "square.and.arrow.up") {
                     showExport = true
@@ -184,7 +184,7 @@ struct iPadListDetailView: View {
 
     private func memberRow(_ member: BlueskyListMember) -> some View {
         Button {
-            navState.selectedProfileDID = member.actor.did
+            // Detail column selection removed with sidebar
         } label: {
             HStack(spacing: 12) {
                 AsyncImage(url: member.actor.avatarURL) { phase in
