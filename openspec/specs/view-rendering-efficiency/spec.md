@@ -15,11 +15,15 @@ SwiftUI views SHALL avoid full-body re-evaluation when unrelated state changes o
 - **THEN** only the count label subview SHALL re-render, not the entire list of moderation lists
 
 ### Requirement: Large scrollable lists SHALL use identity-based diffing
-List rows in `RelationshipsView`, `ListsView`, and `FeedTimelineView` SHALL use stable identifiers (`id: \.id` on model types) and `Equatable` conformance on row data types to minimize SwiftUI diffing cost.
+List rows in `RelationshipsView`, `ListsView`, and ALL timeline views (`FeedTimelineView`, `ListTimelineView`) SHALL use stable identifiers (`id: \\.post.uri` on `RichFeedEntry`) to minimize SwiftUI diffing cost.
 
 #### Scenario: List insertion
-- **WHEN** items are inserted into a list
+- **WHEN** items are inserted into a timeline list
 - **THEN** only the inserted rows SHALL animate/render, not the entire list
+
+#### Scenario: Shared post row component avoids duplicate view hierarchies
+- **WHEN** `TimelinePostRow` is used by both feed and list timelines
+- **THEN** the view hierarchy for each post row SHALL be structurally identical, enabling SwiftUI to reuse rendering paths
 
 ### Requirement: BlueskyProfileView SHALL be decomposed
 The 1841-line `BlueskyProfileView` body SHALL be decomposed into smaller named subviews/subview-builders to improve SwiftUI body diffing granularity and compile-time performance.
