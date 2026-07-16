@@ -386,8 +386,11 @@ struct ConversationListView: View {
                     }
                     .frame(width: 48, height: 48)
                     .clipShape(Circle())
+                } else if conversation.kind == .group {
+                    GroupAvatarView(members: conversation.members, groupName: conversation.groupInfo?.name ?? "", size: 48)
+                        .frame(width: 48, height: 48)
                 } else {
-                    Image(systemName: conversation.kind == .group ? "person.3.fill" : "person.circle.fill")
+                    Image(systemName: "person.circle.fill")
                         .resizable()
                         .frame(width: 48, height: 48)
                         .foregroundStyle(.tertiary)
