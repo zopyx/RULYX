@@ -68,6 +68,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             let response = try await client.fetchListFeed(listURI: list.id, cursor: nil, account: account, appPassword: appPassword)
             entries = response.feed
             cursor = response.cursor
+            updateKnownURIs()
             state = entries.isEmpty ? .empty : (response.cursor == nil ? .exhausted : .loaded)
             if entries.isEmpty {
                 await loadMemberOwnPostsFallback(account: account, appPassword: appPassword, using: client)
@@ -96,10 +97,12 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
                 let response = try await client.fetchListFeed(listURI: list.id, cursor: cursor, account: account, appPassword: appPassword)
                 entries += response.feed
                 self.cursor = response.cursor
+                updateKnownURIs()
                 state = response.cursor == nil ? .exhausted : .loaded
             case .memberOwnPosts:
                 let newPosts = try await loadMoreMemberOwnPosts(account: account, appPassword: appPassword, using: client)
                 entries = deduplicateAndSort(entries + newPosts)
+                updateKnownURIs()
                 let hasMorePosts = nextMemberIndex < members.count || !memberHasMore.isEmpty
                 state = hasMorePosts ? .loaded : .exhausted
             }
@@ -119,13 +122,65 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
 
     // MARK: - Polling
 
+    /// Set of known post URIs for polling dedup.
+    private var knownURIs: Set<String> = []
+    /// Whether the last refresh produced any posts.
+    private var lastRefreshHadPosts = false
+    /// The running polling task.
+    private var pollingTask: Task<Void, Never>?
+    /// Timestamp of the last user interaction for adaptive interval.
+    private var lastInteractionTime = Date()
+    /// Active polling interval, adapts 15s → 30s after inactivity.
+    private var currentPollingInterval: TimeInterval = 15
+
     func startPolling(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, interval: TimeInterval = 15) {
-        // Polling not yet implemented for list timelines — deferred to Phase 4.
+        stopPolling()
+        currentPollingInterval = interval
+        pollingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self, !Task.isCancelled else { return }
+                try? await Task.sleep(nanoseconds: UInt64(currentPollingInterval * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                let elapsed = Date().timeIntervalSince(lastInteractionTime)
+                if elapsed > 120, currentPollingInterval < 30 {
+                    currentPollingInterval = 30
+                } else if elapsed <= 120, currentPollingInterval > 15 {
+                    currentPollingInterval = 15
+                }
+                await checkForNewPosts(account: account, appPassword: appPassword, using: client)
+            }
+        }
     }
 
-    func stopPolling() {}
+    func stopPolling() {
+        pollingTask?.cancel()
+        pollingTask = nil
+    }
 
-    func userDidInteract() {}
+    func userDidInteract() {
+        lastInteractionTime = Date()
+        currentPollingInterval = 15
+    }
+
+    /// Checks for new list-feed posts and increments newPostCount.
+    private func checkForNewPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+        guard !knownURIs.isEmpty, state != .initialLoading else { return }
+        do {
+            let response = try await client.fetchListFeed(listURI: list.id, cursor: nil, limit: 10, account: account, appPassword: appPassword)
+            let newURIs = Set(response.feed.map(\.post.uri)).subtracting(knownURIs)
+            guard !newURIs.isEmpty else { return }
+            knownURIs.formUnion(newURIs)
+            newPostCount += newURIs.count
+        } catch {
+            if AppError.isCancellation(error) { return }
+            AppLogger.moderation.debug("List polling check failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Rebuilds knownURIs from current entries.
+    private func updateKnownURIs() {
+        knownURIs = Set(entries.map(\.post.uri))
+    }
 
     // MARK: - Optimistic Interactions
 
@@ -263,11 +318,13 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             nextMemberIndex = firstBatch.count
             scanProgressLabel = loc("list.timeline.fetching_posts")
             entries = try await deduplicateAndSort(fetchMemberOwnPosts(for: firstBatch, account: account, appPassword: appPassword, using: client))
+            updateKnownURIs()
             let hasMorePosts = nextMemberIndex < members.count || !memberHasMore.isEmpty
             state = entries.isEmpty ? .empty : (hasMorePosts ? .loaded : .exhausted)
             while entries.isEmpty, hasMorePosts, !Task.isCancelled {
                 let morePosts = try await loadMoreMemberOwnPosts(account: account, appPassword: appPassword, using: client)
                 entries = deduplicateAndSort(entries + morePosts)
+                updateKnownURIs()
                 let stillHasMore = nextMemberIndex < members.count || !memberHasMore.isEmpty
                 state = entries.isEmpty ? .empty : (stillHasMore ? .loaded : .exhausted)
             }

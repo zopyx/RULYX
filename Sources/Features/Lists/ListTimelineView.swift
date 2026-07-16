@@ -39,8 +39,7 @@ struct ListTimelineView: View {
     // MARK: - Body
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            Group {
+        Group {
                 if viewModel.state == .initialLoading {
                     skeletonContent
                 } else if case let .failed(msg) = viewModel.state, viewModel.entries.isEmpty {
@@ -190,10 +189,14 @@ struct ListTimelineView: View {
             }
             .task {
                 await loadInitial()
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                viewModel.startPolling(account: account, appPassword: appPassword, using: container.blueskyClient)
             }
             .onDisappear {
                 initialLoadTask?.cancel()
                 loadMoreTask?.cancel()
+                viewModel.stopPolling()
             }
             .task {
                 guard let account = accountStore.activeAccount,
@@ -204,7 +207,6 @@ struct ListTimelineView: View {
             .task(id: viewModel.entries.count) {
                 await classifyVisiblePosts()
             }
-        }
     }
 
     // MARK: - List content
@@ -273,6 +275,15 @@ struct ListTimelineView: View {
         .listStyle(.plain)
         .refreshable {
             await refresh()
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 5)
+                .onChanged { _ in viewModel.userDidInteract() }
+        )
+        .overlay(alignment: .top) {
+            if viewModel.newPostCount > 0 {
+                newPostsBanner
+            }
         }
     }
 
@@ -368,6 +379,27 @@ struct ListTimelineView: View {
             }
         }
         .listStyle(.plain)
+    }
+
+    private var newPostsBanner: some View {
+        Text(loc("timeline.new_posts").replacingOccurrences(of: "{n}", with: "\(viewModel.newPostCount)"))
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(Color.skyPrimary))
+            .padding(.top, 8)
+            .onTapGesture {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    viewModel.newPostCount = 0
+                }
+                Task { await refresh() }
+            }
+            .transition(.move(edge: .top).combined(with: .opacity))
+            .task {
+                try? await Task.sleep(nanoseconds: 4_000_000_000)
+                withAnimation { viewModel.newPostCount = 0 }
+            }
     }
 
     // MARK: - Actions
