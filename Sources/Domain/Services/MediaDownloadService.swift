@@ -7,7 +7,7 @@ private enum MediaDownloadFailure: LocalizedError {
     case invalidStatusCode(Int)
     case invalidPlaylist
     case missingSegments
-    case remuxFailed
+    case remuxFailed(String?)
 
     var errorDescription: String? {
         switch self {
@@ -19,8 +19,12 @@ private enum MediaDownloadFailure: LocalizedError {
             "Invalid playlist."
         case .missingSegments:
             "Missing video segments."
-        case .remuxFailed:
-            "Video remux failed."
+        case let .remuxFailed(reason):
+            if let reason, !reason.isEmpty {
+                "Video remux failed: \(reason)"
+            } else {
+                "Video remux failed."
+            }
         }
     }
 }
@@ -43,8 +47,32 @@ enum MediaAssetSource {
     case videoPlaylist(URL)
 }
 
+private struct MediaByteRange: Sendable {
+    let offset: Int64
+    let length: Int64
+
+    var headerValue: String {
+        "bytes=\(offset)-\(offset + length - 1)"
+    }
+}
+
+private struct PendingMediaByteRange {
+    let length: Int64
+    let offset: Int64?
+}
+
+private struct VideoSegment: Sendable {
+    let url: URL
+    let byteRange: MediaByteRange?
+}
+
+private struct VideoInitSegment: Sendable {
+    let url: URL
+    let byteRange: MediaByteRange?
+}
+
 /// The result of downloading a single media asset.
-struct MediaAssetDownloadOutcome {
+struct MediaAssetDownloadOutcome: Sendable {
     /// The asset index for ordering.
     let index: Int
     /// The filename of the saved file, or `nil` on failure.
@@ -53,9 +81,16 @@ struct MediaAssetDownloadOutcome {
     let error: String?
 }
 
+/// Fine-grained progress for one asset in a bulk media download.
+struct MediaAssetProgress: Sendable {
+    let index: Int
+    let filenameStem: String
+    let fractionCompleted: Double
+}
+
 /// Actor-based service for downloading media assets (images and HLS videos)
 /// with configurable concurrency limits. Handles HLS playlist resolution,
-/// segment downloading, TS concatenation, and AVFoundation remuxing to MP4.
+/// segment downloading, fragmented MP4 assembly, and TS-to-MP4 export.
 actor MediaDownloadService {
     static let shared = MediaDownloadService()
 
@@ -84,24 +119,39 @@ actor MediaDownloadService {
     func downloadImages(
         _ assets: [MediaAssetDownload],
         to targetDir: URL,
-        progress: @Sendable @escaping (_ completed: Int, _ total: Int, _ latestResult: MediaAssetDownloadOutcome) async -> Void
+        progress: @Sendable @escaping (_ completed: Int, _ total: Int, _ latestResult: MediaAssetDownloadOutcome) async -> Void,
+        assetProgress: @Sendable @escaping (MediaAssetProgress) async -> Void = { _ in }
     ) async -> [MediaAssetDownloadOutcome] {
-        await download(assets, to: targetDir, concurrencyLimit: imageDownloadConcurrency, progress: progress)
+        await download(
+            assets,
+            to: targetDir,
+            concurrencyLimit: imageDownloadConcurrency,
+            progress: progress,
+            assetProgress: assetProgress
+        )
     }
 
     func downloadMedia(
         _ assets: [MediaAssetDownload],
         to targetDir: URL,
-        progress: @Sendable @escaping (_ completed: Int, _ total: Int, _ latestResult: MediaAssetDownloadOutcome) async -> Void
+        progress: @Sendable @escaping (_ completed: Int, _ total: Int, _ latestResult: MediaAssetDownloadOutcome) async -> Void,
+        assetProgress: @Sendable @escaping (MediaAssetProgress) async -> Void = { _ in }
     ) async -> [MediaAssetDownloadOutcome] {
-        await download(assets, to: targetDir, concurrencyLimit: mediaItemDownloadConcurrency, progress: progress)
+        await download(
+            assets,
+            to: targetDir,
+            concurrencyLimit: mediaItemDownloadConcurrency,
+            progress: progress,
+            assetProgress: assetProgress
+        )
     }
 
     private func download(
         _ assets: [MediaAssetDownload],
         to targetDir: URL,
         concurrencyLimit: Int,
-        progress: @Sendable @escaping (_ completed: Int, _ total: Int, _ latestResult: MediaAssetDownloadOutcome) async -> Void
+        progress: @Sendable @escaping (_ completed: Int, _ total: Int, _ latestResult: MediaAssetDownloadOutcome) async -> Void,
+        assetProgress: @Sendable @escaping (MediaAssetProgress) async -> Void
     ) async -> [MediaAssetDownloadOutcome] {
         guard !assets.isEmpty else { return [] }
 
@@ -120,7 +170,13 @@ actor MediaDownloadService {
                 let asset = assets[nextAssetIndex]
                 nextAssetIndex += 1
                 group.addTask { [httpClient] in
-                    await Self.process(asset, in: targetDir, using: httpClient, segmentLimit: segmentLimit)
+                    await Self.process(
+                        asset,
+                        in: targetDir,
+                        using: httpClient,
+                        segmentLimit: segmentLimit,
+                        progress: assetProgress
+                    )
                 }
             }
 
@@ -137,7 +193,13 @@ actor MediaDownloadService {
                     let asset = assets[nextAssetIndex]
                     nextAssetIndex += 1
                     group.addTask { [httpClient] in
-                        await Self.process(asset, in: targetDir, using: httpClient, segmentLimit: segmentLimit)
+                        await Self.process(
+                            asset,
+                            in: targetDir,
+                            using: httpClient,
+                            segmentLimit: segmentLimit,
+                            progress: assetProgress
+                        )
                     }
                 }
             }
@@ -150,10 +212,14 @@ actor MediaDownloadService {
         _ asset: MediaAssetDownload,
         in targetDir: URL,
         using httpClient: HTTPClient,
-        segmentLimit: Int
+        segmentLimit: Int,
+        progress: @Sendable @escaping (MediaAssetProgress) async -> Void
     ) async -> MediaAssetDownloadOutcome {
         do {
             try Task.checkCancellation()
+            await progress(
+                MediaAssetProgress(index: asset.index, filenameStem: asset.filenameStem, fractionCompleted: 0.01)
+            )
             switch asset.source {
             case let .image(url, preferredExtension):
                 let filename = try await downloadImage(
@@ -163,6 +229,9 @@ actor MediaDownloadService {
                     in: targetDir,
                     using: httpClient
                 )
+                await progress(
+                    MediaAssetProgress(index: asset.index, filenameStem: asset.filenameStem, fractionCompleted: 1)
+                )
                 return MediaAssetDownloadOutcome(index: asset.index, savedFilename: filename, error: nil)
 
             case let .videoPlaylist(playlistURL):
@@ -171,7 +240,19 @@ actor MediaDownloadService {
                     filenameStem: asset.filenameStem,
                     in: targetDir,
                     using: httpClient,
-                    segmentLimit: segmentLimit
+                    segmentLimit: segmentLimit,
+                    progress: { fraction in
+                        await progress(
+                            MediaAssetProgress(
+                                index: asset.index,
+                                filenameStem: asset.filenameStem,
+                                fractionCompleted: fraction
+                            )
+                        )
+                    }
+                )
+                await progress(
+                    MediaAssetProgress(index: asset.index, filenameStem: asset.filenameStem, fractionCompleted: 1)
                 )
                 return MediaAssetDownloadOutcome(index: asset.index, savedFilename: filename, error: nil)
             }
@@ -209,33 +290,144 @@ actor MediaDownloadService {
         filenameStem: String,
         in targetDir: URL,
         using httpClient: HTTPClient,
-        segmentLimit: Int
+        segmentLimit: Int,
+        progress: @Sendable @escaping (Double) async -> Void
     ) async throws -> String {
         try Task.checkCancellation()
         let resolvedPlaylistURL = try await resolvePlaylistURL(from: playlistURL, using: httpClient)
         let playlistContents = try await loadPlaylist(from: resolvedPlaylistURL, using: httpClient)
-        let segmentURLs = playlistSegmentURLs(from: playlistContents, baseURL: resolvedPlaylistURL.deletingLastPathComponent())
-        guard !segmentURLs.isEmpty else {
+        let baseURL = resolvedPlaylistURL.deletingLastPathComponent()
+        let initSegment = playlistInitSegment(from: playlistContents, baseURL: baseURL)
+        let segments = playlistSegments(from: playlistContents, baseURL: baseURL, initSegment: initSegment)
+        guard !segments.isEmpty else {
             throw MediaDownloadFailure.invalidPlaylist
         }
+        await progress(0.05)
 
-        let tempDirectory = targetDir.appendingPathComponent(".\(filenameStem)-segments", isDirectory: true)
+        let tempDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("media-download-\(filenameStem)-segments", isDirectory: true)
         try? FileManager.default.removeItem(at: tempDirectory)
         try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDirectory) }
 
+        // Download init segment for fMP4 streams (required for valid output).
+        var initSegmentData: Data?
+        if let initSegment {
+            do {
+                initSegmentData = try await downloadInitSegment(initSegment, using: httpClient)
+            } catch {
+                AppLogger.performance.debug("Init segment download failed for \(filenameStem, privacy: .public): \(error.localizedDescription) — continuing without")
+            }
+        }
+        if initSegmentData == nil {
+            AppLogger.performance.debug("No init segment for \(filenameStem, privacy: .public) — stream may be TS-based")
+        }
+
+        let segmentFiles = await downloadVideoSegments(
+            segments,
+            to: tempDirectory,
+            using: httpClient,
+            concurrencyLimit: segmentLimit,
+            progress: progress
+        )
+
+        guard segmentFiles.count == segments.count else {
+            throw MediaDownloadFailure.missingSegments
+        }
+        await progress(0.92)
+
+        let mp4URL = targetDir.appendingPathComponent("\(filenameStem).mp4")
+        if let initSegmentData {
+            try writeFragmentedMP4(
+                initSegmentData: initSegmentData,
+                segmentFiles: segmentFiles,
+                segmentCount: segments.count,
+                outputURL: mp4URL
+            )
+            await progress(0.99)
+            return mp4URL.lastPathComponent
+        }
+
+        // TS playlists are first written directly to the target folder. If MP4
+        // export fails, this transport stream remains as the successful download.
+        let transportStreamURL = targetDir.appendingPathComponent("\(filenameStem).ts")
+        if FileManager.default.fileExists(atPath: transportStreamURL.path) {
+            try FileManager.default.removeItem(at: transportStreamURL)
+        }
+        FileManager.default.createFile(atPath: transportStreamURL.path, contents: nil)
+        let outputHandle = try FileHandle(forWritingTo: transportStreamURL)
+
+        for index in 0 ..< segments.count {
+            try Task.checkCancellation()
+            guard let fileURL = segmentFiles[index] else {
+                try? outputHandle.close()
+                try? FileManager.default.removeItem(at: transportStreamURL)
+                throw URLError(.resourceUnavailable)
+            }
+            let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+            try outputHandle.write(contentsOf: data)
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+        try outputHandle.close()
+
+        let concatSize = (try? FileManager.default.attributesOfItem(atPath: transportStreamURL.path)[.size] as? Int) ?? 0
+        AppLogger.performance.debug("Concatenated \(concatSize) bytes for \(filenameStem, privacy: .public) (\(segments.count) segments, init=no)")
+
+        // Use AVAssetExportSession with passthrough for robust remux.
+        // Handles common TS timestamp discontinuities better than manual reader/writer.
+        if FileManager.default.fileExists(atPath: mp4URL.path) {
+            try FileManager.default.removeItem(at: mp4URL)
+        }
+
+        // Try passthrough first (no re-encoding), fall back to highest quality.
+        let asset = AVAsset(url: transportStreamURL)
+        var export = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough)
+        if export == nil {
+            AppLogger.performance.debug("Passthrough unavailable for \(filenameStem, privacy: .public) — falling back to highest quality")
+            export = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)
+        }
+        guard let export else {
+            AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .public): AVAssetExportSession could not be created")
+            return transportStreamURL.lastPathComponent
+        }
+        export.outputURL = mp4URL
+        export.outputFileType = .mp4
+
+        await progress(0.96)
+        await export.export()
+
+        guard export.status == .completed else {
+            try? FileManager.default.removeItem(at: mp4URL)
+            let reason = export.error?.localizedDescription
+            AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .public): export status=\(export.status.rawValue), error=\(reason ?? "none", privacy: .public)")
+            return transportStreamURL.lastPathComponent
+        }
+
+        try? FileManager.default.removeItem(at: transportStreamURL)
+        await progress(0.99)
+        return mp4URL.lastPathComponent
+    }
+
+    private static func downloadVideoSegments(
+        _ segments: [VideoSegment],
+        to tempDirectory: URL,
+        using httpClient: HTTPClient,
+        concurrencyLimit: Int,
+        progress: @Sendable @escaping (Double) async -> Void
+    ) async -> [Int: URL] {
         var segmentFiles: [Int: URL] = [:]
         var nextSegmentIndex = 0
+        var completedSegmentCount = 0
 
         await withTaskGroup(of: (Int, URL?).self) { group in
-            let initialCount = min(segmentLimit, segmentURLs.count)
+            let initialCount = min(concurrencyLimit, segments.count)
             for _ in 0 ..< initialCount {
                 let currentIndex = nextSegmentIndex
-                let segmentURL = segmentURLs[currentIndex]
+                let segment = segments[currentIndex]
                 nextSegmentIndex += 1
                 group.addTask {
                     let fileURL = try? await downloadSegment(
-                        from: segmentURL,
+                        segment,
                         index: currentIndex,
                         tempDirectory: tempDirectory,
                         using: httpClient
@@ -252,14 +444,16 @@ actor MediaDownloadService {
                 if let fileURL {
                     segmentFiles[segmentIndex] = fileURL
                 }
+                completedSegmentCount += 1
+                await progress(0.05 + (0.85 * Double(completedSegmentCount) / Double(segments.count)))
 
-                if nextSegmentIndex < segmentURLs.count {
+                if nextSegmentIndex < segments.count {
                     let currentIndex = nextSegmentIndex
-                    let segmentURL = segmentURLs[currentIndex]
+                    let segment = segments[currentIndex]
                     nextSegmentIndex += 1
                     group.addTask {
                         let fileURL = try? await downloadSegment(
-                            from: segmentURL,
+                            segment,
                             index: currentIndex,
                             tempDirectory: tempDirectory,
                             using: httpClient
@@ -270,37 +464,7 @@ actor MediaDownloadService {
             }
         }
 
-        guard segmentFiles.count == segmentURLs.count else {
-            throw MediaDownloadFailure.missingSegments
-        }
-
-        let transportStreamURL = targetDir.appendingPathComponent("\(filenameStem).ts")
-        if FileManager.default.fileExists(atPath: transportStreamURL.path) {
-            try FileManager.default.removeItem(at: transportStreamURL)
-        }
-        FileManager.default.createFile(atPath: transportStreamURL.path, contents: nil)
-
-        let outputHandle = try FileHandle(forWritingTo: transportStreamURL)
-        defer { try? outputHandle.close() }
-
-        for index in 0 ..< segmentURLs.count {
-            try Task.checkCancellation()
-            guard let fileURL = segmentFiles[index] else {
-                throw URLError(.resourceUnavailable)
-            }
-            let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
-            try outputHandle.write(contentsOf: data)
-            try? FileManager.default.removeItem(at: fileURL)
-        }
-
-        let mp4URL = targetDir.appendingPathComponent("\(filenameStem).mp4")
-        if await VideoRemuxer.remuxToMP4(source: transportStreamURL, destination: mp4URL) {
-            try? FileManager.default.removeItem(at: transportStreamURL)
-            return mp4URL.lastPathComponent
-        }
-
-        AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .public) after remux failure.")
-        return transportStreamURL.lastPathComponent
+        return segmentFiles
     }
 
     private static func loadPlaylist(from url: URL, using httpClient: HTTPClient) async throws -> String {
@@ -361,25 +525,115 @@ actor MediaDownloadService {
             .flatMap(Int.init)
     }
 
-    private static func playlistSegmentURLs(from playlist: String, baseURL: URL) -> [URL] {
-        playlist
-            .components(separatedBy: .newlines)
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .compactMap { line in
-                guard !line.hasPrefix("#"), !line.isEmpty else { return nil }
-                return URL(string: line, relativeTo: baseURL)
+    private static func playlistSegments(from playlist: String, baseURL: URL, initSegment: VideoInitSegment?) -> [VideoSegment] {
+        var segments: [VideoSegment] = []
+        var pendingByteRange: PendingMediaByteRange?
+        var nextOffsetByURL: [URL: Int64] = [:]
+        if let initSegment, let byteRange = initSegment.byteRange {
+            nextOffsetByURL[initSegment.url] = byteRange.offset + byteRange.length
+        }
+
+        for line in playlist.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("#EXT-X-BYTERANGE:") {
+                pendingByteRange = parsePendingByteRange(String(trimmed.dropFirst("#EXT-X-BYTERANGE:".count)))
+                continue
             }
+            guard !trimmed.hasPrefix("#"), !trimmed.isEmpty,
+                  let url = URL(string: trimmed, relativeTo: baseURL)?.absoluteURL
+            else {
+                continue
+            }
+
+            let byteRange: MediaByteRange?
+            if let pendingByteRange {
+                let offset = pendingByteRange.offset ?? nextOffsetByURL[url] ?? 0
+                byteRange = MediaByteRange(offset: offset, length: pendingByteRange.length)
+                nextOffsetByURL[url] = offset + pendingByteRange.length
+            } else {
+                byteRange = nil
+            }
+            segments.append(VideoSegment(url: url, byteRange: byteRange))
+            pendingByteRange = nil
+        }
+
+        return segments
+    }
+
+    /// Extracts the fMP4 initialization segment URL from an HLS playlist's
+    /// `#EXT-X-MAP:URI="..."` directive. Returns `nil` for TS-based playlists.
+    private static func playlistInitSegment(from playlist: String, baseURL: URL) -> VideoInitSegment? {
+        for line in playlist.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            guard trimmed.hasPrefix("#EXT-X-MAP:"),
+                  let uriValue = hlsAttributeValue(named: "URI", in: trimmed),
+                  let url = URL(string: uriValue, relativeTo: baseURL)?.absoluteURL
+            else { continue }
+
+            let byteRange = hlsAttributeValue(named: "BYTERANGE", in: trimmed)
+                .flatMap { parseExplicitByteRange($0) }
+            return VideoInitSegment(url: url, byteRange: byteRange)
+        }
+        return nil
+    }
+
+    private static func parsePendingByteRange(_ value: String) -> PendingMediaByteRange? {
+        let normalized = value.trimmingCharacters(in: CharacterSet(charactersIn: "\"'").union(.whitespaces))
+        let parts = normalized.split(separator: "@", maxSplits: 1).map(String.init)
+        guard let length = parts.first.flatMap(Int64.init), length > 0 else {
+            return nil
+        }
+        return PendingMediaByteRange(length: length, offset: parts.dropFirst().first.flatMap(Int64.init))
+    }
+
+    private static func parseExplicitByteRange(_ value: String, defaultOffset: Int64 = 0) -> MediaByteRange? {
+        guard let pending = parsePendingByteRange(value) else {
+            return nil
+        }
+        let offset = pending.offset ?? defaultOffset
+        return MediaByteRange(offset: offset, length: pending.length)
+    }
+
+    private static func hlsAttributeValue(named name: String, in line: String) -> String? {
+        guard let nameRange = line.range(of: "\(name)=") else {
+            return nil
+        }
+        var value = line[nameRange.upperBound...]
+        if value.first == "\"" {
+            value = value.dropFirst()
+            guard let endIndex = value.firstIndex(of: "\"") else {
+                return nil
+            }
+            return String(value[..<endIndex])
+        }
+        let endIndex = value.firstIndex(of: ",") ?? value.endIndex
+        return String(value[..<endIndex])
+    }
+
+    private static func downloadInitSegment(_ segment: VideoInitSegment, using httpClient: HTTPClient) async throws -> Data {
+        var request = URLRequest(url: segment.url)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.timeoutInterval = 60
+        if let byteRange = segment.byteRange {
+            request.setValue(byteRange.headerValue, forHTTPHeaderField: "Range")
+        }
+        let (data, httpResponse) = try await httpClient.data(for: request, source: "Media Init Segment")
+        _ = try validate(httpResponse)
+        return data
     }
 
     private static func downloadSegment(
-        from url: URL,
+        _ segment: VideoSegment,
         index: Int,
         tempDirectory: URL,
         using httpClient: HTTPClient
     ) async throws -> URL {
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: segment.url)
         request.cachePolicy = .reloadIgnoringLocalCacheData
         request.timeoutInterval = 120
+        if let byteRange = segment.byteRange {
+            request.setValue(byteRange.headerValue, forHTTPHeaderField: "Range")
+        }
 
         try Task.checkCancellation()
         let (temporaryURL, httpResponse) = try await httpClient.download(for: request, source: "Media Segment Download")
@@ -388,6 +642,38 @@ actor MediaDownloadService {
         let fileURL = tempDirectory.appendingPathComponent(String(format: "%05d.ts", index))
         try moveDownloadedFile(from: temporaryURL, to: fileURL)
         return fileURL
+    }
+
+    private static func writeFragmentedMP4(
+        initSegmentData: Data,
+        segmentFiles: [Int: URL],
+        segmentCount: Int,
+        outputURL: URL
+    ) throws {
+        if FileManager.default.fileExists(atPath: outputURL.path) {
+            try FileManager.default.removeItem(at: outputURL)
+        }
+        FileManager.default.createFile(atPath: outputURL.path, contents: nil)
+
+        let outputHandle = try FileHandle(forWritingTo: outputURL)
+        var completed = false
+        defer {
+            try? outputHandle.close()
+            if !completed {
+                try? FileManager.default.removeItem(at: outputURL)
+            }
+        }
+
+        try outputHandle.write(contentsOf: initSegmentData)
+        for index in 0 ..< segmentCount {
+            guard let fileURL = segmentFiles[index] else {
+                throw URLError(.resourceUnavailable)
+            }
+            let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+            try outputHandle.write(contentsOf: data)
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+        completed = true
     }
 
     private static func validate(_ response: URLResponse) throws -> HTTPURLResponse {
@@ -431,110 +717,5 @@ actor MediaDownloadService {
         }
 
         return defaultValue
-    }
-}
-
-private enum VideoRemuxer {
-    /// @unchecked Sendable: private inner class used as task-local storage for URLSession delegate callbacks.
-    private final class Context: @unchecked Sendable {
-        let reader: AVAssetReader
-        let writer: AVAssetWriter
-        let pairs: [(AVAssetReaderTrackOutput, AVAssetWriterInput)]
-
-        init(reader: AVAssetReader, writer: AVAssetWriter, pairs: [(AVAssetReaderTrackOutput, AVAssetWriterInput)]) {
-            self.reader = reader
-            self.writer = writer
-            self.pairs = pairs
-        }
-    }
-
-    static func remuxToMP4(source: URL, destination: URL) async -> Bool {
-        if FileManager.default.fileExists(atPath: destination.path) {
-            try? FileManager.default.removeItem(at: destination)
-        }
-
-        let asset = AVAsset(url: source)
-        guard let reader = try? AVAssetReader(asset: asset),
-              let writer = try? AVAssetWriter(outputURL: destination, fileType: .mp4)
-        else {
-            return false
-        }
-
-        let pairs = await makeTrackPairs(asset: asset, reader: reader, writer: writer)
-        guard !pairs.isEmpty, reader.startReading(), writer.startWriting() else {
-            return false
-        }
-
-        writer.startSession(atSourceTime: .zero)
-        let context = Context(reader: reader, writer: writer, pairs: pairs)
-
-        await withCheckedContinuation { continuation in
-            let queue = DispatchQueue(label: "media-remux", qos: .utility)
-            queue.async {
-                while context.reader.status == .reading {
-                    var copiedSample = false
-                    for (output, input) in context.pairs where input.isReadyForMoreMediaData {
-                        if let sample = output.copyNextSampleBuffer() {
-                            copiedSample = true
-                            input.append(sample)
-                        }
-                    }
-                    if !copiedSample {
-                        break
-                    }
-                }
-
-                for (_, input) in context.pairs {
-                    input.markAsFinished()
-                }
-
-                context.writer.finishWriting {
-                    continuation.resume()
-                }
-            }
-        }
-
-        return context.writer.status == .completed
-    }
-
-    private static func makeTrackPairs(
-        asset: AVAsset,
-        reader: AVAssetReader,
-        writer: AVAssetWriter
-    ) async -> [(AVAssetReaderTrackOutput, AVAssetWriterInput)] {
-        var pairs: [(AVAssetReaderTrackOutput, AVAssetWriterInput)] = []
-
-        do {
-            let videoTracks = try await asset.loadTracks(withMediaType: .video)
-            appendTrackPairs(for: videoTracks, mediaType: .video, reader: reader, writer: writer, into: &pairs)
-        } catch {}
-
-        do {
-            let audioTracks = try await asset.loadTracks(withMediaType: .audio)
-            appendTrackPairs(for: audioTracks, mediaType: .audio, reader: reader, writer: writer, into: &pairs)
-        } catch {}
-
-        return pairs
-    }
-
-    private static func appendTrackPairs(
-        for tracks: [AVAssetTrack],
-        mediaType: AVMediaType,
-        reader: AVAssetReader,
-        writer: AVAssetWriter,
-        into pairs: inout [(AVAssetReaderTrackOutput, AVAssetWriterInput)]
-    ) {
-        for track in tracks {
-            let input = AVAssetWriterInput(mediaType: mediaType, outputSettings: nil)
-            input.expectsMediaDataInRealTime = false
-            guard writer.canAdd(input) else { continue }
-
-            let output = AVAssetReaderTrackOutput(track: track, outputSettings: nil)
-            guard reader.canAdd(output) else { continue }
-
-            writer.add(input)
-            reader.add(output)
-            pairs.append((output, input))
-        }
     }
 }

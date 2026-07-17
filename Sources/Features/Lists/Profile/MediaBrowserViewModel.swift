@@ -101,14 +101,12 @@ final class MediaBrowserViewModel: ObservableObject {
     @Published var errorMessage: String?
     /// True while a download operation is in progress.
     @Published var isDownloading = false
-    /// Tracks (completed, total) during download for progress UI.
-    @Published var downloadProgress: (current: Int, total: Int)?
-    /// Detailed status of the current download (last file name or error).
-    @Published var downloadStatusDetail: String?
-    /// Active media type filter; triggers `rebuildDerivedState`.
+    /// Fine-grained progress isolated from the media grid's observation graph.
+    let downloadState = MediaDownloadProgressState()
+    /// Active media type filter; switches `filteredItems` in O(1) from pre-built arrays.
     @Published var filter: MediaFilter = .images {
         didSet {
-            rebuildDerivedState()
+            switchFilteredItems()
         }
     }
 
@@ -117,17 +115,9 @@ final class MediaBrowserViewModel: ObservableObject {
 
     // MARK: - Computed Properties
 
-    /// Filters that have at least one matching item.
-    var availableFilters: [MediaFilter] {
-        var result = [MediaFilter]()
-        if items.contains(where: { $0.type == .image }) {
-            result.append(.images)
-        }
-        if items.contains(where: { $0.type == .video }) {
-            result.append(.videos)
-        }
-        return result
-    }
+    /// Filters that have at least one matching item. Stored (not computed)
+    /// to avoid O(n) scans on every SwiftUI body evaluation.
+    @Published private(set) var availableFilters: [MediaFilter] = []
 
     /// Whether all filtered items are selected.
     var selectAll: Bool {
@@ -149,6 +139,10 @@ final class MediaBrowserViewModel: ObservableObject {
     private let did: String
     /// Service used for downloading media files.
     private let downloadService: MediaDownloadService
+    /// Pre-built image-only items for O(1) filter switching.
+    private var imageItems: [MediaItem] = []
+    /// Pre-built video-only items for O(1) filter switching.
+    private var videoItems: [MediaItem] = []
 
     // MARK: - Init
 
@@ -280,33 +274,70 @@ final class MediaBrowserViewModel: ObservableObject {
     /// Replaces all items with a sorted new set and rebuilds derived state.
     private func replaceItems(_ newItems: [MediaItem]) {
         items = Self.sortedItems(newItems)
-        rebuildDerivedState()
-    }
-
-    /// Appends new items, sorts the combined array, and rebuilds derived state.
-    private func appendItems(_ newItems: [MediaItem]) {
-        guard !newItems.isEmpty else { return }
-        items = Self.sortedItems(items + newItems)
-        rebuildDerivedState()
-    }
-
-    /// Recomputes image/video counts, filtered items, and clears summary text.
-    private func rebuildDerivedState() {
-        imageCount = items.reduce(into: 0) { count, item in
+        // Single-pass: counts, availableFilters, and type-specific arrays.
+        imageCount = 0
+        videoCount = 0
+        imageItems.removeAll(keepingCapacity: true)
+        videoItems.removeAll(keepingCapacity: true)
+        var hasImage = false, hasVideo = false
+        for item in items {
             if item.type == .image {
-                count += 1
+                imageCount += 1
+                imageItems.append(item)
+                hasImage = true
+            } else {
+                videoCount += 1
+                videoItems.append(item)
+                hasVideo = true
             }
         }
-        videoCount = items.count - imageCount
+        updateAvailableFilters(hasImage: hasImage, hasVideo: hasVideo)
+    }
 
+    /// Appends new items, sorts the combined array, and updates counts incrementally.
+    private func appendItems(_ newItems: [MediaItem]) {
+        guard !newItems.isEmpty else { return }
+        // Incremental counts and type-specific arrays — O(k) on new items only.
+        for item in newItems {
+            if item.type == .image {
+                imageCount += 1
+                imageItems.append(item)
+            } else {
+                videoCount += 1
+                videoItems.append(item)
+            }
+        }
+        items = Self.sortedItems(items + newItems)
+        updateAvailableFilters(hasImage: imageCount > 0, hasVideo: videoCount > 0)
+    }
+
+    /// Updates filter availability without scanning the media arrays. If the
+    /// current filter is empty, switches to the first media type that exists.
+    private func updateAvailableFilters(hasImage: Bool, hasVideo: Bool) {
+        var filters: [MediaFilter] = []
+        if hasImage {
+            filters.append(.images)
+        }
+        if hasVideo {
+            filters.append(.videos)
+        }
+        availableFilters = filters
+
+        if !filters.contains(filter), let firstFilter = filters.first {
+            filter = firstFilter
+        } else {
+            switchFilteredItems()
+        }
+    }
+
+    /// Switches `filteredItems` in O(1) from pre-built arrays.
+    private func switchFilteredItems() {
         switch filter {
         case .images:
-            filteredItems = items.filter { $0.type == .image }
+            filteredItems = imageItems
         case .videos:
-            filteredItems = items.filter { $0.type == .video }
+            filteredItems = videoItems
         }
-
-        summaryText = ""
     }
 
     /// Sorts items newest-first by indexed date, falling back to ID comparison.
@@ -357,10 +388,9 @@ final class MediaBrowserViewModel: ObservableObject {
 
         isDownloading = true
         downloadSummary = nil
-        downloadStatusDetail = nil
+        downloadState.start(total: selected.count)
         defer {
             isDownloading = false
-            downloadStatusDetail = nil
         }
 
         let targetDir = directory.appendingPathComponent(handle, isDirectory: true)
@@ -390,17 +420,34 @@ final class MediaBrowserViewModel: ObservableObject {
         }
 
         if !invalidResults.isEmpty {
-            downloadProgress = (invalidResults.count, selected.count)
-            downloadStatusDetail = invalidResults.first?.error
+            for (completed, result) in invalidResults.enumerated() {
+                downloadState.complete(
+                    index: result.index,
+                    completed: completed + 1,
+                    detail: result.error
+                )
+            }
         }
 
         let invalidCount = invalidResults.count
-        let downloadedResults = await downloadService.downloadMedia(assets, to: targetDir) { completed, _, latestResult in
-            await MainActor.run {
-                self.downloadProgress = (completed + invalidCount, selected.count)
-                self.downloadStatusDetail = latestResult.savedFilename ?? latestResult.error
+        let downloadedResults = await downloadService.downloadMedia(
+            assets,
+            to: targetDir,
+            progress: { completed, _, latestResult in
+                await MainActor.run {
+                    self.downloadState.complete(
+                        index: latestResult.index,
+                        completed: completed + invalidCount,
+                        detail: latestResult.savedFilename ?? latestResult.error
+                    )
+                }
+            },
+            assetProgress: { progress in
+                await MainActor.run {
+                    self.downloadState.update(progress)
+                }
             }
-        }
+        )
         guard !Task.isCancelled else { return }
         let results = (invalidResults + downloadedResults).sorted { $0.index < $1.index }
 

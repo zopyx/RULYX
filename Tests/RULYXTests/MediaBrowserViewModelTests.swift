@@ -67,6 +67,43 @@ final class MediaBrowserViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.videoCount, 1)
         XCTAssertFalse(viewModel.hasMore)
     }
+
+    func testVideoOnlyFeedSelectsVideoFilterAndShowsItems() async {
+        let viewModel = MediaBrowserViewModel(did: "did:plc:test")
+        let client = MockMediaFeedClient(
+            pages: [
+                RichFeedResponse(
+                    cursor: nil,
+                    feed: [
+                        RichFeedEntry(
+                            post: RichPost(
+                                uri: "at://post/video",
+                                cid: nil,
+                                author: nil,
+                                record: RichRecord(text: "Video", createdAt: "2024-01-01T00:00:00Z"),
+                                embed: makeVideoEmbed(
+                                    thumbnail: "https://cdn.example/video-thumb.jpg",
+                                    playlist: "https://cdn.example/video.m3u8"
+                                ),
+                                viewer: nil,
+                                replyCount: nil,
+                                repostCount: nil,
+                                likeCount: nil,
+                                indexedAt: "2024-01-01T00:00:00Z"
+                            ),
+                            reply: nil
+                        ),
+                    ]
+                ),
+            ]
+        )
+
+        await viewModel.load(account: makeAccount(), appPassword: "pw", using: client)
+
+        XCTAssertEqual(viewModel.availableFilters, [.videos])
+        XCTAssertEqual(viewModel.filter, .videos)
+        XCTAssertEqual(viewModel.filteredItems.count, 1)
+    }
 }
 
 @MainActor

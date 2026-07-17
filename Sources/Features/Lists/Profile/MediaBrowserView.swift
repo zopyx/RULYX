@@ -34,19 +34,8 @@ struct MediaBrowserView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 if viewModel.isDownloading {
-                    if let progress = viewModel.downloadProgress {
-                        VStack(spacing: 4) {
-                            ProgressView(value: Double(progress.current), total: Double(progress.total))
-                                .padding(.horizontal)
-                            if let detail = viewModel.downloadStatusDetail, !detail.isEmpty {
-                                Text(detail)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .background(.ultraThinMaterial)
+                    MediaDownloadProgressView(state: viewModel.downloadState) {
+                        downloadTask?.cancel()
                     }
                 }
 
@@ -204,10 +193,11 @@ struct MediaBrowserView: View {
             .onChange(of: viewModel.filter) { _, _ in viewModel.pruneSelection() }
             .onChange(of: selectedDownloadFolder) { _, url in
                 guard let url else { return }
+                selectedDownloadFolder = nil
                 guard url.startAccessingSecurityScopedResource() else { return }
                 Task {
+                    defer { url.stopAccessingSecurityScopedResource() }
                     await performDownload(to: url)
-                    url.stopAccessingSecurityScopedResource()
                 }
             }
             .task {
