@@ -118,7 +118,8 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
 
         return PagedListMembers(
             members: Array(members[startIndex ..< endIndex]),
-            cursor: nextCursor
+            cursor: nextCursor,
+            memberCount: members.count
         )
     }
 

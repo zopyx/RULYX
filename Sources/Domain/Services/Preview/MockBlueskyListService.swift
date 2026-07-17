@@ -58,7 +58,7 @@ final class MockBlueskyListService: BlueskyListServicing {
         let endIndex = min(startIndex + pageSize, members.count)
         let nextCursor = endIndex < members.count ? String(endIndex) : nil
 
-        return PagedListMembers(members: Array(members[startIndex ..< endIndex]), cursor: nextCursor)
+        return PagedListMembers(members: Array(members[startIndex ..< endIndex]), cursor: nextCursor, memberCount: members.count)
     }
 
     func addActor(did actorDID: String, to _: BlueskyList, account _: AppAccount, appPassword _: String?) async throws -> String {

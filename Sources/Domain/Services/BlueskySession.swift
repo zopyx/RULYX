@@ -11,6 +11,7 @@ struct BlueskySession: Codable {
 struct PagedListMembers {
     let members: [BlueskyListMember]
     let cursor: String?
+    let memberCount: Int?
 }
 
 struct PagedActorSearch {

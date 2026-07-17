@@ -32,6 +32,7 @@ extension ListDetailViewModel {
                 appPassword: appPassword,
                 using: client
             )
+            memberCount = membersController.memberCount
             hasMoreMembers = membersController.hasMore
             onMembersChanged()
             refreshSearchMembershipFilter()

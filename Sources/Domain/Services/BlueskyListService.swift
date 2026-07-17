@@ -121,7 +121,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
                     createdAt: parseDate($0.createdAt)
                 )
             },
-            cursor: response.cursor
+            cursor: response.cursor,
+            memberCount: response.list?.listItemCount
         )
     }
 

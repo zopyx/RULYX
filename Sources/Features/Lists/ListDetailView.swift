@@ -54,7 +54,7 @@ struct ListDetailView: View {
     }
 
     private var listTitleWithMemberCount: String {
-        "\(currentList.name) (\(currentList.memberCount ?? viewModel.members.count))"
+        "\(currentList.name) (\(viewModel.memberCount ?? viewModel.members.count))"
     }
 
     init(list: BlueskyList, onListUpdated: ((BlueskyList) -> Void)? = nil) {

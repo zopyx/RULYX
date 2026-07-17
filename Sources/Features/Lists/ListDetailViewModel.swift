@@ -15,6 +15,8 @@ final class ListDetailViewModel: ObservableObject {
 
     /// All loaded members of the current list.
     var members: [BlueskyListMember] = []
+    /// Total member count from the API (listItemCount), if available.
+    var memberCount: Int?
     /// Members matching the current filter query.
     var filteredMembers: [BlueskyListMember] = []
     /// Actor search results for adding new members.

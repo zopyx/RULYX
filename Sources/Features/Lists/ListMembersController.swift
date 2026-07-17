@@ -7,6 +7,7 @@ import Foundation
 final class ListMembersController {
     private(set) var cursor: String?
     private(set) var hasMore = false
+    private(set) var memberCount: Int?
 
     /// Loads the first page of members, resetting cursor state.
     func loadMembers(
@@ -25,6 +26,7 @@ final class ListMembersController {
         )
         cursor = page.cursor
         hasMore = page.cursor != nil
+        memberCount = page.memberCount
         return deduplicatedMembers(page.members)
     }
 
@@ -53,6 +55,7 @@ final class ListMembersController {
     func reset() {
         cursor = nil
         hasMore = false
+        memberCount = nil
     }
 
     /// Removes duplicate members by ID, keeping the first occurrence.
