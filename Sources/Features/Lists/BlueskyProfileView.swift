@@ -805,22 +805,29 @@ struct BlueskyProfileView: View {
                                 .scaleEffect(0.6)
                         } else {
                             ForEach(moderationMemberships) { membership in
-                                Toggle(isOn: Binding(
-                                    get: { viewModel.pendingListMemberStates[membership.listURI] ?? membership.isMember },
-                                    set: { _ in
-                                        runModeration {
-                                            await viewModel.toggleListMembership(
-                                                membership,
-                                                account: account,
-                                                appPassword: appPassword,
-                                                using: container.blueskyClient
-                                            )
+                                HStack {
+                                    Toggle(isOn: Binding(
+                                        get: { viewModel.pendingListMemberStates[membership.listURI] ?? membership.isMember },
+                                        set: { _ in
+                                            runModeration {
+                                                await viewModel.toggleListMembership(
+                                                    membership,
+                                                    account: account,
+                                                    appPassword: appPassword,
+                                                    using: container.blueskyClient
+                                                )
+                                            }
                                         }
+                                    )) {
+                                        Text(membership.name)
                                     }
-                                )) {
-                                    Text(membership.name)
+                                    .disabled(viewModel.isUpdatingListMembership)
+                                    if let count = membership.memberCount {
+                                        Text("(\(count))")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
-                                .disabled(viewModel.isUpdatingListMembership)
                             }
                         }
                     } header: {
@@ -848,22 +855,29 @@ struct BlueskyProfileView: View {
                                 .scaleEffect(0.6)
                         } else {
                             ForEach(regularMemberships) { membership in
-                                Toggle(isOn: Binding(
-                                    get: { viewModel.pendingListMemberStates[membership.listURI] ?? membership.isMember },
-                                    set: { _ in
-                                        runModeration {
-                                            await viewModel.toggleListMembership(
-                                                membership,
-                                                account: account,
-                                                appPassword: appPassword,
-                                                using: container.blueskyClient
-                                            )
+                                HStack {
+                                    Toggle(isOn: Binding(
+                                        get: { viewModel.pendingListMemberStates[membership.listURI] ?? membership.isMember },
+                                        set: { _ in
+                                            runModeration {
+                                                await viewModel.toggleListMembership(
+                                                    membership,
+                                                    account: account,
+                                                    appPassword: appPassword,
+                                                    using: container.blueskyClient
+                                                )
+                                            }
                                         }
+                                    )) {
+                                        Text(membership.name)
                                     }
-                                )) {
-                                    Text(membership.name)
+                                    .disabled(viewModel.isUpdatingListMembership)
+                                    if let count = membership.memberCount {
+                                        Text("(\(count))")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
-                                .disabled(viewModel.isUpdatingListMembership)
                             }
                         }
                     } header: {
