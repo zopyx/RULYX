@@ -93,7 +93,12 @@ struct NotificationRow: View {
         switch notification.reason {
         case "like": loc("notifications.reason.like")
         case "repost": loc("notifications.reason.repost")
-        case "follow": loc("notifications.reason.follow")
+        case "follow":
+            if notification.author.viewer?.following != nil {
+                loc("notifications.reason.follow_back")
+            } else {
+                loc("notifications.reason.follow")
+            }
         case "reply": loc("notifications.reason.reply")
         case "quote": loc("notifications.reason.quote")
         case "mention": loc("notifications.reason.mention")

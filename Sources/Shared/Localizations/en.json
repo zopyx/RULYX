@@ -806,6 +806,7 @@
   "notifications.mark_read": "Mark all as read",
   "notifications.mark_read.hint": "Marks all notifications as read",
   "notifications.reason.follow": "followed you",
+  "notifications.reason.follow_back": "follows you back",
   "notifications.reason.like": "liked your post",
   "notifications.reason.mention": "mentioned you",
   "notifications.reason.quote": "quoted your post",
