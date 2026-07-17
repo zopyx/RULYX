@@ -34,7 +34,7 @@ struct iPadListDetailView: View {
                 using: container.blueskyClient
             )
         }
-        .pageTitle(listTitleWithMemberCount)
+        .navigationTitle("")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if !detailVM.members.isEmpty {
@@ -75,7 +75,7 @@ struct iPadListDetailView: View {
                 Text(listTitleWithMemberCount)
                     .font(.title2.weight(.semibold))
                 Spacer()
-                Text("\(detailVM.members.count)")
+                Text("\(list.memberCount ?? detailVM.members.count)")
                     .font(.title.weight(.bold))
                     .foregroundStyle(Color.skyPrimary)
                     + Text(" members")
@@ -106,7 +106,7 @@ struct iPadListDetailView: View {
             }
             .padding(.vertical, 4)
         }
-        .padding()
+        .padding([.horizontal, .top])
     }
 
     private func listActionButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {

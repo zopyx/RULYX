@@ -54,7 +54,7 @@ struct ListDetailView: View {
     }
 
     private var listTitleWithMemberCount: String {
-        "\(currentList.name) (\(currentList.memberCount ?? viewModel.members.count))"
+        "\\(currentList.name) (\\(viewModel.members.count))"
     }
 
     init(list: BlueskyList, onListUpdated: ((BlueskyList) -> Void)? = nil) {
@@ -68,7 +68,7 @@ struct ListDetailView: View {
 
     var body: some View {
         rootContent
-            .pageTitle(listTitleWithMemberCount)
+            .navigationTitle("")
             .toolbar(content: toolbarContent)
             .sheet(isPresented: $showAIScreen) {
                 let actors = viewModel.members.map { member in
@@ -512,12 +512,6 @@ struct ListDetailView: View {
                 appPassword: appPassword,
                 syncSnapshot: { syncSnapshot() }
             )
-
-            Section {
-                LabeledContent("list.detail.members", value: "\(currentList.memberCount ?? viewModel.members.count)")
-            } header: {
-                Text(loc: "list.detail.stats_section")
-            }
         }
         .listStyle(.insetGrouped)
         .task {

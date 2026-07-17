@@ -115,7 +115,7 @@ struct InternalListDetailView: View {
             }
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: loc("list.search.placeholder"))
-        .pageTitle(list.name)
+        .navigationTitle("")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {

@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - ClearskyListsView
 
 /// Lists that a given profile belongs to, sourced from ClearSky metadata.
-/// Shows list name, description, owner handle, and relative date added.
+/// Shows list name, description, owner handle, member count, and relative date added.
 struct ClearskyListsView: View {
     let entries: [ClearskyListEntry]
     @Environment(\.dismiss) private var dismiss
@@ -11,6 +11,8 @@ struct ClearskyListsView: View {
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var ownerHandles: [String: String] = [:]
+    @State private var memberCounts: [String: Int] = [:]
+    @State private var isLoadingCounts = false
 
     /// Entries sorted newest-first by date added.
     private var sortedEntries: [ClearskyListEntry] {
@@ -47,6 +49,10 @@ struct ClearskyListsView: View {
             }
             .task {
                 await loadOwnerHandles()
+                if let account = accountStore.activeAccount,
+                   let appPassword = accountStore.appPassword(for: account) {
+                    await loadMemberCounts(account: account, appPassword: appPassword)
+                }
             }
         }
     }
@@ -57,13 +63,13 @@ struct ClearskyListsView: View {
             id: atURI(from: entry.url, ownerDID: entry.did) ?? entry.url,
             name: entry.name,
             description: entry.description ?? "",
-            memberCount: nil,
+            memberCount: memberCounts[entry.url],
             kind: .regular,
             avatarURL: nil
         )
     }
 
-    /// Displays the list name, description, owner handle, and relative date.
+    /// Displays the list name, description, owner handle, member count, and relative date.
     private func rowContent(_ entry: ClearskyListEntry) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
@@ -76,6 +82,11 @@ struct ClearskyListsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
+                }
+                if let count = memberCounts[entry.url] {
+                    Text(loc("internal.list.member_count").replacingOccurrences(of: "{n}", with: "\(count)"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 if let handle = ownerHandles[entry.url] {
                     Text(handle)
@@ -103,6 +114,36 @@ struct ClearskyListsView: View {
             }
         } catch {
             AppLogger.performance.error("Failed to fetch owner handles: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Fetches member counts for each list from the Bluesky API in parallel.
+    private func loadMemberCounts(account: AppAccount, appPassword: String) async {
+        isLoadingCounts = true
+        defer { isLoadingCounts = false }
+
+        await withTaskGroup(of: (String, Int?).self) { group in
+            for entry in entries {
+                guard let atURI = atURI(from: entry.url, ownerDID: entry.did) else { continue }
+                group.addTask {
+                    do {
+                        let (list, _) = try await container.blueskyClient.fetchListDetails(
+                            uri: atURI,
+                            account: account,
+                            appPassword: appPassword
+                        )
+                        return (entry.url, list.memberCount)
+                    } catch {
+                        return (entry.url, nil)
+                    }
+                }
+            }
+
+            for await (url, count) in group {
+                if let count {
+                    memberCounts[url] = count
+                }
+            }
         }
     }
 
