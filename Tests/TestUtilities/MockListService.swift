@@ -8,7 +8,7 @@ final class MockListService: BlueskyListServicing {
     var fetchListsHandler: @Sendable (AppAccount, String?) async throws -> [BlueskyList] = { _, _ in [] }
     var fetchListHandler: @Sendable (String, AppAccount, String?) async throws -> BlueskyList? = { _, _, _ in nil }
     var fetchListMembersHandler: @Sendable (BlueskyList, AppAccount, String?) async throws -> [BlueskyListMember] = { _, _, _ in [] }
-    var fetchListMembersPageHandler: @Sendable (BlueskyList, String?, AppAccount, String?) async throws -> PagedListMembers = { _, _, _, _ in PagedListMembers(members: [], cursor: nil) }
+    var fetchListMembersPageHandler: @Sendable (BlueskyList, String?, AppAccount, String?) async throws -> PagedListMembers = { _, _, _, _ in PagedListMembers(members: [], cursor: nil, memberCount: nil) }
     var addActorHandler: @Sendable (String, BlueskyList, AppAccount, String?) async throws -> String = { did, _, _, _ in "at://record/\(did)/1" }
     var removeMemberHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var updateListMetadataHandler: @Sendable (BlueskyList, String, String, AppAccount, String?) async throws -> BlueskyList = { list, title, desc, _, _ in

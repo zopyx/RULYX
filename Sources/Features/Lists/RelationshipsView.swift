@@ -44,12 +44,19 @@ struct RelationshipsView: View {
     @AppStorage("debugMode") private var debugMode = false
     @AppStorage("showDangerousOperations") private var showDangerousOperations = false
     @AppStorage("showActorDescriptions") private var showActorDescriptions = false
+    @AppStorage("showActorStats") private var showActorStats = false
+    @AppStorage("confirmBlocks") private var confirmBlocks = true
     @State private var actors: [BlueskyActor] = []
     @State private var isLoading = true
     @State private var isRefreshing = false
     @State private var searchQuery = ""
     @State private var errorMessage: String?
     @State private var statusMessage: String?
+    @State private var profileStats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]
+    @State private var isLoadingStats = false
+    @State private var filterNoPosts = false
+    @State private var showBlockNoPostsConfirm = false
+    @State private var blockNoPostsCount = 0
     @State private var selectedActorForList: BlueskyActor?
     @State private var isShowingListPicker = false
     @State private var isShowingBlockConfirm = false
@@ -93,14 +100,24 @@ struct RelationshipsView: View {
     @State private var showBlockBackConfirm2 = false
     @State private var showBlockBackAllClear = false
 
-    /// Filters actors by handle or display name matching the search query.
+    /// Filters actors by handle or display name matching the search query,
+    /// and optionally by no-posts filter for following mode.
     private var filteredActors: [BlueskyActor] {
         let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !trimmed.isEmpty else { return actors }
-        return actors.filter {
-            $0.handle.lowercased().contains(trimmed) ||
-                ($0.displayName?.lowercased().contains(trimmed) ?? false)
+        var result = actors
+        if !trimmed.isEmpty {
+            result = result.filter {
+                $0.handle.lowercased().contains(trimmed) ||
+                    ($0.displayName?.lowercased().contains(trimmed) ?? false)
+            }
         }
+        if mode == .following, filterNoPosts {
+            result = result.filter { actor in
+                guard let stats = profileStats[actor.did] else { return false }
+                return stats.posts == 0
+            }
+        }
+        return result
     }
 
     /// Localized title for the current mode, optionally including a profile handle.
@@ -139,6 +156,17 @@ struct RelationshipsView: View {
                             TextField(String.localized("rel.search_placeholder", replacements: ["mode": modeLocalized.lowercased()]), text: $searchQuery)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled()
+                            if mode == .following {
+                                Toggle(isOn: $filterNoPosts) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "text.badge.minus")
+                                            .foregroundStyle(.secondary)
+                                        Text(loc: "rel.filter_no_posts")
+                                    }
+                                }
+                                .disabled(isLoadingStats || profileStats.isEmpty)
+                                .toggleStyle(.switch)
+                            }
                             if let statusMessage {
                                 Text(statusMessage)
                                     .font(.caption)
@@ -167,7 +195,11 @@ struct RelationshipsView: View {
                             .contextMenu {
                                 Button(role: .destructive) {
                                     actorToBlock = actor
-                                    isShowingBlockConfirm = true
+                                    if confirmBlocks {
+                                        isShowingBlockConfirm = true
+                                    } else {
+                                        performBlock(actor)
+                                    }
                                 } label: {
                                     Label(loc("rel.block"), systemImage: "hand.raised.fill")
                                 }
@@ -184,7 +216,11 @@ struct RelationshipsView: View {
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
                                     actorToBlock = actor
-                                    isShowingBlockConfirm = true
+                                    if confirmBlocks {
+                                        isShowingBlockConfirm = true
+                                    } else {
+                                        performBlock(actor)
+                                    }
                                 } label: {
                                     Label(loc("rel.block"), systemImage: "hand.raised.fill")
                                 }
@@ -193,8 +229,13 @@ struct RelationshipsView: View {
                         }
                         .onDelete { indexSet in
                             if let idx = indexSet.first, idx < filteredActors.count {
-                                actorToBlock = filteredActors[idx]
-                                isShowingBlockConfirm = true
+                                let actor = filteredActors[idx]
+                                actorToBlock = actor
+                                if confirmBlocks {
+                                    isShowingBlockConfirm = true
+                                } else {
+                                    performBlock(actor)
+                                }
                             }
                         }
                     }
@@ -319,6 +360,16 @@ struct RelationshipsView: View {
                             }
                         }
 
+                        if mode == .following {
+                            Toggle(isOn: $showActorStats) {
+                                Label {
+                                    Text(loc("rel.show_stats"))
+                                } icon: {
+                                    Image(systemName: "chart.bar")
+                                }
+                            }
+                        }
+
                         Divider()
 
                         if mode == .following {
@@ -327,6 +378,18 @@ struct RelationshipsView: View {
                             } label: {
                                 Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
                             }
+
+                            Button(role: .destructive) {
+                                let count = actors.filter { actor in
+                                    guard let stats = profileStats[actor.did] else { return false }
+                                    return stats.posts == 0
+                                }.count
+                                blockNoPostsCount = count
+                                showBlockNoPostsConfirm = true
+                            } label: {
+                                Label { Text(loc("rel.block_no_posts")) } icon: { Image(systemName: "hand.raised.slash") }
+                            }
+                            .disabled(isLoadingStats || profileStats.isEmpty)
                         }
 
                         Button {
@@ -441,6 +504,32 @@ struct RelationshipsView: View {
                 .accessibilityInputLabels([loc("actions.cancel")])
 
             Text(loc: "rel.block_message")
+        }
+        .confirmationDialog(
+            loc("rel.block_no_posts.confirm")
+                .replacingOccurrences(of: "{count}", with: "\(blockNoPostsCount)"),
+            isPresented: $showBlockNoPostsConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(loc("rel.block"), role: .destructive) {
+                showBlockNoPostsConfirm = false
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                let targets = actors.compactMap { actor -> PendingLikerTarget? in
+                    guard let stats = profileStats[actor.did], stats.posts == 0 else { return nil }
+                    return PendingLikerTarget(did: actor.did, handle: actor.handle)
+                }
+                guard !targets.isEmpty else { return }
+                batchOperationConfig = BatchOperationConfig(
+                    targets: targets,
+                    mode: .block(account: account, appPassword: appPassword)
+                )
+            }
+            Button(loc("actions.cancel"), role: .cancel) {
+                showBlockNoPostsConfirm = false
+            }
+        } message: {
+            Text(loc("rel.block_no_posts.confirm.message"))
         }
         .alert(Text(loc: "profile.block_back.confirm.first.title"), isPresented: $showBlockBackConfirm1) {
             Button(loc("actions.cancel"), role: .cancel) {}
@@ -716,6 +805,24 @@ struct RelationshipsView: View {
         await actionsVM?.blockBack(actors: nil)
     }
 
+    /// Blocks the given actor immediately without confirmation dialog.
+    private func performBlock(_ actor: BlueskyActor) {
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account) else { return }
+        Task {
+            do {
+                try await container.social.blockActor(
+                    did: actor.did,
+                    account: account,
+                    appPassword: appPassword
+                )
+                actors.removeAll { $0.did == actor.did }
+            } catch {
+                errorMessage = AppError.userMessage(from: error)
+            }
+        }
+    }
+
     /// A localized summary of the block-back operation result.
     private var blockBackResultSummary: String {
         if (actionsVM?.blockBackFailureCount ?? 0) == 0 {
@@ -870,30 +977,61 @@ struct RelationshipsView: View {
         return (try? JSONSerialization.data(withJSONObject: objects, options: [.prettyPrinted, .sortedKeys])) ?? Data()
     }
 
-    /// Computes a cache key from the mode and subject DID.
     /// Row label for the actor list, extracted for type-check performance.
     private func actorRowLabel(actor: BlueskyActor, index: Int) -> some View {
-        HStack(spacing: 0) {
-            BlueskyActorRow(actor: actor) {
-                if actor.isNew {
-                    Text(loc("rel.new_badge"))
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.orange)
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 1)
-                        .background(Color.orange.opacity(0.12), in: Capsule())
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0) {
+                BlueskyActorRow(actor: actor) {
+                    if actor.isNew {
+                        Text(loc("rel.new_badge"))
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.orange)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(Color.orange.opacity(0.12), in: Capsule())
+                    }
+                    Spacer(minLength: 0)
+                    if let blockedDate = actor.blockedDate {
+                        Text(blockedDateDisplay(blockedDate))
+                            .font(.caption2.weight(.regular))
+                            .foregroundStyle(.primary)
+                    }
                 }
-                Spacer(minLength: 0)
-                if let blockedDate = actor.blockedDate {
-                    Text(blockedDateDisplay(blockedDate))
-                        .font(.caption2.weight(.regular))
-                        .foregroundStyle(.primary)
+                if debugMode {
+                    Text("\(index + 1)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
             }
-            if debugMode {
-                Text("\(index + 1)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+
+            if mode == .following, showActorStats, let stats = profileStats[actor.did] {
+                HStack(spacing: 4) {
+                    Image(systemName: "text.bubble")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    Text("\(stats.posts)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text("·")
+                        .foregroundStyle(.tertiary)
+                    Image(systemName: "person.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    Text("\(stats.followers)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text("·")
+                        .foregroundStyle(.tertiary)
+                    Image(systemName: "person.2.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    Text("\(stats.following)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(.leading, 46) // align with text below avatar
+                .padding(.bottom, 4)
             }
         }
     }
@@ -902,6 +1040,19 @@ struct RelationshipsView: View {
         guard let accountDID = accountStore.activeAccount?.did else { return nil }
         let subject = profileDID ?? accountDID
         return "\(mode.rawValue)_\(subject)"
+    }
+
+    /// Fetches profile stats (posts, followers, following) for the given actors
+    /// using the batch public API. Stores results in `profileStats`.
+    private func fetchStats(for actors: [BlueskyActor]) async {
+        let dids = actors.map(\.did)
+        guard !dids.isEmpty else { return }
+        isLoadingStats = true
+        let stats = await (try? LiveBlueskyClient.fetchProfileStats(dids: dids) { _, _ in }) ?? [:]
+        await MainActor.run {
+            profileStats = stats
+            isLoadingStats = false
+        }
     }
 
     /// Loads cached data first, then fetches fresh data from the API.
@@ -915,6 +1066,7 @@ struct RelationshipsView: View {
         let appPassword = accountStore.appPassword(for: account)
 
         actors = []
+        profileStats = [:]
         clearskyTotal = nil
         errorMessage = nil
 
@@ -980,6 +1132,11 @@ struct RelationshipsView: View {
                 actors = result
             }
             isLoading = false
+
+            // Fetch profile stats for following mode
+            if mode == .following, !actors.isEmpty {
+                await fetchStats(for: actors)
+            }
             if let key = cacheKey {
                 RelationshipCache.save(actors, forKey: key)
             }

@@ -1386,5 +1386,13 @@
   "list_bulk.status.cannot_retry": "Cannot retry reports automatically.",
   "list_bulk.status.select_comparison": "Select a comparison list before retrying this action.",
   "lists.account_summary.hint": "Open your profile",
-  "rel.view.hint": "View list"
+  "rel.view.hint": "View list",
+  "rel.show_stats": "統計を表示",
+  "rel.filter_no_posts": "投稿なしのみ",
+  "settings.confirm_blocks": "ブロックを確認",
+  "settings.confirm_unfollow": "フォロー解除を確認",
+  "rel.unfollow_confirm": "このアカウントをフォロー解除しますか？",
+  "rel.block_no_posts": "投稿のないアカウントをすべてブロック",
+  "rel.block_no_posts.confirm": "投稿のない{count}アカウントをブロックしますか？",
+  "rel.block_no_posts.confirm.message": "これらのアカウントには投稿がなく、直ちにブロックされます。"
 }

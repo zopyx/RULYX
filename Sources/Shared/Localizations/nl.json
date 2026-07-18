@@ -1386,5 +1386,13 @@
   "list_bulk.status.cannot_retry": "Cannot retry reports automatically.",
   "list_bulk.status.select_comparison": "Select a comparison list before retrying this action.",
   "lists.account_summary.hint": "Open your profile",
-  "rel.view.hint": "View list"
+  "rel.view.hint": "View list",
+  "rel.show_stats": "Statistieken tonen",
+  "rel.filter_no_posts": "Alleen zonder berichten",
+  "settings.confirm_blocks": "Blokkades bevestigen",
+  "settings.confirm_unfollow": "Ontvolgen bevestigen",
+  "rel.unfollow_confirm": "Dit account ontvolgen?",
+  "rel.block_no_posts": "Blokkeer alle zonder berichten",
+  "rel.block_no_posts.confirm": "{count} accounts zonder berichten blokkeren?",
+  "rel.block_no_posts.confirm.message": "Deze accounts hebben geen berichten en worden onmiddellijk geblokkeerd."
 }

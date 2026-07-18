@@ -346,7 +346,7 @@ struct CustomSearchView: View {
             onBlockAllLikers: {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
             },
             onAddAllLikersToList: { list in
                 guard let account = accountStore.activeAccount,

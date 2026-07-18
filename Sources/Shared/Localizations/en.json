@@ -1413,5 +1413,12 @@
   "rel.import_json.import_error": "Import Error",
   "rel.import_json.already_followed": "{count} of {total} already followed.",
   "rel.import_json.proceed": "Follow Remaining {count}",
-  "rel.show_descriptions": "Show Descriptions"
+  "rel.show_descriptions": "Show Descriptions",
+  "rel.show_stats": "Show Stats",
+  "rel.filter_no_posts": "No posts only",
+  "settings.confirm_blocks": "Confirm blocks",
+  "settings.confirm_unfollow": "Confirm unfollow",
+  "rel.block_no_posts": "Block all without posts",
+  "rel.block_no_posts.confirm": "Block {count} accounts without posts?",
+  "rel.block_no_posts.confirm.message": "These accounts have zero posts and will be blocked immediately."
 }

@@ -118,7 +118,7 @@ extension ListDetailView {
     }
 
     func loadSubscriptionStateIfNeeded(account: AppAccount, appPassword: String) async {
-        guard !isOwnedList, currentList.kind == .moderation else {
+        guard !isOwnedList else {
             isSubscribedToModerationList = false
             subscribeError = nil
             return

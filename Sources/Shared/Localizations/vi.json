@@ -1386,5 +1386,13 @@
   "list_bulk.status.cannot_retry": "Cannot retry reports automatically.",
   "list_bulk.status.select_comparison": "Select a comparison list before retrying this action.",
   "lists.account_summary.hint": "Open your profile",
-  "rel.view.hint": "View list"
+  "rel.view.hint": "View list",
+  "rel.show_stats": "Hiển thị thống kê",
+  "rel.filter_no_posts": "Chỉ không có bài đăng",
+  "settings.confirm_blocks": "Xác nhận chặn",
+  "settings.confirm_unfollow": "Xác nhận bỏ theo dõi",
+  "rel.unfollow_confirm": "Bỏ theo dõi tài khoản này?",
+  "rel.block_no_posts": "Chặn tất cả không có bài đăng",
+  "rel.block_no_posts.confirm": "Chặn {count} tài khoản không có bài đăng?",
+  "rel.block_no_posts.confirm.message": "Các tài khoản này không có bài đăng và sẽ bị chặn ngay lập tức."
 }

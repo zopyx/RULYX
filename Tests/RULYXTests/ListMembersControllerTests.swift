@@ -31,7 +31,8 @@ final class ListMembersControllerTests: XCTestCase {
                 makeMember(did: "did:plc:1", handle: "u1.bsky.social"),
                 makeMember(did: "did:plc:2", handle: "u2.bsky.social"),
             ],
-            cursor: "next"
+            cursor: "next",
+            memberCount: nil
         )
 
         let members = try await controller.loadMembers(
@@ -48,7 +49,7 @@ final class ListMembersControllerTests: XCTestCase {
     func testLoadMembersNoMorePages() async throws {
         let client = MockLiveBlueskyClient2()
         let list = makeList()
-        client.pageResult = PagedListMembers(members: [makeMember()], cursor: nil)
+        client.pageResult = PagedListMembers(members: [makeMember()], cursor: nil, memberCount: nil)
 
         let members = try await controller.loadMembers(
             for: list,
@@ -65,7 +66,7 @@ final class ListMembersControllerTests: XCTestCase {
         let client = MockLiveBlueskyClient2()
         let list = makeList()
         // First page returns a cursor so hasMore becomes true
-        client.pageResult = PagedListMembers(members: [makeMember()], cursor: "next")
+        client.pageResult = PagedListMembers(members: [makeMember()], cursor: "next", memberCount: nil)
 
         _ = try await controller.loadMembers(
             for: list,
@@ -77,7 +78,8 @@ final class ListMembersControllerTests: XCTestCase {
         // Second page returns results with no cursor (last page)
         client.pageResult = PagedListMembers(
             members: [makeMember(did: "did:plc:more", handle: "more.bsky.social")],
-            cursor: nil
+            cursor: nil,
+            memberCount: nil
         )
 
         let more = try await controller.loadMoreMembers(
@@ -92,7 +94,7 @@ final class ListMembersControllerTests: XCTestCase {
     func testLoadMoreMembersNoMore() async throws {
         let client = MockLiveBlueskyClient2()
         let list = makeList()
-        client.pageResult = PagedListMembers(members: [makeMember()], cursor: nil)
+        client.pageResult = PagedListMembers(members: [makeMember()], cursor: nil, memberCount: nil)
 
         _ = try await controller.loadMembers(
             for: list,
@@ -118,7 +120,8 @@ final class ListMembersControllerTests: XCTestCase {
                 makeMember(did: "did:plc:same", handle: "same.bsky.social", recordURI: "at://item/1"),
                 makeMember(did: "did:plc:same", handle: "same.bsky.social", recordURI: "at://item/1"),
             ],
-            cursor: nil
+            cursor: nil,
+            memberCount: nil
         )
 
         let members = try await controller.loadMembers(
@@ -141,6 +144,6 @@ private final class MockLiveBlueskyClient2: LiveBlueskyClient {
         account _: AppAccount,
         appPassword _: String?
     ) async throws -> PagedListMembers {
-        pageResult ?? PagedListMembers(members: [], cursor: nil)
+        pageResult ?? PagedListMembers(members: [], cursor: nil, memberCount: nil)
     }
 }

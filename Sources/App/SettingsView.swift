@@ -42,8 +42,14 @@ struct SettingsView: View {
     /// Controls the HTTP request debug view sheet.
     @State private var isShowingHTTPRequestDebugView = false
 
-    /// When enabled, destructive operations (block, unfollow, etc.) are shown.
+    /// UserDefaults key `"showDangerousOperations"`: destructive operations visibility.
     @AppStorage("showDangerousOperations") private var showDangerousOperations = false
+
+    /// UserDefaults key `"confirmBlocks"`: show confirmation dialog before blocking.
+    @AppStorage("confirmBlocks") private var confirmBlocks = true
+
+    /// UserDefaults key `"confirmUnfollow"`: show confirmation dialog before unfollowing.
+    @AppStorage("confirmUnfollow") private var confirmUnfollow = true
 
     /// When enabled, the performance monitor overlay is shown at the top of the screen.
     @AppStorage("performanceOverlayEnabled") private var performanceOverlayEnabled = false
@@ -124,6 +130,22 @@ struct SettingsView: View {
                             } icon: {
                                 Image(systemName: "clock.arrow.circlepath")
                             }
+                        }
+                    }
+
+                    Toggle(isOn: $confirmBlocks) {
+                        Label {
+                            Text(loc("settings.confirm_blocks"))
+                        } icon: {
+                            Image(systemName: "hand.raised")
+                        }
+                    }
+
+                    Toggle(isOn: $confirmUnfollow) {
+                        Label {
+                            Text(loc("settings.confirm_unfollow"))
+                        } icon: {
+                            Image(systemName: "person.badge.minus")
                         }
                     }
 

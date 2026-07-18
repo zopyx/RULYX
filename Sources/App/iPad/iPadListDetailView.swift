@@ -16,6 +16,16 @@ struct iPadListDetailView: View {
     @State private var showMerge = false
     @State private var showAIScreen = false
 
+    // Subscribe/unsubscribe state
+    @State private var isSubscribedToModerationList = false
+    @State private var subscribeError: String?
+    @State private var isSubscribing = false
+
+    private var isOwnedList: Bool {
+        guard let activeDID = accountStore.activeAccount?.did else { return false }
+        return list.id.hasPrefix("at://\\(activeDID)")
+    }
+
     private var listTitleWithMemberCount: String {
         "\(list.name) (\(list.memberCount ?? detailVM.members.count))"
     }
@@ -24,6 +34,21 @@ struct iPadListDetailView: View {
         VStack(spacing: 0) {
             listHeader
             Divider()
+            if !isOwnedList {
+                List {
+                    ListDetailSubscribeSection(
+                        currentList: list,
+                        isSubscribed: $isSubscribedToModerationList,
+                        subscribeError: $subscribeError,
+                        isSubscribing: $isSubscribing,
+                        account: accountStore.activeAccount!,
+                        appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? ""
+                    )
+                }
+                .listStyle(.inset)
+                .frame(height: 120)
+                Divider()
+            }
             memberList
         }
         .task {
@@ -33,6 +58,21 @@ struct iPadListDetailView: View {
                 appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "",
                 using: container.blueskyClient
             )
+        }
+        .task {
+            guard !isOwnedList,
+                  let account = accountStore.activeAccount,
+                  let appPassword = accountStore.activeAccount.flatMap({ accountStore.appPassword(for: $0) })
+            else { return }
+            do {
+                isSubscribedToModerationList = try await container.list.isSubscribedToModerationList(
+                    list.id,
+                    account: account,
+                    appPassword: appPassword
+                )
+            } catch {
+                subscribeError = AppError.userMessage(from: error)
+            }
         }
         .navigationTitle("")
         .toolbar {

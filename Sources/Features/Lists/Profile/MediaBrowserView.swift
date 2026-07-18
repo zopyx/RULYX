@@ -8,7 +8,7 @@ struct MediaBrowserView: View {
     let did: String
     let handle: String
 
-    @State private var viewModel: MediaBrowserViewModel
+    @StateObject private var viewModel: MediaBrowserViewModel
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
     @Environment(\.dismiss) private var dismiss
@@ -23,7 +23,7 @@ struct MediaBrowserView: View {
     init(did: String, handle: String) {
         self.did = did
         self.handle = handle
-        _viewModel = State(wrappedValue: MediaBrowserViewModel(did: did))
+        _viewModel = StateObject(wrappedValue: MediaBrowserViewModel(did: did))
     }
 
     @EnvironmentObject private var localizationManager: LocalizationManager
@@ -215,50 +215,20 @@ struct MediaBrowserView: View {
     // MARK: - Toolbar
 
     private var toolbar: some View {
-        HStack(spacing: 12) {
-            if !viewModel.items.isEmpty {
-                Button {
-                    viewModel.selectAll.toggle()
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: viewModel.selectAll ? "checkmark.circle.fill" : "circle")
-                        Text(loc: "profile.media.select_all")
-                    }
-                    .font(.body.weight(.medium))
-                    .padding(.vertical, 6)
-                }
-                .buttonStyle(.plain)
-
-                Spacer()
-
-                if !viewModel.selectedIDs.isEmpty {
-                    Text("\(viewModel.selectedIDs.count)")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-
-                Button {
-                    guard !viewModel.selectedIDs.isEmpty else { return }
-                    isShowingFolderPicker = true
-                } label: {
-                    Label(loc("profile.media.download_selected"), systemImage: "arrow.down.circle")
-                        .font(.body.weight(.medium))
-                        .lineLimit(1)
-                        .padding(.vertical, 6)
-                }
-                .disabled(viewModel.selectedIDs.isEmpty || viewModel.isDownloading)
-            }
+        MediaSelectionToolbar(
+            selection: viewModel.selection,
+            filteredIDs: viewModel.filteredItems.map(\.id),
+            hasItems: !viewModel.items.isEmpty,
+            isDownloading: viewModel.isDownloading
+        ) {
+            isShowingFolderPicker = true
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
     }
 
     // MARK: - Thumbnails
 
     @ViewBuilder
     private func mediaThumbnail(_ item: MediaItem) -> some View {
-        let isSelected = viewModel.selectedIDs.contains(item.id)
         let imageURL = URL(string: item.thumbnailURL ?? item.url)
 
         ZStack(alignment: .topTrailing) {
@@ -301,21 +271,13 @@ struct MediaBrowserView: View {
                 .background(Color.black.opacity(0.15))
             }
 
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .font(.title2)
-                .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
-                .shadow(color: .black.opacity(0.4), radius: 2)
-                .padding(6)
+            MediaSelectionIndicator(selection: viewModel.selection, itemID: item.id)
         }
         .onTapGesture(count: 2) {
             previewItem = item
         }
         .onTapGesture {
-            if isSelected {
-                viewModel.selectedIDs.remove(item.id)
-            } else {
-                viewModel.selectedIDs.insert(item.id)
-            }
+            viewModel.selection.toggle(item.id)
         }
     }
 
@@ -377,6 +339,72 @@ struct MediaBrowserView: View {
         }
         downloadTask = task
         await task.value
+    }
+}
+
+private struct MediaSelectionToolbar: View {
+    @ObservedObject var selection: MediaSelectionState
+    let filteredIDs: [String]
+    let hasItems: Bool
+    let isDownloading: Bool
+    let onDownload: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            if hasItems {
+                Button {
+                    if selection.containsAll(filteredIDs) {
+                        selection.clear()
+                    } else {
+                        selection.selectAll(filteredIDs)
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: selection.containsAll(filteredIDs) ? "checkmark.circle.fill" : "circle")
+                        Text(loc: "profile.media.select_all")
+                    }
+                    .font(.body.weight(.medium))
+                    .padding(.vertical, 6)
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                if !selection.isEmpty {
+                    Text("\(selection.count)")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+
+                Button {
+                    guard !selection.isEmpty else { return }
+                    onDownload()
+                } label: {
+                    Label(loc("profile.media.download_selected"), systemImage: "arrow.down.circle")
+                        .font(.body.weight(.medium))
+                        .lineLimit(1)
+                        .padding(.vertical, 6)
+                }
+                .disabled(selection.isEmpty || isDownloading)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
+    }
+}
+
+private struct MediaSelectionIndicator: View {
+    @ObservedObject var selection: MediaSelectionState
+    let itemID: String
+
+    var body: some View {
+        let isSelected = selection.contains(itemID)
+        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+            .font(.title2)
+            .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
+            .shadow(color: .black.opacity(0.4), radius: 2)
+            .padding(6)
     }
 }
 

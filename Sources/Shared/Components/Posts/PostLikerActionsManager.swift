@@ -50,12 +50,26 @@ class PostLikerActionsManager: ObservableObject {
     }
 
     /// Begin the "block all likers" flow: fetch likers, build pending targets,
-    /// then set `showBlockLikersConfirmation` to present the confirmation alert.
-    func handleBlockAllLikers(postURI: String, using blueskyClient: LiveBlueskyClient, fetchAccount: AppAccount, fetchPassword: String) {
+    /// then either show confirmation or block immediately based on user preference.
+    func handleBlockAllLikers(
+        postURI: String,
+        using blueskyClient: LiveBlueskyClient,
+        fetchAccount: AppAccount,
+        fetchPassword: String,
+        confirmBlockAccount: AppAccount? = nil,
+        confirmBlockPassword: String? = nil
+    ) {
+        let shouldConfirm = UserDefaults.standard.bool(forKey: "confirmBlocks")
         Task {
             guard let targets = await fetchLikerTargets(for: postURI, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword) else { return }
             pendingLikerTargets = targets
-            showBlockLikersConfirmation = true
+            if shouldConfirm {
+                showBlockLikersConfirmation = true
+            } else if let account = confirmBlockAccount, let password = confirmBlockPassword {
+                confirmBlockLikers(activeAccount: account, activePassword: password)
+            } else {
+                showBlockLikersConfirmation = true
+            }
         }
     }
 

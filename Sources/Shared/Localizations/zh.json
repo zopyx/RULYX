@@ -1386,5 +1386,13 @@
   "list_bulk.status.cannot_retry": "Cannot retry reports automatically.",
   "list_bulk.status.select_comparison": "Select a comparison list before retrying this action.",
   "lists.account_summary.hint": "Open your profile",
-  "rel.view.hint": "View list"
+  "rel.view.hint": "View list",
+  "rel.show_stats": "显示统计信息",
+  "rel.filter_no_posts": "仅无帖子",
+  "settings.confirm_blocks": "确认屏蔽",
+  "settings.confirm_unfollow": "确认取消关注",
+  "rel.unfollow_confirm": "取消关注此账号？",
+  "rel.block_no_posts": "屏蔽所有无帖子的账号",
+  "rel.block_no_posts.confirm": "屏蔽{count}个无帖子的账号？",
+  "rel.block_no_posts.confirm.message": "这些账号没有帖子，将被立即屏蔽。"
 }

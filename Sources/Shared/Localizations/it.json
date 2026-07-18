@@ -1386,5 +1386,13 @@
   "list_bulk.status.cannot_retry": "Cannot retry reports automatically.",
   "list_bulk.status.select_comparison": "Select a comparison list before retrying this action.",
   "lists.account_summary.hint": "Open your profile",
-  "rel.view.hint": "View list"
+  "rel.view.hint": "View list",
+  "rel.show_stats": "Mostra statistiche",
+  "rel.filter_no_posts": "Solo senza post",
+  "settings.confirm_blocks": "Conferma blocchi",
+  "settings.confirm_unfollow": "Conferma non seguire più",
+  "rel.unfollow_confirm": "Non seguire più questo account?",
+  "rel.block_no_posts": "Blocca tutti senza post",
+  "rel.block_no_posts.confirm": "Bloccare {count} account senza post?",
+  "rel.block_no_posts.confirm.message": "Questi account non hanno post e verranno bloccati immediatamente."
 }

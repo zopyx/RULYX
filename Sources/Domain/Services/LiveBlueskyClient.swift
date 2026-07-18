@@ -27,6 +27,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// The default base URL for the Bluesky PDS.
     private let baseURL: URL
     private let httpClient: HTTPClient
+    /// HTTP client for AppView-proxied PDS requests. Uses no certificate pinning
+    /// because PDS hosts are dynamic and vary per user account.
+    private let appViewHTTPClient = HTTPClient()
     private let session: URLSession
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
@@ -814,7 +817,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
 
-        let (data, httpResponse) = try await httpClient.data(
+        let (data, httpResponse) = try await appViewHTTPClient.data(
             for: request,
             source: "Lists / Relationships",
             origin: "LiveBlueskyClient \(method) xrpc/\(path)"

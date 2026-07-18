@@ -452,7 +452,7 @@ struct ListDetailView: View {
                 }
             }
 
-            if !isOwnedList, currentList.kind == .moderation {
+            if !isOwnedList {
                 ListDetailSubscribeSection(
                     currentList: currentList,
                     isSubscribed: $isSubscribedToModerationList,
@@ -462,17 +462,6 @@ struct ListDetailView: View {
                     appPassword: appPassword
                 )
 
-                Section {
-                    Button(role: .destructive) {
-                        selectedReportReason = .simplifiedDefault
-                        reportEvidenceText = ""
-                        isShowingReportSheet = true
-                    } label: {
-                        Label(loc("actions.report"), systemImage: "exclamationmark.shield")
-                    }
-                    .disabled(isReportingList)
-                }
-            } else if !isOwnedList {
                 Section {
                     Button(role: .destructive) {
                         selectedReportReason = .simplifiedDefault

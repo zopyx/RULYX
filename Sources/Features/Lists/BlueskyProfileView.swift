@@ -51,6 +51,10 @@ struct BlueskyProfileView: View {
     @State private var newInternalListColor = InternalListColor.blue
     @State private var showBlockingListsPanel = false
     @State private var showProfileEditor = false
+    @State private var showUnfollowConfirmation = false
+
+    @AppStorage("confirmUnfollow") private var confirmUnfollow = true
+    @AppStorage("confirmBlocks") private var confirmBlocks = true
 
     // MARK: - Computed properties
 
@@ -446,6 +450,29 @@ struct BlueskyProfileView: View {
                 pendingCreateKind = nil
             }
         }
+        .confirmationDialog(
+            loc("rel.unfollow_confirm"),
+            isPresented: $showUnfollowConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(loc("rel.unfollow"), role: .destructive) {
+                showUnfollowConfirmation = false
+                if let account = accountStore.activeAccount,
+                   let appPassword = accountStore.appPassword(for: account)
+                {
+                    runModeration {
+                        await viewModel.toggleFollow(
+                            account: account,
+                            appPassword: appPassword,
+                            using: container.blueskyClient
+                        )
+                    }
+                }
+            }
+            Button(loc("actions.cancel"), role: .cancel) {
+                showUnfollowConfirmation = false
+            }
+        }
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
@@ -739,7 +766,7 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text(loc: "profile.following") } icon: { Image(systemName: "person.badge.plus") }
+                                Label { Text(loc("profile.following")) } icon: { Image(systemName: "person.badge.plus") }
                             }
                             .disabled(viewModel.isUpdatingModeration)
 

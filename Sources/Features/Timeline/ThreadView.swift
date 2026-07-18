@@ -325,7 +325,7 @@ struct ThreadView: View {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account),
                       let uri = post.uri else { return }
-                likerActions.handleBlockAllLikers(postURI: uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword)
+                likerActions.handleBlockAllLikers(postURI: uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
             },
             onAddAllLikersToList: { list in
                 guard let account = accountStore.activeAccount,

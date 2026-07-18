@@ -1,8 +1,25 @@
+import Combine
 @testable import RULYX
 import XCTest
 
 @MainActor
 final class MediaBrowserViewModelTests: XCTestCase {
+    func testSelectionStateSelectsFortyItemsInOnePublishedChange() {
+        let selection = MediaSelectionState()
+        let ids = (0 ..< 40).map { "image-\($0)" }
+        var publishedSelections: [Set<String>] = []
+        let cancellable = selection.$selectedIDs
+            .dropFirst()
+            .sink { publishedSelections.append($0) }
+
+        selection.selectAll(ids)
+
+        XCTAssertEqual(selection.count, 40)
+        XCTAssertTrue(selection.containsAll(ids))
+        XCTAssertEqual(publishedSelections, [Set(ids)])
+        withExtendedLifetime(cancellable) {}
+    }
+
     func testInitialLoadOnlyFetchesFirstPageUntilLoadMore() async {
         let viewModel = MediaBrowserViewModel(did: "did:plc:test")
         let client = MockMediaFeedClient(

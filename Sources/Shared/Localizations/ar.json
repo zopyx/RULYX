@@ -1402,5 +1402,13 @@
   "list_bulk.status.cannot_retry": "Cannot retry reports automatically.",
   "list_bulk.status.select_comparison": "Select a comparison list before retrying this action.",
   "lists.account_summary.hint": "Open your profile",
-  "rel.view.hint": "View list"
+  "rel.view.hint": "View list",
+  "rel.show_stats": "إظهار الإحصائيات",
+  "rel.filter_no_posts": "بدون منشورات فقط",
+  "settings.confirm_blocks": "تأكيد الحظر",
+  "settings.confirm_unfollow": "تأكيد إلغاء المتابعة",
+  "rel.unfollow_confirm": "إلغاء متابعة هذا الحساب؟",
+  "rel.block_no_posts": "حظر جميع الحسابات بدون منشورات",
+  "rel.block_no_posts.confirm": "حظر {count} حساب بدون منشورات؟",
+  "rel.block_no_posts.confirm.message": "هذه الحسابات ليس لديها منشورات وسيتم حظرها فوراً."
 }

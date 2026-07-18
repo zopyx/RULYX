@@ -317,10 +317,15 @@ struct MentionsSearchView: View {
     }
 
     private func handleBlockAllLikers(postURI: String) {
+        let shouldConfirm = UserDefaults.standard.bool(forKey: "confirmBlocks")
         Task {
             guard let targets = await fetchLikerTargets(for: postURI) else { return }
             pendingLikerTargets = targets
-            showBlockLikersConfirmation = true
+            if shouldConfirm {
+                showBlockLikersConfirmation = true
+            } else {
+                blockLikers(targets)
+            }
         }
     }
 

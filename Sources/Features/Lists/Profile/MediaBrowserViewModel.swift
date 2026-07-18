@@ -62,6 +62,54 @@ struct DownloadSummary: Identifiable {
     }
 }
 
+/// Selection state is kept separate from the browser's data-loading state so
+/// selecting media does not invalidate and rebuild the thumbnail grid.
+@MainActor
+final class MediaSelectionState: ObservableObject {
+    @Published private(set) var selectedIDs = Set<String>()
+
+    var count: Int {
+        selectedIDs.count
+    }
+
+    var isEmpty: Bool {
+        selectedIDs.isEmpty
+    }
+
+    func contains(_ id: String) -> Bool {
+        selectedIDs.contains(id)
+    }
+
+    func toggle(_ id: String) {
+        if selectedIDs.contains(id) {
+            selectedIDs.remove(id)
+        } else {
+            selectedIDs.insert(id)
+        }
+    }
+
+    func containsAll(_ ids: [String]) -> Bool {
+        !ids.isEmpty && selectedIDs.count == ids.count && ids.allSatisfy(selectedIDs.contains)
+    }
+
+    func selectAll(_ ids: [String]) {
+        let newSelection = Set(ids)
+        guard selectedIDs != newSelection else { return }
+        selectedIDs = newSelection
+    }
+
+    func clear() {
+        guard !selectedIDs.isEmpty else { return }
+        selectedIDs.removeAll(keepingCapacity: true)
+    }
+
+    func retain(_ ids: Set<String>) {
+        let retainedSelection = selectedIDs.intersection(ids)
+        guard selectedIDs != retainedSelection else { return }
+        selectedIDs = retainedSelection
+    }
+}
+
 /// A 256MB memory / 2GB disk cache for media thumbnails.
 private let sharedCache: URLCache = {
     let cache = URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
@@ -95,8 +143,8 @@ final class MediaBrowserViewModel: ObservableObject {
     @Published private(set) var videoCount = 0
     /// Summary text (currently unused, always empty).
     @Published private(set) var summaryText = ""
-    /// Set of media item IDs selected for download.
-    @Published var selectedIDs = Set<String>()
+    /// Selection publishes independently so it only refreshes selection UI.
+    let selection = MediaSelectionState()
     /// User-facing error message.
     @Published var errorMessage: String?
     /// True while a download operation is in progress.
@@ -121,14 +169,18 @@ final class MediaBrowserViewModel: ObservableObject {
 
     /// Whether all filtered items are selected.
     var selectAll: Bool {
-        get { selectedIDs.count == filteredItems.count && !filteredItems.isEmpty }
+        get { selection.containsAll(filteredItems.map(\.id)) }
         set {
             if newValue {
-                selectedIDs = Set(filteredItems.map(\.id))
+                selection.selectAll(filteredItems.map(\.id))
             } else {
-                selectedIDs.removeAll()
+                selection.clear()
             }
         }
+    }
+
+    var selectedIDs: Set<String> {
+        selection.selectedIDs
     }
 
     // MARK: - Private Properties
@@ -156,7 +208,7 @@ final class MediaBrowserViewModel: ObservableObject {
 
     /// Removes selection IDs for items no longer in the filtered set.
     func pruneSelection() {
-        selectedIDs = Set(filteredItems.filter { selectedIDs.contains($0.id) }.map(\.id))
+        selection.retain(Set(filteredItems.map(\.id)))
     }
 
     // MARK: - Data Loading
