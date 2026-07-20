@@ -1182,8 +1182,12 @@ struct RelationshipsView: View {
             switch mode {
             case .followers:
                 result = try await container.profile.fetchFollowers(actor: did, account: account, appPassword: appPassword)
+                clearskyTotal = initialCount ?? result.count
+                onCountUpdate?(mode, result.count)
             case .following:
                 result = try await container.profile.fetchFollowing(actor: did, account: account, appPassword: appPassword)
+                clearskyTotal = initialCount ?? result.count
+                onCountUpdate?(mode, result.count)
             case .blocking:
                 let r = try await container.clearsky.fetchBlockedActors(
                     account: account,
@@ -1214,6 +1218,11 @@ struct RelationshipsView: View {
                 if let uris = try? await container.social.fetchExistingBlockRecordURIs(account: account, appPassword: appPassword) {
                     blockRecordURIs = uris
                 }
+            }
+
+            // Show status if loaded count differs from expected total
+            if let expected = clearskyTotal, expected != actors.count, mode != .blocking, mode != .blockedBy {
+                statusMessage = String.localized("rel.loaded_status", replacements: ["count": "\(actors.count)", "total": "\(expected)"])
             }
 
             isLoading = false
