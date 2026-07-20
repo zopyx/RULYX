@@ -1724,8 +1724,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 }
                 lastError = nil
             } catch {
-                lastError = error
-                // If we have a cursor, we can continue from the error; if no cursor, rethrow.
+                AppLogger.moderation.error("fetchFollowers page \(pageCount) failed: \(error.localizedDescription, privacy: .public)")
+                // Retry once on transient failure
+                if cursor != nil, lastError == nil {
+                    lastError = error
+                    continue
+                }
                 if cursor == nil {
                     throw error
                 }
@@ -1792,7 +1796,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 }
                 lastError = nil
             } catch {
-                lastError = error
+                AppLogger.moderation.error("fetchFollowing page \(pageCount) failed: \(error.localizedDescription, privacy: .public)")
+                // Retry once on transient failure
+                if cursor != nil, lastError == nil {
+                    lastError = error
+                    continue
+                }
                 if cursor == nil {
                     throw error
                 }
