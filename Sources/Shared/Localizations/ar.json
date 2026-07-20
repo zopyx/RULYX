@@ -1155,6 +1155,15 @@
   "rel.block_confirm": "Block this account? (AR)",
   "rel.block_message": "Blocking prevents interaction and is treated as a destructive moderation action. (AR)",
   "rel.block_swipe.hint": "حظر هذا الحساب - إجراء السحب",
+  "rel.unfollow": "إلغاء المتابعة",
+  "rel.unfollow.hint": "يلغي متابعة هذا الحساب — إجراء السحب",
+  "rel.force_unfollow": "إجبار إلغاء المتابعة",
+  "rel.force_unfollow.hint": "يحظر ويلغي حظر هذا الحساب فوراً لإزالته كمتابع",
+  "rel.force_unfollow.progress": "جاري إزالة المتابع…",
+  "rel.force_unfollow.done": "تمت إزالة المتابع",
+  "rel.unblock": "إلغاء الحظر",
+  "rel.unblock.hint": "يلغي حظر هذا الحساب",
+  "rel.unblock.no_uri": "تعذر العثور على سجل الحظر لهذا الحساب.",
   "rel.close_picker.hint": "إغلاق منتقي القائمة دون إضافة",
   "rel.export_message": "Bluesky {mode} list (AR)",
   "rel.export_subject": "{mode} Export (AR)",
@@ -1412,3 +1421,6 @@
   "rel.block_no_posts.confirm": "حظر {count} حساب بدون منشورات؟",
   "rel.block_no_posts.confirm.message": "هذه الحسابات ليس لديها منشورات وسيتم حظرها فوراً."
 }
+
+
+

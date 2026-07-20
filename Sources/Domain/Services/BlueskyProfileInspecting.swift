@@ -67,6 +67,18 @@ protocol BlueskyProfileInspecting: Sendable {
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     func unblockActor(recordURI: String, account: AppAccount, appPassword: String?) async throws
 
+    /// Soft-blocks the specified actor: blocks them (removes follower) then immediately unblocks.
+    /// Used to force-remove a follower without permanently blocking them.
+    /// - Parameters:
+    ///   - actorDID: The DID of the actor to soft-block.
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func softBlockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws
+
+    /// Fetches a mapping of blocked actor DID → block record URI from the PDS.
+    /// Used by the Blocking mode swipe to perform unblocking.
+    func fetchExistingBlockRecordURIs(account: AppAccount, appPassword: String?) async throws -> [String: String]
+
     /// Follows the specified actor.
     /// - Parameters:
     ///   - actorDID: The DID of the actor to follow.

@@ -436,6 +436,65 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
         }
     }
 
+    func softBlockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
+        let uri: String = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let body = CreateGenericRecordRequest(
+                repo: authSession.did,
+                collection: "app.bsky.graph.block",
+                record: SubjectRecord(type: "app.bsky.graph.block", subject: actorDID)
+            )
+            let response: CreateRecordResponse = try await requestExecutor.send(
+                path: "com.atproto.repo.createRecord",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+            return response.uri
+        }
+        try await unblockActor(recordURI: uri, account: account, appPassword: appPassword)
+    }
+
+    func fetchExistingBlockRecordURIs(account: AppAccount, appPassword: String?) async throws -> [String: String] {
+        try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            var result = [String: String]()
+            var cursor: String?
+
+            repeat {
+                var queryItems: [URLQueryItem] = [
+                    URLQueryItem(name: "repo", value: authSession.did),
+                    URLQueryItem(name: "collection", value: "app.bsky.graph.block"),
+                    URLQueryItem(name: "limit", value: "100"),
+                ]
+                if let cursor {
+                    queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+                }
+
+                let response: BlockListRecordsResponse = try await requestExecutor.send(
+                    path: "com.atproto.repo.listRecords",
+                    method: "GET",
+                    queryItems: queryItems,
+                    accessToken: authSession.accessJWT,
+                    hostURL: authSession.pdsURL
+                )
+
+                for entry in response.records {
+                    result[entry.value.subject] = entry.uri
+                }
+                cursor = response.cursor
+            } while cursor != nil
+
+            return result
+        }
+    }
+
     /// Follows the specified actor.
     func followActor(
         did actorDID: String,

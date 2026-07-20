@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "Bloccare questo account?",
   "rel.block_message": "Bloccare impedisce l'interazione ed è considerata un'azione distruttiva.",
   "rel.block_swipe.hint": "Blocca questo account: azione di scorrimento",
+  "rel.unfollow": "Non seguire più",
+  "rel.unfollow.hint": "Smetti di seguire questo account — azione di scorrimento",
+  "rel.force_unfollow": "Forza unfollow",
+  "rel.force_unfollow.hint": "Blocca e sblocca immediatamente questo account per rimuoverlo dai follower",
+  "rel.force_unfollow.progress": "Rimozione follower…",
+  "rel.force_unfollow.done": "Follower rimosso",
+  "rel.unblock": "Sblocca",
+  "rel.unblock.hint": "Sblocca questo account",
+  "rel.unblock.no_uri": "Impossibile trovare il record di blocco per questo account.",
   "rel.close_picker.hint": "Chiude il selettore elenco senza aggiungere",
   "rel.export_message": "Lista Bluesky {mode}",
   "rel.export_subject": "Esporta {mode}",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "Bloccare {count} account senza post?",
   "rel.block_no_posts.confirm.message": "Questi account non hanno post e verranno bloccati immediatamente."
 }
+
+
+

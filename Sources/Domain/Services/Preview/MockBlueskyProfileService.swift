@@ -116,6 +116,15 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
         try await Task.sleep(for: .milliseconds(120))
     }
 
+    func softBlockActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {
+        try await Task.sleep(for: .milliseconds(250))
+    }
+
+    func fetchExistingBlockRecordURIs(account _: AppAccount, appPassword _: String?) async throws -> [String: String] {
+        try await Task.sleep(for: .milliseconds(50))
+        return [:]
+    }
+
     func muteActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {
         try await Task.sleep(for: .milliseconds(120))
     }

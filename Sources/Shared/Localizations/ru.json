@@ -1149,6 +1149,15 @@
   "rel.block_confirm": "Block this account? (RU)",
   "rel.block_message": "Blocking prevents interaction and is treated as a destructive moderation action. (RU)",
   "rel.block_swipe.hint": "Блокирует этот аккаунт — проведите пальцем по экрану",
+  "rel.unfollow": "Отписаться",
+  "rel.unfollow.hint": "Отписывает от этого аккаунта — действие смахивания",
+  "rel.force_unfollow": "Принудительно отписать",
+  "rel.force_unfollow.hint": "Блокирует и сразу разблокирует аккаунт, чтобы удалить из подписчиков",
+  "rel.force_unfollow.progress": "Удаление подписчика…",
+  "rel.force_unfollow.done": "Подписчик удалён",
+  "rel.unblock": "Разблокировать",
+  "rel.unblock.hint": "Разблокирует этот аккаунт",
+  "rel.unblock.no_uri": "Не удалось найти запись блокировки для этого аккаунта.",
   "rel.close_picker.hint": "Закрывает средство выбора списка без добавления",
   "rel.export_message": "Bluesky {mode} list (RU)",
   "rel.export_subject": "{mode} Export (RU)",
@@ -1404,3 +1413,6 @@
   "rel.block_no_posts.confirm": "Заблокировать {count} аккаунтов без записей?",
   "rel.block_no_posts.confirm.message": "У этих аккаунтов нет записей, и они будут немедленно заблокированы."
 }
+
+
+

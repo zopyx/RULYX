@@ -74,6 +74,9 @@ struct RelationshipsView: View {
     @State private var isChoosingJSONImportList = false
     @State private var jsonImportError: String?
 
+    /// DID → block record URI for unblocking (Blocking mode). Only populated when mode == .blocking.
+    @State private var blockRecordURIs: [String: String] = [:]
+
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
 
@@ -214,17 +217,46 @@ struct RelationshipsView: View {
                                 .accessibilityHint(loc: "rel.add_to_list.hint")
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    actorToBlock = actor
-                                    if confirmBlocks {
-                                        isShowingBlockConfirm = true
-                                    } else {
-                                        performBlock(actor)
+                                if mode == .blocking {
+                                    Button {
+                                        performUnblock(actor)
+                                    } label: {
+                                        Label(loc("rel.unblock"), systemImage: "lock.open.fill")
                                     }
-                                } label: {
-                                    Label(loc("rel.block"), systemImage: "hand.raised.fill")
+                                    .tint(.orange)
+                                    .accessibilityHint(loc: "rel.unblock.hint")
+                                } else {
+                                    Button(role: .destructive) {
+                                        actorToBlock = actor
+                                        if confirmBlocks {
+                                            isShowingBlockConfirm = true
+                                        } else {
+                                            performBlock(actor)
+                                        }
+                                    } label: {
+                                        Label(loc("rel.block"), systemImage: "hand.raised.fill")
+                                    }
+                                    .accessibilityHint(loc: "rel.block_swipe.hint")
                                 }
-                                .accessibilityHint(loc: "rel.block_swipe.hint")
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                if mode == .followers {
+                                    Button {
+                                        performForceUnfollow(actor)
+                                    } label: {
+                                        Label(loc("rel.force_unfollow"), systemImage: "person.crop.circle.badge.minus")
+                                    }
+                                    .tint(.orange)
+                                    .accessibilityHint(loc: "rel.force_unfollow.hint")
+                                } else if mode == .following {
+                                    Button {
+                                        performForceUnfollow(actor)
+                                    } label: {
+                                        Label(loc("rel.unfollow"), systemImage: "person.fill.xmark")
+                                    }
+                                    .tint(.orange)
+                                    .accessibilityHint(loc: "rel.unfollow.hint")
+                                }
                             }
                         }
                         .onDelete { indexSet in
@@ -823,6 +855,51 @@ struct RelationshipsView: View {
         }
     }
 
+    /// Force-unfollows the given follower (block + immediate unblock).
+    private func performForceUnfollow(_ actor: BlueskyActor) {
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account) else { return }
+        statusMessage = loc("rel.force_unfollow.progress")
+        Task {
+            do {
+                try await container.social.softBlockActor(
+                    did: actor.did,
+                    account: account,
+                    appPassword: appPassword
+                )
+                actors.removeAll { $0.did == actor.did }
+                statusMessage = loc("rel.force_unfollow.done")
+            } catch {
+                errorMessage = AppError.userMessage(from: error)
+                statusMessage = nil
+            }
+        }
+    }
+
+    /// Unblocks the given actor in Blocking mode using the cached block record URI.
+    private func performUnblock(_ actor: BlueskyActor) {
+        guard let account = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: account),
+              let recordURI = blockRecordURIs[actor.did]
+        else {
+            errorMessage = loc("rel.unblock.no_uri")
+            return
+        }
+        Task {
+            do {
+                try await container.social.unblockActor(
+                    recordURI: recordURI,
+                    account: account,
+                    appPassword: appPassword
+                )
+                actors.removeAll { $0.did == actor.did }
+                blockRecordURIs.removeValue(forKey: actor.did)
+            } catch {
+                errorMessage = AppError.userMessage(from: error)
+            }
+        }
+    }
+
     /// A localized summary of the block-back operation result.
     private var blockBackResultSummary: String {
         if (actionsVM?.blockBackFailureCount ?? 0) == 0 {
@@ -1131,6 +1208,14 @@ struct RelationshipsView: View {
             } else {
                 actors = result
             }
+
+            // Fetch block record URIs for unblocking in Blocking mode
+            if mode == .blocking {
+                if let uris = try? await container.social.fetchExistingBlockRecordURIs(account: account, appPassword: appPassword) {
+                    blockRecordURIs = uris
+                }
+            }
+
             isLoading = false
 
             // Fetch profile stats for following mode

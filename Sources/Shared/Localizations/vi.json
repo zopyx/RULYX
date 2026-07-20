@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "屏蔽此账户？ (VI)",
   "rel.block_message": "屏蔽会阻止互动，被视为破坏性审核操作。 (VI)",
   "rel.block_swipe.hint": "Chặn tài khoản này - thao tác vuốt",
+  "rel.unfollow": "Bỏ theo dõi",
+  "rel.unfollow.hint": "Bỏ theo dõi tài khoản này — thao tác vuốt",
+  "rel.force_unfollow": "Buộc bỏ theo dõi",
+  "rel.force_unfollow.hint": "Chặn và bỏ chặn ngay tài khoản này để xóa khỏi người theo dõi",
+  "rel.force_unfollow.progress": "Đang xóa người theo dõi…",
+  "rel.force_unfollow.done": "Đã xóa người theo dõi",
+  "rel.unblock": "Bỏ chặn",
+  "rel.unblock.hint": "Bỏ chặn tài khoản này",
+  "rel.unblock.no_uri": "Không tìm thấy bản ghi chặn cho tài khoản này.",
   "rel.close_picker.hint": "Đóng bộ chọn danh sách mà không thêm",
   "rel.export_message": "Bluesky {mode} 列表 (VI)",
   "rel.export_subject": "{mode} 导出 (VI)",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "Chặn {count} tài khoản không có bài đăng?",
   "rel.block_no_posts.confirm.message": "Các tài khoản này không có bài đăng và sẽ bị chặn ngay lập tức."
 }
+
+
+

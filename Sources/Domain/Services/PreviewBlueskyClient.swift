@@ -516,6 +516,19 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         try await Task.sleep(for: .milliseconds(120))
     }
 
+    override func softBlockActor(
+        did _: String,
+        account _: AppAccount,
+        appPassword _: String?
+    ) async throws {
+        try await Task.sleep(for: .milliseconds(250))
+    }
+
+    override func fetchExistingBlockRecordURIs(account _: AppAccount, appPassword _: String?) async throws -> [String: String] {
+        try await Task.sleep(for: .milliseconds(50))
+        return [:]
+    }
+
     override func muteActor(
         did _: String,
         account _: AppAccount,

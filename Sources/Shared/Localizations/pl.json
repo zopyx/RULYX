@@ -1149,6 +1149,15 @@
   "rel.block_confirm": "Block this account? (PL)",
   "rel.block_message": "Blocking prevents interaction and is treated as a destructive moderation action. (PL)",
   "rel.block_swipe.hint": "Blokuje to konto — akcja przesunięcia",
+  "rel.unfollow": "Przestań obserwować",
+  "rel.unfollow.hint": "Przestaje obserwować to konto — gest przesunięcia",
+  "rel.force_unfollow": "Wymuś przestanie obserwowania",
+  "rel.force_unfollow.hint": "Blokuje i natychmiast odblokowuje to konto, aby usunąć je jako obserwującego",
+  "rel.force_unfollow.progress": "Usuwanie obserwującego…",
+  "rel.force_unfollow.done": "Obserwujący usunięty",
+  "rel.unblock": "Odblokuj",
+  "rel.unblock.hint": "Odblokowuje to konto",
+  "rel.unblock.no_uri": "Nie można znaleźć rekordu blokady dla tego konta.",
   "rel.close_picker.hint": "Zamyka selektor listy bez dodawania",
   "rel.export_message": "Bluesky {mode} list (PL)",
   "rel.export_subject": "{mode} Export (PL)",
@@ -1404,3 +1413,6 @@
   "rel.block_no_posts.confirm": "Zablokować {count} kont bez postów?",
   "rel.block_no_posts.confirm.message": "Te konta nie mają postów i zostaną natychmiast zablokowane."
 }
+
+
+

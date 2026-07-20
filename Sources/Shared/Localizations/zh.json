@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "屏蔽此账户？",
   "rel.block_message": "屏蔽会阻止互动，被视为破坏性审核操作。",
   "rel.block_swipe.hint": "阻止此帐户 - 滑动操作",
+  "rel.unfollow": "取消关注",
+  "rel.unfollow.hint": "取消关注此账户 — 滑动操作",
+  "rel.force_unfollow": "强制取消关注",
+  "rel.force_unfollow.hint": "立即封锁并解除封锁此账户，将其从关注者中移除",
+  "rel.force_unfollow.progress": "正在移除关注者…",
+  "rel.force_unfollow.done": "关注者已移除",
+  "rel.unblock": "解除封锁",
+  "rel.unblock.hint": "解除对此账户的封锁",
+  "rel.unblock.no_uri": "找不到此账户的封锁记录。",
   "rel.close_picker.hint": "关闭列表选择器而不添加",
   "rel.export_message": "Bluesky {mode} 列表",
   "rel.export_subject": "{mode} 导出",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "屏蔽{count}个无帖子的账号？",
   "rel.block_no_posts.confirm.message": "这些账号没有帖子，将被立即屏蔽。"
 }
+
+
+

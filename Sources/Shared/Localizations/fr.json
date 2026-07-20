@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "Bloquer ce compte ?",
   "rel.block_message": "Bloquer empêche toute interaction et est considéré comme une action de modération destructive.",
   "rel.block_swipe.hint": "Bloque ce compte – action de balayage",
+  "rel.unfollow": "Ne plus suivre",
+  "rel.unfollow.hint": "Ne plus suivre ce compte — action de balayage",
+  "rel.force_unfollow": "Forcer le désabonnement",
+  "rel.force_unfollow.hint": "Bloque et débloque immédiatement ce compte pour le supprimer de vos abonnés",
+  "rel.force_unfollow.progress": "Suppression de l'abonné…",
+  "rel.force_unfollow.done": "Abonné supprimé",
+  "rel.unblock": "Débloquer",
+  "rel.unblock.hint": "Débloque ce compte",
+  "rel.unblock.no_uri": "Impossible de trouver l'enregistrement de blocage pour ce compte.",
   "rel.close_picker.hint": "Ferme le sélecteur de liste sans ajouter",
   "rel.export_message": "Liste {mode} Bluesky",
   "rel.export_subject": "Export {mode}",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "Bloquer {count} comptes sans publications ?",
   "rel.block_no_posts.confirm.message": "Ces comptes n'ont aucune publication et seront bloqués immédiatement."
 }
+
+
+

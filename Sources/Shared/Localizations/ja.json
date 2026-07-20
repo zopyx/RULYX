@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "[ja] Diesen Account blockieren?",
   "rel.block_message": "[ja] Blockieren verhindert Interaktion und gilt als destruktive Maßnahme.",
   "rel.block_swipe.hint": "このアカウントをブロックします — スワイプアクション",
+  "rel.unfollow": "フォロー解除",
+  "rel.unfollow.hint": "このアカウントのフォローを解除します — スワイプ操作",
+  "rel.force_unfollow": "フォロー解除を強制",
+  "rel.force_unfollow.hint": "このアカウントをブロックして即座に解除し、フォロワーから削除します",
+  "rel.force_unfollow.progress": "フォロワーを削除中…",
+  "rel.force_unfollow.done": "フォロワーを削除しました",
+  "rel.unblock": "ブロック解除",
+  "rel.unblock.hint": "このアカウントのブロックを解除します",
+  "rel.unblock.no_uri": "このアカウントのブロックレコードが見つかりませんでした。",
   "rel.close_picker.hint": "追加せずにリストピッカーを閉じます",
   "rel.export_message": "[ja] Bluesky-{mode}-Liste",
   "rel.export_subject": "[ja] {mode}-Export",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "投稿のない{count}アカウントをブロックしますか？",
   "rel.block_no_posts.confirm.message": "これらのアカウントには投稿がなく、直ちにブロックされます。"
 }
+
+
+

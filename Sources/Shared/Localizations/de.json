@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "Diesen Account blockieren?",
   "rel.block_message": "Blockieren verhindert Interaktion und gilt als destruktive Maßnahme.",
   "rel.block_swipe.hint": "Blockiert dieses Konto – Wischaktion",
+  "rel.unfollow": "Entfolgen",
+  "rel.unfollow.hint": "Entfolgt diesem Konto — Wischaktion",
+  "rel.force_unfollow": "Entfolgen erzwingen",
+  "rel.force_unfollow.hint": "Blockiert und entsperrt dieses Konto sofort, um es als Follower zu entfernen",
+  "rel.force_unfollow.progress": "Entferne Follower…",
+  "rel.force_unfollow.done": "Follower entfernt",
+  "rel.unblock": "Entsperren",
+  "rel.unblock.hint": "Entsperrt dieses Konto",
+  "rel.unblock.no_uri": "Block-Eintrag für dieses Konto nicht gefunden.",
   "rel.close_picker.hint": "Schließt die Listenauswahl, ohne etwas hinzuzufügen",
   "rel.export_message": "Bluesky-{mode}-Liste",
   "rel.export_subject": "{mode}-Export",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "{count} Accounts ohne Beiträge blocken?",
   "rel.block_no_posts.confirm.message": "Diese Accounts haben keine Beiträge und werden sofort geblockt."
 }
+
+
+

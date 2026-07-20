@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "Block this account? (TR)",
   "rel.block_message": "Blocking prevents interaction and is treated as a destructive moderation action. (TR)",
   "rel.block_swipe.hint": "Bu hesabı engeller — kaydırma eylemi",
+  "rel.unfollow": "Takibi bırak",
+  "rel.unfollow.hint": "Bu hesabı takip etmeyi bırakır — kaydırma eylemi",
+  "rel.force_unfollow": "Takibi bırakmaya zorla",
+  "rel.force_unfollow.hint": "Takipçi olarak kaldırmak için bu hesabı engeller ve hemen engeli kaldırır",
+  "rel.force_unfollow.progress": "Takipçi kaldırılıyor…",
+  "rel.force_unfollow.done": "Takipçi kaldırıldı",
+  "rel.unblock": "Engeli kaldır",
+  "rel.unblock.hint": "Bu hesabın engellemesini kaldırır",
+  "rel.unblock.no_uri": "Bu hesap için engelleme kaydı bulunamadı.",
   "rel.close_picker.hint": "Liste seçiciyi eklemeden kapatır",
   "rel.export_message": "Bluesky {mode} list (TR)",
   "rel.export_subject": "{mode} Export (TR)",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "Gönderisi olmayan {count} hesap engellensin mi?",
   "rel.block_no_posts.confirm.message": "Bu hesapların hiç gönderisi yok ve hemen engellenecek."
 }
+
+
+

@@ -41,6 +41,18 @@ protocol BlueskySocialServicing: Sendable {
         appPassword: String?
     ) async throws
 
+    /// Soft-block an actor: blocks them (removes follower) then immediately unblocks.
+    /// Used to force-remove a follower without permanently blocking them.
+    func softBlockActor(
+        did actorDID: String,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws
+
+    /// Fetches a mapping of blocked actor DID → block record URI from the PDS.
+    /// Used by the Blocking mode swipe to perform unblocking.
+    func fetchExistingBlockRecordURIs(account: AppAccount, appPassword: String?) async throws -> [String: String]
+
     /// Follow an actor.
     func followActor(
         did actorDID: String,

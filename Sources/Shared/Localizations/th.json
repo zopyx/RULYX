@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "Block this account? (TH)",
   "rel.block_message": "Blocking prevents interaction and is treated as a destructive moderation action. (TH)",
   "rel.block_swipe.hint": "บล็อกบัญชีนี้ — การดำเนินการปัด",
+  "rel.unfollow": "เลิกติดตาม",
+  "rel.unfollow.hint": "เลิกติดตามบัญชีนี้ — การปัด",
+  "rel.force_unfollow": "บังคับเลิกติดตาม",
+  "rel.force_unfollow.hint": "บล็อกและเลิกบล็อกบัญชีนี้ทันทีเพื่อลบออกจากผู้ติดตาม",
+  "rel.force_unfollow.progress": "กำลังลบผู้ติดตาม…",
+  "rel.force_unfollow.done": "ลบผู้ติดตามแล้ว",
+  "rel.unblock": "เลิกบล็อก",
+  "rel.unblock.hint": "เลิกบล็อกบัญชีนี้",
+  "rel.unblock.no_uri": "ไม่พบบันทึกการบล็อกสำหรับบัญชีนี้",
   "rel.close_picker.hint": "ปิดตัวเลือกรายการโดยไม่ต้องเพิ่ม",
   "rel.export_message": "Bluesky {mode} list (TH)",
   "rel.export_subject": "{mode} Export (TH)",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "บล็อก {count} บัญชีที่ไม่มีโพสต์?",
   "rel.block_no_posts.confirm.message": "บัญชีเหล่านี้ไม่มีโพสต์และจะถูกบล็อกทันที"
 }
+
+
+

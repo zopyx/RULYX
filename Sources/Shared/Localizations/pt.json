@@ -1143,6 +1143,15 @@
   "rel.block_confirm": "Bloquear this account?",
   "rel.block_message": "Blocking prevents interaction and is treated as a destructive moderação action.",
   "rel.block_swipe.hint": "Bloqueia esta conta – ação de deslizar",
+  "rel.unfollow": "Deixar de seguir",
+  "rel.unfollow.hint": "Deixa de seguir esta conta — ação de deslizar",
+  "rel.force_unfollow": "Forçar deixar de seguir",
+  "rel.force_unfollow.hint": "Bloqueia e desbloqueia imediatamente esta conta para removê-la como seguidora",
+  "rel.force_unfollow.progress": "Removendo seguidor…",
+  "rel.force_unfollow.done": "Seguidor removido",
+  "rel.unblock": "Desbloquear",
+  "rel.unblock.hint": "Desbloqueia esta conta",
+  "rel.unblock.no_uri": "Não foi possível encontrar o registro de bloqueio para esta conta.",
   "rel.close_picker.hint": "Fecha o seletor de lista sem adicionar",
   "rel.export_message": "[pt] Bluesky-{mode}-Liste",
   "rel.export_subject": "{mode} Exportar",
@@ -1396,3 +1405,6 @@
   "rel.block_no_posts.confirm": "Bloquear {count} contas sem publicações?",
   "rel.block_no_posts.confirm.message": "Estas contas não têm publicações e serão bloqueadas imediatamente."
 }
+
+
+
