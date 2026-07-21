@@ -91,29 +91,20 @@ struct FeedTimelineView: View {
             }
         }
         .sheet(item: $composeContext) { context in
-            if context.isReply {
-                ReplyComposerView(
-                    account: context.account,
-                    appPassword: context.appPassword,
-                    blueskyClient: container.blueskyClient,
-                    parentURI: context.parentURI,
-                    parentCID: context.parentCID,
-                    rootURI: context.rootURI,
-                    rootCID: context.rootCID,
-                    onComplete: { refreshAfterAction() }
-                )
-                .presentationDetents([.medium, .large])
-            } else {
-                ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: container.blueskyClient,
-                    account: context.account,
-                    appPassword: context.appPassword,
-                    onComplete: { refreshAfterAction() },
-                    quote: (context.uri, context.cid)
-                ))
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-            }
+            ComposePostView(viewModel: ComposePostViewModel(
+                blueskyClient: container.blueskyClient,
+                account: context.account,
+                appPassword: context.appPassword,
+                onComplete: { refreshAfterAction() },
+                replyTo: context.isReply
+                    ? (context.parentURI, context.parentCID, context.rootURI, context.rootCID)
+                    : nil,
+                quote: context.isReply
+                    ? nil
+                    : (context.uri, context.cid)
+            ))
+            .environmentObject(accountStore)
+            .environmentObject(container.blueskyClient)
         }
         .sheet(item: $editPostEntry) { entry in
             if let account = accountStore.activeAccount,
