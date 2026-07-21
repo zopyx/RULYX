@@ -18,6 +18,7 @@ struct FeedTimelineView: View {
     @State private var showLikesForURI: String?
     @State private var initialLoadTask: Task<Void, Never>?
     @State private var loadMoreTask: Task<Void, Never>?
+    @Environment(\.openURL) private var openURL
     @State private var composeContext: ComposeContext?
     @State private var showFeedPicker = false
     @State private var showNewPostComposer = false
@@ -292,6 +293,7 @@ struct FeedTimelineView: View {
                 }
             },
             onOpenProfile: { handle in openProfile(handle) },
+            onOpenURL: { url in openURL(url) },
             onReply: { handleReply(entry) },
             onLike: { handleLike(entry) },
             onShowLikes: { showLikesForURI = entry.post.uri },
@@ -351,7 +353,6 @@ struct FeedTimelineView: View {
         )
     }
 
-    @ViewBuilder
     // MARK: - State views
 
     private var skeletonContent: some View {

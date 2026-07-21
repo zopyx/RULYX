@@ -33,51 +33,53 @@ struct PostRowView: View {
         }
     }
 
-    // MARK: - Standard Layout
+    // MARK: - Standard Layout (Twitter/X-style)
 
+    /// Twitter/X-style layout: avatar on the left, content column on the right.
+    /// The space below the avatar stays empty.
     private var standardContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            PostAuthorHeader(
-                author: author,
-                createdAt: post.safeRecord.createdAt,
-                onOpenProfile: callbacks.onOpenProfile,
-                avatarSize: avatarSize
-            )
+        HStack(alignment: .top, spacing: 8) {
+            // Left column: avatar only
+            avatarButton
 
-            if style != .minimal, style != .threadReply, let parent = entry.reply?.parent {
-                PostReplyContextView(parent: parent)
-            }
+            // Right column: display name, handle, time, and post content
+            VStack(alignment: .leading, spacing: 4) {
+                // Row 1: display name, handle, relative time
+                authorNameRow
 
-            if let text = post.safeRecord.text, !text.isEmpty {
-                PostTextContent(
-                    text: text,
-                    onTapThread: callbacks.onTapThread,
-                    onOpenProfile: callbacks.onOpenProfile,
-                    onOpenURL: callbacks.onOpenURL,
-                    font: style == .threadReply ? .subheadline : .body,
-                    lineLimit: style == .threadReply ? 10 : nil
-                )
-                .padding(.leading, avatarSize + 8)
-            }
+                if style != .minimal, style != .threadReply, let parent = entry.reply?.parent {
+                    PostReplyContextView(parent: parent)
+                }
 
-            if style != .minimal, let embed = post.embed {
-                PostEmbedView(
-                    embed: embed,
-                    onTapImage: callbacks.onTapImage,
-                    onPlayVideo: callbacks.onPlayVideo,
-                    contentLeadingPadding: avatarSize + 8
-                )
-            }
+                if let text = post.safeRecord.text, !text.isEmpty {
+                    PostTextContent(
+                        text: text,
+                        onTapThread: callbacks.onTapThread,
+                        onOpenProfile: callbacks.onOpenProfile,
+                        onOpenURL: callbacks.onOpenURL,
+                        font: style == .threadReply ? .subheadline : .body,
+                        lineLimit: style == .threadReply ? 10 : nil
+                    )
+                }
 
-            if style == .full || style == .compact || style == .threadReply {
-                PostActionBar(
-                    replyCount: post.replyCount,
-                    repostCount: post.repostCount,
-                    likeCount: post.likeCount,
-                    isLiked: callbacks.isLiked,
-                    isReposted: callbacks.isReposted,
-                    callbacks: callbacks
-                )
+                if style != .minimal, let embed = post.embed {
+                    PostEmbedView(
+                        embed: embed,
+                        onTapImage: callbacks.onTapImage,
+                        onPlayVideo: callbacks.onPlayVideo
+                    )
+                }
+
+                if style == .full || style == .compact || style == .threadReply {
+                    PostActionBar(
+                        replyCount: post.replyCount,
+                        repostCount: post.repostCount,
+                        likeCount: post.likeCount,
+                        isLiked: callbacks.isLiked,
+                        isReposted: callbacks.isReposted,
+                        callbacks: callbacks
+                    )
+                }
             }
         }
     }
@@ -118,6 +120,80 @@ struct PostRowView: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.primary.opacity(0.05), lineWidth: 1)
         }
+    }
+
+    // MARK: - Avatar Button
+
+    /// The author avatar as a standalone tappable button.
+    private var avatarButton: some View {
+        Button {
+            callbacks.onOpenProfile?(author.handle ?? author.did ?? "")
+        } label: {
+            if let url = author.avatar.flatMap(URL.init) {
+                ThumbnailImageView(url: url, maxPixelSize: 72) {
+                    Circle().fill(Color.skyPrimary.opacity(0.16))
+                }
+                .scaledToFill()
+                .frame(width: avatarSize, height: avatarSize)
+                .clipShape(Circle())
+            } else {
+                Circle()
+                    .fill(Color.skyPrimary.opacity(0.16))
+                    .frame(width: avatarSize, height: avatarSize)
+                    .overlay {
+                        Text(displayName.prefix(1).uppercased())
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color.skyPrimary)
+                    }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// The display name falling back to the handle if unavailable.
+    private var displayName: String {
+        author.displayName ?? author.handle ?? ""
+    }
+
+    /// Whether to show the display name separately from the handle.
+    private var shouldShowDisplayName: Bool {
+        guard let rawDisplayName = author.displayName,
+              let rawHandle = author.handle
+        else { return false }
+        return rawDisplayName != rawHandle
+    }
+
+    // MARK: - Author Name Row
+
+    /// First row: display name, handle, and relative timestamp — tappable to open profile.
+    private var authorNameRow: some View {
+        Button {
+            callbacks.onOpenProfile?(author.handle ?? author.did ?? "")
+        } label: {
+            HStack(spacing: 4) {
+                if shouldShowDisplayName {
+                    Text(displayName)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        .foregroundStyle(.primary)
+                }
+                if let handle = author.handle {
+                    Text("@\(handle)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                if let created = post.safeRecord.createdAt, let date = parseDate(created) {
+                    Text(relativeTimeString(from: date))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 
