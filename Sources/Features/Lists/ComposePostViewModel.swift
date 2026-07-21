@@ -40,6 +40,7 @@ final class ComposePostViewModel {
     var uploadSpeed: String?
     var errorMessage: String?
     var referencedPost: ThreadPostNode?
+    var loadError: String?
     var showGIFPicker = false
     var isDownloadingGIF = false
     var isPreloadingEdit = false
@@ -127,6 +128,7 @@ final class ComposePostViewModel {
             let response = try await postService.fetchPostThread(uri: uri, depth: nil, account: account, appPassword: appPassword)
             referencedPost = response.thread.post
         } catch {
+            loadError = AppError.userMessage(from: error)
             AppLogger.moderation.error("Failed to load referenced post: \(error.localizedDescription, privacy: .public)")
         }
     }

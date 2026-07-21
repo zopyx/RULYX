@@ -23,6 +23,14 @@ struct ComposePostView: View {
                     Section {
                         if let referencedPost = viewModel.referencedPost {
                             postPreviewRow(referencedPost)
+                        } else if let loadError = viewModel.loadError {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .foregroundStyle(.orange)
+                                Text(loadError)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         } else {
                             HStack {
                                 ProgressView()
