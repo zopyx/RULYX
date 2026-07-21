@@ -154,14 +154,14 @@ final class NotificationViewModel {
     /// Falls back to individual fetches for any URIs that fail in the batch request.
     private func fetchRelevantPosts(
         for notifications: [NotificationItem],
-        repostMappings _: [String: String],
+        repostMappings: [String: String],
         account _: AppAccount,
         appPassword _: String,
         using client: LiveBlueskyClient
     ) async -> [String: RichPost] {
         var postURIs: Set<String> = []
         for notification in notifications {
-            if let uri = effectivePostURI(for: notification, repostMappings: [:]) {
+            if let uri = effectivePostURI(for: notification, repostMappings: repostMappings) {
                 postURIs.insert(uri)
             }
         }
