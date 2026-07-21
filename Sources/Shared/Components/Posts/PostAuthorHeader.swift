@@ -26,10 +26,19 @@ struct PostAuthorHeader: View {
         author.handle
     }
 
+    /// Whether to show the display name separately from the handle.
+    /// Hidden when the display name equals the handle (or displayName is nil).
+    private var shouldShowDisplayName: Bool {
+        guard let rawDisplayName = author.displayName,
+              let rawHandle = author.handle
+        else { return false }
+        return rawDisplayName != rawHandle
+    }
+
     // MARK: - Body
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(alignment: .top, spacing: 8) {
             Button {
                 onOpenProfile?(author.handle ?? author.did ?? "")
             } label: {
@@ -56,11 +65,13 @@ struct PostAuthorHeader: View {
             Button {
                 onOpenProfile?(author.handle ?? author.did ?? "")
             } label: {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(displayName)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(1)
-                        .foregroundStyle(.primary)
+                HStack(spacing: 4) {
+                    if shouldShowDisplayName {
+                        Text(displayName)
+                            .font(.subheadline.weight(.semibold))
+                            .lineLimit(1)
+                            .foregroundStyle(.primary)
+                    }
                     if let handle {
                         Text("@\(handle)")
                             .font(.caption)
@@ -69,6 +80,7 @@ struct PostAuthorHeader: View {
                 }
             }
             .buttonStyle(.plain)
+            .frame(maxHeight: avatarSize, alignment: .top)
 
             Spacer()
 
@@ -76,6 +88,7 @@ struct PostAuthorHeader: View {
                 Text(relativeTimeString(from: date))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
+                    .frame(maxHeight: avatarSize, alignment: .top)
             }
         }
     }

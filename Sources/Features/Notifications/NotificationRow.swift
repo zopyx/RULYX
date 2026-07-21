@@ -24,7 +24,7 @@ struct NotificationRow: View {
                     .frame(width: 32, height: 32)
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 4) {
-                        Text(notification.author.displayName ?? notification.author.handle)
+                        Text(notification.author.displayName.flatMap { $0.isEmpty ? nil : $0 } ?? notification.author.handle)
                             .font(.subheadline.weight(.semibold))
                             .lineLimit(1)
                         Text(reasonText)
@@ -84,7 +84,7 @@ struct NotificationRow: View {
 
     /// Single-character initial from display name or handle.
     private var initials: String {
-        let name = notification.author.displayName ?? notification.author.handle
+        let name = notification.author.displayName.flatMap { $0.isEmpty ? nil : $0 } ?? notification.author.handle
         return String(name.prefix(1).uppercased())
     }
 

@@ -57,6 +57,7 @@ struct PostRowView: View {
                     font: style == .threadReply ? .subheadline : .body,
                     lineLimit: style == .threadReply ? 10 : nil
                 )
+                .padding(.leading, avatarSize + 8)
             }
 
             if style != .minimal, let embed = post.embed {
@@ -65,6 +66,7 @@ struct PostRowView: View {
                     onTapImage: callbacks.onTapImage,
                     onPlayVideo: callbacks.onPlayVideo
                 )
+                .padding(.leading, avatarSize + 8)
             }
 
             if style == .full || style == .compact || style == .threadReply {
