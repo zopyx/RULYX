@@ -48,29 +48,24 @@ struct PostRowView: View {
                 PostReplyContextView(parent: parent)
             }
 
-            HStack(spacing: 0) {
-                Color.clear
-                    .frame(width: avatarSize + 8)
-                VStack(alignment: .leading, spacing: 8) {
-                    if let text = post.safeRecord.text, !text.isEmpty {
-                        PostTextContent(
-                            text: text,
-                            onTapThread: callbacks.onTapThread,
-                            onOpenProfile: callbacks.onOpenProfile,
-                            onOpenURL: callbacks.onOpenURL,
-                            font: style == .threadReply ? .subheadline : .body,
-                            lineLimit: style == .threadReply ? 10 : nil
-                        )
-                    }
+            if let text = post.safeRecord.text, !text.isEmpty {
+                PostTextContent(
+                    text: text,
+                    onTapThread: callbacks.onTapThread,
+                    onOpenProfile: callbacks.onOpenProfile,
+                    onOpenURL: callbacks.onOpenURL,
+                    font: style == .threadReply ? .subheadline : .body,
+                    lineLimit: style == .threadReply ? 10 : nil
+                )
+                .padding(.leading, avatarSize + 8)
+            }
 
-                    if style != .minimal, let embed = post.embed {
-                        PostEmbedView(
-                            embed: embed,
-                            onTapImage: callbacks.onTapImage,
-                            onPlayVideo: callbacks.onPlayVideo
-                        )
-                    }
-                }
+            if style != .minimal, let embed = post.embed {
+                PostEmbedView(
+                    embed: embed,
+                    onTapImage: callbacks.onTapImage,
+                    onPlayVideo: callbacks.onPlayVideo
+                )
             }
 
             if style == .full || style == .compact || style == .threadReply {

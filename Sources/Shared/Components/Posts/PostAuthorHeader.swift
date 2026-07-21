@@ -65,22 +65,23 @@ struct PostAuthorHeader: View {
             Button {
                 onOpenProfile?(author.handle ?? author.did ?? "")
             } label: {
-                HStack(spacing: 4) {
-                    if shouldShowDisplayName {
-                        Text(displayName)
-                            .font(.subheadline.weight(.semibold))
-                            .lineLimit(1)
-                            .foregroundStyle(.primary)
-                    }
-                    if let handle {
-                        Text("@\(handle)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 4) {
+                        if shouldShowDisplayName {
+                            Text(displayName)
+                                .font(.subheadline.weight(.semibold))
+                                .lineLimit(1)
+                                .foregroundStyle(.primary)
+                        }
+                        if let handle {
+                            Text("@\(handle)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
             .buttonStyle(.plain)
-            .frame(maxHeight: avatarSize, alignment: .top)
 
             Spacer()
 
@@ -88,7 +89,6 @@ struct PostAuthorHeader: View {
                 Text(relativeTimeString(from: date))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                    .frame(maxHeight: avatarSize, alignment: .top)
             }
         }
     }
