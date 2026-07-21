@@ -179,8 +179,14 @@ struct ProfileInspectorView: View {
                                 .foregroundStyle(.secondary)
 
                             if let description = inspection.profile.description, !description.isEmpty {
-                                Text(description)
+                                Text(postAttributedString(from: description))
                                     .font(.body)
+                                    .environment(\.openURL, OpenURLAction { url in
+                                        if url.scheme == "mention" {
+                                            return .handled
+                                        }
+                                        return .systemAction
+                                    })
                             }
                         }
                         .padding(.vertical, 4)

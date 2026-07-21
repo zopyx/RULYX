@@ -130,10 +130,16 @@ struct iPadProfileInspector: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         if let description = profile.description, !description.isEmpty {
-                            Text(description)
+                            Text(postAttributedString(from: description))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(3)
+                                .environment(\.openURL, OpenURLAction { url in
+                                    if url.scheme == "mention" {
+                                        return .handled
+                                    }
+                                    return .systemAction
+                                })
                         }
                     }
 

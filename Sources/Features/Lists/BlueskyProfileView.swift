@@ -517,8 +517,14 @@ struct BlueskyProfileView: View {
                                 }
 
                                 if let description = profile.description, !description.isEmpty {
-                                    Text(description)
+                                    Text(postAttributedString(from: description))
                                         .appFont(.body)
+                                        .environment(\.openURL, OpenURLAction { url in
+                                            if url.scheme == "mention" {
+                                                return .handled
+                                            }
+                                            return .systemAction
+                                        })
                                 }
 
                                 if !isOwnProfile, let state = profile.viewerState {
@@ -558,8 +564,14 @@ struct BlueskyProfileView: View {
                                 }
 
                                 if let description = profile.description, !description.isEmpty {
-                                    Text(description)
+                                    Text(postAttributedString(from: description))
                                         .appFont(.body)
+                                        .environment(\.openURL, OpenURLAction { url in
+                                            if url.scheme == "mention" {
+                                                return .handled
+                                            }
+                                            return .systemAction
+                                        })
                                 }
 
                                 if !isOwnProfile, let state = profile.viewerState {
