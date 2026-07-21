@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Markeert alle meldingen als gelezen",
   "notifications.reason.follow": "volgde je",
   "notifications.reason.like": "vond je bericht leuk",
+  "notifications.reason.like_repost": "vond je repost leuk",
   "notifications.reason.mention": "noemde jou",
   "notifications.reason.quote": "citeerde jouw bericht",
   "notifications.reason.reply": "heb op je bericht gereageerd",

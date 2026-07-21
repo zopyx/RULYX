@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Đánh dấu tất cả thông báo là đã đọc",
   "notifications.reason.follow": "đã theo dõi bạn",
   "notifications.reason.like": "thích bài viết của bạn",
+  "notifications.reason.like_repost": "thích bài đăng lại của bạn",
   "notifications.reason.mention": "đã đề cập đến bạn",
   "notifications.reason.quote": "trích dẫn bài viết của bạn",
   "notifications.reason.reply": "đã trả lời bài viết của bạn",

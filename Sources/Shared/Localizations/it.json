@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Contrassegna tutte le notifiche come lette",
   "notifications.reason.follow": "ti ho seguito",
   "notifications.reason.like": "mi è piaciuto il tuo post",
+  "notifications.reason.like_repost": "ha apprezzato il tuo repost",
   "notifications.reason.mention": "ti ho menzionato",
   "notifications.reason.quote": "citato il tuo post",
   "notifications.reason.reply": "risposto al tuo post",

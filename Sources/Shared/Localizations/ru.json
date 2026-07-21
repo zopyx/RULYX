@@ -811,6 +811,7 @@
   "notifications.mark_read.hint": "Отмечает все уведомления как прочитанные",
   "notifications.reason.follow": "следил за тобой",
   "notifications.reason.like": "понравился твой пост",
+  "notifications.reason.like_repost": "понравился ваш репост",
   "notifications.reason.mention": "упомянул тебя",
   "notifications.reason.quote": "процитировал твой пост",
   "notifications.reason.reply": "ответил на твой пост",

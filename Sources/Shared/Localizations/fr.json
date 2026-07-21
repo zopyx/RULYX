@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Marque toutes les notifications comme lues",
   "notifications.reason.follow": "je t'ai suivi",
   "notifications.reason.like": "j'ai aimé ton message",
+  "notifications.reason.like_repost": "a aimé votre repost",
   "notifications.reason.mention": "je t'ai mentionné",
   "notifications.reason.quote": "j'ai cité ton message",
   "notifications.reason.reply": "j'ai répondu à ton message",

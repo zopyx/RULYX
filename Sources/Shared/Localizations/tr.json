@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Tüm bildirimleri okundu olarak işaretler",
   "notifications.reason.follow": "seni takip ettim",
   "notifications.reason.like": "Gönderini beğendim",
+  "notifications.reason.like_repost": "Repostunu beğendim",
   "notifications.reason.mention": "senden bahsettim",
   "notifications.reason.quote": "yazınızı alıntıladım",
   "notifications.reason.reply": "gönderinize yanıt verdi",

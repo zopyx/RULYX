@@ -815,6 +815,7 @@
   "notifications.mark_read.hint": "وضع علامة على كافة الإخطارات كمقروءة",
   "notifications.reason.follow": "تبعتك",
   "notifications.reason.like": "أحب رسالتك",
+  "notifications.reason.like_repost": "أعجب بإعادة نشرك",
   "notifications.reason.mention": "ذكرتك",
   "notifications.reason.quote": "نقلا عن رسالتك",
   "notifications.reason.reply": "رد على رسالتك",

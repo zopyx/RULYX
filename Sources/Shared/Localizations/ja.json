@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "すべての通知を既読としてマークします",
   "notifications.reason.follow": "あなたをフォローしました",
   "notifications.reason.like": "あなたの投稿にいいね！",
+  "notifications.reason.like_repost": "あなたのリポストにいいねしました",
   "notifications.reason.mention": "あなたについて言及しました",
   "notifications.reason.quote": "あなたの投稿を引用しました",
   "notifications.reason.reply": "あなたの投稿に返信しました",

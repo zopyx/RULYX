@@ -811,6 +811,7 @@
   "notifications.mark_read.hint": "Oznacza wszystkie powiadomienia jako przeczytane",
   "notifications.reason.follow": "podążał za tobą",
   "notifications.reason.like": "polubił Twój post",
+  "notifications.reason.like_repost": "polubił Twój repost",
   "notifications.reason.mention": "wspomniałem o tobie",
   "notifications.reason.quote": "zacytował Twój post",
   "notifications.reason.reply": "odpowiedział na Twój post",

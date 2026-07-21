@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "ทำเครื่องหมายการแจ้งเตือนทั้งหมดว่าอ่านแล้ว",
   "notifications.reason.follow": "ติดตามคุณ",
   "notifications.reason.like": "ชอบโพสต์ของคุณ",
+  "notifications.reason.like_repost": "ชอบการโพสต์ซ้ำของคุณ",
   "notifications.reason.mention": "กล่าวถึงคุณ",
   "notifications.reason.quote": "อ้างถึงโพสต์ของคุณ",
   "notifications.reason.reply": "ตอบกลับโพสต์ของคุณ",

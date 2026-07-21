@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "모든 알림을 읽음으로 표시합니다.",
   "notifications.reason.follow": "당신을 따랐다",
   "notifications.reason.like": "당신의 게시물을 좋아했습니다",
+  "notifications.reason.like_repost": "리포스트를 좋아합니다",
   "notifications.reason.mention": "당신을 언급했습니다",
   "notifications.reason.quote": "귀하의 게시물을 인용했습니다",
   "notifications.reason.reply": "네 게시물에 답글을 달았어",

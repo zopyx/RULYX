@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "将所有通知标记为已读",
   "notifications.reason.follow": "跟着你",
   "notifications.reason.like": "喜欢你的帖子",
+  "notifications.reason.like_repost": "喜欢了你的转发",
   "notifications.reason.mention": "提到你",
   "notifications.reason.quote": "引用你的帖子",
   "notifications.reason.reply": "回复了你的帖子",

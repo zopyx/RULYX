@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Marca todas as notificações como lidas",
   "notifications.reason.follow": "segui você",
   "notifications.reason.like": "gostei da sua postagem",
+  "notifications.reason.like_repost": "gostou do seu repost",
   "notifications.reason.mention": "mencionou você",
   "notifications.reason.quote": "citou sua postagem",
   "notifications.reason.reply": "respondi à sua postagem",

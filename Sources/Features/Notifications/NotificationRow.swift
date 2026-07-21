@@ -93,19 +93,23 @@ struct NotificationRow: View {
     /// Localized reason text based on the notification reason string.
     private var reasonText: String {
         switch notification.reason {
-        case "like": loc("notifications.reason.like")
-        case "repost": loc("notifications.reason.repost")
+        case "like":
+            if let subject = notification.reasonSubject, subject.contains("/app.bsky.feed.repost/") {
+                return loc("notifications.reason.like_repost")
+            }
+            return loc("notifications.reason.like")
+        case "repost": return loc("notifications.reason.repost")
         case "follow":
             if notification.author.viewer?.following != nil {
-                loc("notifications.reason.follow_back")
+                return loc("notifications.reason.follow_back")
             } else {
-                loc("notifications.reason.follow")
+                return loc("notifications.reason.follow")
             }
-        case "reply": loc("notifications.reason.reply")
-        case "quote": loc("notifications.reason.quote")
-        case "mention": loc("notifications.reason.mention")
-        case "starterpack_joined": loc("notifications.reason.starterpack_joined")
-        default: ""
+        case "reply": return loc("notifications.reason.reply")
+        case "quote": return loc("notifications.reason.quote")
+        case "mention": return loc("notifications.reason.mention")
+        case "starterpack_joined": return loc("notifications.reason.starterpack_joined")
+        default: return ""
         }
     }
 

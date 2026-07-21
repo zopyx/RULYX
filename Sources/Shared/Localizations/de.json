@@ -807,6 +807,7 @@
   "notifications.mark_read.hint": "Markiert alle Benachrichtigungen als gelesen",
   "notifications.reason.follow": "bin dir gefolgt",
   "notifications.reason.like": "Dein Beitrag hat mir gefallen",
+  "notifications.reason.like_repost": "Dein Repost hat gefallen",
   "notifications.reason.mention": "habe dich erwähnt",
   "notifications.reason.quote": "habe Deinen Beitrag zitiert",
   "notifications.reason.reply": "habe auf deinen Beitrag geantwortet",
