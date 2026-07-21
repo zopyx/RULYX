@@ -9,6 +9,7 @@ struct PostRowView: View {
     let style: PostDisplayStyle
     let callbacks: PostRowCallbacks
     var avatarSize: CGFloat
+    @Environment(\.colorScheme) private var colorScheme
 
     init(entry: RichFeedEntry, style: PostDisplayStyle = .full, callbacks: PostRowCallbacks = PostRowCallbacks(), avatarSize: CGFloat? = nil) {
         self.entry = entry
@@ -180,7 +181,7 @@ struct PostRowView: View {
                 if let handle = author.handle {
                     Text("@\(handle)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(colorScheme == .dark ? Color(white: 0.73) : .secondary)
                         .lineLimit(1)
                 }
 

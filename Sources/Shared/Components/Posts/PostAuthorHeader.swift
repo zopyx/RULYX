@@ -13,6 +13,7 @@ struct PostAuthorHeader: View {
     var onOpenProfile: ((String) -> Void)?
     /// Diameter of the avatar circle.
     var avatarSize: CGFloat = 36
+    @Environment(\.colorScheme) private var colorScheme
 
     // MARK: - Private Helpers
 
@@ -76,7 +77,7 @@ struct PostAuthorHeader: View {
                         if let handle {
                             Text("@\(handle)")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(colorScheme == .dark ? Color(white: 0.73) : .secondary)
                         }
                     }
                 }
