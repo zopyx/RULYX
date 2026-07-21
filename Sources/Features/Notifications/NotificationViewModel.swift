@@ -180,15 +180,10 @@ final class NotificationViewModel {
     /// Extracts the relevant post URI from a notification based on its reason type.
     /// - Returns: The URI of the post to show as context, or `nil` for follows and repost-likes.
     private func postURI(for notification: NotificationItem) -> String? {
-        let isRepostSubject: Bool = {
-            guard let subject = notification.reasonSubject else { return false }
-            return subject.contains("app.bsky.feed.repost")
-        }()
-
         switch notification.reason {
         case "like":
             // "Like on repost" — reasonSubject is a repost record, not a post; skip post card
-            if isRepostSubject {
+            if notification.isRepostSubject {
                 return nil
             }
             return notification.reasonSubject
