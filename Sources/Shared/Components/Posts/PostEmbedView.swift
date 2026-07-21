@@ -6,6 +6,8 @@ struct PostEmbedView: View {
     let embed: RichEmbed
     var onTapImage: ((Int) -> Void)?
     var onPlayVideo: (() -> Void)?
+    /// Leading padding applied to all embed content so it aligns with the post text.
+    var contentLeadingPadding: CGFloat = 0
     @State private var altTextToShow: String?
     @Environment(\.openURL) private var openURL
 
@@ -19,10 +21,12 @@ struct PostEmbedView: View {
                 videoEmbedCard(video)
             }
             .buttonStyle(.plain)
+            .padding(.leading, contentLeadingPadding)
         }
 
         if let images = embed.images, !images.isEmpty {
             imageGrid(images: images)
+                .padding(.leading, contentLeadingPadding)
         }
 
         if let external = embed.external, let uri = external.uri, let url = URL(string: uri) {
@@ -33,6 +37,7 @@ struct PostEmbedView: View {
                     tenorEmbedCard(previewURL: gifURL, external: external)
                 }
                 .buttonStyle(.plain)
+                .padding(.leading, contentLeadingPadding)
             } else {
                 Button {
                     openURL(url)
@@ -40,6 +45,7 @@ struct PostEmbedView: View {
                     externalEmbedCard(external)
                 }
                 .buttonStyle(.plain)
+                .padding(.leading, contentLeadingPadding)
             }
         }
     }

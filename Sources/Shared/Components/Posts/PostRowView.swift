@@ -64,7 +64,8 @@ struct PostRowView: View {
                 PostEmbedView(
                     embed: embed,
                     onTapImage: callbacks.onTapImage,
-                    onPlayVideo: callbacks.onPlayVideo
+                    onPlayVideo: callbacks.onPlayVideo,
+                    contentLeadingPadding: avatarSize + 8
                 )
             }
 
