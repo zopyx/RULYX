@@ -112,15 +112,26 @@ final class NotificationViewModel {
     // MARK: - Private Helpers
 
     /// Enriches `NotificationItem` array with related post data fetched in batch.
+    /// Resolves repost records to original post URIs before fetching.
     private func buildEntries(
         for notifications: [NotificationItem],
         account: AppAccount,
         appPassword: String,
         using client: LiveBlueskyClient
     ) async -> [NotificationEntry] {
-        let posts = await fetchRelevantPosts(for: notifications, account: account, appPassword: appPassword, using: client)
+        // Resolve repost records to original post URIs
+        var repostToOriginal: [String: String] = [:] // repostURI → originalPostURI
+        for notification in notifications where notification.isRepostSubject {
+            let repostURI = notification.record?.subjectUri ?? notification.reasonSubject
+            guard let repostURI else { continue }
+            if let originalURI = try? await client.resolveRepostToPostURI(repostURI, account: account, appPassword: appPassword) {
+                repostToOriginal[repostURI] = originalURI
+            }
+        }
+
+        let posts = await fetchRelevantPosts(for: notifications, repostMappings: repostToOriginal, account: account, appPassword: appPassword, using: client)
         return notifications.map { notification in
-            let uri = postURI(for: notification)
+            let uri = effectivePostURI(for: notification, repostMappings: repostToOriginal)
             return NotificationEntry(
                 notification: notification,
                 relatedPostURI: uri,
@@ -129,21 +140,37 @@ final class NotificationViewModel {
         }
     }
 
+    /// Returns the effective post URI for display, resolving repost URIs via the mapping.
+    private func effectivePostURI(for notification: NotificationItem, repostMappings: [String: String]) -> String? {
+        let rawURI = postURI(for: notification)
+        // If this is a repost URI, resolve to original post
+        if let rawURI, notification.isRepostSubject {
+            return repostMappings[rawURI] ?? rawURI
+        }
+        return rawURI
+    }
+
     /// Batch-fetches all posts referenced by the notification list.
     /// Falls back to individual fetches for any URIs that fail in the batch request.
     private func fetchRelevantPosts(
         for notifications: [NotificationItem],
+        repostMappings _: [String: String],
         account _: AppAccount,
         appPassword _: String,
         using client: LiveBlueskyClient
     ) async -> [String: RichPost] {
-        let postURIs = Array(Set(notifications.compactMap { postURI(for: $0) }))
+        var postURIs: Set<String> = []
+        for notification in notifications {
+            if let uri = effectivePostURI(for: notification, repostMappings: [:]) {
+                postURIs.insert(uri)
+            }
+        }
         guard !postURIs.isEmpty else { return [:] }
 
         var resolvedPosts: [String: RichPost] = [:]
 
         do {
-            let posts = try await client.fetchPosts(uris: postURIs)
+            let posts = try await client.fetchPosts(uris: Array(postURIs))
             for post in posts {
                 resolvedPosts[post.uri] = post
             }
@@ -178,13 +205,13 @@ final class NotificationViewModel {
     }
 
     /// Extracts the relevant post URI from a notification based on its reason type.
-    /// - Returns: The URI of the post to show as context, or `nil` for follows and repost-likes.
+    /// For repost-likes, returns the repost record URI (resolved later in buildEntries).
     private func postURI(for notification: NotificationItem) -> String? {
         switch notification.reason {
         case "like":
-            // "Like on repost" — reasonSubject is a repost record, not a post; skip post card
             if notification.isRepostSubject {
-                return nil
+                // Return the repost URI — resolved to original post in buildEntries
+                return notification.record?.subjectUri ?? notification.reasonSubject
             }
             return notification.reasonSubject
         case "repost":

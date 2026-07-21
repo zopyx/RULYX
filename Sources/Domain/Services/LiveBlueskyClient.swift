@@ -2418,6 +2418,37 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             )
         }
     }
+
+    /// Resolves a repost AT URI to the original post URI.
+    /// Parses the URI to extract repo/collection/rkey, fetches the repost record,
+    /// and returns the `subject.uri` pointing to the original post.
+    func resolveRepostToPostURI(_ repostURI: String, account: AppAccount, appPassword: String?) async throws -> String? {
+        guard let url = URL(string: repostURI),
+              url.scheme == "at",
+              let repo = url.host else { return nil }
+        // Path is like /app.bsky.feed.repost/rkey
+        let components = url.pathComponents.dropFirst() // drop leading "/"
+        guard components.count >= 2 else { return nil }
+        let collection = components[0]
+        let rkey = components[1]
+
+        let response: RepostRecordResponse = try await sessionService.performAuthenticatedRequest(
+            account: account, appPassword: appPassword
+        ) { authSession in
+            try await requestExecutor.send(
+                path: "com.atproto.repo.getRecord",
+                method: "GET",
+                queryItems: [
+                    URLQueryItem(name: "repo", value: repo),
+                    URLQueryItem(name: "collection", value: collection),
+                    URLQueryItem(name: "rkey", value: rkey),
+                ],
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+        return response.value.subject.uri
+    }
 }
 
 // MARK: - Supporting Types
@@ -2426,6 +2457,19 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 struct PostImageAttachment {
     let blob: UploadedBlob
     let alt: String
+}
+
+/// Response from `com.atproto.repo.getRecord` for resolving a repost record.
+private struct RepostRecordResponse: Decodable {
+    let value: RepostRecordValue
+
+    struct RepostRecordValue: Decodable {
+        let subject: RepostSubject
+    }
+
+    struct RepostSubject: Decodable {
+        let uri: String
+    }
 }
 
 /// A video attachment for post creation (pre-uploaded blob + alt text + optional aspect ratio).
