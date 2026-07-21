@@ -92,12 +92,17 @@ struct NotificationRow: View {
 
     /// Localized reason text based on the notification reason string.
     private var reasonText: String {
+        // Check if the liked/reposted subject is a repost record
+        let isRepostSubject: Bool = {
+            guard let subject = notification.reasonSubject else { return false }
+            return subject.contains("app.bsky.feed.repost")
+        }()
+
         switch notification.reason {
         case "like":
-            if let subject = notification.reasonSubject, subject.contains("/app.bsky.feed.repost/") {
-                return loc("notifications.reason.like_repost")
-            }
-            return loc("notifications.reason.like")
+            return isRepostSubject
+                ? loc("notifications.reason.like_repost")
+                : loc("notifications.reason.like")
         case "repost": return loc("notifications.reason.repost")
         case "follow":
             if notification.author.viewer?.following != nil {
