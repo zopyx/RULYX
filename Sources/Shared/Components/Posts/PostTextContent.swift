@@ -84,8 +84,6 @@ struct PostTextContent: View {
 /// Converts @mentions and URLs in post text to tappable attributed links.
 func postAttributedString(from text: String) -> AttributedString {
     var attributed = AttributedString(text)
-    guard text.contains("@") || text.contains("://") || text.contains("www.") else { return attributed }
-
     let nsRange = NSRange(text.startIndex..., in: text)
 
     let mentionRegex = MentionTextRegex.shared
