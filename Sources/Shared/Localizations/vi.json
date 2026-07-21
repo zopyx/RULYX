@@ -812,6 +812,7 @@
   "notifications.reason.quote": "trích dẫn bài viết của bạn",
   "notifications.reason.reply": "đã trả lời bài viết của bạn",
   "notifications.reason.repost": "đăng lại bài viết của bạn",
+  "notifications.reason.repost_repost": "đã đăng lại bài đăng lại của bạn",
   "notifications.reason.starterpack_joined": "đã tham gia gói khởi đầu của bạn",
   "notifications.title": "Thông báo",
   "offline.title": "Không có kết nối Internet",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "Chặn {count} tài khoản không có bài đăng?",
   "rel.block_no_posts.confirm.message": "Các tài khoản này không có bài đăng và sẽ bị chặn ngay lập tức."
 }
-
 
 

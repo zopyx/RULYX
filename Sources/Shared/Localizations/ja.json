@@ -812,6 +812,7 @@
   "notifications.reason.quote": "あなたの投稿を引用しました",
   "notifications.reason.reply": "あなたの投稿に返信しました",
   "notifications.reason.repost": "あなたの投稿を再投稿しました",
+  "notifications.reason.repost_repost": "あなたのリポストをリポストしました",
   "notifications.reason.starterpack_joined": "スターターパックに参加しました",
   "notifications.title": "通知",
   "offline.title": "インターネット接続なし",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "投稿のない{count}アカウントをブロックしますか？",
   "rel.block_no_posts.confirm.message": "これらのアカウントには投稿がなく、直ちにブロックされます。"
 }
-
 
 

@@ -812,6 +812,7 @@
   "notifications.reason.quote": "귀하의 게시물을 인용했습니다",
   "notifications.reason.reply": "네 게시물에 답글을 달았어",
   "notifications.reason.repost": "귀하의 게시물을 다시 게시했습니다",
+  "notifications.reason.repost_repost": "회원님의 리포스트를 다시 게시했습니다",
   "notifications.reason.starterpack_joined": "스타터 팩에 합류했습니다",
   "notifications.title": "알림",
   "offline.title": "인터넷에 연결되어 있지 않음",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "게시물이 없는 {count}개 계정을 차단할까요?",
   "rel.block_no_posts.confirm.message": "이 계정들은 게시물이 없으며 즉시 차단됩니다."
 }
-
 
 

@@ -812,6 +812,7 @@
   "notifications.reason.quote": "j'ai cité ton message",
   "notifications.reason.reply": "j'ai répondu à ton message",
   "notifications.reason.repost": "republié ton message",
+  "notifications.reason.repost_repost": "a republié votre repost",
   "notifications.reason.starterpack_joined": "rejoint votre pack de démarrage",
   "notifications.title": "Notifications",
   "offline.title": "Pas de connexion Internet",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "Bloquer {count} comptes sans publications ?",
   "rel.block_no_posts.confirm.message": "Ces comptes n'ont aucune publication et seront bloqués immédiatement."
 }
-
 
 

@@ -44,6 +44,10 @@ struct NotificationItem: Decodable, Identifiable {
 struct NotificationRecordValue: Decodable {
     let subjectUri: String?
 
+    init(subjectUri: String?) {
+        self.subjectUri = subjectUri
+    }
+
     enum CodingKeys: String, CodingKey {
         case subject
     }

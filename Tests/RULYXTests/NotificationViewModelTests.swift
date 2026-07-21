@@ -24,6 +24,7 @@ final class NotificationViewModelTests: XCTestCase {
                     ),
                     reason: "like",
                     reasonSubject: "at://did:plc:post/app.bsky.feed.post/1",
+                    record: nil,
                     isRead: false,
                     indexedAt: "2026-05-18T10:00:00Z"
                 ),
@@ -72,6 +73,7 @@ final class NotificationViewModelTests: XCTestCase {
                     ),
                     reason: "follow",
                     reasonSubject: nil,
+                    record: nil,
                     isRead: false,
                     indexedAt: "2026-05-18T10:00:00Z"
                 ),
@@ -107,6 +109,7 @@ final class NotificationViewModelTests: XCTestCase {
                     ),
                     reason: "like",
                     reasonSubject: "at://did:plc:post/app.bsky.feed.post/2",
+                    record: nil,
                     isRead: false,
                     indexedAt: "2026-05-18T10:00:00Z"
                 ),
@@ -132,6 +135,87 @@ final class NotificationViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.entries.first?.relatedPost?.safeRecord.text, "Recovered from single fetch")
         XCTAssertEqual(client.fetchPostsCallCount, 2)
     }
+
+    func testLoadResolvesPostsForViaRepostNotifications() async {
+        let viewModel = NotificationViewModel()
+        let client = MockNotificationClient()
+        let account = makeAccount()
+        let likePostURI = "at://did:plc:poster/app.bsky.feed.post/liked"
+        let repostPostURI = "at://did:plc:poster/app.bsky.feed.post/reposted"
+
+        client.notificationsResponse = ListNotificationsResponse(
+            cursor: nil,
+            notifications: [
+                makeViaRepostNotification(
+                    id: "like-via-repost",
+                    reason: "like-via-repost",
+                    reasonSubject: "at://did:plc:owner/app.bsky.feed.repost/original-like-repost",
+                    postURI: likePostURI
+                ),
+                makeViaRepostNotification(
+                    id: "repost-via-repost",
+                    reason: "repost-via-repost",
+                    reasonSubject: "at://did:plc:owner/app.bsky.feed.repost/original-repost",
+                    postURI: repostPostURI
+                ),
+            ]
+        )
+        client.posts = [
+            makePost(uri: likePostURI, text: "Post liked via repost"),
+            makePost(uri: repostPostURI, text: "Post reposted via repost"),
+        ]
+
+        await viewModel.load(account: account, appPassword: "pass", using: client)
+
+        XCTAssertEqual(viewModel.entries.map(\.relatedPost?.uri), [likePostURI, repostPostURI])
+        XCTAssertEqual(Set(client.fetchedPostURIs), Set([likePostURI, repostPostURI]))
+        XCTAssertEqual(client.resolveRepostCallCount, 0)
+    }
+
+    private func makeViaRepostNotification(
+        id: String,
+        reason: String,
+        reasonSubject: String,
+        postURI: String
+    ) -> NotificationItem {
+        NotificationItem(
+            uri: "at://did:plc:notif/app.bsky.notification/\(id)",
+            cid: "notif-cid-\(id)",
+            author: ActorView(
+                did: "did:plc:author",
+                handle: "author.bsky.social",
+                displayName: "Author",
+                avatar: nil,
+                createdAt: nil,
+                viewer: nil
+            ),
+            reason: reason,
+            reasonSubject: reasonSubject,
+            record: NotificationRecordValue(subjectUri: postURI),
+            isRead: false,
+            indexedAt: "2026-05-18T10:00:00Z"
+        )
+    }
+
+    private func makePost(uri: String, text: String) -> RichPost {
+        RichPost(
+            uri: uri,
+            cid: "post-cid-\(text)",
+            author: RichAuthor(
+                did: "did:plc:post-author",
+                handle: "poster.bsky.social",
+                displayName: "Poster",
+                avatar: nil
+            ),
+            record: RichRecord(text: text, createdAt: "2026-05-18T09:00:00Z"),
+            embed: nil,
+            viewer: nil,
+            replyCount: nil,
+            repostCount: nil,
+            likeCount: nil,
+            indexedAt: nil
+        )
+    }
 }
 
 @MainActor
@@ -141,6 +225,7 @@ private final class MockNotificationClient: LiveBlueskyClient {
     var fetchedPostURIs: [String] = []
     var fetchPostsCallCount = 0
     var shouldFailBatchFetch = false
+    var resolveRepostCallCount = 0
 
     override func fetchNotifications(cursor _: String? = nil, limit _: Int = 50, account _: AppAccount, appPassword _: String?) async throws -> ListNotificationsResponse {
         notificationsResponse
@@ -154,6 +239,11 @@ private final class MockNotificationClient: LiveBlueskyClient {
             throw URLError(.badServerResponse)
         }
         return posts
+    }
+
+    override func resolveRepostToPostURI(_: String, account _: AppAccount, appPassword _: String?) async throws -> String? {
+        resolveRepostCallCount += 1
+        return nil
     }
 
     override func getUnreadCount(account _: AppAccount, appPassword _: String?) async throws -> Int {

@@ -820,6 +820,7 @@
   "notifications.reason.quote": "نقلا عن رسالتك",
   "notifications.reason.reply": "رد على رسالتك",
   "notifications.reason.repost": "إعادة نشر مشاركتك",
+  "notifications.reason.repost_repost": "أعاد نشر إعادة نشرك",
   "notifications.reason.starterpack_joined": "انضم إلى حزمة البداية الخاصة بك",
   "notifications.title": "إشعارات",
   "offline.title": "لا يوجد اتصال بالإنترنت",
@@ -1422,6 +1423,5 @@
   "rel.block_no_posts.confirm": "حظر {count} حساب بدون منشورات؟",
   "rel.block_no_posts.confirm.message": "هذه الحسابات ليس لديها منشورات وسيتم حظرها فوراً."
 }
-
 
 

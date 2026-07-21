@@ -816,6 +816,7 @@
   "notifications.reason.quote": "процитировал твой пост",
   "notifications.reason.reply": "ответил на твой пост",
   "notifications.reason.repost": "репостнул твой пост",
+  "notifications.reason.repost_repost": "репостнул ваш репост",
   "notifications.reason.starterpack_joined": "присоединился к вашему стартовому пакету",
   "notifications.title": "Уведомления",
   "offline.title": "Нет подключения к Интернету",
@@ -1414,6 +1415,5 @@
   "rel.block_no_posts.confirm": "Заблокировать {count} аккаунтов без записей?",
   "rel.block_no_posts.confirm.message": "У этих аккаунтов нет записей, и они будут немедленно заблокированы."
 }
-
 
 

@@ -816,6 +816,7 @@
   "notifications.reason.quote": "zacytował Twój post",
   "notifications.reason.reply": "odpowiedział na Twój post",
   "notifications.reason.repost": "ponownie opublikowałeś swój post",
+  "notifications.reason.repost_repost": "ponownie opublikował Twój repost",
   "notifications.reason.starterpack_joined": "dołączył do Twojego pakietu startowego",
   "notifications.title": "Powiadomienia",
   "offline.title": "Brak połączenia z Internetem",
@@ -1414,6 +1415,5 @@
   "rel.block_no_posts.confirm": "Zablokować {count} kont bez postów?",
   "rel.block_no_posts.confirm.message": "Te konta nie mają postów i zostaną natychmiast zablokowane."
 }
-
 
 

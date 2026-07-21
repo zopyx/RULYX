@@ -112,18 +112,20 @@ final class NotificationViewModel {
     // MARK: - Private Helpers
 
     /// Enriches `NotificationItem` array with related post data fetched in batch.
-    /// Resolves repost records to original post URIs before fetching.
+    /// Resolves any remaining repost-record URIs to original post URIs before fetching.
     private func buildEntries(
         for notifications: [NotificationItem],
         account: AppAccount,
         appPassword: String,
         using client: LiveBlueskyClient
     ) async -> [NotificationEntry] {
-        // Resolve repost records to original post URIs
+        // Modern via-repost notifications expose the original post in record.subject.
+        // Resolve only when the best available URI is still a repost record.
         var repostToOriginal: [String: String] = [:] // repostURI → originalPostURI
-        for notification in notifications where notification.isRepostSubject {
-            let repostURI = notification.record?.subjectUri ?? notification.reasonSubject
-            guard let repostURI else { continue }
+        for notification in notifications {
+            guard let repostURI = postURI(for: notification),
+                  repostURI.contains("app.bsky.feed.repost")
+            else { continue }
             if let originalURI = try? await client.resolveRepostToPostURI(repostURI, account: account, appPassword: appPassword) {
                 repostToOriginal[repostURI] = originalURI
             }
@@ -142,12 +144,8 @@ final class NotificationViewModel {
 
     /// Returns the effective post URI for display, resolving repost URIs via the mapping.
     private func effectivePostURI(for notification: NotificationItem, repostMappings: [String: String]) -> String? {
-        let rawURI = postURI(for: notification)
-        // If this is a repost URI, resolve to original post
-        if let rawURI, notification.isRepostSubject {
-            return repostMappings[rawURI] ?? rawURI
-        }
-        return rawURI
+        guard let rawURI = postURI(for: notification) else { return nil }
+        return repostMappings[rawURI] ?? rawURI
     }
 
     /// Batch-fetches all posts referenced by the notification list.
@@ -205,17 +203,19 @@ final class NotificationViewModel {
     }
 
     /// Extracts the relevant post URI from a notification based on its reason type.
-    /// For repost-likes, returns the repost record URI (resolved later in buildEntries).
+    /// Via-repost notifications carry the original post URI in their embedded record.
     private func postURI(for notification: NotificationItem) -> String? {
         switch notification.reason {
         case "like":
             if notification.isRepostSubject {
-                // Return the repost URI — resolved to original post in buildEntries
+                // Prefer the hydrated record subject, which may already be the original post.
                 return notification.record?.subjectUri ?? notification.reasonSubject
             }
             return notification.reasonSubject
         case "repost":
             return notification.reasonSubject
+        case "like-via-repost", "repost-via-repost":
+            return notification.record?.subjectUri ?? notification.reasonSubject
         case "reply", "quote", "mention":
             return notification.uri
         case "follow":

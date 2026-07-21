@@ -812,6 +812,7 @@
   "notifications.reason.quote": "yazınızı alıntıladım",
   "notifications.reason.reply": "gönderinize yanıt verdi",
   "notifications.reason.repost": "gönderinizi yeniden yayınladınız",
+  "notifications.reason.repost_repost": "repostunu yeniden paylaştı",
   "notifications.reason.starterpack_joined": "başlangıç ​​paketinize katıldım",
   "notifications.title": "Bildirimler",
   "offline.title": "İnternet Bağlantısı Yok",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "Gönderisi olmayan {count} hesap engellensin mi?",
   "rel.block_no_posts.confirm.message": "Bu hesapların hiç gönderisi yok ve hemen engellenecek."
 }
-
 
 

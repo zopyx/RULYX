@@ -812,6 +812,7 @@
   "notifications.reason.quote": "habe Deinen Beitrag zitiert",
   "notifications.reason.reply": "habe auf deinen Beitrag geantwortet",
   "notifications.reason.repost": "habe deinen Beitrag erneut gepostet",
+  "notifications.reason.repost_repost": "hat deinen Repost repostet",
   "notifications.reason.starterpack_joined": "Ihrem Starterpaket beigetreten",
   "notifications.title": "Benachrichtigungen",
   "offline.title": "Keine Internetverbindung",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "{count} Accounts ohne Beiträge blocken?",
   "rel.block_no_posts.confirm.message": "Diese Accounts haben keine Beiträge und werden sofort geblockt."
 }
-
 
 

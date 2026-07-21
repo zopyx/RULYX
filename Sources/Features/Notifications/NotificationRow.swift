@@ -93,11 +93,14 @@ struct NotificationRow: View {
     /// Localized reason text based on the notification reason string.
     private var reasonText: String {
         switch notification.reason {
-        case "like":
-            notification.isRepostSubject
-                ? loc("notifications.reason.like_repost")
-                : loc("notifications.reason.like")
+        case "like", "like-via-repost":
+            if notification.reason == "like-via-repost" || notification.isRepostSubject {
+                loc("notifications.reason.like_repost")
+            } else {
+                loc("notifications.reason.like")
+            }
         case "repost": loc("notifications.reason.repost")
+        case "repost-via-repost": loc("notifications.reason.repost_repost")
         case "follow":
             if notification.author.viewer?.following != nil {
                 loc("notifications.reason.follow_back")
@@ -134,7 +137,5 @@ struct NotificationRow: View {
                 availableLikerTargetLists: availableTargetLists
             )
         )
-        .contentShape(Rectangle())
-        .onTapGesture { onPostTap?() }
     }
 }

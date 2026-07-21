@@ -813,6 +813,7 @@
   "notifications.reason.quote": "quoted your post",
   "notifications.reason.reply": "replied to your post",
   "notifications.reason.repost": "reposted your post",
+  "notifications.reason.repost_repost": "reposted your repost",
   "notifications.reason.starterpack_joined": "joined your starter pack",
   "notifications.title": "Notifications",
   "offline.title": "No Internet Connection",

@@ -812,6 +812,7 @@
   "notifications.reason.quote": "citeerde jouw bericht",
   "notifications.reason.reply": "heb op je bericht gereageerd",
   "notifications.reason.repost": "heb je bericht opnieuw geplaatst",
+  "notifications.reason.repost_repost": "heeft je repost opnieuw geplaatst",
   "notifications.reason.starterpack_joined": "toegevoegd aan uw startpakket",
   "notifications.title": "Meldingen",
   "offline.title": "Geen internetverbinding",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "{count} accounts zonder berichten blokkeren?",
   "rel.block_no_posts.confirm.message": "Deze accounts hebben geen berichten en worden onmiddellijk geblokkeerd."
 }
-
 
 

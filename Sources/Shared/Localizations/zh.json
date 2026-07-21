@@ -812,6 +812,7 @@
   "notifications.reason.quote": "引用你的帖子",
   "notifications.reason.reply": "回复了你的帖子",
   "notifications.reason.repost": "转发了你的帖子",
+  "notifications.reason.repost_repost": "转发了你的转发",
   "notifications.reason.starterpack_joined": "加入您的入门包",
   "notifications.title": "通知",
   "offline.title": "无互联网连接",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "屏蔽{count}个无帖子的账号？",
   "rel.block_no_posts.confirm.message": "这些账号没有帖子，将被立即屏蔽。"
 }
-
 
 

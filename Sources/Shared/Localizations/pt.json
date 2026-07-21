@@ -812,6 +812,7 @@
   "notifications.reason.quote": "citou sua postagem",
   "notifications.reason.reply": "respondi à sua postagem",
   "notifications.reason.repost": "repostei sua postagem",
+  "notifications.reason.repost_repost": "republicou o seu repost",
   "notifications.reason.starterpack_joined": "juntou-se ao seu pacote inicial",
   "notifications.title": "Notificações",
   "offline.title": "Sem conexão com a Internet",
@@ -1406,6 +1407,5 @@
   "rel.block_no_posts.confirm": "Bloquear {count} contas sem publicações?",
   "rel.block_no_posts.confirm.message": "Estas contas não têm publicações e serão bloqueadas imediatamente."
 }
-
 
 
