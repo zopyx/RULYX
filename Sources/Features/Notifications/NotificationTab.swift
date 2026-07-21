@@ -15,6 +15,8 @@ struct NotificationTab: View {
     @EnvironmentObject private var analyticsStore: AnalyticsStore
     @EnvironmentObject private var internalListStore: InternalListStore
     @State private var availableTargetLists: [BlueskyList] = []
+    @State private var imagePreview: ImagePreviewCollection?
+    @State private var videoPreviewURL: URL?
 
     // MARK: - Body
 
@@ -68,6 +70,16 @@ struct NotificationTab: View {
                     }
                 }
             }
+            .fullScreenCover(item: $imagePreview) { preview in
+                ImageCarouselView(urls: preview.urls, initialIndex: preview.initialIndex) {
+                    imagePreview = nil
+                }
+            }
+            .fullScreenCover(item: $videoPreviewURL) { url in
+                VideoPlayerView(url: url) {
+                    videoPreviewURL = nil
+                }
+            }
         }
         .task {
             guard let account = accountStore.activeAccount,
@@ -100,7 +112,18 @@ struct NotificationTab: View {
                     },
                     onBlockAuthor: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore).onBlock,
                     onAddAuthorToList: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore).onAddToList,
-                    availableTargetLists: availableTargetLists
+                    availableTargetLists: availableTargetLists,
+                    onTapImage: { index in
+                        let allImages = entry.relatedPost?.embed?.images ?? []
+                        let urls = allImages.compactMap { $0.fullsize.flatMap(URL.init) }
+                        guard index < urls.count else { return }
+                        imagePreview = ImagePreviewCollection(urls: urls, initialIndex: index)
+                    },
+                    onPlayVideo: {
+                        if let playlist = entry.relatedPost?.embed?.video?.playlist, let url = URL(string: playlist) {
+                            videoPreviewURL = url
+                        }
+                    }
                 )
                 .onAppear {
                     if entry.id == viewModel.entries.last?.id {

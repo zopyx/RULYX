@@ -13,6 +13,8 @@ struct NotificationRow: View {
     var onBlockAuthor: (() -> Void)?
     var onAddAuthorToList: ((BlueskyList) -> Void)?
     var availableTargetLists: [BlueskyList] = []
+    var onTapImage: ((Int) -> Void)?
+    var onPlayVideo: (() -> Void)?
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     // MARK: - Body
@@ -120,12 +122,14 @@ struct NotificationRow: View {
             style: .card,
             callbacks: PostRowCallbacks(
                 onTapThread: onPostTap,
-                onTapImage: nil,
-                onPlayVideo: nil,
+                onTapImage: onTapImage,
+                onPlayVideo: onPlayVideo,
                 onBlockAuthor: onBlockAuthor,
                 onAddAuthorToList: onAddAuthorToList,
                 availableLikerTargetLists: availableTargetLists
             )
         )
+        .contentShape(Rectangle())
+        .onTapGesture { onPostTap?() }
     }
 }
