@@ -1,9 +1,10 @@
+import PhotosUI
 import SwiftUI
 
 // MARK: - ReplyComposerView
 
 /// Composes a reply to a post — shows the parent post preview, a text editor
-/// with character count, and posts via the Bluesky API.
+/// with character count, optional images, and posts via the Bluesky API.
 struct ReplyComposerView: View {
     let account: AppAccount
     let appPassword: String
@@ -21,57 +22,107 @@ struct ReplyComposerView: View {
     @State private var errorMessage: String?
     @State private var profileToShow: BlueskyActor?
 
+    // Media attachments
+    @State private var selectedItems: [PhotosPickerItem] = []
+    @State private var selectedImages: [(data: Data, mimeType: String)] = []
+
+    private let maxImages = 4
     private let maxChars = 300
 
     // MARK: - Body
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                if let parentPost {
-                    parentPreview(parentPost)
-                }
+            ScrollView {
+                VStack(spacing: 0) {
+                    if let parentPost {
+                        parentPreview(parentPost)
+                    }
 
-                TextEditor(text: $postText)
-                    .font(.body)
-                    .scrollContentBackground(.hidden)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .frame(minHeight: 100)
-                    .overlay(alignment: .topLeading) {
-                        if postText.isEmpty {
-                            Text(loc("compose.placeholder"))
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 14)
-                                .allowsHitTesting(false)
+                    TextEditor(text: $postText)
+                        .font(.body)
+                        .scrollContentBackground(.hidden)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .frame(minHeight: 100)
+                        .overlay(alignment: .topLeading) {
+                            if postText.isEmpty {
+                                Text(loc("compose.placeholder"))
+                                    .font(.body)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 14)
+                                    .allowsHitTesting(false)
+                            }
+                        }
+
+                    if !selectedImages.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, img in
+                                    ZStack(alignment: .topTrailing) {
+                                        if let uiImage = UIImage(data: img.data) {
+                                            Image(uiImage: uiImage)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 80, height: 80)
+                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        }
+                                        Button {
+                                            selectedImages.remove(at: index)
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundStyle(.red)
+                                                .background(Circle().fill(.white))
+                                        }
+                                        .padding(4)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
                         }
                     }
 
-                Divider()
-
-                HStack {
-                    HStack(spacing: 2) {
-                        Text("\(postText.count)")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(postText.count > maxChars ? .red : postText.count > maxChars - 40 ? .orange : .secondary)
-                        Text("/ \(maxChars)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    if selectedImages.count < maxImages {
+                        PhotosPicker(
+                            selection: $selectedItems,
+                            maxSelectionCount: maxImages - selectedImages.count,
+                            matching: .images
+                        ) {
+                            Label(loc("compose.add_images"), systemImage: "photo.on.rectangle.angled")
+                                .font(.subheadline)
+                                .foregroundStyle(Color.skyPrimary)
+                        }
+                        .disabled(selectedImages.count >= maxImages)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                     }
 
-                    Spacer()
+                    Divider()
 
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                            .lineLimit(1)
+                    HStack {
+                        HStack(spacing: 2) {
+                            Text("\(postText.count)")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(postText.count > maxChars ? .red : postText.count > maxChars - 40 ? .orange : .secondary)
+                            Text("/ \(maxChars)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        if let errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .lineLimit(1)
+                        }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
             }
             .background(Color(.systemBackground))
             .pageTitle(loc("compose.reply_title"))
@@ -80,17 +131,25 @@ struct ReplyComposerView: View {
                     Button(loc("actions.cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.reply")) {
-                        Task { await post() }
+                    if isPosting {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Button(loc("actions.reply")) {
+                            Task { await post() }
+                        }
+                        .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                     }
-                    .disabled(postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
                 }
             }
         }
         .task {
             await loadParentPost()
         }
-        .interactiveDismissDisabled(!postText.isEmpty)
+        .onChange(of: selectedItems) { _, newItems in
+            Task { await handleImageSelection(newItems) }
+        }
+        .interactiveDismissDisabled(!postText.isEmpty || !selectedImages.isEmpty)
         .sheet(item: $profileToShow) { actor in
             NavigationStack {
                 BlueskyProfileView(
@@ -169,6 +228,17 @@ struct ReplyComposerView: View {
         .padding(.bottom, 4)
     }
 
+    // MARK: - Image Handling
+
+    private func handleImageSelection(_ items: [PhotosPickerItem]) async {
+        for item in items {
+            guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
+            let mime = item.supportedContentTypes.first?.preferredMIMEType ?? "image/jpeg"
+            selectedImages.append((data: data, mimeType: mime))
+        }
+        selectedItems = []
+    }
+
     /// Fetches the parent post from the API to display as context.
     private func loadParentPost() async {
         do {
@@ -198,9 +268,22 @@ struct ReplyComposerView: View {
         isPosting = true
         errorMessage = nil
         do {
+            // Upload images first
+            var attachments: [PostImageAttachment] = []
+            for img in selectedImages {
+                let response = try await blueskyClient.uploadBlob(data: img.data, mimeType: img.mimeType, account: account, appPassword: appPassword)
+                attachments.append(PostImageAttachment(blob: response.blob, alt: ""))
+            }
+
             _ = try await blueskyClient.createPost(
                 text: text,
+                images: attachments.isEmpty ? nil : attachments,
+                video: nil,
+                external: nil,
                 replyTo: (parentURI: parentURI, parentCID: parentCID, rootURI: rootURI, rootCID: rootCID),
+                quote: nil,
+                threadGate: nil,
+                allowQuoting: true,
                 account: account,
                 appPassword: appPassword
             )
