@@ -54,25 +54,23 @@ struct PostActionBar: View {
                 }
                 .buttonStyle(.plain)
             }
-            if let count = effectiveLikeCount {
-                Button(action: { callbacks.onShowLikes?() }) {
-                    HStack(spacing: 4) {
-                        Text("\(count)")
-                            .font(.callout)
-                        Image(systemName: isLiked ? "heart.fill" : "heart")
-                            .font(.body.weight(.medium))
-                            .foregroundStyle(isLiked ? Color.red : Color(.secondaryLabel))
-                    }
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-            } else if let onLike = callbacks.onLike {
-                Button(action: { onLike() }) {
+            // Heart icon – always toggles like
+            if callbacks.onLike != nil {
+                Button(action: { callbacks.onLike?() }) {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
                         .font(.body.weight(.medium))
                         .foregroundStyle(isLiked ? Color.red : Color(.secondaryLabel))
                         .scaleEffect(isLiked ? 1.1 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
+                }
+                .buttonStyle(.plain)
+            }
+
+            // Like count – opens likes list
+            if let count = effectiveLikeCount, callbacks.onShowLikes != nil {
+                Button(action: { callbacks.onShowLikes?() }) {
+                    Text("\(count)")
+                        .font(.callout)
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
