@@ -23,6 +23,8 @@ extension ListDetailView {
 
         @State private var pendingFollowActions: Set<String> = []
         @State private var pendingUnfollowActions: Set<String> = []
+        /// Follow record URIs captured from successful follow calls (needed for unfollow before next API reload).
+        @State private var optimisticFollowRecordURIs: [String: String] = [:]
         /// Tracks last tap for manual double-tap detection (member recordURI + timestamp).
         @State private var lastTapMemberID: String?
         @State private var lastTapTime: Date?
@@ -33,7 +35,7 @@ extension ListDetailView {
                 state = BlueskyViewerState(
                     muted: state.muted, blockedBy: state.blockedBy,
                     isBlocking: state.isBlocking, blockingRecordURI: state.blockingRecordURI,
-                    isFollowing: true, followingRecordURI: state.followingRecordURI,
+                    isFollowing: true, followingRecordURI: optimisticFollowRecordURIs[member.actor.did] ?? state.followingRecordURI,
                     followsYou: state.followsYou,
                     mutedByListName: state.mutedByListName, blockingByListName: state.blockingByListName
                 )
@@ -184,16 +186,19 @@ extension ListDetailView {
             else { return }
 
             let did = member.actor.did
+            let isCurrentlyFollowing = pendingFollowActions.contains(did)
+                || (member.viewerState?.isFollowing == true && !pendingUnfollowActions.contains(did))
 
-            if member.viewerState?.isFollowing == true {
+            if isCurrentlyFollowing {
                 pendingUnfollowActions.insert(did)
                 pendingFollowActions.remove(did)
-                guard let recordURI = member.viewerState?.followingRecordURI else {
+                guard let recordURI = optimisticFollowRecordURIs[did] ?? member.viewerState?.followingRecordURI else {
                     pendingUnfollowActions.remove(did)
                     return
                 }
                 do {
                     try await container.social.unfollowActor(recordURI: recordURI, account: activeAccount, appPassword: appPassword)
+                    optimisticFollowRecordURIs.removeValue(forKey: did)
                 } catch {
                     pendingUnfollowActions.remove(did)
                 }
@@ -201,7 +206,8 @@ extension ListDetailView {
                 pendingFollowActions.insert(did)
                 pendingUnfollowActions.remove(did)
                 do {
-                    try await container.social.followActor(did: did, account: activeAccount, appPassword: appPassword)
+                    let recordURI = try await container.social.followActor(did: did, account: activeAccount, appPassword: appPassword)
+                    optimisticFollowRecordURIs[did] = recordURI
                 } catch {
                     pendingFollowActions.remove(did)
                 }

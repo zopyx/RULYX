@@ -1,6 +1,6 @@
 import Foundation
-import XCTest
 @testable import RULYX
+import XCTest
 
 // MARK: - AutoBlockBackServiceTests
 
@@ -28,11 +28,11 @@ final class AutoBlockBackServiceTests: XCTestCase {
 
     // MARK: - loadTargetLists
 
-    func testLoadTargetLists_returnsEmpty_whenNoStoredIDs() async {
+    func testLoadTargetLists_returnsEmpty_whenNoStoredIDs() async throws {
         service = makeService()
 
-        let lists = await service.loadTargetLists(
-            account: mockAccountStore.activeAccount!,
+        let lists = try await service.loadTargetLists(
+            account: XCTUnwrap(mockAccountStore.activeAccount),
             appPassword: "pw",
             using: mockList
         )
@@ -40,13 +40,13 @@ final class AutoBlockBackServiceTests: XCTestCase {
         XCTAssertTrue(lists.isEmpty, "No target list IDs stored → empty result")
     }
 
-    func testLoadTargetLists_returnsEmpty_whenStoredIDsDoNotMatch() async {
+    func testLoadTargetLists_returnsEmpty_whenStoredIDsDoNotMatch() async throws {
         // Store a non-matching ID
         UserDefaults.standard.set(try? JSONEncoder().encode(["does-not-exist"]), forKey: "autoBlockTargetListIDs")
         service = makeService()
 
-        let lists = await service.loadTargetLists(
-            account: mockAccountStore.activeAccount!,
+        let lists = try await service.loadTargetLists(
+            account: XCTUnwrap(mockAccountStore.activeAccount),
             appPassword: "pw",
             using: mockList
         )
@@ -54,7 +54,7 @@ final class AutoBlockBackServiceTests: XCTestCase {
         XCTAssertTrue(lists.isEmpty, "Nonexistent list ID → empty result")
     }
 
-    func testLoadTargetLists_matchesRemoteListByID() async {
+    func testLoadTargetLists_matchesRemoteListByID() async throws {
         let listID = "at://did:plc:test/app.bsky.graph.list/abc"
         UserDefaults.standard.set(try? JSONEncoder().encode([listID]), forKey: "autoBlockTargetListIDs")
 
@@ -63,8 +63,8 @@ final class AutoBlockBackServiceTests: XCTestCase {
 
         service = makeService()
 
-        let lists = await service.loadTargetLists(
-            account: mockAccountStore.activeAccount!,
+        let lists = try await service.loadTargetLists(
+            account: XCTUnwrap(mockAccountStore.activeAccount),
             appPassword: "pw",
             using: mockList
         )
@@ -74,15 +74,15 @@ final class AutoBlockBackServiceTests: XCTestCase {
         XCTAssertEqual(lists.first?.name, "TestList")
     }
 
-    func testLoadTargetLists_includesInternalLists() async {
+    func testLoadTargetLists_includesInternalLists() async throws {
         let internalID = "internal:\(internalListStore.lists.first?.id.uuidString ?? "")"
         UserDefaults.standard.set(try? JSONEncoder().encode([internalID]), forKey: "autoBlockTargetListIDs")
         mockList.fetchListsHandler = { _, _ in [] }
 
         service = makeService()
 
-        let lists = await service.loadTargetLists(
-            account: mockAccountStore.activeAccount!,
+        let lists = try await service.loadTargetLists(
+            account: XCTUnwrap(mockAccountStore.activeAccount),
             appPassword: "pw",
             using: mockList
         )
@@ -107,7 +107,7 @@ final class AutoBlockBackServiceTests: XCTestCase {
             did: "did:plc:target",
             handle: "target.bsky.social",
             list: list,
-            account: mockAccountStore.activeAccount!,
+            account: XCTUnwrap(mockAccountStore.activeAccount),
             appPassword: "pw",
             using: mockList
         )
@@ -115,7 +115,7 @@ final class AutoBlockBackServiceTests: XCTestCase {
         await fulfillment(of: [addCalled], timeout: 1)
     }
 
-    func testAddActorToTargetList_internalList_addsToStore() async {
+    func testAddActorToTargetList_internalList_addsToStore() async throws {
         let list = BlueskyList(id: "internal:\(internalListStore.lists[0].id.uuidString)", name: "Hostile", description: "", memberCount: nil, kind: .internal, cid: nil)
 
         service = makeService()
@@ -124,7 +124,7 @@ final class AutoBlockBackServiceTests: XCTestCase {
             did: "did:plc:target",
             handle: "target.bsky.social",
             list: list,
-            account: mockAccountStore.activeAccount!,
+            account: try XCTUnwrap(mockAccountStore.activeAccount),
             appPassword: "pw",
             using: mockList
         )

@@ -138,7 +138,7 @@ struct UserPostsView: View {
                 .environmentObject(accountStore)
                 .environmentObject(container.blueskyClient)
             }
-            .task {
+            .task(id: accountStore.activeAccountID) {
                 await loadInitial()
             }
             .onDisappear {

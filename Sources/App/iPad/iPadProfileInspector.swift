@@ -56,7 +56,7 @@ struct iPadProfileInspector: View {
                 )
             }
         }
-        .task {
+        .task(id: accountStore.activeAccountID) {
             guard let active = accountStore.activeAccount else { return }
             let password = accountStore.appPassword(for: active) ?? ""
             let dataAccount: AppAccount = if let preferredID = accountStore.preferredSearchAccountID,
@@ -75,6 +75,11 @@ struct iPadProfileInspector: View {
                 dataPassword: dataPassword,
                 using: container.blueskyClient
             )
+        }
+        .onChange(of: accountStore.activeAccountID) { _, _ in
+            // Reset synchronously; the id-keyed .task above refetches viewer state
+            // for the new account.
+            profileVM.reset()
         }
         .pageTitle(profileVM.inspection?.profile.handle ?? "")
         .toolbar {

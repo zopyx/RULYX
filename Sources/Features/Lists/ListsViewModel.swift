@@ -31,6 +31,28 @@ final class ListsViewModel {
     /// User-facing error message.
     var errorMessage: String?
 
+    // MARK: - Init
+
+    /// Observer for synchronous account-switch resets.
+    /// `nonisolated(unsafe)` so `deinit` (nonisolated in Swift 6) can unregister it.
+    nonisolated(unsafe) private var accountSwitchObserver: NSObjectProtocol?
+
+    init() {
+        accountSwitchObserver = NotificationCenter.default.addObserver(
+            forName: .accountWillSwitch, object: nil, queue: nil
+        ) { [weak self] _ in
+            // Posted synchronously on the main actor from `AccountStore.switchAccount`,
+            // so this closure already runs on the main thread.
+            MainActor.assumeIsolated { self?.reset() }
+        }
+    }
+
+    deinit {
+        if let accountSwitchObserver {
+            NotificationCenter.default.removeObserver(accountSwitchObserver)
+        }
+    }
+
     // MARK: - Public Methods
 
     /// Resets all state to initial values.
@@ -39,6 +61,8 @@ final class ListsViewModel {
         activeProfile = nil
         blockingCount = nil
         blockedByCount = nil
+        followingCount = nil
+        followersCount = nil
         isLoading = false
         isRefreshing = false
         errorMessage = nil
@@ -62,6 +86,8 @@ final class ListsViewModel {
             activeProfile = nil
             blockingCount = nil
             blockedByCount = nil
+            followingCount = nil
+            followersCount = nil
             errorMessage = nil
             return
         }

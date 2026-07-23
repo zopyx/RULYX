@@ -20,6 +20,8 @@ struct UserSearchSheet: View {
 
     @State private var pendingFollowActions: Set<String> = []
     @State private var pendingUnfollowActions: Set<String> = []
+    /// Follow record URIs captured from successful follow calls (needed for unfollow before next API reload).
+    @State private var optimisticFollowRecordURIs: [String: String] = [:]
 
     var body: some View {
         NavigationStack {
@@ -114,7 +116,7 @@ struct UserSearchSheet: View {
     private func effectiveViewerState(for actor: BlueskyActor) -> BlueskyViewerState? {
         guard var state = actor.viewerState else { return nil }
         if pendingFollowActions.contains(actor.did) {
-            state = state.withOptimisticFollow(following: true)
+            state = state.withOptimisticFollow(following: true, recordURI: optimisticFollowRecordURIs[actor.did])
         }
         if pendingUnfollowActions.contains(actor.did) {
             state = state.withOptimisticFollow(following: false)
@@ -128,13 +130,14 @@ struct UserSearchSheet: View {
         else { return }
 
         let did = actor.did
-        let isCurrentlyFollowing = actor.viewerState?.isFollowing == true
+        let isCurrentlyFollowing = pendingFollowActions.contains(did)
+            || (actor.viewerState?.isFollowing == true && !pendingUnfollowActions.contains(did))
 
         if isCurrentlyFollowing {
             pendingUnfollowActions.insert(did)
             pendingFollowActions.remove(did)
 
-            guard let recordURI = actor.viewerState?.followingRecordURI else {
+            guard let recordURI = optimisticFollowRecordURIs[did] ?? actor.viewerState?.followingRecordURI else {
                 pendingUnfollowActions.remove(did)
                 return
             }
@@ -145,6 +148,7 @@ struct UserSearchSheet: View {
                     account: activeAccount,
                     appPassword: appPassword
                 )
+                optimisticFollowRecordURIs.removeValue(forKey: did)
                 // Optimistic: pendingUnfollowActions keeps the badge hidden.
                 // On the next full reload, viewerState will reflect the change.
             } catch {
@@ -156,11 +160,12 @@ struct UserSearchSheet: View {
             pendingUnfollowActions.remove(did)
 
             do {
-                try await container.social.followActor(
+                let recordURI = try await container.social.followActor(
                     did: did,
                     account: activeAccount,
                     appPassword: appPassword
                 )
+                optimisticFollowRecordURIs[did] = recordURI
                 // Optimistic: pendingFollowActions keeps the badge visible.
             } catch {
                 // Revert optimistic update

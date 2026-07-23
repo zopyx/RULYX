@@ -200,7 +200,7 @@ struct MediaBrowserView: View {
                     await performDownload(to: url)
                 }
             }
-            .task {
+            .task(id: accountStore.activeAccountID) {
                 resolveSearchAccount()
                 await loadInitial()
             }

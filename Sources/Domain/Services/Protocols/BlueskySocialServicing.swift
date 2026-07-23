@@ -54,11 +54,13 @@ protocol BlueskySocialServicing: Sendable {
     func fetchExistingBlockRecordURIs(account: AppAccount, appPassword: String?) async throws -> [String: String]
 
     /// Follow an actor.
+    /// - Returns: The AT URI of the created follow record (needed for later unfollow).
+    @discardableResult
     func followActor(
         did actorDID: String,
         account: AppAccount,
         appPassword: String?
-    ) async throws
+    ) async throws -> String
 
     /// Unfollow an actor by follow record URI.
     func unfollowActor(

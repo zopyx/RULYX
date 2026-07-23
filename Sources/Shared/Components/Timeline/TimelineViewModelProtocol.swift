@@ -90,13 +90,19 @@ protocol TimelineViewModelProtocol: AnyObject {
 
 extension TimelineViewModelProtocol {
     /// Whether the timeline is currently fetching data.
-    var isLoading: Bool { state.isLoading }
+    var isLoading: Bool {
+        state.isLoading
+    }
 
     /// Whether more pages can be loaded.
-    var hasMore: Bool { state.hasMore }
+    var hasMore: Bool {
+        state.hasMore
+    }
 
     /// Optional progress label (nil by default for feed timelines).
-    var scanProgressLabel: String? { nil }
+    var scanProgressLabel: String? {
+        nil
+    }
 
     /// Adaptive polling: 15s base, backs off to 30s after 120s without interaction.
     /// Conforming types must provide `knownURIs` as an associated storage or
@@ -105,10 +111,10 @@ extension TimelineViewModelProtocol {
     /// Default implementation uses a polling task with adaptive back-off.
     /// Override `checkForNewPosts` to provide the data-source-specific fetch.
     func startPolling(
-        account: AppAccount,
-        appPassword: String,
-        using client: LiveBlueskyClient,
-        interval: TimeInterval = 15
+        account _: AppAccount,
+        appPassword _: String,
+        using _: LiveBlueskyClient,
+        interval _: TimeInterval = 15
     ) {
         // Default no-op; conforming types with polling support override this.
         // The full implementation lives in FeedTimelineViewModel and will be

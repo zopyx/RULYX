@@ -248,7 +248,12 @@ struct MentionsSearchView: View {
             }
         }
         .onChange(of: accountStore.activeAccount?.id) { _, _ in
+            // Account switched: clear results loaded under the previous account, then reload.
+            viewModel.reset()
+            searchAccount = accountStore.accounts.first(where: { $0.id == accountStore.preferredSearchAccountID })
+                ?? accountStore.activeAccount
             Task {
+                await loadInitial()
                 await loadAvailableTargetLists()
             }
         }

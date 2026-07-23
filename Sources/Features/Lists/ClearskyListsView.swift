@@ -50,7 +50,8 @@ struct ClearskyListsView: View {
             .task {
                 await loadOwnerHandles()
                 if let account = accountStore.activeAccount,
-                   let appPassword = accountStore.appPassword(for: account) {
+                   let appPassword = accountStore.appPassword(for: account)
+                {
                     await loadMemberCounts(account: account, appPassword: appPassword)
                 }
             }

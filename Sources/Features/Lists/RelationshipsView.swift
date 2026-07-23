@@ -86,6 +86,8 @@ struct RelationshipsView: View {
     @State private var pendingFollowActions: Set<String> = []
     /// DIDs for which the user has double-tapped to unfollow (optimistic).
     @State private var pendingUnfollowActions: Set<String> = []
+    /// Follow record URIs captured from successful follow calls (needed for unfollow before next API reload).
+    @State private var optimisticFollowRecordURIs: [String: String] = [:]
 
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
@@ -206,36 +208,6 @@ struct RelationshipsView: View {
                                 }
                                 .appScrollTransition()
                                 .contextMenu {
-                                Button(role: .destructive) {
-                                    actorToBlock = actor
-                                    if confirmBlocks {
-                                        isShowingBlockConfirm = true
-                                    } else {
-                                        performBlock(actor)
-                                    }
-                                } label: {
-                                    Label(loc("rel.block"), systemImage: "hand.raised.fill")
-                                }
-                                .accessibilityHint(loc: "rel.block.hint")
-
-                                Button {
-                                    selectedActorForList = actor
-                                    isShowingListPicker = true
-                                } label: {
-                                    Label(loc("rel.add_to_list"), systemImage: "list.bullet")
-                                }
-                                .accessibilityHint(loc: "rel.add_to_list.hint")
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                if mode == .blocking {
-                                    Button {
-                                        performUnblock(actor)
-                                    } label: {
-                                        Label(loc("rel.unblock"), systemImage: "lock.open.fill")
-                                    }
-                                    .tint(.orange)
-                                    .accessibilityHint(loc: "rel.unblock.hint")
-                                } else {
                                     Button(role: .destructive) {
                                         actorToBlock = actor
                                         if confirmBlocks {
@@ -246,28 +218,58 @@ struct RelationshipsView: View {
                                     } label: {
                                         Label(loc("rel.block"), systemImage: "hand.raised.fill")
                                     }
-                                    .accessibilityHint(loc: "rel.block_swipe.hint")
-                                }
-                            }
-                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                                if mode == .followers {
+                                    .accessibilityHint(loc: "rel.block.hint")
+
                                     Button {
-                                        performForceUnfollow(actor)
+                                        selectedActorForList = actor
+                                        isShowingListPicker = true
                                     } label: {
-                                        Label(loc("rel.force_unfollow"), systemImage: "person.crop.circle.badge.minus")
+                                        Label(loc("rel.add_to_list"), systemImage: "list.bullet")
                                     }
-                                    .tint(.orange)
-                                    .accessibilityHint(loc: "rel.force_unfollow.hint")
-                                } else if mode == .following {
-                                    Button {
-                                        performForceUnfollow(actor)
-                                    } label: {
-                                        Label(loc("rel.unfollow"), systemImage: "person.fill.xmark")
-                                    }
-                                    .tint(.orange)
-                                    .accessibilityHint(loc: "rel.unfollow.hint")
+                                    .accessibilityHint(loc: "rel.add_to_list.hint")
                                 }
-                            }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    if mode == .blocking {
+                                        Button {
+                                            performUnblock(actor)
+                                        } label: {
+                                            Label(loc("rel.unblock"), systemImage: "lock.open.fill")
+                                        }
+                                        .tint(.orange)
+                                        .accessibilityHint(loc: "rel.unblock.hint")
+                                    } else {
+                                        Button(role: .destructive) {
+                                            actorToBlock = actor
+                                            if confirmBlocks {
+                                                isShowingBlockConfirm = true
+                                            } else {
+                                                performBlock(actor)
+                                            }
+                                        } label: {
+                                            Label(loc("rel.block"), systemImage: "hand.raised.fill")
+                                        }
+                                        .accessibilityHint(loc: "rel.block_swipe.hint")
+                                    }
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                    if mode == .followers {
+                                        Button {
+                                            performForceUnfollow(actor)
+                                        } label: {
+                                            Label(loc("rel.force_unfollow"), systemImage: "person.crop.circle.badge.minus")
+                                        }
+                                        .tint(.orange)
+                                        .accessibilityHint(loc: "rel.force_unfollow.hint")
+                                    } else if mode == .following {
+                                        Button {
+                                            performForceUnfollow(actor)
+                                        } label: {
+                                            Label(loc("rel.unfollow"), systemImage: "person.fill.xmark")
+                                        }
+                                        .tint(.orange)
+                                        .accessibilityHint(loc: "rel.unfollow.hint")
+                                    }
+                                }
                         }
                         .onDelete { indexSet in
                             if let idx = indexSet.first, idx < filteredActors.count {
@@ -1140,7 +1142,7 @@ struct RelationshipsView: View {
     private func effectiveViewerState(for actor: BlueskyActor) -> BlueskyViewerState? {
         guard var state = actor.viewerState else { return nil }
         if pendingFollowActions.contains(actor.did) {
-            state = state.withOptimisticFollow(following: true)
+            state = state.withOptimisticFollow(following: true, recordURI: optimisticFollowRecordURIs[actor.did])
         }
         if pendingUnfollowActions.contains(actor.did) {
             state = state.withOptimisticFollow(following: false)
@@ -1156,14 +1158,15 @@ struct RelationshipsView: View {
         else { return }
 
         let did = actor.did
-        let isCurrentlyFollowing = actor.viewerState?.isFollowing == true
+        let isCurrentlyFollowing = pendingFollowActions.contains(did)
+            || (actor.viewerState?.isFollowing == true && !pendingUnfollowActions.contains(did))
 
         if isCurrentlyFollowing {
             // Optimistic: show unfollowed
             pendingUnfollowActions.insert(did)
             pendingFollowActions.remove(did)
 
-            guard let recordURI = actor.viewerState?.followingRecordURI else {
+            guard let recordURI = optimisticFollowRecordURIs[did] ?? actor.viewerState?.followingRecordURI else {
                 pendingUnfollowActions.remove(did)
                 return
             }
@@ -1174,6 +1177,7 @@ struct RelationshipsView: View {
                     account: activeAccount,
                     appPassword: appPassword
                 )
+                optimisticFollowRecordURIs.removeValue(forKey: did)
                 // Optimistic: pendingUnfollowActions keeps the badge hidden
                 // On the next full reload, viewerState will reflect the change.
             } catch {
@@ -1186,11 +1190,12 @@ struct RelationshipsView: View {
             pendingUnfollowActions.remove(did)
 
             do {
-                try await container.social.followActor(
+                let recordURI = try await container.social.followActor(
                     did: did,
                     account: activeAccount,
                     appPassword: appPassword
                 )
+                optimisticFollowRecordURIs[did] = recordURI
                 // Optimistic: pendingFollowActions keeps the badge visible
             } catch {
                 // Revert optimistic update

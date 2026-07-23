@@ -21,12 +21,18 @@ struct iPadListsView: View {
                 listSelectionView
             }
         }
-        .task {
+        .task(id: accountStore.activeAccountID) {
             await viewModel.load(
                 for: accountStore.activeAccount,
                 appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
                 using: container.blueskyClient
             )
+        }
+        .onChange(of: accountStore.activeAccountID) { _, _ in
+            // Account switched: clear previous account's lists/counters and the
+            // detail-column selection (the selected list belongs to the old account).
+            viewModel.reset()
+            navState.selectedList = nil
         }
     }
 

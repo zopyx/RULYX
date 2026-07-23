@@ -27,24 +27,22 @@ struct PerformanceMonitorOverlay: View {
     // MARK: - Body
 
     var body: some View {
-        Group {
-            VStack(spacing: 0) {
-                compactHUD
-                    .onTapGesture { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }
+        VStack(spacing: 0) {
+            compactHUD
+                .onTapGesture { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }
 
-                if isExpanded {
-                    expandedDetail
-                }
+            if isExpanded {
+                expandedDetail
             }
-            .background {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.ultraThinMaterial)
-                    .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-            }
-            .padding(.horizontal, 8)
-            .padding(.top, 4)
-            .transition(.move(edge: .top).combined(with: .opacity))
         }
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 4)
+        .transition(.move(edge: .top).combined(with: .opacity))
         .onAppear {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
                 Task { @MainActor in refreshTick += 1 }

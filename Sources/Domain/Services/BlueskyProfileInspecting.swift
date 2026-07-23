@@ -84,7 +84,9 @@ protocol BlueskyProfileInspecting: Sendable {
     ///   - actorDID: The DID of the actor to follow.
     ///   - account: The account to authenticate with.
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
-    func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws
+    /// - Returns: The AT URI of the created follow record (needed for later unfollow).
+    @discardableResult
+    func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> String
 
     /// Unfollows the specified actor using the existing follow record URI.
     /// - Parameters:

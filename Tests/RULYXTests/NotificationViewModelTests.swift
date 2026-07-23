@@ -216,6 +216,28 @@ final class NotificationViewModelTests: XCTestCase {
             indexedAt: nil
         )
     }
+
+    // MARK: - Account Switch Reset
+
+    func testAccountWillSwitchNotificationResetsState() async {
+        let viewModel = NotificationViewModel()
+        let client = MockNotificationClient()
+        let account = makeAccount()
+        client.notificationsResponse = ListNotificationsResponse(
+            cursor: nil,
+            notifications: [makeViaRepostNotification(id: "9", reason: "like", reasonSubject: "", postURI: "")]
+        )
+
+        await viewModel.load(account: account, appPassword: "pass", using: client)
+        XCTAssertEqual(viewModel.entries.count, 1)
+        XCTAssertNotEqual(viewModel.state, .initialLoading)
+
+        NotificationCenter.default.post(name: .accountWillSwitch, object: nil)
+
+        XCTAssertTrue(viewModel.entries.isEmpty)
+        XCTAssertEqual(viewModel.state, .initialLoading)
+        XCTAssertEqual(viewModel.unreadCount, 0)
+    }
 }
 
 @MainActor

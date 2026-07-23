@@ -189,11 +189,13 @@ final class AppLockManager: ObservableObject {
     /// Restores lockout state from Keychain on launch.
     private func loadLockout() {
         if let countStr = try? keychain.read(service: lockoutService, account: lockoutFailuresAccount),
-           let count = Int(countStr), count > 0 {
+           let count = Int(countStr), count > 0
+        {
             consecutiveFailedAttempts = count
         }
         if let untilStr = try? keychain.read(service: lockoutService, account: lockoutUntilAccount),
-           let ts = TimeInterval(untilStr) {
+           let ts = TimeInterval(untilStr)
+        {
             lockoutUntil = Date(timeIntervalSince1970: ts)
             // Clear expired lockout
             if let until = lockoutUntil, now() >= until {

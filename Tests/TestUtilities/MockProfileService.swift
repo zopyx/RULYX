@@ -57,7 +57,7 @@ final class MockProfileService: BlueskyProfileInspecting {
     var blockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unblockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var softBlockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
-    var followActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
+    var followActorHandler: @Sendable (String, AppAccount, String?) async throws -> String = { _, _, _ in "at://mock/app.bsky.graph.follow/mock" }
     var unfollowActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var muteActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unmuteActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
@@ -100,7 +100,7 @@ final class MockProfileService: BlueskyProfileInspecting {
         try await softBlockActorHandler(actorDID, account, appPassword)
     }
 
-    func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
+    func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> String {
         try await followActorHandler(actorDID, account, appPassword)
     }
 

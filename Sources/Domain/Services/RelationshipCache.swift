@@ -4,9 +4,10 @@ import Foundation
 /// keyed by account identifier and relationship type. Stores data in the
 /// app's caches directory.
 enum RelationshipCache {
+    /// Dedicated subdirectory so `clearAll()` cannot delete sibling cache files.
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.ajung.RULYX")
+            .appendingPathComponent("com.ajung.RULYX/relationships")
     }
 
     private static func fileURL(forKey key: String) -> URL {

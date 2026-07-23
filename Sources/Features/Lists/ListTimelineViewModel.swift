@@ -172,7 +172,9 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             knownURIs.formUnion(newURIs)
             newPostCount += newURIs.count
         } catch {
-            if AppError.isCancellation(error) { return }
+            if AppError.isCancellation(error) {
+                return
+            }
             AppLogger.moderation.debug("List polling check failed: \(error.localizedDescription, privacy: .public)")
         }
     }

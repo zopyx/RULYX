@@ -16,9 +16,10 @@ struct DashboardCacheData: Codable {
 /// JSON file-based cache for dashboard data, keyed by account identifier.
 /// Stores/loads data from the app's caches directory.
 enum DashboardCache {
+    /// Dedicated subdirectory so `clearAll()` cannot delete sibling cache files.
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.ajung.RULYX")
+            .appendingPathComponent("com.ajung.RULYX/dashboard")
     }
 
     private static func fileURL(forKey key: String) -> URL {

@@ -499,12 +499,14 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
     }
 
     /// Follows the specified actor.
+    /// - Returns: The AT URI of the created follow record (needed for later unfollow).
+    @discardableResult
     func followActor(
         did actorDID: String,
         account: AppAccount,
         appPassword: String?
-    ) async throws {
-        let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
+    ) async throws -> String {
+        try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
         ) { authSession in
@@ -514,7 +516,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                 record: SubjectRecord(type: "app.bsky.graph.follow", subject: actorDID)
             )
 
-            let _: CreateRecordResponse = try await requestExecutor.send(
+            let response: CreateRecordResponse = try await requestExecutor.send(
                 path: "com.atproto.repo.createRecord",
                 method: "POST",
                 queryItems: [],
@@ -523,7 +525,7 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                 hostURL: authSession.pdsURL
             )
 
-            return EmptyResponse()
+            return response.uri
         }
     }
 

@@ -760,8 +760,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Follows an actor by DID. Creates a `app.bsky.graph.follow` record.
-    func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
-        let _: EmptyResponse = try await sessionService.performAuthenticatedRequest(
+    @discardableResult
+    func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> String {
+        try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
         ) { authSession in
@@ -771,7 +772,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 record: SubjectRecord(type: "app.bsky.graph.follow", subject: actorDID)
             )
 
-            let _: CreateRecordResponse = try await requestExecutor.send(
+            let response: CreateRecordResponse = try await requestExecutor.send(
                 path: "com.atproto.repo.createRecord",
                 method: "POST",
                 queryItems: [],
@@ -780,7 +781,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 hostURL: authSession.pdsURL
             )
 
-            return EmptyResponse()
+            return response.uri
         }
     }
 

@@ -151,7 +151,7 @@ final class BlueskySessionService: BlueskySessionServicing {
 
     func performAuthenticatedRequest<Response>(
         account: AppAccount,
-        appPassword: String?,
+        appPassword _: String?,
         operation: (BlueskySession) async throws -> Response
     ) async throws -> Response {
         var authSession = try await cachedSession(for: account)

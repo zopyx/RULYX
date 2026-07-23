@@ -96,6 +96,49 @@ final class ListsViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.activeProfile)
         XCTAssertEqual(viewModel.activeProfile?.handle, account.handle)
     }
+
+    // MARK: - Account Switch Reset
+
+    func testResetClearsAllRelationshipCounters() {
+        let account = makeAccount()
+        viewModel.updateRelationshipCount(.blocking, count: 1, for: account)
+        viewModel.updateRelationshipCount(.blockedBy, count: 2, for: account)
+        viewModel.updateRelationshipCount(.following, count: 3, for: account)
+        viewModel.updateRelationshipCount(.followers, count: 4, for: account)
+
+        viewModel.reset()
+
+        XCTAssertNil(viewModel.blockingCount)
+        XCTAssertNil(viewModel.blockedByCount)
+        XCTAssertNil(viewModel.followingCount)
+        XCTAssertNil(viewModel.followersCount)
+    }
+
+    func testLoadWithNilAccountClearsRelationshipCounters() async {
+        let account = makeAccount()
+        viewModel.updateRelationshipCount(.following, count: 3, for: account)
+        viewModel.updateRelationshipCount(.followers, count: 4, for: account)
+
+        await viewModel.load(for: nil, appPassword: nil, using: client)
+
+        XCTAssertNil(viewModel.followingCount)
+        XCTAssertNil(viewModel.followersCount)
+    }
+
+    func testAccountWillSwitchNotificationResetsState() async {
+        let account = makeAccount()
+        viewModel.updateRelationshipCount(.blocking, count: 1, for: account)
+        viewModel.updateRelationshipCount(.followers, count: 4, for: account)
+        await viewModel.load(for: account, appPassword: "pass", using: client)
+        XCTAssertNotNil(viewModel.activeProfile)
+
+        NotificationCenter.default.post(name: .accountWillSwitch, object: nil)
+
+        XCTAssertNil(viewModel.blockingCount)
+        XCTAssertNil(viewModel.followersCount)
+        XCTAssertNil(viewModel.activeProfile)
+        XCTAssertTrue(viewModel.listsByKind.isEmpty)
+    }
 }
 
 @MainActor

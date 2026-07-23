@@ -81,7 +81,7 @@ struct NotificationTab: View {
                 }
             }
         }
-        .task {
+        .task(id: accountStore.activeAccount?.did) {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account)
             else { return }
@@ -90,6 +90,7 @@ struct NotificationTab: View {
             await loadTargetLists(account: account, appPassword: appPassword)
         }
         .onChange(of: accountStore.activeAccount?.did) { _, _ in
+            // Reset synchronously; the id-keyed .task above refetches for the new account.
             viewModel.reset()
         }
         .badge(viewModel.unreadCount > 0 ? viewModel.unreadCount : 0)

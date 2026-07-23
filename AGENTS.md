@@ -224,6 +224,37 @@ Every completed task MUST include an accurate description rendered as a table:
 - Dashboard blocking count (`fetchBlockingCount`/`fetchBlockedByCount`) and detail view count (`fetchBlockedActors`/`fetchBlockedByActors`) MUST come from the **same source** — the paginated Clearsky API (`fetchClearskyActors`), NOT the `/total/` endpoint
 - This ensures the number shown on the dashboard always matches the number in the RelationshipsView detail list
 
+## Account Switch — State Reset Contract
+
+When the active account changes, **all account-scoped caches are cleared, all account-scoped UI counters reset, and all visible account-scoped data is refetched automatically** — on iPhone AND iPad.
+
+**Single orchestration point:** `AccountStore.switchAccount(to:using:)`. All switch paths (toolbar menu, double-tap quick-switch, `AccountSwitcherSheet`, `AccountTabView`) MUST go through it — never call `setActiveAccount` from production code.
+
+**Ordering invariant:** every reset completes BEFORE `activeAccountID` is assigned. Views refetch in reaction to the ID change and must never observe a half-cleared state.
+
+| Layer | What is cleared/reset | Where |
+|-------|----------------------|-------|
+| HTTP | URL session cache, `URLCache.shared`, session cache | `LiveBlueskyClient.clearAllCaches()` |
+| Disk API cache | `BlueskyAPICache` (all entries) | `LiveBlueskyClient.clearAllCaches()` |
+| Disk model caches | `DashboardCache`, `RelationshipCache` (separate subdirectories under `~/Library/Caches/com.ajung.RULYX/`) | `AccountStore.switchAccount` |
+| In-memory | `ThreadCacheService` | `AccountStore.switchAccount` |
+| Counters (synchronous) | `.accountWillSwitch` notification posted in `switchAccount` BEFORE `activeAccountID` changes; observers zero counters immediately, even when their views are alive but not visible | `ListsViewModel.reset()` (blocking/blockedBy/following/followers), `NotificationViewModel.reset()` (unread badge, entries) |
+| Chat | Conversations, messages, cursors, unread badge; refetch via `rebuildConversations` | `RULYXApp.onReceive($activeAccountID)` |
+| View models | Reset synchronously in `.onChange(of: accountStore.activeAccount…)`; refetch via `.task(id: accountStore.activeAccountID)` (or explicit reload) | Lists/Timeline/Notifications/Search/Media/FollowerDiff + iPad views |
+
+**`.accountWillSwitch` contract:** posted synchronously on the main actor inside `switchAccount` (after cache clears, before the ID assignment; `object` = new `AppAccount`). Counter-holding view models subscribe in `init`, reset via `MainActor.assumeIsolated`, and remove the observer in `deinit`. No-op switches (same account) do NOT post.
+
+**Global by design — NOT reset on switch** (documented exceptions):
+- `MutedWordsStore` — user preference, account-independent
+- `InternalListStore` — app-local lists, intentionally shared across accounts
+- `AnalyticsStore` — engagement snapshots keyed by post URI (post-global, not viewer-relative)
+- `FeedStore` — already per-DID keys
+- `WorkspacePreferencesStore` — saved/recent searches (user-level)
+- Media thumbnail caches (`ThumbnailPipeline`, media `URLCache`) — public CDN content, not viewer-relative
+- `HTTPRequestDebugStore` + cache hit/miss metrics — debug tooling; intentionally keeps logs across switches (explicit decision, not an oversight)
+
+**Adding a new account-scoped store:** register its reset either in `AccountStore.switchAccount` (services), via an `.accountWillSwitch` observer (view models holding counters/visible state — see contract above), or via `.onChange(of: accountStore.activeAccountID)` + `.task(id:)` (views). iPad views MUST handle account changes themselves — iPhone `onChange` handlers are not in the iPad view hierarchy.
+
 ## Blocking / Blocked-By List Item Layout
 In `RelationshipsView`, each blocking/blocked-by list item uses this two-row layout:
 

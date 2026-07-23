@@ -90,11 +90,11 @@ final class MediaDownloadServiceTests: XCTestCase {
         }
 
         let assets = try (0 ..< assetCount).map { index in
-            MediaAssetDownload(
+            try MediaAssetDownload(
                 index: index,
                 filenameStem: "image-\(index)",
                 source: .image(
-                    url: try XCTUnwrap(URL(string: "https://example.com/image-\(index)")),
+                    url: XCTUnwrap(URL(string: "https://example.com/image-\(index)")),
                     preferredExtension: nil
                 )
             )

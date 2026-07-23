@@ -1,16 +1,7 @@
 import SwiftUI
 
-// MARK: - Environment Key
-
-private struct ShowActorDescriptionsKey: EnvironmentKey {
-    static let defaultValue = false
-}
-
 extension EnvironmentValues {
-    var showActorDescriptions: Bool {
-        get { self[ShowActorDescriptionsKey.self] }
-        set { self[ShowActorDescriptionsKey.self] = newValue }
-    }
+    @Entry var showActorDescriptions: Bool = false
 }
 
 // MARK: - BlueskyActorRow

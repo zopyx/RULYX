@@ -55,6 +55,10 @@ struct CustomSearchView: View {
                 }
             }
             .onChange(of: accountStore.activeAccount?.id) { _, _ in
+                // Account switched: drop results fetched under the previous account.
+                viewModel.reset()
+                searchAccount = accountStore.accounts.first(where: { $0.id == accountStore.preferredSearchAccountID })
+                    ?? accountStore.activeAccount
                 Task { await loadAvailableTargetLists() }
             }
             .onDisappear {

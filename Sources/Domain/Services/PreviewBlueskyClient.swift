@@ -541,8 +541,9 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         did _: String,
         account _: AppAccount,
         appPassword _: String?
-    ) async throws {
+    ) async throws -> String {
         try await Task.sleep(for: .milliseconds(120))
+        return "at://preview/app.bsky.graph.follow/preview"
     }
 
     override func unfollowActor(

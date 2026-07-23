@@ -205,6 +205,95 @@ final class AccountStoreTests: XCTestCase {
         XCTAssertNotEqual(store.activeAccount?.handle, "unknown.bsky.social")
     }
 
+    // MARK: - Switch Account (Cache Reset)
+
+    func testSwitchAccountClearsThreadCacheAndTracksPrevious() async {
+        let (store, _) = makeStore()
+        let client = MockAuthenticatingClient()
+
+        await addTestAccount(store: store, client: client, handle: "alpha.bsky.social")
+        await addTestAccount(store: store, client: client, handle: "beta.bsky.social")
+        guard let firstAccount = store.accounts.first(where: { $0.handle == "alpha.bsky.social" }) else { return XCTFail("alpha account missing") }
+        guard let secondAccount = store.accounts.first(where: { $0.handle == "beta.bsky.social" }) else { return XCTFail("beta account missing") }
+
+        // Seed the in-memory thread cache with a stale entry
+        let postNode = ThreadPostNode(
+            uri: "at://did:plc:x/app.bsky.feed.post/1",
+            cid: nil, author: nil, record: nil, embed: nil, viewer: nil,
+            replyCount: nil, repostCount: nil, likeCount: nil, indexedAt: nil,
+            isBlocked: false, isNotFound: false
+        )
+        let threadURI = postNode.uri ?? ""
+        ThreadCacheService.shared.set(uri: threadURI, thread: ThreadNode(post: postNode, parent: nil, replies: nil))
+        XCTAssertNotNil(ThreadCacheService.shared.get(uri: threadURI))
+
+        // Second account is active after addAccount; switch back to the first
+        await store.switchAccount(to: firstAccount, using: LiveBlueskyClient())
+
+        XCTAssertEqual(store.activeAccountID, firstAccount.id)
+        XCTAssertEqual(store.previousActiveAccountID, secondAccount.id)
+        XCTAssertNil(ThreadCacheService.shared.get(uri: threadURI), "Thread cache must be cleared on account switch")
+    }
+
+    func testSwitchAccountToSameAccountIsNoOp() async {
+        let (store, _) = makeStore()
+        let client = MockAuthenticatingClient()
+
+        await addTestAccount(store: store, client: client)
+        guard let account = store.activeAccount else { return XCTFail("Expected active account") }
+
+        await store.switchAccount(to: account, using: LiveBlueskyClient())
+
+        XCTAssertEqual(store.activeAccountID, account.id)
+        XCTAssertNil(store.previousActiveAccountID)
+    }
+
+    func testSwitchAccountPostsWillSwitchBeforeIDChange() async {
+        let (store, _) = makeStore()
+        let client = MockAuthenticatingClient()
+
+        await addTestAccount(store: store, client: client, handle: "alpha.bsky.social")
+        await addTestAccount(store: store, client: client, handle: "beta.bsky.social")
+        guard let firstAccount = store.accounts.first(where: { $0.handle == "alpha.bsky.social" }) else { return XCTFail("alpha account missing") }
+        let oldID = store.activeAccountID
+
+        var postedOldID: UUID??
+        var postedObject: AppAccount?
+        let observer = NotificationCenter.default.addObserver(
+            forName: .accountWillSwitch, object: nil, queue: nil
+        ) { notification in
+            let object = notification.object as? AppAccount
+            MainActor.assumeIsolated {
+                postedOldID = store.activeAccountID
+                postedObject = object
+            }
+        }
+        defer { NotificationCenter.default.removeObserver(observer) }
+
+        await store.switchAccount(to: firstAccount, using: LiveBlueskyClient())
+
+        XCTAssertEqual(postedOldID ?? nil, oldID, "accountWillSwitch must fire before activeAccountID changes")
+        XCTAssertEqual(postedObject?.id, firstAccount.id)
+    }
+
+    func testSwitchAccountNoOpDoesNotPostWillSwitch() async {
+        let (store, _) = makeStore()
+        let client = MockAuthenticatingClient()
+
+        await addTestAccount(store: store, client: client)
+        guard let account = store.activeAccount else { return XCTFail("Expected active account") }
+
+        var didPost = false
+        let observer = NotificationCenter.default.addObserver(
+            forName: .accountWillSwitch, object: nil, queue: nil
+        ) { _ in didPost = true }
+        defer { NotificationCenter.default.removeObserver(observer) }
+
+        await store.switchAccount(to: account, using: LiveBlueskyClient())
+
+        XCTAssertFalse(didPost)
+    }
+
     // MARK: - Labels
 
     func testSetLabelUpdatesLabel() async {

@@ -129,8 +129,9 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
         try await Task.sleep(for: .milliseconds(120))
     }
 
-    func followActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {
+    func followActor(did _: String, account _: AppAccount, appPassword _: String?) async throws -> String {
         try await Task.sleep(for: .milliseconds(120))
+        return "at://mock/app.bsky.graph.follow/mock"
     }
 
     func unfollowActor(recordURI _: String, account _: AppAccount, appPassword _: String?) async throws {

@@ -72,7 +72,7 @@ struct FollowerDiffView: View {
                     .accessibilityHint(loc("follower_diff.refresh.hint"))
             }
         }
-        .task { await load() }
+        .task(id: accountStore.activeAccountID) { await load() }
     }
 
     /// Fetches followers, saves as new baseline, and computes diff from cached data.

@@ -91,6 +91,39 @@ final class BlueskyProfileViewModel {
         !combinedBlockingNames.isEmpty
     }
 
+    // MARK: - Account Switch
+
+    /// Resets all inspection state so no viewer-relative data from the previous
+    /// account remains visible. Called before reloading after an account switch.
+    func reset() {
+        inspection = nil
+        isLoading = false
+        isUpdatingModeration = false
+        handleHistory = []
+        mediaImageCount = 0
+        mediaVideoCount = 0
+        isScanningMedia = false
+        statusMessage = nil
+        errorMessage = nil
+        clearskyLists = []
+        isFetchingLists = false
+        listError = nil
+        pendingFollowingState = nil
+        pendingBlockState = nil
+        pendingMuteState = nil
+        pendingListMemberStates = [:]
+        ownedLists = nil
+        isFetchingOwnedLists = false
+        isFetchingMemberships = false
+        isUpdatingListMembership = false
+        subscribedLists = nil
+        subscribedListBlockingNames = []
+        combinedBlockingNames = []
+        blockingLists = []
+        isFetchingSubscribedLists = false
+        isCreatingList = false
+    }
+
     // MARK: - Private Methods
 
     /// Merges blocking-by-list names from viewer state, owned list memberships, and subscribed lists.

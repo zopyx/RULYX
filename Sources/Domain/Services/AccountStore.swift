@@ -293,17 +293,34 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         persist()
     }
 
-    /// Switches the active account and clears all caches (HTTP cache, DashboardCache, RelationshipCache).
+    /// Switches the active account and clears all account-scoped caches and state.
+    ///
+    /// Ordering invariant: ALL resets complete BEFORE `activeAccountID` is assigned.
+    /// Views and stores react to the `activeAccountID` change by refetching — they must
+    /// never observe a half-cleared state.
+    ///
+    /// Cleared here (single orchestration point):
+    /// - HTTP/URL caches, session cache, `BlueskyAPICache` (disk) via `client.clearAllCaches()`
+    /// - `DashboardCache` and `RelationshipCache` (disk)
+    /// - `ThreadCacheService` (in-memory thread viewer state)
+    /// - All view models observing `.accountWillSwitch` (counters zeroed synchronously)
+    /// Downstream (reacting to the `activeAccountID` change): ChatStore rebuild,
+    /// timeline/notification/list view models (refetch).
     func switchAccount(to account: AppAccount, using client: LiveBlueskyClient) async {
         guard accounts.contains(account) else { return }
         guard account.id != activeAccountID else { return } // no-op if already active
         AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .public)")
         // Track the previous account before switching
         previousActiveAccountID = activeAccountID
-        // Clear ALL caches — await both URL/API cache and Dashboard/Relationship cache
+        // Clear ALL caches — await URL/API cache, Dashboard/Relationship cache, thread cache
         await client.clearAllCaches()
         DashboardCache.clearAll()
         RelationshipCache.clearAll()
+        ThreadCacheService.shared.invalidateAll()
+        // Notify view models synchronously so every account-scoped counter is zeroed
+        // in the same runloop turn — before any view re-renders or refetches.
+        NotificationCenter.default.post(name: .accountWillSwitch, object: account)
+        // Assign last: publishes the change only after every reset above has completed.
         activeAccountID = account.id
         if let index = accounts.firstIndex(of: account) {
             accounts[index].lastUsedAt = .now
@@ -460,4 +477,12 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             }
         }
     }
+}
+
+extension Notification.Name {
+    /// Posted synchronously inside `AccountStore.switchAccount(to:using:)` — after all caches
+    /// are cleared, but BEFORE `activeAccountID` changes. `object` is the new `AppAccount`.
+    /// Account-scoped view models observe this to zero counters/visible state immediately,
+    /// independent of view lifecycle (works for tabs that are alive but not visible).
+    static let accountWillSwitch = Notification.Name("accountWillSwitch")
 }
