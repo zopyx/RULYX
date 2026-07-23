@@ -83,6 +83,9 @@ struct RelationshipsView: View {
     @State private var pendingFollowActions: Set<String> = []
     /// DIDs for which the user has double-tapped to unfollow (optimistic).
     @State private var pendingUnfollowActions: Set<String> = []
+    /// Tracks last tap for manual double-tap detection.
+    @State private var lastTapMemberID: String?
+    @State private var lastTapTime: Date?
 
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
@@ -201,9 +204,19 @@ struct RelationshipsView: View {
                             } label: {
                                 actorRowLabel(actor: actor, index: index)
                             }
-                            .highPriorityGesture(
-                                TapGesture(count: 2).onEnded {
-                                    Task { await toggleFollow(actor: actor) }
+                            .simultaneousGesture(
+                                TapGesture().onEnded {
+                                    let now = Date()
+                                    let did = actor.did
+                                    if lastTapMemberID == did, let last = lastTapTime, now.timeIntervalSince(last) < 0.35 {
+                                        // Double-tap on same actor → toggle follow
+                                        lastTapMemberID = nil
+                                        lastTapTime = nil
+                                        Task { await toggleFollow(actor: actor) }
+                                    } else {
+                                        lastTapMemberID = did
+                                        lastTapTime = now
+                                    }
                                 }
                             )
                             .appScrollTransition()
