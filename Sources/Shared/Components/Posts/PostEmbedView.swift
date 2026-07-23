@@ -94,6 +94,8 @@ struct PostEmbedView: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
         }
+        // Pin the button's tappable region to the visible card frame.
+        .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Image Grid
@@ -119,6 +121,9 @@ struct PostEmbedView: View {
                         .frame(maxHeight: isSingle ? 300 : nil)
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        // Pin the button's tappable region to the visible (clipped) frame —
+                        // resizable images can otherwise inflate hit-testing over the action bar.
+                        .contentShape(RoundedRectangle(cornerRadius: 8))
                         .overlay(alignment: .topLeading) {
                             if let alt = item.alt, !alt.isEmpty {
                                 Button {
@@ -184,6 +189,8 @@ struct PostEmbedView: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.skyPrimary.opacity(0.12), lineWidth: 1)
         }
+        // Pin the button's tappable region to the visible card frame.
+        .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Video Embed
@@ -215,6 +222,9 @@ struct PostEmbedView: View {
                 .shadow(radius: 4)
         }
         .frame(height: 200)
+        .clipped()
         .clipShape(RoundedRectangle(cornerRadius: 8))
+        // Pin the button's tappable region to the visible (clipped) frame.
+        .contentShape(RoundedRectangle(cornerRadius: 8))
     }
 }

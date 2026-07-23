@@ -69,6 +69,7 @@ struct PostRowView: View {
                         onTapImage: callbacks.onTapImage,
                         onPlayVideo: callbacks.onPlayVideo
                     )
+                    .padding(.vertical, 4)
                 }
 
                 if style == .full || style == .compact || style == .threadReply {
@@ -113,6 +114,7 @@ struct PostRowView: View {
                     onTapImage: callbacks.onTapImage,
                     onPlayVideo: callbacks.onPlayVideo
                 )
+                .padding(.vertical, 4)
             }
         }
         .padding(10)

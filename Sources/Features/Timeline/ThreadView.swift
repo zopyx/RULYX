@@ -219,7 +219,7 @@ struct ThreadView: View {
             PostRowView(
                 entry: RichFeedEntry(threadPost: node.post),
                 style: .threadReply,
-                callbacks: ancestorCallbacks(for: node.post),
+                callbacks: threadCallbacks(for: node.post),
                 avatarSize: 28
             )
         }
@@ -341,25 +341,6 @@ struct ThreadView: View {
             isLiked: post.isLikedByMe,
             isReposted: post.isRepostedByMe,
             availableLikerTargetLists: likerActions.availableTargetLists
-        )
-    }
-
-    private func ancestorCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
-        let authorCB = makeAuthorCallbacks(author: post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
-        return PostRowCallbacks(
-            onOpenProfile: { handle in
-                if let author = post.author {
-                    profileToShow = BlueskyActor(
-                        did: author.did ?? handle,
-                        handle: author.handle ?? handle,
-                        displayName: author.displayName
-                    )
-                }
-            },
-            onCopy: { UIPasteboard.general.string = post.record?.text },
-            onTranslate: { translateText(post.record?.text ?? "") },
-            onBlockAuthor: authorCB.onBlock,
-            onAddAuthorToList: authorCB.onAddToList
         )
     }
 
