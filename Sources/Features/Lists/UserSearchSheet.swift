@@ -20,8 +20,6 @@ struct UserSearchSheet: View {
 
     @State private var pendingFollowActions: Set<String> = []
     @State private var pendingUnfollowActions: Set<String> = []
-    @State private var lastTapMemberID: String?
-    @State private var lastTapTime: Date?
 
     var body: some View {
         NavigationStack {
@@ -56,11 +54,9 @@ struct UserSearchSheet: View {
                                 .padding(.leading, 46)
                         }
                     }
-                    .simultaneousGesture(
-                        TapGesture().onEnded {
-                            if handleTap(actor: actor) {
-                                Task { await toggleFollow(actor: actor) }
-                            }
+                    .highPriorityGesture(
+                        TapGesture(count: 2).onEnded {
+                            Task { await toggleFollow(actor: actor) }
                         }
                     )
                 }
@@ -172,16 +168,4 @@ struct UserSearchSheet: View {
         }
     }
 
-    private func handleTap(actor: BlueskyActor) -> Bool {
-        let now = Date()
-        let threshold: TimeInterval = 0.35
-        if actor.did == lastTapMemberID, let lastTap = lastTapTime, now.timeIntervalSince(lastTap) < threshold {
-            lastTapMemberID = nil
-            lastTapTime = nil
-            return true
-        }
-        lastTapMemberID = actor.did
-        lastTapTime = now
-        return false
-    }
 }

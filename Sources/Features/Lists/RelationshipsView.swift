@@ -83,9 +83,6 @@ struct RelationshipsView: View {
     @State private var pendingFollowActions: Set<String> = []
     /// DIDs for which the user has double-tapped to unfollow (optimistic).
     @State private var pendingUnfollowActions: Set<String> = []
-    /// Tracks last tap for manual double-tap detection.
-    @State private var lastTapMemberID: String?
-    @State private var lastTapTime: Date?
 
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
@@ -204,11 +201,9 @@ struct RelationshipsView: View {
                             } label: {
                                 actorRowLabel(actor: actor, index: index)
                             }
-                            .simultaneousGesture(
-                                TapGesture().onEnded {
-                                    if handleTap(actor: actor) {
-                                        Task { await toggleFollow(actor: actor) }
-                                    }
+                            .highPriorityGesture(
+                                TapGesture(count: 2).onEnded {
+                                    Task { await toggleFollow(actor: actor) }
                                 }
                             )
                             .appScrollTransition()
@@ -1198,21 +1193,6 @@ struct RelationshipsView: View {
                 pendingFollowActions.remove(did)
             }
         }
-    }
-
-    /// Manual double-tap detection for member rows.
-    /// Returns true if this is the second tap on the same actor within the threshold.
-    private func handleTap(actor: BlueskyActor) -> Bool {
-        let now = Date()
-        let threshold: TimeInterval = 0.35
-        if actor.did == lastTapMemberID, let lastTap = lastTapTime, now.timeIntervalSince(lastTap) < threshold {
-            lastTapMemberID = nil
-            lastTapTime = nil
-            return true
-        }
-        lastTapMemberID = actor.did
-        lastTapTime = now
-        return false
     }
 
     private var cacheKey: String? {
