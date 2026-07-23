@@ -77,15 +77,15 @@ struct RelationshipsView: View {
     /// DID → block record URI for unblocking (Blocking mode). Only populated when mode == .blocking.
     @State private var blockRecordURIs: [String: String] = [:]
 
+    /// Actor selected for profile navigation (single tap).
+    @State private var selectedActor: BlueskyActor?
+
     // MARK: - Optimistic Follow State (double-tap)
 
     /// DIDs for which the user has double-tapped to follow (optimistic).
     @State private var pendingFollowActions: Set<String> = []
     /// DIDs for which the user has double-tapped to unfollow (optimistic).
     @State private var pendingUnfollowActions: Set<String> = []
-    /// Tracks last tap for manual double-tap detection.
-    @State private var lastTapMemberID: String?
-    @State private var lastTapTime: Date?
 
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
@@ -196,31 +196,16 @@ struct RelationshipsView: View {
                         }
                     } else {
                         ForEach(Array(filteredActors.enumerated()), id: \.element.id) { index, actor in
-                            NavigationLink {
-                                BlueskyProfileView(
-                                    member: BlueskyListMember(recordURI: "rel:\(actor.did)", actor: actor),
-                                    list: nil
-                                )
-                            } label: {
-                                actorRowLabel(actor: actor, index: index)
-                            }
-                            .simultaneousGesture(
-                                TapGesture().onEnded {
-                                    let now = Date()
-                                    let did = actor.did
-                                    if lastTapMemberID == did, let last = lastTapTime, now.timeIntervalSince(last) < 0.35 {
-                                        // Double-tap on same actor → toggle follow
-                                        lastTapMemberID = nil
-                                        lastTapTime = nil
-                                        Task { await toggleFollow(actor: actor) }
-                                    } else {
-                                        lastTapMemberID = did
-                                        lastTapTime = now
-                                    }
+                            actorRowLabel(actor: actor, index: index)
+                                .contentShape(Rectangle())
+                                .onTapGesture(count: 2) {
+                                    Task { await toggleFollow(actor: actor) }
                                 }
-                            )
-                            .appScrollTransition()
-                            .contextMenu {
+                                .onTapGesture(count: 1) {
+                                    selectedActor = actor
+                                }
+                                .appScrollTransition()
+                                .contextMenu {
                                 Button(role: .destructive) {
                                     actorToBlock = actor
                                     if confirmBlocks {
@@ -503,6 +488,12 @@ struct RelationshipsView: View {
         }
         .refreshable {
             await refresh()
+        }
+        .navigationDestination(item: $selectedActor) { actor in
+            BlueskyProfileView(
+                member: BlueskyListMember(recordURI: "rel:\(actor.did)", actor: actor),
+                list: nil
+            )
         }
         .fileImporter(
             isPresented: $isShowingJSONImportPicker,

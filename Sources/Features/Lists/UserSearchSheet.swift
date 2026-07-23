@@ -13,15 +13,13 @@ struct UserSearchSheet: View {
     @State private var searchQuery = ""
     @State private var results: [BlueskyActor] = []
     @State private var isSearching = false
-    @State private var selectedActor: BlueskyActor?
+    @State private var profileActor: BlueskyActor?
     @FocusState private var searchFocused: Bool
 
     // MARK: - Optimistic Follow State
 
     @State private var pendingFollowActions: Set<String> = []
     @State private var pendingUnfollowActions: Set<String> = []
-    @State private var lastTapMemberID: String?
-    @State private var lastTapTime: Date?
 
     var body: some View {
         NavigationStack {
@@ -42,34 +40,18 @@ struct UserSearchSheet: View {
                 }
 
                 ForEach(results) { actor in
-                    NavigationLink {
-                        BlueskyProfileView(
-                            member: BlueskyListMember(recordURI: "search:\(actor.did)", actor: actor),
-                            list: nil
-                        )
-                        .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            BlueskyActorRow(actor: actor)
-                            MemberFollowBadgesView(viewerState: effectiveViewerState(for: actor))
-                                .padding(.leading, 46)
-                        }
+                    VStack(alignment: .leading, spacing: 2) {
+                        BlueskyActorRow(actor: actor)
+                        MemberFollowBadgesView(viewerState: effectiveViewerState(for: actor))
+                            .padding(.leading, 46)
                     }
-                    .simultaneousGesture(
-                        TapGesture().onEnded {
-                            let now = Date()
-                            let did = actor.did
-                            if lastTapMemberID == did, let last = lastTapTime, now.timeIntervalSince(last) < 0.35 {
-                                lastTapMemberID = nil
-                                lastTapTime = nil
-                                Task { await toggleFollow(actor: actor) }
-                            } else {
-                                lastTapMemberID = did
-                                lastTapTime = now
-                            }
-                        }
-                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: 2) {
+                        Task { await toggleFollow(actor: actor) }
+                    }
+                    .onTapGesture(count: 1) {
+                        profileActor = actor
+                    }
                 }
 
                 if isSearching {
@@ -86,6 +68,14 @@ struct UserSearchSheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     ToolbarCloseButton()
                 }
+            }
+            .navigationDestination(item: $profileActor) { actor in
+                BlueskyProfileView(
+                    member: BlueskyListMember(recordURI: "search:\(actor.did)", actor: actor),
+                    list: nil
+                )
+                .environmentObject(accountStore)
+                .environmentObject(container.blueskyClient)
             }
         }
         .onChange(of: searchQuery) { _, query in
@@ -178,5 +168,4 @@ struct UserSearchSheet: View {
             }
         }
     }
-
 }
