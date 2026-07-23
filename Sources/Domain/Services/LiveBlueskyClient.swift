@@ -450,7 +450,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 handle: $0.handle,
                 displayName: $0.displayName,
                 avatarURL: URL(string: $0.avatar ?? ""),
-                description: $0.description
+                description: $0.description,
+                viewerState: mapViewerState($0.viewer)
             )
         }
     }
@@ -491,7 +492,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     handle: $0.handle,
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
-                    description: $0.description
+                    description: $0.description,
+                    viewerState: mapViewerState($0.viewer)
                 )
             },
             cursor: response.cursor
@@ -1783,7 +1785,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
                     createdAt: parseDate($0.createdAt),
-                    description: $0.description
+                    description: $0.description,
+                    viewerState: mapViewerState($0.viewer)
                 )
             },
             cursor: response.cursor
@@ -1855,7 +1858,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
                     createdAt: parseDate($0.createdAt),
-                    description: $0.description
+                    description: $0.description,
+                    viewerState: mapViewerState($0.viewer)
                 )
             },
             cursor: response.cursor
