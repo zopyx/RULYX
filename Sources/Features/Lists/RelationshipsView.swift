@@ -77,6 +77,16 @@ struct RelationshipsView: View {
     /// DID → block record URI for unblocking (Blocking mode). Only populated when mode == .blocking.
     @State private var blockRecordURIs: [String: String] = [:]
 
+    // MARK: - Optimistic Follow State (double-tap)
+
+    /// DIDs for which the user has double-tapped to follow (optimistic).
+    @State private var pendingFollowActions: Set<String> = []
+    /// DIDs for which the user has double-tapped to unfollow (optimistic).
+    @State private var pendingUnfollowActions: Set<String> = []
+    /// Tracks last tap for manual double-tap detection.
+    @State private var lastTapMemberID: String?
+    @State private var lastTapTime: Date?
+
     /// Block-all-back state — uses shared VM
     @State private var actionsVM: BlueskyProfileActionsViewModel?
 
@@ -194,6 +204,13 @@ struct RelationshipsView: View {
                             } label: {
                                 actorRowLabel(actor: actor, index: index)
                             }
+                            .simultaneousGesture(
+                                TapGesture().onEnded {
+                                    if handleTap(actor: actor) {
+                                        Task { await toggleFollow(actor: actor) }
+                                    }
+                                }
+                            )
                             .appScrollTransition()
                             .contextMenu {
                                 Button(role: .destructive) {
@@ -293,11 +310,11 @@ struct RelationshipsView: View {
                             HStack(spacing: 12) {
                                 Label("\(actionsVM?.blockBackSuccessCount ?? 0)", systemImage: "checkmark.circle.fill")
                                     .font(.caption)
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(Color.successGreen)
                                 if (actionsVM?.blockBackFailureCount ?? 0) > 0 {
                                     Label("\(actionsVM?.blockBackFailureCount ?? 0)", systemImage: "xmark.circle.fill")
                                         .font(.caption)
-                                        .foregroundStyle(.red)
+                                        .foregroundStyle(Color.errorRed)
                                 }
                                 Spacer()
                             }
@@ -337,10 +354,10 @@ struct RelationshipsView: View {
                         HStack(spacing: 8) {
                             if (actionsVM?.blockBackFailureCount ?? 0) == 0 {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(Color.successGreen)
                             } else {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(Color.warningOrange)
                             }
                             Text(blockBackResultSummary)
                                 .font(.caption)
@@ -1062,7 +1079,7 @@ struct RelationshipsView: View {
                     if actor.isNew {
                         Text(loc("rel.new_badge"))
                             .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.warningOrange)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
                             .background(Color.orange.opacity(0.12), in: Capsule())
@@ -1080,6 +1097,10 @@ struct RelationshipsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            // Follow-relationship badges below the handle
+            MemberFollowBadgesView(viewerState: effectiveViewerState(for: actor))
+                .padding(.leading, 46) // indent below text column (avatar 36 + spacing 10)
 
             if mode == .following, showActorStats, let stats = profileStats[actor.did] {
                 HStack(spacing: 4) {
@@ -1111,6 +1132,87 @@ struct RelationshipsView: View {
                 .padding(.bottom, 4)
             }
         }
+    }
+
+    // MARK: - Follow / Unfollow via Double-Tap
+
+    /// Returns the effective viewer state for an actor, merging API data
+    /// with any pending optimistic follow/unfollow action.
+    private func effectiveViewerState(for actor: BlueskyActor) -> BlueskyViewerState? {
+        guard var state = actor.viewerState else { return nil }
+        if pendingFollowActions.contains(actor.did) {
+            state = state.withOptimisticFollow(following: true)
+        }
+        if pendingUnfollowActions.contains(actor.did) {
+            state = state.withOptimisticFollow(following: false)
+        }
+        return state
+    }
+
+    /// Toggles follow state for an actor with optimistic UI feedback.
+    /// Double-tap a row to follow (if not following) or unfollow (if following).
+    private func toggleFollow(actor: BlueskyActor) async {
+        guard let activeAccount = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: activeAccount)
+        else { return }
+
+        let did = actor.did
+        let isCurrentlyFollowing = actor.viewerState?.isFollowing == true
+
+        if isCurrentlyFollowing {
+            // Optimistic: show unfollowed
+            pendingUnfollowActions.insert(did)
+            pendingFollowActions.remove(did)
+
+            guard let recordURI = actor.viewerState?.followingRecordURI else {
+                pendingUnfollowActions.remove(did)
+                return
+            }
+
+            do {
+                try await container.social.unfollowActor(
+                    recordURI: recordURI,
+                    account: activeAccount,
+                    appPassword: appPassword
+                )
+                // Optimistic: pendingUnfollowActions keeps the badge hidden
+                // On the next full reload, viewerState will reflect the change.
+            } catch {
+                // Revert optimistic update
+                pendingUnfollowActions.remove(did)
+            }
+        } else {
+            // Optimistic: show following
+            pendingFollowActions.insert(did)
+            pendingUnfollowActions.remove(did)
+
+            do {
+                try await container.social.followActor(
+                    did: did,
+                    account: activeAccount,
+                    appPassword: appPassword
+                )
+                // Optimistic: pendingFollowActions keeps the badge visible
+            } catch {
+                // Revert optimistic update
+                pendingFollowActions.remove(did)
+            }
+        }
+    }
+
+    /// Manual double-tap detection for member rows.
+    /// Returns true if this is the second tap on the same actor within the threshold.
+    private func handleTap(actor: BlueskyActor) -> Bool {
+        let now = Date()
+        let threshold: TimeInterval = 0.35
+        if actor.did == lastTapMemberID, let lastTap = lastTapTime, now.timeIntervalSince(lastTap) < threshold {
+            lastTapMemberID = nil
+            lastTapTime = nil
+            return true
+        }
+        lastTapMemberID = actor.did
+        lastTapTime = now
+        return false
     }
 
     private var cacheKey: String? {

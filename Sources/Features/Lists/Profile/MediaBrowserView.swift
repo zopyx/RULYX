@@ -164,7 +164,7 @@ struct MediaBrowserView: View {
                             LabeledContent(loc("profile.media.download_succeeded"), value: "\(summary.succeeded)")
                             if summary.failed > 0 {
                                 LabeledContent(loc("profile.media.download_failed"), value: "\(summary.failed)")
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(Color.errorRed)
                             }
                             LabeledContent(loc("profile.media.download_folder"), value: summary.directory.lastPathComponent)
                         }
@@ -173,7 +173,7 @@ struct MediaBrowserView: View {
                                 ForEach(summary.errors, id: \.self) { error in
                                     Text(error)
                                         .font(.caption2)
-                                        .foregroundStyle(.red)
+                                        .foregroundStyle(Color.errorRed)
                                 }
                             } header: {
                                 Text(loc: "profile.media.download_errors")
@@ -405,6 +405,7 @@ private struct MediaSelectionIndicator: View {
             .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
             .shadow(color: .black.opacity(0.4), radius: 2)
             .padding(6)
+            .accessibilityLabel(isSelected ? loc("a11y.selected") : loc("a11y.not_selected"))
     }
 }
 
@@ -450,6 +451,7 @@ struct VideoPlayerView: View {
                         .foregroundStyle(.white.opacity(0.8))
                         .padding()
                 }
+                .accessibilityLabel(loc("actions.close"))
             }
             .onAppear {
                 player = AVPlayer(url: url)
@@ -544,6 +546,7 @@ private struct ImagePreviewView: View {
                         .foregroundStyle(.white.opacity(0.8))
                         .padding()
                 }
+                .accessibilityLabel(loc("actions.close"))
             }
             .onTapGesture {
                 if scale <= 1 {

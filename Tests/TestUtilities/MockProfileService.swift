@@ -56,6 +56,7 @@ final class MockProfileService: BlueskyProfileInspecting {
 
     var blockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unblockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
+    var softBlockActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var followActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var unfollowActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var muteActorHandler: @Sendable (String, AppAccount, String?) async throws -> Void = { _, _, _ in }
@@ -69,6 +70,7 @@ final class MockProfileService: BlueskyProfileInspecting {
     var reportAccountTypedHandler: @Sendable (String, ModerationReportReasonType?, String?, AppAccount, String?) async throws -> Void = { _, _, _, _, _ in }
     var putProfileRecordHandler: @Sendable (ProfileRecord, AppAccount, String?) async throws -> Void = { _, _, _ in }
     var fetchExistingBlockedDIDsHandler: @Sendable (AppAccount, String?) async throws -> Set<String> = { _, _ in [] }
+    var fetchExistingBlockRecordURIsHandler: @Sendable (AppAccount, String?) async throws -> [String: String] = { _, _ in [:] }
 
     func searchActors(query: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyActor] {
         try await searchActorsHandler(query, account, appPassword)
@@ -92,6 +94,10 @@ final class MockProfileService: BlueskyProfileInspecting {
 
     func unblockActor(recordURI: String, account: AppAccount, appPassword: String?) async throws {
         try await unblockActorHandler(recordURI, account, appPassword)
+    }
+
+    func softBlockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
+        try await softBlockActorHandler(actorDID, account, appPassword)
     }
 
     func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
@@ -144,5 +150,9 @@ final class MockProfileService: BlueskyProfileInspecting {
 
     func fetchExistingBlockedDIDs(account: AppAccount, appPassword: String?) async throws -> Set<String> {
         try await fetchExistingBlockedDIDsHandler(account, appPassword)
+    }
+
+    func fetchExistingBlockRecordURIs(account: AppAccount, appPassword: String?) async throws -> [String: String] {
+        try await fetchExistingBlockRecordURIsHandler(account, appPassword)
     }
 }

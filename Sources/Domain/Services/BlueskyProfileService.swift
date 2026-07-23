@@ -76,7 +76,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     handle: $0.handle,
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
-                    description: $0.description
+                    description: $0.description,
+                    viewerState: mapViewerState($0.viewer)
                 )
             },
             cursor: response.cursor
@@ -139,7 +140,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
                     createdAt: parseDate($0.createdAt),
-                    description: $0.description
+                    description: $0.description,
+                    viewerState: mapViewerState($0.viewer)
                 )
             },
             cursor: response.cursor
@@ -335,7 +337,8 @@ final class BlueskyProfileService: ObservableObject, BlueskyProfileInspecting {
                     displayName: $0.displayName,
                     avatarURL: URL(string: $0.avatar ?? ""),
                     createdAt: parseDate($0.createdAt),
-                    description: $0.description
+                    description: $0.description,
+                    viewerState: mapViewerState($0.viewer)
                 )
             },
             cursor: response.cursor

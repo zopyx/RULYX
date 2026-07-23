@@ -203,7 +203,7 @@ struct BatchOperationProgressView: View {
         HStack(spacing: 10) {
             if isComplete {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.successGreen)
                     .font(.title3)
             } else {
                 ProgressView()

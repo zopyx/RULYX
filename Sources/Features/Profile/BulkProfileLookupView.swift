@@ -140,12 +140,12 @@ private struct ProfileLookupResultRow: View {
                 Circle()
                     .fill(Color.red.opacity(0.1))
                     .frame(width: 40, height: 40)
-                    .overlay { Image(systemName: "questionmark").font(.headline).foregroundStyle(.red) }
+                    .overlay { Image(systemName: "questionmark").font(.headline).foregroundStyle(Color.errorRed) }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(result.query).font(.subheadline.monospaced())
                     if let error = result.error {
-                        Text(error).font(.caption).foregroundStyle(.red)
+                        Text(error).font(.caption).foregroundStyle(Color.errorRed)
                     }
                 }
             }

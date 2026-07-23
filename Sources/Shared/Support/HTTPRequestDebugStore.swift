@@ -183,7 +183,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
         var result = url
         let nsRange = NSRange(result.startIndex..., in: result)
         for (regex, template) in urlSanitizers {
-            result = regex.stringByReplacingMatches(in: result, range: nsRange, withTemplate: template)
+            result = regex.stringByReplacingMatches(in  : result, range: nsRange, withTemplate: template)
         }
         return result
     }

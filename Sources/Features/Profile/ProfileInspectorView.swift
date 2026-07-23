@@ -44,7 +44,11 @@ struct ProfileInspectorView: View {
                                     )
                                 }
                             } label: {
-                                BlueskyActorRow(actor: actor)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    BlueskyActorRow(actor: actor)
+                                    MemberFollowBadgesView(viewerState: actor.viewerState)
+                                        .padding(.leading, 46)
+                                }
                             }
                             .buttonStyle(.plain)
                             .accessibilityHint(localizationManager.localized("profile.result.hint"))

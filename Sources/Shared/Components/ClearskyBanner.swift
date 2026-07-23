@@ -20,7 +20,7 @@ struct ClearskyBanner: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
         .background(Color.red.opacity(0.12))
-        .foregroundStyle(.red)
+        .foregroundStyle(Color.errorRed)
     }
 }
 

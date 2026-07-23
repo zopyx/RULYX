@@ -23,7 +23,8 @@ final class PreviewAIService: LiveAIService {
             downloadURL: URL(string: "https://example.com/models/toxicity-v1.mlpackage.zip")!,
             fileSize: 4_194_304,
             description: "Detects toxic, harassing, and abusive language in posts.",
-            requires: "17.0"
+            requires: "17.0",
+            sha256: nil
         ),
         ModelBundle(
             id: "phi-3-mini-q4",
@@ -32,7 +33,8 @@ final class PreviewAIService: LiveAIService {
             downloadURL: URL(string: "https://example.com/models/phi-3-mini-q4.gguf")!,
             fileSize: 2_147_483_648,
             description: "Microsoft Phi-3 mini 3.8B parameter model, 4-bit quantized.",
-            requires: "17.0"
+            requires: "17.0",
+            sha256: nil
         ),
     ]
 

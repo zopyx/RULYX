@@ -212,7 +212,7 @@ struct iPadRootView: View {
                             .multilineTextAlignment(.center)
                         Text(verbatim: localizationManager.localized("onboarding.subtitle"))
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.top, 32)
 

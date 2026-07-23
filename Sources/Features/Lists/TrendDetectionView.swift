@@ -33,7 +33,7 @@ struct TrendDetectionView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(actor.title).font(.headline)
                         Text(actor.handle).font(.subheadline).foregroundStyle(.secondary)
-                        Text(reason).font(.caption).foregroundStyle(.orange)
+                        Text(reason).font(.caption).foregroundStyle(Color.warningOrange)
                     }
                 }
             }

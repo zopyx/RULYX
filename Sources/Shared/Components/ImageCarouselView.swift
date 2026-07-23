@@ -79,6 +79,7 @@ struct ImageCarouselView: View {
                             .padding(8)
                             .background(.black.opacity(0.3), in: Circle())
                     }
+                    .accessibilityLabel(loc("actions.close"))
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 54)

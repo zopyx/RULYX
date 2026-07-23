@@ -256,7 +256,7 @@ struct ListTimelineView: View {
                 VStack(spacing: 8) {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.warningOrange)
                         Text(msg)
                             .font(.caption)
                             .foregroundStyle(.secondary)

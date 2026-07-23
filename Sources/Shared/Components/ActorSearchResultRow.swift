@@ -25,7 +25,9 @@ struct ActorSearchResultRow: View {
                     .foregroundStyle(isSelected ? Color.skyPrimary : Color.secondary.opacity(0.45))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(isSelected ? "Deselect \(actor.handle)" : "Select \(actor.handle)")
+            .accessibilityLabel(isSelected
+                ? loc("actor_search.deselect.label").replacingOccurrences(of: "{handle}", with: actor.handle)
+                : loc("actor_search.select.label").replacingOccurrences(of: "{handle}", with: actor.handle))
             .accessibilityHint(loc("actor_search.toggle.hint"))
 
             BlueskyActorRow(actor: actor)

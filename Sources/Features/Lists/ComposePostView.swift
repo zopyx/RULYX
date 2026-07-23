@@ -26,7 +26,7 @@ struct ComposePostView: View {
                         } else if let loadError = viewModel.loadError {
                             HStack {
                                 Image(systemName: "exclamationmark.triangle")
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(Color.warningOrange)
                                 Text(loadError)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -54,7 +54,7 @@ struct ComposePostView: View {
                         if viewModel.postText.count > 300 {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.errorRed)
                         }
                         Text("\(viewModel.postText.count)/300")
                             .font(.caption)
@@ -256,7 +256,7 @@ struct ComposePostView: View {
                                         } else {
                                             Image(systemName: "checkmark.circle.fill")
                                                 .font(.caption)
-                                                .foregroundStyle(.green)
+                                                .foregroundStyle(Color.successGreen)
                                                 .background(Circle().fill(.white).frame(width: 12, height: 12))
                                                 .padding(6)
                                         }
@@ -272,7 +272,7 @@ struct ComposePostView: View {
                                             } label: {
                                                 Image(systemName: "xmark.circle.fill")
                                                     .font(.title3)
-                                                    .foregroundStyle(.red)
+                                                    .foregroundStyle(Color.errorRed)
                                                     .background(Circle().fill(.ultraThinMaterial).frame(width: 24, height: 24))
                                             }
                                             .buttonStyle(.plain)

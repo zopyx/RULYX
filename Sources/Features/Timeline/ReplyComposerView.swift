@@ -72,9 +72,10 @@ struct ReplyComposerView: View {
                                             selectedImages.remove(at: index)
                                         } label: {
                                             Image(systemName: "xmark.circle.fill")
-                                                .foregroundStyle(.red)
+                                                .foregroundStyle(Color.errorRed)
                                                 .background(Circle().fill(.white))
                                         }
+                                        .accessibilityLabel(loc("actions.remove"))
                                         .padding(4)
                                     }
                                 }
@@ -116,7 +117,7 @@ struct ReplyComposerView: View {
                         if let errorMessage {
                             Text(errorMessage)
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.errorRed)
                                 .lineLimit(1)
                         }
                     }

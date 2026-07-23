@@ -118,7 +118,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
                         displayName: $0.subject.displayName,
                         avatarURL: URL(string: $0.subject.avatar ?? "")
                     ),
-                    createdAt: parseDate($0.createdAt)
+                    createdAt: parseDate($0.createdAt),
+                    viewerState: mapViewerState($0.subject.viewer)
                 )
             },
             cursor: response.cursor,

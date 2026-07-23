@@ -58,6 +58,7 @@ struct iPadCommandPalette: View {
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(loc("actions.clear_search"))
                 }
             }
             .padding()

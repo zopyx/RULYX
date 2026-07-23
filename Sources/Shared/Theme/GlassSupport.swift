@@ -186,7 +186,7 @@ extension View {
             if store.isDeactivated(account) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.caption)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Color.warningOrange)
             }
 
             if account.id == store.activeAccountID {

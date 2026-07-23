@@ -27,9 +27,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// The default base URL for the Bluesky PDS.
     private let baseURL: URL
     private let httpClient: HTTPClient
-    /// HTTP client for AppView-proxied PDS requests. Uses no certificate pinning
-    /// because PDS hosts are dynamic and vary per user account.
-    private let appViewHTTPClient = HTTPClient()
+    /// HTTP client for AppView-proxied PDS requests. Pins known Bluesky/ClearSky
+    /// hosts via HTTPClient.defaultPinnedHashes; custom PDS hosts use standard TLS
+    /// validation (CertificatePinningDelegate falls back to performDefaultHandling
+    /// when no pin matches the host).
+    private let appViewHTTPClient = HTTPClient(session: URLSession.shared, pinnedHashes: HTTPClient.defaultPinnedHashes)
     private let session: URLSession
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
@@ -249,7 +251,17 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
         return PagedListMembers(
             members: response.items.map {
-                BlueskyListMember(recordURI: $0.uri, actor: BlueskyActor(did: $0.subject.did, handle: $0.subject.handle, displayName: $0.subject.displayName, avatarURL: URL(string: $0.subject.avatar ?? "")), createdAt: parseDate($0.createdAt))
+                BlueskyListMember(
+                    recordURI: $0.uri,
+                    actor: BlueskyActor(
+                        did: $0.subject.did,
+                        handle: $0.subject.handle,
+                        displayName: $0.subject.displayName,
+                        avatarURL: URL(string: $0.subject.avatar ?? "")
+                    ),
+                    createdAt: parseDate($0.createdAt),
+                    viewerState: mapViewerState($0.subject.viewer)
+                )
             },
             cursor: response.cursor,
             memberCount: response.list?.listItemCount

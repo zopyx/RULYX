@@ -56,7 +56,7 @@ struct ChatMessageBubble: View {
                     if isPending {
                         Image(systemName: "clock")
                             .font(.caption2)
-                            .foregroundStyle(isOutgoing ? .white.opacity(0.6) : Color(.secondaryLabel))
+                            .foregroundStyle(isOutgoing ? .white.opacity(0.9) : Color(.secondaryLabel))
                     }
 
                     if hasFailed {
@@ -65,7 +65,7 @@ struct ChatMessageBubble: View {
                         } label: {
                             Image(systemName: "exclamationmark.circle.fill")
                                 .font(.caption2)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.errorRed)
                         }
                     }
 
@@ -77,7 +77,7 @@ struct ChatMessageBubble: View {
                                     .font(.caption2)
                                 if grouped[emoji]!.count > 1 {
                                     Text("\(grouped[emoji]!.count)")
-                                        .font(.system(size: 9, weight: .semibold))
+                                        .font(.caption2.weight(.semibold))
                                 }
                             }
                             .padding(.horizontal, 5)
@@ -88,12 +88,12 @@ struct ChatMessageBubble: View {
 
                     Text(timeString)
                         .font(.caption2)
-                        .foregroundStyle(isOutgoing ? .white.opacity(0.8) : Color(.secondaryLabel))
+                        .foregroundStyle(isOutgoing ? .white.opacity(0.9) : Color(.secondaryLabel))
                 }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isOutgoing ? Color.skyPrimary : Color(.systemGray5))
+            .background(isOutgoing ? Color.chatBubbleOutgoing : Color(.systemGray5))
             .opacity(isPending ? 0.6 : 1.0)
             .clipShape(BubbleShape(isOutgoing: isOutgoing))
             .contextMenu {

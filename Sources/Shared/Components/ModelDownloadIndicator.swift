@@ -28,14 +28,15 @@ struct ModelDownloadIndicator: View {
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.2), value: progress)
                 Text(Int(progress * 100).formatted() + "%")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
+                    .minimumScaleFactor(0.6)
                     .foregroundStyle(.primary)
             }
 
         case .ready:
             HStack(spacing: 4) {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.successGreen)
                     .font(.caption)
                 Button(loc("ai.models.delete"), role: .destructive, action: onDelete)
                     .buttonStyle(.bordered)
@@ -47,7 +48,7 @@ struct ModelDownloadIndicator: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(msg)
                     .font(.caption2)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Color.errorRed)
                     .lineLimit(1)
                 Button(loc("ai.models.retry"), action: onDownload)
                     .buttonStyle(.bordered)

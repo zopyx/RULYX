@@ -31,3 +31,6 @@ fastlane/README.md
 
 # Credentials
 accounts.txt
+
+# Build-time secrets (API keys injected via xcconfig)
+Config/Secrets.xcconfig

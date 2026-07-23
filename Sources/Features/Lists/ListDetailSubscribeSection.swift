@@ -35,7 +35,7 @@ struct ListDetailSubscribeSection: View {
                 if let error = subscribeError {
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Color.errorRed)
                 }
 
                 Button {

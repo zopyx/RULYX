@@ -132,7 +132,7 @@ struct PendingActionsSheet: View {
                             Color.clear.background(Color.orange.opacity(0.12), in: Capsule())
                         }
                     }
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Color.warningOrange)
             } else {
                 Text(loc: "pending.status.done")
                     .font(.caption2.weight(.semibold))
@@ -145,7 +145,7 @@ struct PendingActionsSheet: View {
                             Color.clear.background(Color.green.opacity(0.12), in: Capsule())
                         }
                     }
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.successGreen)
             }
         }
     }

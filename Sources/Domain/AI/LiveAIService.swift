@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 // MARK: - LiveAIService
@@ -34,7 +35,8 @@ class LiveAIService: ObservableObject {
             downloadURL: URL(string: "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf")!,
             fileSize: 2_350_000_000,
             description: "Microsoft Phi-3 mini 3.8B parameter model, 4-bit quantized.",
-            requires: "17.0"
+            requires: "17.0",
+            sha256: nil
         ),
         ModelBundle(
             id: "qwen3-1.7b-q8",
@@ -43,7 +45,8 @@ class LiveAIService: ObservableObject {
             downloadURL: URL(string: "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q8_0.gguf")!,
             fileSize: 1_834_426_016,
             description: "Official Qwen3 1.7B model, Q8_0 quantized, for on-device moderation and content analysis.",
-            requires: "17.0"
+            requires: "17.0",
+            sha256: nil
         ),
     ]
 
@@ -122,6 +125,22 @@ class LiveAIService: ObservableObject {
             downloadManager.recordFailure(id: model.id, message: error.localizedDescription)
             rebuildStates()
             throw error
+        }
+
+        // SHA-256 integrity check (when hash is configured)
+        if let expectedHash = model.sha256 {
+            let fileHandle = try FileHandle(forReadingFrom: local)
+            let fileData = fileHandle.readDataToEndOfFile()
+            try fileHandle.close()
+            let actualHash = SHA256.hash(data: fileData).map { String(format: "%02x", $0) }.joined()
+            guard actualHash == expectedHash.lowercased() else {
+                let error = AIError("Model integrity check failed: SHA-256 mismatch. Expected \(expectedHash), got \(actualHash).")
+                try? fileManager.delete(model.id)
+                downloadManager.recordFailure(id: model.id, message: error.localizedDescription)
+                rebuildStates()
+                throw error
+            }
+            AppLogger.persistence.info("SHA-256 integrity check passed for \(model.id, privacy: .public)")
         }
 
         rebuildStates()

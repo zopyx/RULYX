@@ -75,7 +75,7 @@ struct ActivityLogView: View {
                         Text(entry.summary).font(.caption).foregroundStyle(.secondary)
                         if !entry.failedHandles.isEmpty {
                             Text(verbatim: loc("activity.failed_format").replacingOccurrences(of: "{handles}", with: entry.failedHandles.joined(separator: ", ")))
-                                .font(.caption2).foregroundStyle(.red)
+                                .font(.caption2).foregroundStyle(Color.errorRed)
                         }
                     }
                     .padding(.vertical, 2)

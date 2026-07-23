@@ -1429,5 +1429,12 @@
   "settings.confirm_unfollow": "Confirm unfollow",
   "rel.block_no_posts": "Block all without posts",
   "rel.block_no_posts.confirm": "Block {count} accounts without posts?",
-  "rel.block_no_posts.confirm.message": "These accounts have zero posts and will be blocked immediately."
+  "rel.block_no_posts.confirm.message": "These accounts have zero posts and will be blocked immediately.",
+  "actions.clear_search": "Clear search",
+  "lists.members.count": "{n} members",
+  "a11y.selected": "Selected",
+  "a11y.not_selected": "Not selected",
+  "actions.dismiss": "Dismiss",
+  "actor_search.select.label": "Select {handle}",
+  "actor_search.deselect.label": "Deselect {handle}"
 }

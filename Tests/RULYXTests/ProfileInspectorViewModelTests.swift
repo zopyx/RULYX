@@ -223,4 +223,10 @@ private struct MockLiveBlueskyClient: BlueskyProfileInspecting {
     func fetchExistingBlockedDIDs(account _: AppAccount, appPassword _: String?) async throws -> Set<String> {
         []
     }
+
+    func softBlockActor(did _: String, account _: AppAccount, appPassword _: String?) async throws {}
+
+    func fetchExistingBlockRecordURIs(account _: AppAccount, appPassword _: String?) async throws -> [String: String] {
+        [:]
+    }
 }

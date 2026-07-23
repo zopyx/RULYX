@@ -234,7 +234,7 @@ struct iPadProfileInspector: View {
                             if let count = list.memberCount {
                                 Text("\(count)")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }

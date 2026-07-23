@@ -74,7 +74,7 @@ struct iPadDashboardView: View {
                     .foregroundStyle(.secondary)
                 Text(loc("dashboard.total_ops"))
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
             }
             Chart(operationCounts, id: \.0) { type, count in
                 BarMark(x: .value("Type", type), y: .value("Count", count))
@@ -146,7 +146,7 @@ struct iPadDashboardView: View {
                     Spacer()
                     Text(entry.createdAt, style: .date)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 4)
                 if entry.id != workspaceStore.operationLog.prefix(10).last?.id {

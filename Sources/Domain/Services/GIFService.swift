@@ -46,7 +46,15 @@ final class GIFService: Sendable {
     static let keychainService = "com.ajung.RULYX.klipy"
     static let keychainAccount = "apiKey"
 
-    private static let bundledAPIKey = "W3FgVTePIgmlS4FEj8oF2xbMzXgwx3QGPX3pYEmrQZIvH4eRB0sin6PKqzun4f6R"
+    /// Loads the Klipy API key from the Info.plist (injected at build time via Secrets.xcconfig).
+    /// Returns `nil` when the key is not configured (e.g. development without xcconfig).
+    private static func loadBundledAPIKey() -> String? {
+        guard let key = Bundle.main.object(forInfoDictionaryKey: "KlipyAPIKey") as? String,
+              !key.isEmpty,
+              !key.hasPrefix("$(") // unexpanded build setting placeholder → not configured
+        else { return nil }
+        return key
+    }
 
     private let baseURL = URL(string: "https://api.klipy.com/api/v1")!
     private let httpClient: HTTPClient
@@ -69,8 +77,10 @@ final class GIFService: Sendable {
     }
 
     static func seedKeyIfNeeded(in keychain: KeychainServicing = KeychainService()) {
-        guard (try? keychain.read(service: keychainService, account: keychainAccount)) == nil else { return }
-        try? keychain.save(bundledAPIKey, service: keychainService, account: keychainAccount)
+        guard (try? keychain.read(service: keychainService, account: keychainAccount)) == nil,
+              let apiKey = loadBundledAPIKey()
+        else { return }
+        try? keychain.save(apiKey, service: keychainService, account: keychainAccount)
     }
 
     func search(query: String) async throws -> [GIFResult] {

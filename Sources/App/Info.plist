@@ -26,6 +26,8 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>KlipyAPIKey</key>
+	<string>$(KLIPY_API_KEY)</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Rulyx uses Face ID to protect your accounts and moderation data.</string>
 	<key>PushNotificationsEnabled</key>

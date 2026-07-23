@@ -38,7 +38,7 @@ struct FollowerDiffView: View {
             if !newFollowers.isEmpty {
                 Section {
                     ForEach(newFollowers) { actor in
-                        Label(actor.handle, systemImage: "person.fill.badge.plus").foregroundStyle(.green)
+                        Label(actor.handle, systemImage: "person.fill.badge.plus").foregroundStyle(Color.successGreen)
                     }
                 } header: {
                     Text(verbatim: loc("follower_diff.new").replacingOccurrences(of: "{count}", with: "\(newFollowers.count)"))
@@ -48,7 +48,7 @@ struct FollowerDiffView: View {
             if !unfollowed.isEmpty {
                 Section {
                     ForEach(unfollowed) { actor in
-                        Label(actor.handle, systemImage: "person.fill.badge.minus").foregroundStyle(.red)
+                        Label(actor.handle, systemImage: "person.fill.badge.minus").foregroundStyle(Color.errorRed)
                     }
                 } header: {
                     Text(verbatim: loc("follower_diff.unfollowed").replacingOccurrences(of: "{count}", with: "\(unfollowed.count)"))

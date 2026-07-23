@@ -202,6 +202,7 @@ struct CustomSearchView: View {
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(loc("actions.remove"))
                 }
             }
         } header: {
@@ -392,8 +393,12 @@ struct CustomSearchView: View {
                 Button {
                     showProfileFor = actor
                 } label: {
-                    BlueskyActorRow(actor: actor) {
-                        EmptyView()
+                    VStack(alignment: .leading, spacing: 2) {
+                        BlueskyActorRow(actor: actor) {
+                            EmptyView()
+                        }
+                        MemberFollowBadgesView(viewerState: actor.viewerState)
+                            .padding(.leading, 46)
                     }
                 }
                 .buttonStyle(.plain)

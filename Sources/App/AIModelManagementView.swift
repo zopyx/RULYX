@@ -204,14 +204,15 @@ private struct ModelCard: View {
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.2), value: progress)
                 Text(Int(progress * 100).formatted())
-                    .font(.system(size: 8, weight: .bold))
+                    .font(.caption2.weight(.bold))
+                    .minimumScaleFactor(0.5)
                     .foregroundStyle(.primary)
             }
 
         case .ready:
             HStack(spacing: 4) {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.successGreen)
                     .font(.title3)
                 Button(loc("ai.models.delete"), role: .destructive) {
                     pendingAction = .delete
@@ -226,7 +227,7 @@ private struct ModelCard: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(msg)
                     .font(.caption2)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Color.errorRed)
                     .lineLimit(1)
                 Button(loc("ai.models.retry"), action: onDownload)
                     .buttonStyle(.bordered)

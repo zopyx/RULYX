@@ -444,7 +444,7 @@ struct SimplifiedReportSheet: View {
                                             } label: {
                                                 Image(systemName: "xmark.circle.fill")
                                                     .font(.caption)
-                                                    .foregroundStyle(.red)
+                                                    .foregroundStyle(Color.errorRed)
                                                     .background(Circle().fill(.white.opacity(0.9)))
                                             }
                                             .buttonStyle(.plain)

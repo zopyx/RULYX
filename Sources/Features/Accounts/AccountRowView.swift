@@ -103,7 +103,7 @@ struct AccountRowView: View {
                         Color.clear.background(Color.red.opacity(0.14), in: Capsule())
                     }
                 }
-                .foregroundStyle(.red)
+                .foregroundStyle(Color.errorRed)
             }
         }
         .padding(.vertical, 2)

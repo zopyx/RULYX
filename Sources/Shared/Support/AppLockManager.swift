@@ -5,7 +5,7 @@ import SwiftUI
 
 /// Manages app-lock via Face ID / Touch ID / device passcode.
 /// Locks the app on background entry (configurable timeout) and authenticates on foreground.
-/// Includes lockout after 5 consecutive failed attempts (60s cooldown).
+/// Includes lockout after 5 consecutive failed attempts (60s cooldown), persisted in Keychain.
 @MainActor
 final class AppLockManager: ObservableObject {
     static let shared = AppLockManager()
@@ -36,9 +36,17 @@ final class AppLockManager: ObservableObject {
     /// Injectable date provider for testing.
     var now: () -> Date = { Date() }
 
+    // MARK: - Keychain Persistence (lockout state)
+
+    private let keychain: KeychainServicing = KeychainService()
+    private let lockoutService = "com.ajung.RULYX.lockout"
+    private let lockoutFailuresAccount = "consecutiveFailures"
+    private let lockoutUntilAccount = "lockoutUntil"
+
     // MARK: - Init
 
     private init() {
+        loadLockout()
         if isEnabled {
             isLocked = true
         }
@@ -103,8 +111,8 @@ final class AppLockManager: ObservableObject {
         }
     }
 
-    /// Authenticate using biometrics. Returns success/failure.
-    /// Implements a 60-second lockout after 5 consecutive failures.
+    /// Authenticate using biometrics or device passcode. Returns success/failure.
+    /// Implements a 60-second lockout after 5 consecutive failures (persisted in Keychain).
     func authenticate() async -> Bool {
         guard isEnabled else {
             isLocked = false
@@ -120,14 +128,16 @@ final class AppLockManager: ObservableObject {
         let context = LAContext()
         context.localizedReason = String.localized("biometric.auth_reason")
         do {
+            // Uses .deviceOwnerAuthentication — offers passcode fallback when biometrics fail
             let success = try await context.evaluatePolicy(
-                .deviceOwnerAuthenticationWithBiometrics,
+                .deviceOwnerAuthentication,
                 localizedReason: String.localized("biometric.auth_reason")
             )
             if success {
                 isLocked = false
                 consecutiveFailedAttempts = 0
                 lockoutUntil = nil
+                persistLockout()
             }
             return success
         } catch {
@@ -135,6 +145,7 @@ final class AppLockManager: ObservableObject {
             if consecutiveFailedAttempts >= 5 {
                 lockoutUntil = now().addingTimeInterval(60)
             }
+            persistLockout()
             isLocked = true
             return false
         }
@@ -160,6 +171,37 @@ final class AppLockManager: ObservableObject {
             )
         } catch {
             return false
+        }
+    }
+
+    // MARK: - Keychain Persistence
+
+    /// Persists lockout state to Keychain so it survives app termination.
+    private func persistLockout() {
+        try? keychain.save("\(consecutiveFailedAttempts)", service: lockoutService, account: lockoutFailuresAccount)
+        if let until = lockoutUntil {
+            try? keychain.save("\(until.timeIntervalSince1970)", service: lockoutService, account: lockoutUntilAccount)
+        } else {
+            try? keychain.delete(service: lockoutService, account: lockoutUntilAccount)
+        }
+    }
+
+    /// Restores lockout state from Keychain on launch.
+    private func loadLockout() {
+        if let countStr = try? keychain.read(service: lockoutService, account: lockoutFailuresAccount),
+           let count = Int(countStr), count > 0 {
+            consecutiveFailedAttempts = count
+        }
+        if let untilStr = try? keychain.read(service: lockoutService, account: lockoutUntilAccount),
+           let ts = TimeInterval(untilStr) {
+            lockoutUntil = Date(timeIntervalSince1970: ts)
+            // Clear expired lockout
+            if let until = lockoutUntil, now() >= until {
+                lockoutUntil = nil
+                consecutiveFailedAttempts = 0
+                try? keychain.delete(service: lockoutService, account: lockoutFailuresAccount)
+                try? keychain.delete(service: lockoutService, account: lockoutUntilAccount)
+            }
         }
     }
 }

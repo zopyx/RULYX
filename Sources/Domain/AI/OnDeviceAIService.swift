@@ -28,6 +28,9 @@ struct ModelBundle: Identifiable, Codable, Hashable {
     let description: String
     /// Minimum iOS version requirement string (e.g. ``17.0``).
     let requires: String
+    /// Optional SHA-256 hex digest of the model file for integrity verification.
+    /// When set, the download is verified against this hash after completion.
+    let sha256: String?
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

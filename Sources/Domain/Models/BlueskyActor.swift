@@ -23,6 +23,9 @@ struct BlueskyActor: Identifiable, Hashable, Codable, Sendable {
     var blockedDate: Date?
     /// A short description/bio for this actor, if available.
     var description: String?
+    /// Viewer-specific relationship state (follows/followed-by/blocked/etc).
+    /// Populated from the API response when available; nil when unknown.
+    var viewerState: BlueskyViewerState?
 
     // MARK: - Init
 
@@ -34,7 +37,8 @@ struct BlueskyActor: Identifiable, Hashable, Codable, Sendable {
         avatarURL: URL? = nil,
         createdAt: Date? = nil,
         blockedDate: Date? = nil,
-        description: String? = nil
+        description: String? = nil,
+        viewerState: BlueskyViewerState? = nil
     ) {
         self.id = id ?? did
         self.did = did
@@ -44,6 +48,7 @@ struct BlueskyActor: Identifiable, Hashable, Codable, Sendable {
         self.createdAt = createdAt
         self.blockedDate = blockedDate
         self.description = description
+        self.viewerState = viewerState
     }
 
     // MARK: - Computed Properties

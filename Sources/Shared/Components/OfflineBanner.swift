@@ -19,6 +19,6 @@ struct OfflineBanner: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
         .background(Color.orange.opacity(0.15))
-        .foregroundStyle(.orange)
+        .foregroundStyle(Color.warningOrange)
     }
 }

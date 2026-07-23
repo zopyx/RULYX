@@ -10,7 +10,7 @@ struct ChatStatusBanner: View {
                     .controlSize(.small)
             } else {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.successGreen)
             }
             Text(message)
                 .font(.footnote.weight(.medium))

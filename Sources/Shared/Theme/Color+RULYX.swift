@@ -60,6 +60,21 @@ extension Color {
     static let infoBlue = Color.skyPrimary
 }
 
+// MARK: - Chat Colors
+
+extension Color {
+    /// Outgoing chat bubble background — darker brand blue tuned so that white
+    /// text reaches WCAG-AA contrast (≥4.5:1) in BOTH color schemes.
+    /// Light: white ≈ 4.9:1, Dark: white ≈ 5.1:1 (verified by scripts/check_contrast.py).
+    /// Note: `skyPrimary` itself is too light for white text (3.6:1 light / 1.9:1 dark)
+    /// and MUST NOT be used as a text background.
+    static let chatBubbleOutgoing = Color(uiColor: UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(red: 0.10, green: 0.42, blue: 0.85, alpha: 1.0)
+            : UIColor(red: 0.05, green: 0.42, blue: 0.88, alpha: 1.0)
+    })
+}
+
 // MARK: - Surface Colors
 
 extension Color {

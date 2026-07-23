@@ -230,7 +230,7 @@ private struct ModelSelectionRow: View {
                     if state == .ready {
                         if isSelected {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Color.infoBlue)
                         } else {
                             Image(systemName: "circle")
                                 .foregroundStyle(.secondary)
@@ -303,7 +303,7 @@ private struct ResultCard: View {
             case let .failed(msg):
                 HStack {
                     Image(systemName: "exclamationmark.triangle")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.warningOrange)
                     Text(msg)
                         .font(.caption)
                         .foregroundStyle(.secondary)

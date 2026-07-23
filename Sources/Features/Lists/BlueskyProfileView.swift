@@ -170,7 +170,7 @@ struct BlueskyProfileView: View {
                     } else {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.successGreen)
                         Text(loc("profile.export.complete"))
                             .font(.headline)
                     }
@@ -268,7 +268,7 @@ struct BlueskyProfileView: View {
 
                     Image(systemName: "hand.raised.slash.fill")
                         .font(.system(size: 64))
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Color.errorRed)
                         .symbolRenderingMode(.hierarchical)
 
                     VStack(spacing: 8) {
@@ -754,7 +754,7 @@ struct BlueskyProfileView: View {
                             Spacer()
                             Text(error)
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.errorRed)
                                 .lineLimit(1)
                         }
                     }
@@ -1193,11 +1193,11 @@ struct BlueskyProfileView: View {
                                     HStack(spacing: 12) {
                                         Label("\(actionsVM?.blockBackSuccessCount ?? 0)", systemImage: "checkmark.circle.fill")
                                             .font(.caption)
-                                            .foregroundStyle(.green)
+                                            .foregroundStyle(Color.successGreen)
                                         if actionsVM?.blockBackFailureCount ?? 0 > 0 {
                                             Label("\(actionsVM?.blockBackFailureCount ?? 0)", systemImage: "xmark.circle.fill")
                                                 .font(.caption)
-                                                .foregroundStyle(.red)
+                                                .foregroundStyle(Color.errorRed)
                                         }
                                         Spacer()
                                     }
@@ -1231,10 +1231,10 @@ struct BlueskyProfileView: View {
                                 HStack(spacing: 8) {
                                     if actionsVM?.blockBackFailureCount ?? 0 == 0 {
                                         Image(systemName: "checkmark.circle.fill")
-                                            .foregroundStyle(.green)
+                                            .foregroundStyle(Color.successGreen)
                                     } else {
                                         Image(systemName: "exclamationmark.triangle.fill")
-                                            .foregroundStyle(.orange)
+                                            .foregroundStyle(Color.warningOrange)
                                     }
                                     Text(actionsVM?.blockBackResultSummary ?? "")
                                         .font(.subheadline)
@@ -1246,10 +1246,10 @@ struct BlueskyProfileView: View {
                             {
                                 if blockedBy == 0 {
                                     Label(loc("profile.block_back.none_blocking"), systemImage: "checkmark.circle.fill")
-                                        .foregroundStyle(.green)
+                                        .foregroundStyle(Color.successGreen)
                                 } else if unblocked == 0 {
                                     Label(loc("profile.block_back.all_clear"), systemImage: "checkmark.circle.fill")
-                                        .foregroundStyle(.green)
+                                        .foregroundStyle(Color.successGreen)
                                 }
                             }
                         }
@@ -1257,7 +1257,7 @@ struct BlueskyProfileView: View {
                         if let error = actionsVM?.blockBackError {
                             Text(error)
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.errorRed)
                         }
                     } header: {
                         HStack(spacing: 6) {
@@ -1596,7 +1596,7 @@ struct BlueskyProfileView: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Label(loc("profile.block_back.preview.blocks_me"), systemImage: "hand.raised.slash.fill")
                     .font(.caption2)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Color.errorRed)
                 Label(loc("profile.block_back.preview.not_blocked"), systemImage: "hand.raised.slash")
                     .font(.caption2)
                     .foregroundStyle(.secondary)

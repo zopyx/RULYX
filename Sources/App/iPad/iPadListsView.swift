@@ -71,7 +71,7 @@ struct iPadListsView: View {
                             Spacer()
                             Text("\(lists.count + (kind == .internal ? internalListStore.lists.count : 0))")
                                 .font(.caption)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -117,9 +117,9 @@ struct iPadListsView: View {
                     .font(.body.weight(.medium))
                     .lineLimit(1)
                 if let count = list.memberCount {
-                    Text("\(count) members")
+                    Text(loc("lists.members.count").replacingOccurrences(of: "{n}", with: "\(count)"))
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -137,9 +137,9 @@ struct iPadListsView: View {
                     Text(list.name)
                         .font(.body.weight(.medium))
                         .lineLimit(1)
-                    Text("\(list.memberCount) members")
+                    Text(loc("lists.members.count").replacingOccurrences(of: "{n}", with: "\(list.memberCount)"))
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding(.vertical, 4)

@@ -21,13 +21,53 @@ struct iPadListDetailView: View {
     @State private var subscribeError: String?
     @State private var isSubscribing = false
 
+    // Optimistic follow state (double-tap)
+    @State private var pendingFollowActions: Set<String> = []
+    @State private var pendingUnfollowActions: Set<String> = []
+    /// Tracks last tap for manual double-tap detection (member recordURI + timestamp).
+    @State private var lastTapMemberID: String?
+    @State private var lastTapTime: Date?
+
     private var isOwnedList: Bool {
         guard let activeDID = accountStore.activeAccount?.did else { return false }
-        return list.id.hasPrefix("at://\\(activeDID)")
+        return list.id.hasPrefix("at://\(activeDID)")
     }
 
     private var listTitleWithMemberCount: String {
         "\(list.name) (\(list.memberCount ?? detailVM.members.count))"
+    }
+
+    /// Returns the effective viewer state for a member, merging API data
+    /// with any pending optimistic follow/unfollow action.
+    private func effectiveViewerState(for member: BlueskyListMember) -> BlueskyViewerState? {
+        guard var state = member.viewerState else { return nil }
+        if pendingFollowActions.contains(member.actor.did) {
+            state = BlueskyViewerState(
+                muted: state.muted,
+                blockedBy: state.blockedBy,
+                isBlocking: state.isBlocking,
+                blockingRecordURI: state.blockingRecordURI,
+                isFollowing: true,
+                followingRecordURI: state.followingRecordURI,
+                followsYou: state.followsYou,
+                mutedByListName: state.mutedByListName,
+                blockingByListName: state.blockingByListName
+            )
+        }
+        if pendingUnfollowActions.contains(member.actor.did) {
+            state = BlueskyViewerState(
+                muted: state.muted,
+                blockedBy: state.blockedBy,
+                isBlocking: state.isBlocking,
+                blockingRecordURI: state.blockingRecordURI,
+                isFollowing: false,
+                followingRecordURI: nil,
+                followsYou: state.followsYou,
+                mutedByListName: state.mutedByListName,
+                blockingByListName: state.blockingByListName
+            )
+        }
+        return state
     }
 
     var body: some View {
@@ -187,6 +227,20 @@ struct iPadListDetailView: View {
             List {
                 ForEach(filteredMembers) { member in
                     memberRow(member)
+                        .simultaneousGesture(
+                            TapGesture().onEnded {
+                                let now = Date()
+                                let memberID = member.id
+                                if lastTapMemberID == memberID, let last = lastTapTime, now.timeIntervalSince(last) < 0.35 {
+                                    lastTapMemberID = nil
+                                    lastTapTime = nil
+                                    Task { await toggleFollow(member: member) }
+                                } else {
+                                    lastTapMemberID = memberID
+                                    lastTapTime = now
+                                }
+                            }
+                        )
                 }
                 if detailVM.hasMoreMembers {
                     HStack {
@@ -245,6 +299,9 @@ struct iPadListDetailView: View {
                     Text("@\(member.actor.handle)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    // Dedicated row for follow-relationship badges below handle
+                    memberFollowBadges(member: member)
+                        .padding(.top, 2)
                 }
 
                 Spacer()
@@ -252,7 +309,7 @@ struct iPadListDetailView: View {
                 if let createdAt = member.createdAt {
                     Text(createdAt, style: .date)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -274,6 +331,78 @@ struct iPadListDetailView: View {
                         account: accountStore.activeAccount!,
                         appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) }
                     )
+                }
+            }
+        }
+    }
+
+    // MARK: - Follow / Unfollow via Double-Tap
+
+    /// Toggles follow state for a member with optimistic UI feedback.
+    private func toggleFollow(member: BlueskyListMember) async {
+        guard let activeAccount = accountStore.activeAccount,
+              let appPassword = accountStore.appPassword(for: activeAccount)
+        else { return }
+
+        let did = member.actor.did
+        let isCurrentlyFollowing = member.viewerState?.isFollowing == true
+
+        if isCurrentlyFollowing {
+            pendingUnfollowActions.insert(did)
+            pendingFollowActions.remove(did)
+
+            guard let recordURI = member.viewerState?.followingRecordURI else {
+                pendingUnfollowActions.remove(did)
+                return
+            }
+
+            do {
+                try await container.social.unfollowActor(
+                    recordURI: recordURI,
+                    account: activeAccount,
+                    appPassword: appPassword
+                )
+            } catch {
+                pendingUnfollowActions.remove(did)
+            }
+        } else {
+            pendingFollowActions.insert(did)
+            pendingUnfollowActions.remove(did)
+
+            do {
+                try await container.social.followActor(
+                    did: did,
+                    account: activeAccount,
+                    appPassword: appPassword
+                )
+            } catch {
+                pendingFollowActions.remove(did)
+            }
+        }
+    }
+
+    // MARK: - Follow Badges
+
+    /// Compact follow-relationship badges for a list member.
+    @ViewBuilder
+    private func memberFollowBadges(member: BlueskyListMember) -> some View {
+        if let state = effectiveViewerState(for: member) {
+            HStack(spacing: 3) {
+                if state.isFollowing {
+                    Text(loc("profile.badge.following"))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(Color.infoBlue)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.infoBlue.opacity(0.12), in: Capsule())
+                }
+                if state.followsYou {
+                    Text(loc("profile.badge.follows_me"))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(Color.successGreen)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.successGreen.opacity(0.12), in: Capsule())
                 }
             }
         }

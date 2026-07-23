@@ -425,6 +425,7 @@ struct UserPostsView: View {
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(loc("actions.clear_search"))
                 }
                 dateFilterButton
             }

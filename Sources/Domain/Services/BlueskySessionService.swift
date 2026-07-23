@@ -141,7 +141,7 @@ final class BlueskySessionService: BlueskySessionServicing {
 
     func restoreSessions(for accounts: [AppAccount]) async {
         for account in accounts {
-            _ = try? await cachedSession(for: account, appPassword: nil)
+            _ = try? await cachedSession(for: account)
         }
     }
 
@@ -154,7 +154,10 @@ final class BlueskySessionService: BlueskySessionServicing {
         appPassword: String?,
         operation: (BlueskySession) async throws -> Response
     ) async throws -> Response {
-        var authSession = try await cachedSession(for: account, appPassword: appPassword)
+        var authSession = try await cachedSession(for: account)
+        // Reduce memory exposure: shadow appPassword after initial session acquisition.
+        // recreateSession() reads credentials from Keychain directly if a retry is needed.
+        let _appPassword: String? = nil
 
         for attempt in 0 ..< 3 {
             do {
@@ -176,8 +179,7 @@ final class BlueskySessionService: BlueskySessionServicing {
                 guard attempt < 2 else { throw BlueskyAPIError.unauthorized }
                 authSession = try await recoverSession(
                     currentSession: authSession,
-                    for: account,
-                    appPassword: appPassword
+                    for: account
                 )
                 let delay = pow(2.0, Double(attempt)) * Double.random(in: 0.8 ..< 1.2)
                 try? await Task.sleep(for: .seconds(delay))
@@ -197,21 +199,19 @@ final class BlueskySessionService: BlueskySessionServicing {
     }
 
     private func cachedSession(
-        for account: AppAccount,
-        appPassword: String?
+        for account: AppAccount
     ) async throws -> BlueskySession {
         let sessionKey = account.id.uuidString
         if let cachedSession = cachedSessions[sessionKey] {
             guard session(cachedSession, belongsTo: account) else {
                 cachedSessions.removeValue(forKey: sessionKey)
                 try? keychain.delete(service: persistedSessionService, account: sessionKey)
-                return try await recreateSession(for: account, appPassword: appPassword)
+                return try await recreateSession(for: account)
             }
             if shouldRefresh(cachedSession.accessJWT) {
                 return try await recoverSession(
                     currentSession: cachedSession,
-                    for: account,
-                    appPassword: appPassword
+                    for: account
                 )
             }
             return cachedSession
@@ -220,52 +220,52 @@ final class BlueskySessionService: BlueskySessionServicing {
         if let restoredSession = try restoredSession(for: account) {
             guard session(restoredSession, belongsTo: account) else {
                 try? keychain.delete(service: persistedSessionService, account: sessionKey)
-                return try await recreateSession(for: account, appPassword: appPassword)
+                return try await recreateSession(for: account)
             }
             cachedSessions[sessionKey] = restoredSession
             if shouldRefresh(restoredSession.accessJWT) {
                 return try await recoverSession(
                     currentSession: restoredSession,
-                    for: account,
-                    appPassword: appPassword
+                    for: account
                 )
             }
             return restoredSession
         }
 
-        return try await recreateSession(for: account, appPassword: appPassword)
+        return try await recreateSession(for: account)
     }
 
     private func recreateSession(
-        for account: AppAccount,
-        appPassword: String?
+        for account: AppAccount
     ) async throws -> BlueskySession {
-        guard let appPassword else {
+        let passwordService = "com.ajung.RULYX.password"
+        guard let value = try? keychain.read(service: passwordService, account: account.id.uuidString),
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else {
             throw BlueskyAPIError.missingCredentials
         }
 
-        let newSession = try await authenticate(handle: account.handle, appPassword: appPassword)
+        let newSession = try await authenticate(handle: account.handle, appPassword: value)
         try await persistSession(newSession, for: account)
         return newSession
     }
 
     private func recoverSession(
         currentSession: BlueskySession,
-        for account: AppAccount,
-        appPassword: String?
+        for account: AppAccount
     ) async throws -> BlueskySession {
         let sessionKey = account.id.uuidString
 
         if let refreshedSession = try await refreshSession(currentSession) {
             guard session(refreshedSession, belongsTo: account) else {
-                return try await recreateSession(for: account, appPassword: appPassword)
+                return try await recreateSession(for: account)
             }
             cachedSessions[sessionKey] = refreshedSession
             try await persistSession(refreshedSession, for: account)
             return refreshedSession
         }
 
-        return try await recreateSession(for: account, appPassword: appPassword)
+        return try await recreateSession(for: account)
     }
 
     private func refreshSession(_ existingSession: BlueskySession) async throws -> BlueskySession? {

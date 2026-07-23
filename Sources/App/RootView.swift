@@ -99,7 +99,8 @@ struct RootView: View {
                     .overlay(alignment: .bottomTrailing) {
                         if accountStore.previousActiveAccountID != nil {
                             Image(systemName: "chevron.left.2")
-                                .font(.system(size: 7, weight: .bold))
+                                .font(.caption2.weight(.bold))
+                                .imageScale(.small)
                                 .foregroundStyle(.secondary)
                                 .padding(2)
                                 .background(Circle().fill(.bar))
@@ -371,7 +372,7 @@ private struct AccountSwitcherRow: View {
                 if isDeactivated {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.title3)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.warningOrange)
                 }
             }
         }

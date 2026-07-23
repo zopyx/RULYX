@@ -222,7 +222,7 @@ struct ManagePostsView: View {
                         HStack {
                             Image(systemName: "exclamationmark.triangle.fill")
                             Text(loc("profile.manage_posts.delete_all"))
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.errorRed)
                         }
                     }
                 }
@@ -305,6 +305,7 @@ struct ManagePostsView: View {
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(loc("actions.clear_search"))
                 }
             }
             .padding(.vertical, 4)
@@ -419,6 +420,12 @@ struct ManagePostsView: View {
                         : AnyShapeStyle(.tertiary)
                 )
                 .font(.title3)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel(
+                    viewModel.selectedURIs.contains(entry.post.uri)
+                        ? loc("a11y.selected")
+                        : loc("a11y.not_selected")
+                )
                 .onTapGesture {
                     if viewModel.selectedURIs.contains(entry.post.uri) {
                         viewModel.selectedURIs.remove(entry.post.uri)

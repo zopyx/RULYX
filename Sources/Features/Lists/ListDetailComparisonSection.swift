@@ -245,10 +245,15 @@ extension ListDetailView {
                                 HStack(spacing: 12) {
                                     Image(systemName: viewModel.selectedComparisonActorDIDs.contains(member.actor.did) ? "checkmark.circle.fill" : "circle")
                                         .foregroundStyle(viewModel.selectedComparisonActorDIDs.contains(member.actor.did) ? Color.skyPrimary : Color.secondary.opacity(0.45))
-                                    BlueskyActorRow(actor: member.actor)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        BlueskyActorRow(actor: member.actor)
+                                        MemberFollowBadgesView(viewerState: member.actor.viewerState)
+                                            .padding(.leading, 46)
+                                    }
                                 }
                             }
                             .buttonStyle(.plain)
+                            .accessibilityAddTraits(viewModel.selectedComparisonActorDIDs.contains(member.actor.did) ? .isSelected : [])
                             .accessibilityLabel(
                                 viewModel.selectedComparisonActorDIDs.contains(member.actor.did)
                                     ? loc("list.compare.deselect_actor.label").replacingOccurrences(of: "{handle}", with: member.actor.handle)

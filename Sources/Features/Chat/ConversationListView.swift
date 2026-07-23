@@ -72,7 +72,7 @@ struct ConversationListView: View {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.warningOrange)
                         Text(loc: "chat.error.title")
                             .font(.headline)
                         Text(chatError.localizedDescription)
@@ -400,7 +400,7 @@ struct ConversationListView: View {
 
                     Text(lastMessagePreview)
                         .font(.subheadline)
-                        .foregroundStyle(Color(.label).opacity(0.7))
+                        .foregroundStyle(Color(.secondaryLabel))
                         .lineLimit(2)
                 }
 
@@ -409,7 +409,7 @@ struct ConversationListView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(lastMessageTime)
                         .font(.caption)
-                        .foregroundStyle(Color(.label).opacity(0.7))
+                        .foregroundStyle(Color(.secondaryLabel))
 
                     if conversation.unreadCount > 0 {
                         Text("\(conversation.unreadCount)")

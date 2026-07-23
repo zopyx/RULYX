@@ -73,6 +73,7 @@ struct SplashScreenView: View {
                                 .font(.title2)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
+                        .accessibilityLabel(loc("actions.dismiss"))
                         .padding(16)
                         .opacity(phase >= 2 ? 1 : 0)
                         .animation(.easeOut(duration: 0.4).delay(0.5), value: phase)
