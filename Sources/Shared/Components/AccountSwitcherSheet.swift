@@ -85,6 +85,9 @@ struct AccountSwitcherSheet: View {
                     }
                 }
             }
+            .listStyle(.plain)
+            .listSectionSpacing(.compact)
+            .environment(\.defaultMinListHeaderHeight, 0)
             .pageTitle(loc("account.manage.title"))
             .task {
                 await accountStore.refreshAccountProfiles(using: container.blueskyClient)

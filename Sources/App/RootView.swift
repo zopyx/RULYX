@@ -394,32 +394,32 @@ private struct AccountSwitcherTabSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    ForEach(accountStore.accounts) { acct in
-                        AccountSwitcherRow(
-                            account: acct,
-                            isActive: acct.id == accountStore.activeAccountID,
-                            isDeactivated: accountStore.isDeactivated(acct),
-                            action: { onSwitch(acct)
-                                dismiss()
-                            }
-                        )
-                    }
+                ForEach(accountStore.accounts) { acct in
+                    AccountSwitcherRow(
+                        account: acct,
+                        isActive: acct.id == accountStore.activeAccountID,
+                        isDeactivated: accountStore.isDeactivated(acct),
+                        action: { onSwitch(acct)
+                            dismiss()
+                        }
+                    )
                 }
 
-                Section {
-                    Button {
-                        dismiss()
-                        Task { @MainActor in
-                            try? await Task.sleep(for: .milliseconds(300))
-                            workspaceStore.selectedTab = .account
-                        }
-                    } label: {
-                        Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
-                            .foregroundStyle(.primary)
+                Button {
+                    dismiss()
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(300))
+                        workspaceStore.selectedTab = .account
                     }
+                } label: {
+                    Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
+                        .foregroundStyle(.primary)
                 }
+                .listRowSeparator(.hidden)
             }
+            .listStyle(.plain)
+            .listSectionSpacing(.compact)
+            .environment(\.defaultMinListHeaderHeight, 0)
             .pageTitle(loc("account.switcher.title"))
         }
         .presentationDetents([.medium, .large])
