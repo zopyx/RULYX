@@ -42,6 +42,7 @@
 		162DB300DD90FEA3D5BAC00F /* PendingActionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81C8701DE6159917DAB0491 /* PendingActionsSheet.swift */; };
 		1645D38F36D0283350DC05D1 /* ServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C6580FDFEE12BF203E463AC /* ServiceTests.swift */; };
 		16B010003DAF27457AB23FD8 /* BlueskySessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9247E08E5551755A2ED991A /* BlueskySessionService.swift */; };
+		16B2729FE73C22AB94751E76 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83D220C4CCB384F5D358BA /* AppEnvironment.swift */; };
 		16E9B9F84C588B9699BF83D7 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A10A0C5F5FA51FB7BDB61C5 /* AddAccountView.swift */; };
 		1B9FB40632CE42DB9FE3D9F2 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455BE6AADDCAE77994743069 /* AppDependencies.swift */; };
 		1D0022748B12E87E17288449 /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84DD9189BEC402334C69FEE /* Endpoints.swift */; };
@@ -490,6 +491,7 @@
 		59BB4D904C184EB1F7BF2189 /* RelationshipCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipCache.swift; sourceTree = "<group>"; };
 		5A3437EF23B86025FCCAFEBF /* BlueskyListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyListService.swift; sourceTree = "<group>"; };
 		5AB93BF578ACCC53F66E4892 /* LikesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikesListView.swift; sourceTree = "<group>"; };
+		5B83D220C4CCB384F5D358BA /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		5CB7156B625C3C42F5686FD3 /* ListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListRowView.swift; sourceTree = "<group>"; };
 		5DFBA75AFA172D6A0FB5CC90 /* IdentityDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDTOs.swift; sourceTree = "<group>"; };
 		5FBBE749A4442A2FAD4D7772 /* BlueskyListServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyListServiceTests.swift; sourceTree = "<group>"; };
@@ -720,6 +722,7 @@
 			children = (
 				FDB05777BA063DDA7CD3518F /* AIModelManagementView.swift */,
 				455BE6AADDCAE77994743069 /* AppDependencies.swift */,
+				5B83D220C4CCB384F5D358BA /* AppEnvironment.swift */,
 				D7A39B45AC0B961A32846F08 /* BlueskyAppDelegate.swift */,
 				7C8E06586B7B53653D0529F7 /* HTTPDebugStatsView.swift */,
 				7C2BA4F453710A4F661A13B6 /* HTTPRequestDebugView.swift */,
@@ -1578,6 +1581,7 @@
 				D43E73CA36B85BF21D00F094 /* AnalyticsStore.swift in Sources */,
 				FE8477B7DBEAF316FCE639B0 /* AppAccount.swift in Sources */,
 				1B9FB40632CE42DB9FE3D9F2 /* AppDependencies.swift in Sources */,
+				16B2729FE73C22AB94751E76 /* AppEnvironment.swift in Sources */,
 				01FBC10B1CCE745D118D53D7 /* AppError.swift in Sources */,
 				CECD7D5F34215B77043259BF /* AppLockManager.swift in Sources */,
 				30C6532847608A3368F1EF6D /* AppLogger.swift in Sources */,

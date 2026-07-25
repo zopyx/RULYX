@@ -60,6 +60,7 @@ final class AppDependencies: ObservableObject {
     let aiService: LiveAIService
     let autoBlockBackService: AutoBlockBackService
     let serviceContainer: BlueskyServiceContainerWrapper
+    let appEnvironment: AppEnvironment
 
     // MARK: - Init
 
@@ -115,6 +116,16 @@ final class AppDependencies: ObservableObject {
             chatStore: chatStore
         )
         serviceContainer = BlueskyServiceContainerWrapper(liveClient: blueskyClient, accountStore: accountStore)
+        appEnvironment = AppEnvironment(
+            mutedWordsStore: mutedWordsStore,
+            analyticsStore: analyticsStore,
+            internalListStore: internalListStore,
+            httpRequestDebugStore: httpRequestDebugStore,
+            clearskyHeartbeat: clearskyHeartbeat,
+            autoBlockBackService: autoBlockBackService,
+            aiService: aiService,
+            chatStore: chatStore
+        )
     }
 }
 

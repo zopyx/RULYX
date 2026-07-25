@@ -57,6 +57,12 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
 
     /// Legacy accessor for parameter passing to functions that still accept `LiveBlueskyClient`.
     /// Prefer using the individual protocol properties above for direct method calls.
+    /// 
+    /// Migration guide (83 environment + 120 parameter sites across ~40 files):
+    /// 1. Replace `.environmentObject(container.blueskyClient)` → `.environmentObject(container)`
+    /// 2. In child views: `@EnvironmentObject var client: LiveBlueskyClient` → `@EnvironmentObject var container: BlueskyServiceContainerWrapper`
+    /// 3. Replace `client.method()` with the appropriate protocol: `container.social.method()` etc.
+    /// 4. For `using: container.blueskyClient` parameters: change VM method signature from `LiveBlueskyClient` to the specific protocol it uses.
     @available(*, deprecated, message: "Use individual protocol properties (container.profile, container.list, etc.)")
     var blueskyClient: LiveBlueskyClient {
         container.auth as! LiveBlueskyClient
