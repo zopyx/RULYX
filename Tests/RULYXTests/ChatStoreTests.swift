@@ -33,8 +33,6 @@ final class ChatStoreTests: XCTestCase {
 
     func testSetVisibleConversation() {
         let store = ChatStore(chatService: MockChatService())
-        // setVisibleConversation is a no-op when no account is set
-        // but should not crash or produce errors.
         store.setVisibleConversation("convo-1")
         store.setVisibleConversation(nil)
         XCTAssertNil(store.error)
@@ -45,14 +43,35 @@ final class ChatStoreTests: XCTestCase {
 
 @MainActor
 private final class MockChatService: ChatServicing {
-    func listConvos() async throws -> [ChatConversation] { [] }
-    func getConvo(id: String) async throws -> ChatConversation? { nil }
-    func getConvoForMembers(dids: [String]) async throws -> ChatConversation? { nil }
-    func getMessages(convoId: String, cursor: String?) async throws -> (messages: [ChatMessageKind], cursor: String?) { ([], nil) }
-    func sendMessage(convoId: String, text: String) async throws -> ChatMessageKind { fatalError() }
-    func updateRead(convoId: String, messageId: String?) async throws {}
-    func leaveConvo(convoId: String) async throws {}
-    func muteConvo(convoId: String) async throws {}
-    func unmuteConvo(convoId: String) async throws {}
-    func getLog(cursor: String?) async throws -> (events: [ChatLogEvent], cursor: String?) { ([], nil) }
+    func clearCaches() {}
+
+    func listConvos(account: AppAccount, appPassword: String?, status: String?, cursor: String?) async throws -> PagedConvos {
+        PagedConvos(conversations: [], cursor: nil)
+    }
+
+    func getConvo(convoId: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+        throw NSError(domain: "mock", code: -1)
+    }
+
+    func getConvoForMembers(members: [String], account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+        throw NSError(domain: "mock", code: -1)
+    }
+
+    func getMessages(convoId: String, cursor: String?, limit: Int, account: AppAccount, appPassword: String?) async throws -> PagedMessages {
+        PagedMessages(messages: [], cursor: nil)
+    }
+
+    func sendMessage(convoId: String, text: String, account: AppAccount, appPassword: String?) async throws -> ChatMessageSendResult {
+        fatalError("not tested")
+    }
+
+    func updateRead(convoId: String, messageId: String?, account: AppAccount, appPassword: String?) async throws {}
+
+    func leaveConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {}
+    func muteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {}
+    func unmuteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {}
+
+    func getLog(cursor: String?, account: AppAccount, appPassword: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {
+        ([], nil)
+    }
 }
