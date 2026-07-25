@@ -59,6 +59,12 @@ struct RULYXApp: App {
     /// of the main content.
     @State private var showSplash = true
 
+    /// Controls the privacy shield: an opaque cover rendered while the app is
+    /// backgrounded, so the system app-switcher snapshot never contains chat
+    /// DMs or moderation data. Shown unconditionally — independent of whether
+    /// biometric app lock is enabled.
+    @State private var showPrivacyShield = false
+
     // MARK: - Scene
 
     // MARK: - Scene
@@ -198,6 +204,9 @@ struct RULYXApp: App {
                     // stops the Clearsky heartbeat, and pauses chat polling to save resources.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
                         DispatchQueue.main.async {
+                            // Cover all content before iOS captures the app-switcher
+                            // snapshot — regardless of app-lock state or timeout.
+                            showPrivacyShield = true
                             appLockManager.appDidEnterBackground()
                             deps.clearskyHeartbeat.stop()
                             deps.chatStore.stopPolling()
@@ -209,6 +218,7 @@ struct RULYXApp: App {
                     // triggers an immediate log sync, and performs auto-block-back check.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                         DispatchQueue.main.async {
+                            showPrivacyShield = false
                             appLockManager.appDidBecomeActive()
                             deps.clearskyHeartbeat.start()
                             deps.pushNotificationCoordinator.start()
@@ -239,6 +249,24 @@ struct RULYXApp: App {
                             }
                             hasSplashed = true
                         }
+                }
+
+                // MARK: Privacy Shield
+
+                // Opaque cover shown whenever the app is backgrounded so the
+                // app-switcher snapshot contains no sensitive content
+                // (chat DMs, moderation targets). Rendered above everything
+                // (`zIndex: 200`, above splash and lock overlays).
+                if showPrivacyShield {
+                    ZStack {
+                        Color(.systemBackground).ignoresSafeArea()
+                        Image(systemName: "shield.lefthalf.filled")
+                            .font(.system(size: 64))
+                            .foregroundStyle(.tertiary)
+                            .accessibilityHidden(true)
+                    }
+                    .transition(.opacity)
+                    .zIndex(200)
                 }
             }
         }
@@ -340,7 +368,7 @@ struct RULYXApp: App {
     private func reloadChatForActiveAccount(showPrompts: Bool) async {
         let account = deps.accountStore.activeAccount
         let appPassword = account.flatMap { deps.accountStore.appPassword(for: $0) }
-        AppLogger.persistence.info("Chat account reload requested for \(account?.handle ?? "none", privacy: .public)")
+        AppLogger.persistence.info("Chat account reload requested for \(account?.handle ?? "none")")
         await deps.chatStore.rebuildConversations(
             for: account,
             appPassword: appPassword,

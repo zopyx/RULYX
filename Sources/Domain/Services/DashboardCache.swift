@@ -32,7 +32,7 @@ enum DashboardCache {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode(DashboardCacheData.self, from: data)
         } catch {
-            AppLogger.persistence.error("DashboardCache load failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache load failed for key \(key): \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
@@ -42,9 +42,9 @@ enum DashboardCache {
         do {
             try FileManager.default.createDirectory(at: cachesDirectory, withIntermediateDirectories: true)
             let encoded = try JSONEncoder().encode(data)
-            try encoded.write(to: url)
+            try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("DashboardCache save failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache save failed for key \(key): \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -53,7 +53,7 @@ enum DashboardCache {
         do {
             try FileManager.default.removeItem(at: url)
         } catch {
-            AppLogger.persistence.error("DashboardCache clear failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache clear failed for key \(key): \(error.localizedDescription, privacy: .public)")
         }
     }
 

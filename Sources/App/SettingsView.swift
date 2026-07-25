@@ -280,8 +280,11 @@ struct SettingsView: View {
                     }
                     .contentShape(Rectangle())
                     // Hidden gesture: double-tapping the "Internal" section header
-                    // opens the HTTP request debug view regardless of `debugMode`.
+                    // opens the HTTP request debug view — gated behind `debugMode`
+                    // so the 24h request log (handles, search queries) is not
+                    // reachable on a casual user's device.
                     .onTapGesture(count: 2) {
+                        guard debugMode else { return }
                         isShowingHTTPRequestDebugView = true
                     }
                 }

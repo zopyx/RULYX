@@ -3,8 +3,8 @@ import Foundation
 // MARK: - InternalListStore
 
 /// Manages user-created internal (local-only) lists that are not synced to
-/// Bluesky. Persisted via `UserDefaults` with automatic seeding of default
-/// lists ("Hostile" and "Friends") on first launch.
+/// Bluesky. Persisted via `ProtectedDataStore` (file-protected, backup-excluded)
+/// with automatic seeding of default lists ("Hostile" and "Friends") on first launch.
 @MainActor
 final class InternalListStore: ObservableObject {
     /// The list of internal lists, published for SwiftUI observation.
@@ -12,12 +12,13 @@ final class InternalListStore: ObservableObject {
         didSet { persist() }
     }
 
-    private let storageKey = "internal.lists"
+    private let store: ProtectedDataStore
     private let seededKey = "internal.lists.seeded"
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        store = ProtectedDataStore(name: "internal-lists", legacyKey: "internal.lists", defaults: defaults)
         load()
         if !defaults.bool(forKey: seededKey) {
             seedDefaults()
@@ -33,7 +34,7 @@ final class InternalListStore: ObservableObject {
     }
 
     private func load() {
-        guard let data = defaults.data(forKey: storageKey),
+        guard let data = store.data(),
               let decoded = try? JSONDecoder().decode([InternalList].self, from: data)
         else { return }
         lists = decoded
@@ -41,7 +42,7 @@ final class InternalListStore: ObservableObject {
 
     private func persist() {
         guard let data = try? JSONEncoder().encode(lists) else { return }
-        defaults.set(data, forKey: storageKey)
+        store.set(data)
     }
 
     func addList(name: String, color: InternalListColor) {

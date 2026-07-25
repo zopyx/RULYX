@@ -96,7 +96,7 @@ final class ProfileInspectorViewModel {
 
         isSearching = true
         errorMessage = nil
-        AppLogger.search.debug("Starting profile search for query '\(requestQuery, privacy: .public)'.")
+        AppLogger.search.debug("Starting profile search for query '\(requestQuery)'.")
 
         do {
             let actors = try await client.searchActors(
@@ -118,10 +118,10 @@ final class ProfileInspectorViewModel {
                     $0.did.lowercased().contains(lowered)
             }
             // swiftformat:disable:next redundantSelf
-            AppLogger.search.debug("Profile search for '\(requestQuery, privacy: .public)' returned \(self.searchResults.count) filtered results.")
+            AppLogger.search.debug("Profile search for '\(requestQuery)' returned \(self.searchResults.count) filtered results.")
         } catch {
             if AppError.isCancellation(error) {
-                AppLogger.search.debug("Profile search for '\(requestQuery, privacy: .public)' was cancelled.")
+                AppLogger.search.debug("Profile search for '\(requestQuery)' was cancelled.")
                 isSearching = false
                 return
             }
@@ -132,7 +132,7 @@ final class ProfileInspectorViewModel {
             }
 
             let appError = AppError.from(error)
-            AppLogger.search.error("Profile search for '\(requestQuery, privacy: .public)' failed: \(appError.message, privacy: .public)")
+            AppLogger.search.error("Profile search for '\(requestQuery)' failed: \(appError.message, privacy: .public)")
             errorMessage = appError.message
             searchResults = []
         }

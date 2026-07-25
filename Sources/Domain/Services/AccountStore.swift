@@ -251,9 +251,15 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         }
     }
 
-    /// Removes an account from the store, deletes its Keychain entry, and optionally
-    /// deletes its persisted session. If it was the active or preferred search account,
-    /// falls back to the first remaining account.
+    /// Removes an account from the store, deletes its Keychain entry, its persisted
+    /// session, and all of its on-disk caches. If it was the active or preferred
+    /// search account, falls back to the first remaining account.
+    ///
+    /// Cache contract: account removal is a logout — the account's social graph and
+    /// moderation data must not linger on disk. Clears the account-keyed entries in
+    /// `DashboardCache`/`RelationshipCache` and all `BlueskyAPICache` entries for the
+    /// account DID. When the LAST account is removed, both caches are wiped entirely
+    /// (they also contain entries keyed by inspected third-party subjects).
     func removeAccount(_ account: AppAccount, client: BlueskyAuthenticating? = nil) {
         do {
             try keychain.delete(service: passwordService, account: account.id.uuidString)
@@ -277,6 +283,23 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
 
         if previousActiveAccountID == account.id {
             previousActiveAccountID = nil
+        }
+
+        // Logout hygiene: wipe the removed account's on-disk caches.
+        if accounts.isEmpty {
+            DashboardCache.clearAll()
+            RelationshipCache.clearAll()
+        } else {
+            let key = account.did ?? account.handle
+            DashboardCache.clear(forKey: key)
+            if let did = account.did {
+                RelationshipCache.clear(forKey: "blocking_\(did)")
+                RelationshipCache.clear(forKey: "blockedBy_\(did)")
+                RelationshipCache.clear(forKey: "followers_diff_\(did)")
+            }
+        }
+        if let did = account.did {
+            Task { await BlueskyAPICache.shared.clear(for: did) }
         }
 
         persist()
@@ -309,7 +332,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     func switchAccount(to account: AppAccount, using client: LiveBlueskyClient) async {
         guard accounts.contains(account) else { return }
         guard account.id != activeAccountID else { return } // no-op if already active
-        AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .public)")
+        AppLogger.persistence.info("Account switch requested for \(account.handle)")
         // Track the previous account before switching
         previousActiveAccountID = activeAccountID
         // Clear ALL caches — await URL/API cache, Dashboard/Relationship cache, thread cache
@@ -326,7 +349,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             accounts[index].lastUsedAt = .now
         }
         persist()
-        AppLogger.persistence.info("Account switch completed for \(account.handle, privacy: .public)")
+        AppLogger.persistence.info("Account switch completed for \(account.handle)")
     }
 
     /// Returns `true` if the given account has been flagged as deactivated.

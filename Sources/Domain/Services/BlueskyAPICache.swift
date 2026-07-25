@@ -208,7 +208,7 @@ actor BlueskyAPICache: CacheMetricsProviding {
         guard let dir = cacheDirectory() else { return }
         let fileURL = dir.appendingPathComponent(key)
         guard let encoded = try? JSONEncoder().encode(entry) else { return }
-        try? encoded.write(to: fileURL)
+        try? encoded.write(to: fileURL, options: [.atomic, .completeFileProtection])
         evictIfNeeded()
     }
 

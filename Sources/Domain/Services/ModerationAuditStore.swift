@@ -86,15 +86,15 @@ struct ModerationOperationLogEntry: Identifiable, Codable, Hashable {
 
 /// Manages list membership snapshots and moderation operation history.
 /// Snapshots are used to detect membership drift across time.
-/// All data is persisted to UserDefaults.
+/// All data is persisted via `ProtectedDataStore` (file-protected, backup-excluded).
 @MainActor
 final class ModerationAuditStore: ObservableObject {
     /// The moderation operation log, newest first (capped at 25 entries).
     @Published private(set) var operationLog: [ModerationOperationLogEntry] = []
 
     private let defaults: UserDefaults
-    private let snapshotsKey = "moderation.listSnapshots"
-    private let operationLogKey = "moderation.operationLog"
+    private let snapshotsStore: ProtectedDataStore
+    private let operationLogStore: ProtectedDataStore
     /// Maximum number of operation log entries to keep.
     private let operationLogLimit = 25
     /// Maximum number of snapshots per list.
@@ -106,6 +106,8 @@ final class ModerationAuditStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard, preview: Bool = false) {
         self.defaults = defaults
+        snapshotsStore = ProtectedDataStore(name: "moderation-list-snapshots", legacyKey: "moderation.listSnapshots", defaults: defaults)
+        operationLogStore = ProtectedDataStore(name: "moderation-operation-log", legacyKey: "moderation.operationLog", defaults: defaults)
 
         if preview {
             operationLog = [
@@ -134,7 +136,7 @@ final class ModerationAuditStore: ObservableObject {
         }
         operationLog.insert(result, at: 0)
         operationLog = Array(operationLog.prefix(operationLogLimit))
-        AppLogger.persistence.debug("Recorded moderation operation '\(result.title, privacy: .public)' with \(result.succeededHandles.count) successes and \(result.failedHandles.count) failures.")
+        AppLogger.persistence.debug("Recorded moderation operation '\(result.title)' with \(result.succeededHandles.count) successes and \(result.failedHandles.count) failures.")
         persistOperationLog()
     }
 
@@ -177,7 +179,7 @@ final class ModerationAuditStore: ObservableObject {
         if let previousSnapshot,
            previousSnapshot.members == currentMembers
         {
-            AppLogger.persistence.debug("Skipped snapshot write for list '\(list.name, privacy: .public)' because membership was unchanged.")
+            AppLogger.persistence.debug("Skipped snapshot write for list '\(list.name)' because membership was unchanged.")
             return ListMembershipSnapshotSummary(
                 listID: list.id,
                 listName: list.name,
@@ -200,7 +202,7 @@ final class ModerationAuditStore: ObservableObject {
         history.insert(snapshot, at: 0)
         history = Array(history.prefix(snapshotHistoryLimit))
         snapshotsByListID[list.id] = history
-        AppLogger.persistence.debug("Captured snapshot for list '\(list.name, privacy: .public)' with \(currentMembers.count) members.")
+        AppLogger.persistence.debug("Captured snapshot for list '\(list.name)' with \(currentMembers.count) members.")
         persistSnapshots()
 
         return ListMembershipSnapshotSummary(
@@ -259,32 +261,32 @@ final class ModerationAuditStore: ObservableObject {
 
     // MARK: - Private Helpers
 
-    /// Loads snapshots and operation log from UserDefaults.
+    /// Loads snapshots and operation log from the protected on-disk store.
     private func load() {
-        if let data = defaults.data(forKey: snapshotsKey),
+        if let data = snapshotsStore.data(),
            let decoded = try? JSONDecoder().decode([String: [ListMembershipSnapshot]].self, from: data)
         {
             snapshotsByListID = decoded
         }
 
-        if let data = defaults.data(forKey: operationLogKey),
+        if let data = operationLogStore.data(),
            let decoded = try? JSONDecoder().decode([ModerationOperationLogEntry].self, from: data)
         {
             operationLog = decoded.sorted { $0.createdAt > $1.createdAt }
         }
     }
 
-    /// Persists all snapshots to UserDefaults.
+    /// Persists all snapshots to the protected on-disk store.
     private func persistSnapshots() {
         if let data = try? JSONEncoder().encode(snapshotsByListID) {
-            defaults.set(data, forKey: snapshotsKey)
+            snapshotsStore.set(data)
         }
     }
 
-    /// Persists the operation log to UserDefaults.
+    /// Persists the operation log to the protected on-disk store.
     private func persistOperationLog() {
         if let data = try? JSONEncoder().encode(operationLog) {
-            defaults.set(data, forKey: operationLogKey)
+            operationLogStore.set(data)
         }
     }
 }

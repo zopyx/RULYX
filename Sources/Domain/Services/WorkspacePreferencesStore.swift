@@ -62,24 +62,29 @@ final class WorkspacePreferencesStore: ObservableObject {
     /// The last profile query string. Changes are immediately persisted.
     @Published var lastProfileQuery = "" {
         didSet {
-            defaults.set(lastProfileQuery, forKey: lastProfileQueryKey)
+            if let data = try? JSONEncoder().encode(lastProfileQuery) {
+                lastProfileQueryStore.set(data)
+            }
         }
     }
 
     private let defaults: UserDefaults
+    private let savedSearchesStore: ProtectedDataStore
+    private let recentSearchesStore: ProtectedDataStore
+    private let lastProfileQueryStore: ProtectedDataStore
 
     // MARK: - UserDefaults Keys
 
-    private let savedSearchesKey = "moderation.savedProfileSearches"
-    private let recentSearchesKey = "moderation.recentProfileSearches"
     private let selectedTabKey = "moderation.selectedTab"
-    private let lastProfileQueryKey = "moderation.lastProfileQuery"
     private let recentSearchLimit = 12
 
     // MARK: - Init
 
     init(defaults: UserDefaults = .standard, preview: Bool = false) {
         self.defaults = defaults
+        savedSearchesStore = ProtectedDataStore(name: "saved-profile-searches", legacyKey: "moderation.savedProfileSearches", defaults: defaults)
+        recentSearchesStore = ProtectedDataStore(name: "recent-profile-searches", legacyKey: "moderation.recentProfileSearches", defaults: defaults)
+        lastProfileQueryStore = ProtectedDataStore(name: "last-profile-query", legacyKey: "moderation.lastProfileQuery", defaults: defaults)
 
         if preview {
             savedSearches = [
@@ -144,15 +149,15 @@ final class WorkspacePreferencesStore: ObservableObject {
 
     // MARK: - Private Helpers
 
-    /// Loads all preferences from UserDefaults.
+    /// Loads all preferences from the protected on-disk store.
     private func load() {
-        if let data = defaults.data(forKey: savedSearchesKey),
+        if let data = savedSearchesStore.data(),
            let decoded = try? JSONDecoder().decode([SavedProfileSearch].self, from: data)
         {
             savedSearches = decoded.sorted { $0.lastUsedAt > $1.lastUsedAt }
         }
 
-        if let data = defaults.data(forKey: recentSearchesKey),
+        if let data = recentSearchesStore.data(),
            let decoded = try? JSONDecoder().decode([RecentProfileSearch].self, from: data)
         {
             recentSearches = decoded.sorted { $0.usedAt > $1.usedAt }
@@ -164,20 +169,24 @@ final class WorkspacePreferencesStore: ObservableObject {
             self.selectedTab = selectedTab
         }
 
-        lastProfileQuery = defaults.string(forKey: lastProfileQueryKey) ?? ""
-    }
-
-    /// Persists saved searches to UserDefaults.
-    private func persistSavedSearches() {
-        if let data = try? JSONEncoder().encode(savedSearches) {
-            defaults.set(data, forKey: savedSearchesKey)
+        if let data = lastProfileQueryStore.data(),
+           let query = try? JSONDecoder().decode(String.self, from: data)
+        {
+            lastProfileQuery = query
         }
     }
 
-    /// Persists recent searches to UserDefaults.
+    /// Persists saved searches to the protected on-disk store.
+    private func persistSavedSearches() {
+        if let data = try? JSONEncoder().encode(savedSearches) {
+            savedSearchesStore.set(data)
+        }
+    }
+
+    /// Persists recent searches to the protected on-disk store.
     private func persistRecentSearches() {
         if let data = try? JSONEncoder().encode(recentSearches) {
-            defaults.set(data, forKey: recentSearchesKey)
+            recentSearchesStore.set(data)
         }
     }
 

@@ -20,7 +20,7 @@ enum RelationshipCache {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode([BlueskyActor].self, from: data)
         } catch {
-            AppLogger.persistence.error("RelationshipCache load failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache load failed for key \(key): \(error.localizedDescription, privacy: .public)")
             return []
         }
     }
@@ -30,9 +30,9 @@ enum RelationshipCache {
         do {
             try FileManager.default.createDirectory(at: cachesDirectory, withIntermediateDirectories: true)
             let data = try JSONEncoder().encode(actors)
-            try data.write(to: url)
+            try data.write(to: url, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("RelationshipCache save failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache save failed for key \(key): \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -41,7 +41,7 @@ enum RelationshipCache {
         do {
             try FileManager.default.removeItem(at: url)
         } catch {
-            AppLogger.persistence.error("RelationshipCache clear failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache clear failed for key \(key): \(error.localizedDescription, privacy: .public)")
         }
     }
 

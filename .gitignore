@@ -17,9 +17,6 @@ build/
 .derived/
 .module-cache/
 
-# Large binary pods (Tor framework exceeds GitHub's 100 MB limit)
-Pods/Tor/tor.xcframework/
-
 # Screenshots
 screenshots/
 
@@ -31,6 +28,3 @@ fastlane/README.md
 
 # Credentials
 accounts.txt
-
-# Build-time secrets (API keys injected via xcconfig)
-Config/Secrets.xcconfig

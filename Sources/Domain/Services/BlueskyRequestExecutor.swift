@@ -116,7 +116,7 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
             }
             let bodyPreview = String(decoding: data.prefix(500), as: UTF8.self)
             AppLogger.moderation.error(
-                "BlueskyRequestExecutor got HTTP \(httpResponse.statusCode) for \(method) xrpc/\(path): \(bodyPreview, privacy: .public)"
+                "BlueskyRequestExecutor got HTTP \(httpResponse.statusCode) for \(method) xrpc/\(path): \(bodyPreview)"
             )
             throw BlueskyAPIError.invalidResponse
         }
@@ -129,7 +129,7 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
         } catch {
             let bodyPreview = String(decoding: data.prefix(500), as: UTF8.self)
             AppLogger.performance.debug(
-                "Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public). Body: \(bodyPreview, privacy: .public)"
+                "Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public). Body: \(bodyPreview)"
             )
             throw BlueskyAPIError.invalidResponse
         }

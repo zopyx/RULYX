@@ -125,7 +125,7 @@ final class PushNotificationCoordinator: ObservableObject {
                     appPassword: accountStore.appPassword(for: account)
                 )
             } catch {
-                AppLogger.moderation.error("Push unregister failed for removed account \(account.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Push unregister failed for removed account \(account.handle): \(error.localizedDescription, privacy: .public)")
             }
         }
 
@@ -141,7 +141,7 @@ final class PushNotificationCoordinator: ObservableObject {
                 )
                 successfulRegistrations[account.id] = account
             } catch {
-                AppLogger.moderation.error("Push register failed for \(account.handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Push register failed for \(account.handle): \(error.localizedDescription, privacy: .public)")
             }
         }
 

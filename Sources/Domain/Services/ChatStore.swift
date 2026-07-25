@@ -101,7 +101,7 @@ final class ChatStore: ObservableObject {
     /// Switches chat to `account` by discarding every cached conversation/message and
     /// rebuilding the visible conversation list from the chat service response.
     func rebuildConversations(for account: AppAccount?, appPassword: String?, clearCaches: Bool = false, showPrompts: Bool = false) async {
-        AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none", privacy: .public); clearCaches=\(clearCaches, privacy: .public); showPrompts=\(showPrompts, privacy: .public)")
+        AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none"); clearCaches=\(clearCaches, privacy: .public); showPrompts=\(showPrompts, privacy: .public)")
         activeAccountID = account?.id
         activeAccount = account
         activeAppPassword = appPassword
@@ -209,7 +209,7 @@ final class ChatStore: ObservableObject {
             }
         } catch {
             guard isCurrentContext(context) else { return }
-            AppLogger.persistence.error("Failed to load messages for \(convoId, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("Failed to load messages for \(convoId): \(error.localizedDescription, privacy: .public)")
             messageError = error
             isLoadingMessages = false
         }

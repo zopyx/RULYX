@@ -30,16 +30,28 @@ struct InlineAnimatedMediaView: View {
 // MARK: - InlineAnimatedMediaWebView
 
 /// `UIViewRepresentable` wrapping a `WKWebView` configured for inline media playback.
+///
+/// Security hardening (the media URL originates from remote, untrusted post
+/// content):
+/// - The URL is HTML-escaped before being embedded into the page template, so
+///   a crafted URL cannot break out of the `src` attribute and inject markup.
+/// - JavaScript is disabled — `<img>`/`<video>` rendering does not need it.
+/// - A non-persistent data store is used (no cookies, cache, or storage shared
+///   with other web views).
+/// - All navigation requests are cancelled by the navigation delegate: the
+///   embedded page must never follow links or redirects to other content.
 private struct InlineAnimatedMediaWebView: UIViewRepresentable {
     let url: URL
     let allowsInteraction: Bool
 
     // MARK: - UIViewRepresentable
 
-    func makeUIView(context _: Context) -> WKWebView {
+    func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.mediaTypesRequiringUserActionForPlayback = []
         config.allowsInlineMediaPlayback = true
+        config.defaultWebpagePreferences.allowsContentJavaScript = false
+        config.websiteDataStore = .nonPersistent()
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.isOpaque = false
@@ -47,6 +59,7 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
         webView.isUserInteractionEnabled = allowsInteraction
+        webView.navigationDelegate = context.coordinator
 
         loadContent(in: webView)
         return webView
@@ -58,11 +71,46 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
         loadContent(in: webView)
     }
 
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    // MARK: - Coordinator
+
+    /// Cancels every navigation action: the media page is fully self-contained
+    /// and must never navigate away (link clicks, redirects, JS-less tricks).
+    final class Coordinator: NSObject, WKNavigationDelegate {
+        func webView(
+            _: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            if navigationAction.navigationType == .other {
+                decisionHandler(.allow)
+            } else {
+                decisionHandler(.cancel)
+            }
+        }
+    }
+
     // MARK: - Private Helpers
+
+    /// Escapes a URL string for safe embedding inside a double-quoted HTML
+    /// attribute value. Prevents attribute-breakout HTML injection from
+    /// untrusted remote URLs.
+    private func htmlEscaped(_ string: String) -> String {
+        string
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "'", with: "&#39;")
+    }
 
     /// Construct an HTML page embedding the media file with transparent background and cover sizing.
     private func loadContent(in webView: WKWebView) {
         let ext = url.pathExtension.lowercased()
+        let safeURL = htmlEscaped(url.absoluteString)
         if ["gif", "jpg", "jpeg", "png", "webp"].contains(ext) {
             let html = """
             <html>
@@ -74,7 +122,7 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
             img{width:100%;height:100%;object-fit:cover}
             </style>
             </head>
-            <body><img src="\(url.absoluteString)" /></body>
+            <body><img src="\(safeURL)" /></body>
             </html>
             """
             webView.loadHTMLString(html, baseURL: nil)
@@ -90,13 +138,16 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
             </head>
             <body>
             <video autoplay muted loop playsinline>
-                <source src="\(url.absoluteString)">
+                <source src="\(safeURL)">
             </video>
             </body>
             </html>
             """
             webView.loadHTMLString(html, baseURL: nil)
         } else {
+            // Unknown extension: load directly, still under the locked-down
+            // configuration (JavaScript disabled, ephemeral store, navigation
+            // delegate cancels any subsequent navigation).
             webView.load(URLRequest(url: url))
         }
     }

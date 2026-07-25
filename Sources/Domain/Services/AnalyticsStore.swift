@@ -22,10 +22,13 @@ final class AnalyticsStore: ObservableObject {
 
     private static let saveKey = "engagementSnapshots"
 
+    private let store: ProtectedDataStore
+
     // MARK: - Init
 
-    /// Loads persisted engagement snapshots from UserDefaults.
-    init() {
+    /// Loads persisted engagement snapshots from the protected on-disk store.
+    init(defaults: UserDefaults = .standard) {
+        store = ProtectedDataStore(name: "engagement-snapshots", legacyKey: Self.saveKey, defaults: defaults)
         load()
     }
 
@@ -78,16 +81,16 @@ final class AnalyticsStore: ObservableObject {
 
     // MARK: - Private Helpers
 
-    /// Persists all snapshots to UserDefaults.
+    /// Persists all snapshots to the protected on-disk store.
     private func save() {
         if let data = try? JSONEncoder().encode(snapshots) {
-            UserDefaults.standard.set(data, forKey: Self.saveKey)
+            store.set(data)
         }
     }
 
-    /// Loads all snapshots from UserDefaults.
+    /// Loads all snapshots from the protected on-disk store.
     private func load() {
-        guard let data = UserDefaults.standard.data(forKey: Self.saveKey),
+        guard let data = store.data(),
               let decoded = try? JSONDecoder().decode([String: [EngagementSnapshot]].self, from: data)
         else { return }
         snapshots = decoded

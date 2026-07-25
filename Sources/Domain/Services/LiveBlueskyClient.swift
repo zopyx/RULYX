@@ -1444,7 +1444,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             let urlString = page == 1
                 ? "https://api.clearsky.app/csky/api/v1/get-list/\(handle)"
                 : "https://api.clearsky.app/csky/api/v1/get-list/\(handle)/\(page)"
-            AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(urlString, privacy: .public)")
+            AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(urlString)")
             guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
             request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -1452,7 +1452,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             guard (200 ..< 300).contains(httpResponse.statusCode) else {
                 if page == 1 {
                     if let body = String(data: data, encoding: .utf8) {
-                        AppLogger.performance.error("Clearsky lists API returned \(httpResponse.statusCode): \(body, privacy: .public)")
+                        AppLogger.performance.error("Clearsky lists API returned \(httpResponse.statusCode): \(body)")
                     }
                     throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
                 }

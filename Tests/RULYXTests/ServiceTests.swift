@@ -183,20 +183,33 @@ final class MutedWordsStoreTests: XCTestCase {
 
 @MainActor
 final class AnalyticsStoreTests: XCTestCase {
-    private nonisolated(unsafe) static let saveKey = "engagementSnapshots"
+    private nonisolated(unsafe) var defaults: UserDefaults!
+
+    override nonisolated func setUp() {
+        super.setUp()
+        let suiteName = "AnalyticsStoreTests.\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: suiteName)
+        defaults?.removePersistentDomain(forName: suiteName)
+    }
 
     override nonisolated func tearDown() {
+        defaults = nil
         super.tearDown()
-        UserDefaults.standard.removeObject(forKey: Self.saveKey)
+    }
+
+    /// Each test gets a fresh isolated UserDefaults suite so state never leaks
+    /// between tests (the suite is the store's isolation seam).
+    private func makeStore() -> AnalyticsStore {
+        AnalyticsStore(defaults: defaults)
     }
 
     func testInitialState() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         XCTAssertTrue(store.snapshots.isEmpty)
     }
 
     func testRecordCreatesSnapshot() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 5, replyCount: 2)
         let history = store.history(for: "at://post/1")
         XCTAssertEqual(history.count, 1)
@@ -206,7 +219,7 @@ final class AnalyticsStoreTests: XCTestCase {
     }
 
     func testRecordAppendsMultiple() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 5, replyCount: 2)
         store.record(postURI: "at://post/1", likeCount: 15, repostCount: 8, replyCount: 3)
         let history = store.history(for: "at://post/1")
@@ -214,7 +227,7 @@ final class AnalyticsStoreTests: XCTestCase {
     }
 
     func testRecordDifferentURIsSeparate() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 5, replyCount: 2)
         store.record(postURI: "at://post/2", likeCount: 20, repostCount: 10, replyCount: 4)
         XCTAssertEqual(store.history(for: "at://post/1").count, 1)
@@ -222,12 +235,12 @@ final class AnalyticsStoreTests: XCTestCase {
     }
 
     func testHistoryForUnknownURI() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         XCTAssertTrue(store.history(for: "at://post/missing").isEmpty)
     }
 
     func testRetentionLimitFifty() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         for i in 0 ..< 55 {
             store.record(postURI: "at://post/1", likeCount: i, repostCount: 0, replyCount: 0)
         }
@@ -236,42 +249,41 @@ final class AnalyticsStoreTests: XCTestCase {
     }
 
     func testLikeTrendUp() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 0, replyCount: 0)
         store.record(postURI: "at://post/1", likeCount: 25, repostCount: 0, replyCount: 0)
         XCTAssertEqual(store.likeTrend(for: "at://post/1"), "+15")
     }
 
     func testLikeTrendDown() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 25, repostCount: 0, replyCount: 0)
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 0, replyCount: 0)
         XCTAssertEqual(store.likeTrend(for: "at://post/1"), "-15")
     }
 
     func testLikeTrendFlat() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 0, replyCount: 0)
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 0, replyCount: 0)
         XCTAssertEqual(store.likeTrend(for: "at://post/1"), "→")
     }
 
     func testLikeTrendEmpty() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         XCTAssertEqual(store.likeTrend(for: "at://post/1"), "")
     }
 
     func testLikeTrendSingleSnapshot() {
-        let store = AnalyticsStore()
+        let store = makeStore()
         store.record(postURI: "at://post/1", likeCount: 10, repostCount: 0, replyCount: 0)
         XCTAssertEqual(store.likeTrend(for: "at://post/1"), "")
     }
 
     func testPersistence() {
-        UserDefaults.standard.removeObject(forKey: Self.saveKey)
-        let store1 = AnalyticsStore()
+        let store1 = makeStore()
         store1.record(postURI: "at://post/1", likeCount: 42, repostCount: 0, replyCount: 0)
-        let store2 = AnalyticsStore()
+        let store2 = makeStore()
         XCTAssertEqual(store2.history(for: "at://post/1").first?.likeCount, 42)
     }
 }

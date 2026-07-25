@@ -77,10 +77,16 @@ final class BlueskySessionService: BlueskySessionServicing {
 
     func authenticate(handle: String, appPassword: String, entrywayURL: URL? = nil, authFactorToken: String? = nil) async throws -> BlueskySession {
         let requestBody = CreateSessionRequest(identifier: handle, password: appPassword, authFactorToken: authFactorToken)
-        let authURL: URL = if let entrywayURL {
-            entrywayURL
+        let authURL: URL
+        if let entrywayURL {
+            // Explicit, user-entered custom PDS. Credentials are about to be sent
+            // to this host, so HTTPS is mandatory (defense-in-depth on top of ATS).
+            guard entrywayURL.scheme?.lowercased() == "https" else {
+                throw BlueskyAPIError.server("PDS URL must use HTTPS.")
+            }
+            authURL = entrywayURL
         } else {
-            try await authenticationURL(forHandle: handle)
+            authURL = try await authenticationURL(forHandle: handle)
         }
         let response: CreateSessionResponse
         do {
@@ -328,18 +334,17 @@ final class BlueskySessionService: BlueskySessionServicing {
         return session.handle.caseInsensitiveCompare(account.handle) == .orderedSame
     }
 
+    /// Determines where `createSession` credentials are sent for a handle.
+    ///
+    /// Security contract: the PDS endpoint is taken exclusively from the
+    /// verified DID document, resolved through the trusted entryway resolver
+    /// (`bsky.social` performs both DNS TXT `_atproto.` and HTTPS well-known
+    /// handle verification server-side). The credential endpoint is NEVER
+    /// derived from the handle string itself — a hostile or parked domain must
+    /// not be able to receive the user's app password.
     private func authenticationURL(forHandle handle: String) async throws -> URL {
         if handle.lowercased().hasSuffix(".bsky.social") {
             return entrywayURL
-        }
-
-        if let domainEntryway = entrywayFromDomain(for: handle) {
-            if let did = try? await resolveHandle(handle, hostURL: domainEntryway),
-               let pdsURL = try? await resolvePDSURL(forDID: did)
-            {
-                return pdsURL
-            }
-            return domainEntryway
         }
 
         if let did = try? await resolveHandle(handle),
@@ -349,14 +354,6 @@ final class BlueskySessionService: BlueskySessionServicing {
         }
 
         return entrywayURL
-    }
-
-    private func entrywayFromDomain(for handle: String) -> URL? {
-        let components = handle.split(separator: "@").last?.split(separator: ".")
-        guard let components, components.count >= 2 else { return nil }
-        let domain = components.suffix(2).joined(separator: ".")
-        guard domain != "bsky.social" else { return nil }
-        return URL(string: "https://\(domain)")
     }
 
     private func resolveHandle(_ handle: String, hostURL: URL? = nil) async throws -> String {

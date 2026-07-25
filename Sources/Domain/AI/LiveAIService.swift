@@ -33,10 +33,10 @@ class LiveAIService: ObservableObject {
             name: "Phi-3 Mini (Q4)",
             role: .textGenerator,
             downloadURL: URL(string: "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf")!,
-            fileSize: 2_350_000_000,
+            fileSize: 2_393_231_072,
             description: "Microsoft Phi-3 mini 3.8B parameter model, 4-bit quantized.",
             requires: "17.0",
-            sha256: nil
+            sha256: "8a83c7fb9049a9b2e92266fa7ad04933bb53aa1e85136b7b30f1b8000ff2edef"
         ),
         ModelBundle(
             id: "qwen3-1.7b-q8",
@@ -46,7 +46,7 @@ class LiveAIService: ObservableObject {
             fileSize: 1_834_426_016,
             description: "Official Qwen3 1.7B model, Q8_0 quantized, for on-device moderation and content analysis.",
             requires: "17.0",
-            sha256: nil
+            sha256: "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a"
         ),
     ]
 
@@ -127,21 +127,36 @@ class LiveAIService: ObservableObject {
             throw error
         }
 
-        // SHA-256 integrity check (when hash is configured)
-        if let expectedHash = model.sha256 {
-            let fileHandle = try FileHandle(forReadingFrom: local)
-            let fileData = fileHandle.readDataToEndOfFile()
-            try fileHandle.close()
-            let actualHash = SHA256.hash(data: fileData).map { String(format: "%02x", $0) }.joined()
-            guard actualHash == expectedHash.lowercased() else {
-                let error = AIError("Model integrity check failed: SHA-256 mismatch. Expected \(expectedHash), got \(actualHash).")
-                try? fileManager.delete(model.id)
-                downloadManager.recordFailure(id: model.id, message: error.localizedDescription)
-                rebuildStates()
-                throw error
-            }
-            AppLogger.persistence.info("SHA-256 integrity check passed for \(model.id, privacy: .public)")
+        // SHA-256 integrity check. A configured hash is MANDATORY for catalog
+        // models: downloading a multi-GB executable artifact without integrity
+        // verification is a supply-chain risk, so fail closed when it is absent.
+        guard let expectedHash = model.sha256, !expectedHash.isEmpty else {
+            let error = AIError("Model \(model.id) has no SHA-256 integrity hash configured — refusing to install an unverifiable download.")
+            try? fileManager.delete(model.id)
+            downloadManager.recordFailure(id: model.id, message: error.localizedDescription)
+            rebuildStates()
+            throw error
         }
+        // Stream the file in chunks — never load a multi-GB model into memory.
+        let fileHandle = try FileHandle(forReadingFrom: local)
+        var hasher = SHA256()
+        while true {
+            let chunk = autoreleasepool { fileHandle.readData(ofLength: 8 * 1024 * 1024) }
+            if chunk.isEmpty {
+                break
+            }
+            hasher.update(data: chunk)
+        }
+        try fileHandle.close()
+        let actualHash = hasher.finalize().map { String(format: "%02x", $0) }.joined()
+        guard actualHash == expectedHash.lowercased() else {
+            let error = AIError("Model integrity check failed: SHA-256 mismatch. Expected \(expectedHash), got \(actualHash).")
+            try? fileManager.delete(model.id)
+            downloadManager.recordFailure(id: model.id, message: error.localizedDescription)
+            rebuildStates()
+            throw error
+        }
+        AppLogger.persistence.info("SHA-256 integrity check passed for \(model.id, privacy: .public)")
 
         rebuildStates()
     }

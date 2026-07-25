@@ -217,7 +217,7 @@ final class AutoBlockBackService: ObservableObject {
                                 let underlyingErrors = nsError.underlyingErrors.map(\.localizedDescription).joined(separator: "; ")
                                 let detail = underlyingErrors.isEmpty ? "" : " [underlying: \(underlyingErrors)]"
                                 AppLogger.moderation.error(
-                                    "Auto-block-back failed for \(actor.handle, privacy: .public): \(errorDesc, privacy: .public)\(detail, privacy: .public)"
+                                    "Auto-block-back failed for \(actor.handle): \(errorDesc, privacy: .public)\(detail, privacy: .public)"
                                 )
                                 return (false, actor)
                             }
@@ -240,7 +240,7 @@ final class AutoBlockBackService: ObservableObject {
                                     )
                                 } catch {
                                     AppLogger.moderation.error(
-                                        "Auto-block-back: failed to add \(actor.handle, privacy: .public) to list \(list.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                                        "Auto-block-back: failed to add \(actor.handle) to list \(list.name): \(error.localizedDescription, privacy: .public)"
                                     )
                                 }
                             }
