@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  push:
+    branches: [main, security/*]
+  pull_request:
+    branches: [main, security/*]
+
+jobs:
+  test:
+    name: Unit Tests (iOS)
+    runs-on: macos-15
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build for testing
+        run: >
+          xcodebuild -project RULYX.xcodeproj
+          -scheme RULYX
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max'
+          build-for-testing
+          CODE_SIGNING_ALLOWED=NO
+
+      - name: Run unit tests (skip live-network + UI tests)
+        run: >
+          xcodebuild -project RULYX.xcodeproj
+          -scheme RULYX
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max'
+          test-without-building
+          CODE_SIGNING_ALLOWED=NO
+          -skip-testing:UITests
+          -skip-testing:RULYXTests/ServiceIntegrationTests
+          -skip-testing:RULYXTests/LiveBlueskyClientTests
+          -skip-testing:RULYXTests/LiveAuthenticationTests

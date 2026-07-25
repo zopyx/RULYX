@@ -13,6 +13,14 @@ class ClearskyHeartbeatService: ObservableObject {
     /// Whether the ClearSky API is currently reachable.
     @Published private(set) var isClearskyAvailable: Bool = true
 
+    /// Consecutive failure counter: after `circuitOpenThreshold` failures
+    /// the circuit opens and stays open until `circuitCloseSuccesses`
+    /// consecutive successes are observed (hysteresis prevents thrash).
+    private var consecutiveFailures = 0
+    private var consecutiveSuccesses = 0
+    private let circuitOpenThreshold = 3
+    private let circuitCloseSuccesses = 2
+
     /// The repeating ping task.
     private var timerTask: Task<Void, Never>?
 
@@ -44,7 +52,9 @@ class ClearskyHeartbeatService: ObservableObject {
     }
 
     /// Performs a single HEAD request to the ClearSky health endpoint and
-    /// updates `isClearskyAvailable` based on the response status.
+    /// updates `isClearskyAvailable` using a hysteresis circuit breaker:
+    /// opens after `circuitOpenThreshold` consecutive failures, closes after
+    /// `circuitCloseSuccesses` consecutive successes.
     func ping() async {
         guard let url = URL(string: heartbeatURL) else { return }
         var request = URLRequest(url: url)
@@ -52,9 +62,27 @@ class ClearskyHeartbeatService: ObservableObject {
         request.timeoutInterval = timeout
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
-            isClearskyAvailable = (200 ..< 300).contains((response as? HTTPURLResponse)?.statusCode ?? 0)
+            let isSuccess = (200 ..< 300).contains((response as? HTTPURLResponse)?.statusCode ?? 0)
+            if isSuccess {
+                consecutiveFailures = 0
+                consecutiveSuccesses += 1
+                if consecutiveSuccesses >= circuitCloseSuccesses {
+                    isClearskyAvailable = true
+                    consecutiveSuccesses = 0
+                }
+            } else {
+                consecutiveSuccesses = 0
+                consecutiveFailures += 1
+                if consecutiveFailures >= circuitOpenThreshold {
+                    isClearskyAvailable = false
+                }
+            }
         } catch {
-            isClearskyAvailable = false
+            consecutiveSuccesses = 0
+            consecutiveFailures += 1
+            if consecutiveFailures >= circuitOpenThreshold {
+                isClearskyAvailable = false
+            }
         }
     }
 }

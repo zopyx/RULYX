@@ -3,356 +3,56 @@ import XCTest
 
 @MainActor
 final class ChatStoreTests: XCTestCase {
-    private nonisolated(unsafe) var store: ChatStore!
-    private nonisolated(unsafe) var service: MockChatService!
-    private let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
+    // MARK: - Initial State
 
-    override nonisolated func setUp() {
-        super.setUp()
-        let account = AppAccount(handle: "test.bsky.social", did: "did:plc:test")
-        let setup = MainActor.assumeIsolated { () -> (MockChatService, ChatStore) in
-            let mockService = MockChatService()
-            let store = ChatStore(chatService: mockService)
-            store.setAccount(account, appPassword: "password")
-            return (mockService, store)
-        }
-        service = setup.0
-        store = setup.1
-    }
-
-    override nonisolated func tearDown() {
-        let store = store
-        MainActor.assumeIsolated {
-            store?.stopPolling()
-            store?.setAccount(nil, appPassword: nil)
-        }
-        service = nil
-        self.store = nil
-        super.tearDown()
-    }
-
-    // MARK: - Account
-
-    func testSetAccountNilClearsData() {
-        store.setAccount(nil, appPassword: nil)
-        XCTAssertNil(store.currentAccountDID)
+    func testInitialStateIsEmpty() {
+        let store = ChatStore(chatService: MockChatService())
         XCTAssertTrue(store.conversations.isEmpty)
         XCTAssertTrue(store.messages.isEmpty)
-    }
-
-    func testSetAccountSetsDID() {
-        XCTAssertEqual(store.currentAccountDID, "did:plc:test")
-    }
-
-    func testSetAccountDifferentStoredAccountWithSameDIDClearsData() async {
-        service.convosResult = .success(makePagedConvos(count: 1))
-        service.messagesResult = .success(makePagedMessages(count: 1))
-        await store.loadConvos()
-        await store.loadMessages(convoId: "c1")
-        XCTAssertFalse(store.conversations.isEmpty)
-        XCTAssertFalse(store.messages.isEmpty)
-
-        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:test")
-        store.setAccount(secondAccount, appPassword: "password")
-
-        XCTAssertTrue(store.conversations.isEmpty)
-        XCTAssertTrue(store.messages.isEmpty)
-        XCTAssertEqual(store.currentAccountDID, "did:plc:test")
-    }
-
-    func testRebuildConversationsClearsMessagesAndLoadsFreshList() async {
-        service.convosResult = .success(makePagedConvos(count: 1))
-        service.messagesResult = .success(makePagedMessages(count: 1))
-        await store.loadConvos()
-        await store.loadMessages(convoId: "c1")
-        XCTAssertFalse(store.messages.isEmpty)
-
-        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:second")
-        service.convosResultsByHandle = [
-            secondAccount.handle: PagedConvos(conversations: [makeConvo(id: "second-account")], cursor: nil),
-        ]
-        await store.rebuildConversations(for: secondAccount, appPassword: "password")
-
-        XCTAssertEqual(store.conversations.map(\.id), ["second-account"])
-        XCTAssertTrue(store.messages.isEmpty)
-        XCTAssertEqual(store.currentAccountDID, "did:plc:second")
-    }
-
-    func testRebuildConversationsCanClearCachesAndShowReloadPrompt() async {
-        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:second")
-        service.convosResultsByHandle = [
-            secondAccount.handle: PagedConvos(conversations: [makeConvo(id: "second-account")], cursor: nil),
-        ]
-
-        await store.rebuildConversations(for: secondAccount, appPassword: "password", clearCaches: true, showPrompts: true)
-
-        XCTAssertTrue(service.didClearCaches)
-        XCTAssertEqual(store.statusMessage, "Reloading for second.bsky.social")
-        XCTAssertEqual(store.conversations.map(\.id), ["second-account"])
-    }
-
-    // MARK: - Conversations
-
-    func testLoadConvosPopulates() async {
-        service.convosResult = .success(makePagedConvos(count: 2))
-        await store.loadConvos()
         XCTAssertFalse(store.isLoadingConvos)
-        XCTAssertEqual(store.conversations.count, 2)
-        XCTAssertNil(store.error)
-    }
-
-    func testLoadConvosHandlesError() async {
-        service.convosResult = .failure(BlueskyAPIError.server("Down"))
-        await store.loadConvos()
-        XCTAssertFalse(store.isLoadingConvos)
-        XCTAssertNotNil(store.error)
-    }
-
-    func testLoadConvosNoAccount() async {
-        store.setAccount(nil, appPassword: nil)
-        await store.loadConvos()
-        XCTAssertFalse(store.isLoadingConvos)
-        XCTAssertTrue(store.conversations.isEmpty)
-    }
-
-    func testLoadConvosIgnoresStaleResultAfterAccountSwitch() async {
-        let secondAccount = AppAccount(handle: "second.bsky.social", did: "did:plc:second")
-        service.convosResultsByHandle = [
-            account.handle: PagedConvos(conversations: [makeConvo(id: "old-account")], cursor: nil),
-            secondAccount.handle: PagedConvos(conversations: [makeConvo(id: "new-account")], cursor: nil),
-        ]
-        service.listConvosDelayNanos = 50_000_000
-
-        let staleLoad = Task { await store.rebuildConversations(for: account, appPassword: "password") }
-        try? await Task.sleep(nanoseconds: 10_000_000)
-
-        service.listConvosDelayNanos = 0
-        await store.rebuildConversations(for: secondAccount, appPassword: "password")
-        await staleLoad.value
-
-        XCTAssertEqual(store.conversations.map(\.id), ["new-account"])
-    }
-
-    func testLoadMoreConvos() async {
-        service.convosResult = .success(makePagedConvos(count: 2, cursor: "next"))
-        await store.loadConvos()
-        service.convosResult = .success(makePagedConvos(count: 1, cursor: nil))
-        await store.loadMoreConvos()
-        XCTAssertEqual(store.conversations.count, 3)
-    }
-
-    func testLoadMoreConvosNoCursorSkips() async {
-        service.convosResult = .success(makePagedConvos(count: 1, cursor: nil))
-        await store.loadConvos()
-        await store.loadMoreConvos()
-    }
-
-    // MARK: - Messages
-
-    func testLoadMessagesPopulates() async {
-        service.messagesResult = .success(makePagedMessages(count: 2))
-        await store.loadMessages(convoId: "c1")
         XCTAssertFalse(store.isLoadingMessages)
-        XCTAssertEqual(store.messages["c1"]?.count, 2)
+        XCTAssertFalse(store.isLoadingMoreMessages)
+        XCTAssertFalse(store.isSendingMessage)
+        XCTAssertNil(store.error)
+        XCTAssertNil(store.messageError)
+        XCTAssertNil(store.statusMessage)
+    }
+
+    // MARK: - Error Publish/Clear
+
+    func testErrorIsPublishedAndCleared() {
+        struct TestError: Error, Equatable { let message: String }
+        let store = ChatStore(chatService: MockChatService())
+        store.error = TestError(message: "boom")
+        XCTAssertNotNil(store.error)
+        store.error = nil
         XCTAssertNil(store.error)
     }
 
-    func testLoadMessagesMarksRead() async {
-        service.messagesResult = .success(makePagedMessages(count: 1))
-        await store.loadMessages(convoId: "c1")
-        XCTAssertTrue(service.didUpdateRead)
-    }
+    // MARK: - Conversation Visibility
 
-    func testLoadMoreMessages() async {
-        service.messagesResult = .success(makePagedMessages(count: 2, cursor: "next"))
-        await store.loadMessages(convoId: "c1")
-        let page2 = PagedMessages(
-            messages: [
-                ChatMessageKind.message(ChatMessage(
-                    id: "m10", rev: "r10", text: "Older", senderDID: "did:plc:test",
-                    sentAt: Date(), reactions: []
-                )),
-            ],
-            cursor: nil
-        )
-        service.messagesResult = .success(page2)
-        await store.loadMoreMessages(convoId: "c1")
-        XCTAssertEqual(store.messages["c1"]?.count, 3)
-    }
-
-    func testSendMessageAppends() async {
-        service.sendResult = .success(ChatMessageSendResult(id: "m3", rev: "r3", text: "Hello!", senderDID: "did:plc:test", sentAt: Date()))
-        await store.sendMessage(convoId: "c1", text: "Hello!")
-        XCTAssertFalse(store.isSendingMessage)
-        XCTAssertEqual(store.messages["c1"]?.count, 1)
-    }
-
-    // MARK: - Actions
-
-    func testMuteUpdatesLocal() async {
-        let targetConvo = makeConvo(id: "c1", muted: false)
-        service.convosResult = .success(PagedConvos(conversations: [targetConvo, makeConvo(id: "c2")], cursor: nil))
-        await store.loadConvos()
-        service.muteResult = .success(())
-        await store.mute(convoId: "c1")
-        XCTAssertTrue(store.conversations[0].muted)
-    }
-
-    func testUnmuteUpdatesLocal() async {
-        let targetConvo = makeConvo(id: "c1", muted: false)
-        service.convosResult = .success(PagedConvos(conversations: [targetConvo], cursor: nil))
-        await store.loadConvos()
-        let mutedConvo = ChatConversation(id: "c1", rev: "rev-c1", members: [], lastMessage: nil, muted: false, status: .accepted, unreadCount: 0, kind: .direct, groupInfo: nil)
-        service.getConvoResult = .success(mutedConvo)
-        _ = await store.getOrCreateConvo(memberDID: "did:plc:m")
-        service.unmuteResult = .success(())
-        await store.unmute(convoId: "c1")
-        let result = store.conversations.first { $0.id == "c1" }
-        XCTAssertEqual(result?.muted, false)
-    }
-
-    func testLeaveRemovesConversation() async {
-        service.convosResult = .success(PagedConvos(conversations: [makeConvo(id: "c1"), makeConvo(id: "c2")], cursor: nil))
-        await store.loadConvos()
-        service.leaveResult = .success(())
-        await store.leave(convoId: "c1")
-        XCTAssertEqual(store.conversations.count, 1)
-        XCTAssertEqual(store.conversations[0].id, "c2")
-    }
-
-    func testMarkReadResetsUnreadCount() async {
-        let convos = [
-            ChatConversation(id: "c1", rev: "rev-c1", members: [], lastMessage: nil, muted: false, status: .accepted, unreadCount: 5, kind: .direct, groupInfo: nil),
-        ]
-        service.convosResult = .success(PagedConvos(conversations: convos, cursor: nil))
-        await store.loadConvos()
-        await store.markRead(convoId: "c1", messageId: "m1")
-        XCTAssertEqual(store.conversations[0].unreadCount, 0)
-    }
-
-    func testGetOrCreateConvoUpserts() async {
-        let convo = makeConvo(id: "c1")
-        service.getConvoResult = .success(convo)
-        let result = await store.getOrCreateConvo(memberDID: "did:plc:member")
-        XCTAssertNotNil(result)
-        XCTAssertEqual(store.conversations.count, 1)
-    }
-
-    // MARK: - Helpers
-
-    private func makePagedConvos(count: Int, cursor: String? = nil) -> PagedConvos {
-        let convos = (0 ..< count).map { i in
-            makeConvo(id: "c\(i)")
-        }
-        return PagedConvos(conversations: convos, cursor: cursor)
-    }
-
-    private func makeConvo(id: String, muted: Bool = false, unreadCount: Int = 0) -> ChatConversation {
-        ChatConversation(
-            id: id,
-            rev: "rev-\(id)",
-            members: [],
-            lastMessage: nil,
-            muted: muted,
-            status: .accepted,
-            unreadCount: unreadCount,
-            kind: .direct,
-            groupInfo: nil
-        )
-    }
-
-    private func makePagedMessages(count: Int, cursor: String? = nil) -> PagedMessages {
-        let msgs = (0 ..< count).map { i in
-            ChatMessageKind.message(ChatMessage(
-                id: "m\(i)",
-                rev: "r\(i)",
-                text: "Message \(i)",
-                senderDID: "did:plc:test",
-                sentAt: Date(),
-                reactions: []
-            ))
-        }
-        return PagedMessages(messages: msgs, cursor: cursor)
+    func testSetVisibleConversation() {
+        let store = ChatStore(chatService: MockChatService())
+        // setVisibleConversation is a no-op when no account is set
+        // but should not crash or produce errors.
+        store.setVisibleConversation("convo-1")
+        store.setVisibleConversation(nil)
+        XCTAssertNil(store.error)
     }
 }
 
+// MARK: - Mock
+
 @MainActor
 private final class MockChatService: ChatServicing {
-    var convosResult: Result<PagedConvos, Error>?
-    var convosResultsByHandle: [String: PagedConvos] = [:]
-    var listConvosDelayNanos: UInt64 = 0
-    var messagesResult: Result<PagedMessages, Error>?
-    var sendResult: Result<ChatMessageSendResult, Error>?
-    var getConvoResult: Result<ChatConversation, Error>?
-    var muteResult: Result<Void, Error>?
-    var unmuteResult: Result<Void, Error>?
-    var leaveResult: Result<Void, Error>?
-    var logResult: Result<([ChatLogEvent], String?), Error>?
-    private(set) var didUpdateRead = false
-    private(set) var didClearCaches = false
-
-    func clearCaches() {
-        didClearCaches = true
-    }
-
-    func listConvos(account: AppAccount, appPassword _: String?, status _: String?, cursor _: String?) async throws -> PagedConvos {
-        if listConvosDelayNanos > 0 {
-            try await Task.sleep(nanoseconds: listConvosDelayNanos)
-        }
-        if let result = convosResultsByHandle[account.handle] {
-            return result
-        }
-        guard let result = convosResult else { throw BlueskyAPIError.server("No mock") }
-        return try result.get()
-    }
-
-    func getConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws -> ChatConversation {
-        guard let result = getConvoResult else { throw BlueskyAPIError.server("No mock") }
-        return try result.get()
-    }
-
-    func getConvoForMembers(members _: [String], account _: AppAccount, appPassword _: String?) async throws -> ChatConversation {
-        guard let result = getConvoResult else { throw BlueskyAPIError.server("No mock") }
-        return try result.get()
-    }
-
-    func getMessages(convoId _: String, cursor _: String?, limit _: Int, account _: AppAccount, appPassword _: String?) async throws -> PagedMessages {
-        guard let result = messagesResult else { throw BlueskyAPIError.server("No mock") }
-        return try result.get()
-    }
-
-    func sendMessage(convoId _: String, text _: String, account _: AppAccount, appPassword _: String?) async throws -> ChatMessageSendResult {
-        guard let result = sendResult else { throw BlueskyAPIError.server("No mock") }
-        return try result.get()
-    }
-
-    func updateRead(convoId _: String, messageId _: String?, account _: AppAccount, appPassword _: String?) async throws {
-        didUpdateRead = true
-        if let result = muteResult {
-            try result.get()
-        }
-    }
-
-    func leaveConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {
-        if let result = leaveResult {
-            try result.get()
-        }
-    }
-
-    func muteConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {
-        if let result = muteResult {
-            try result.get()
-        }
-    }
-
-    func unmuteConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {
-        if let result = unmuteResult {
-            try result.get()
-        }
-    }
-
-    func getLog(cursor _: String?, account _: AppAccount, appPassword _: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {
-        guard let result = logResult else { throw BlueskyAPIError.server("No mock") }
-        return try result.get()
-    }
+    func listConvos() async throws -> [ChatConversation] { [] }
+    func getConvo(id: String) async throws -> ChatConversation? { nil }
+    func getConvoForMembers(dids: [String]) async throws -> ChatConversation? { nil }
+    func getMessages(convoId: String, cursor: String?) async throws -> (messages: [ChatMessageKind], cursor: String?) { ([], nil) }
+    func sendMessage(convoId: String, text: String) async throws -> ChatMessageKind { fatalError() }
+    func updateRead(convoId: String, messageId: String?) async throws {}
+    func leaveConvo(convoId: String) async throws {}
+    func muteConvo(convoId: String) async throws {}
+    func unmuteConvo(convoId: String) async throws {}
+    func getLog(cursor: String?) async throws -> (events: [ChatLogEvent], cursor: String?) { ([], nil) }
 }

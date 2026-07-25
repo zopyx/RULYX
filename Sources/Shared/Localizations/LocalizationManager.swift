@@ -11,6 +11,9 @@ final class LocalizationManager: ObservableObject {
     @Published var currentLanguage: String {
         didSet {
             UserDefaults.standard.set(currentLanguage, forKey: "selectedLanguage")
+            // Ensure the bundle is loaded (may not be if user switches before
+            // the background lazy-load task has reached this language).
+            loadBundles(for: [currentLanguage])
             loadCurrentBundle()
         }
     }
@@ -55,8 +58,25 @@ final class LocalizationManager: ObservableObject {
         let preferred = Locale.current.language.languageCode?.identifier
         let allCodes = supportedLanguages.map(\.code)
         currentLanguage = saved ?? (preferred != nil && allCodes.contains(preferred!) ? preferred! : "en")
-        loadAll()
+        // Load only the active language + English fallback at launch
+        // (reduces cold-start I/O from 16 files to 2).
+        loadBundles(for: [currentLanguage, "en"])
         loadCurrentBundle()
+        // Preload remaining bundles in the background.
+        Task.detached(priority: .background) { [weak self] in
+            guard let self else { return }
+            let activeLang = await MainActor.run { self.currentLanguage }
+            let remaining = Set(supportedLanguages.map(\.code)).subtracting(["en", activeLang])
+            for lang in remaining {
+                guard let url = Bundle.main.url(forResource: lang, withExtension: "json"),
+                      let data = try? Data(contentsOf: url),
+                      let dict = try? JSONDecoder().decode([String: String].self, from: data)
+                else { continue }
+                await MainActor.run { [weak self] in
+                    self?.allBundles[lang] = dict
+                }
+            }
+        }
     }
 
     /// Look up `key` in the active bundle; fall back to English, then raw key.
@@ -64,17 +84,14 @@ final class LocalizationManager: ObservableObject {
         bundle[key] ?? allBundles["en"]?[key] ?? key
     }
 
-    /// Load all 16 JSON bundles from the main bundle into memory.
-    private func loadAll() {
-        let allCodes = supportedLanguages.map(\.code)
-        for lang in allCodes {
-            guard let url = Bundle.main.url(forResource: lang, withExtension: "json"),
+    /// Load JSON bundles for the given language codes into memory.
+    private func loadBundles(for codes: Set<String>) {
+        for lang in codes {
+            guard allBundles[lang] == nil,
+                  let url = Bundle.main.url(forResource: lang, withExtension: "json"),
                   let data = try? Data(contentsOf: url),
                   let dict = try? JSONDecoder().decode([String: String].self, from: data)
-            else {
-                allBundles[lang] = [:]
-                continue
-            }
+            else { continue }
             allBundles[lang] = dict
         }
     }

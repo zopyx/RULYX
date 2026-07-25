@@ -64,6 +64,10 @@ final class BlueskySessionService: BlueskySessionServicing {
     private let keychain: KeychainServicing
     private var cachedSessions: [String: BlueskySession] = [:]
     private let persistedSessionService = "com.ajung.RULYX.session"
+    /// Deduplicates concurrent refreshSession calls per account.
+    /// Multiple 401 responses arriving in the same time window share the same
+    /// in-flight refresh task rather than starting N parallel refresh calls.
+    private var pendingRefreshes: [AppAccount.ID: Task<BlueskySession, Error>] = [:]
 
     init(
         baseURL: URL = .bskySocial,
@@ -262,16 +266,26 @@ final class BlueskySessionService: BlueskySessionServicing {
     ) async throws -> BlueskySession {
         let sessionKey = account.id.uuidString
 
-        if let refreshedSession = try await refreshSession(currentSession) {
-            guard session(refreshedSession, belongsTo: account) else {
-                return try await recreateSession(for: account)
-            }
-            cachedSessions[sessionKey] = refreshedSession
-            try await persistSession(refreshedSession, for: account)
-            return refreshedSession
+        // If a refresh is already in-flight for this account, await it
+        // instead of starting a duplicate refresh.
+        if let existing = pendingRefreshes[account.id] {
+            return try await existing.value
         }
 
-        return try await recreateSession(for: account)
+        let task = Task<BlueskySession, Error> {
+            defer { pendingRefreshes[account.id] = nil }
+            if let refreshedSession = try await refreshSession(currentSession) {
+                guard session(refreshedSession, belongsTo: account) else {
+                    return try await recreateSession(for: account)
+                }
+                cachedSessions[sessionKey] = refreshedSession
+                try await persistSession(refreshedSession, for: account)
+                return refreshedSession
+            }
+            return try await recreateSession(for: account)
+        }
+        pendingRefreshes[account.id] = task
+        return try await task.value
     }
 
     private func refreshSession(_ existingSession: BlueskySession) async throws -> BlueskySession? {

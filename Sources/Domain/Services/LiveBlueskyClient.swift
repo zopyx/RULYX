@@ -83,6 +83,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         await BlueskyAPICache.shared.clearAll()
     }
 
+    /// Invalidates per-DID moderation caches after a block/unblock/mute action.
+    /// Ensures that stale block counts and relationship data are not shown
+    /// to the user immediately after performing an action.
+    private func invalidateModerationCaches(for did: String) {
+        DashboardCache.clear(forKey: did)
+        RelationshipCache.clear(forKey: did)
+    }
+
     // MARK: - Authentication & Session
 
     /// Authenticates against the Bluesky PDS using a handle and app password.
@@ -655,6 +663,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
             return EmptyResponse()
         }
+        invalidateModerationCaches(for: actorDID)
     }
 
     func softBlockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {

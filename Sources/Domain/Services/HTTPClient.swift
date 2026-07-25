@@ -265,36 +265,59 @@ struct HTTPClient {
             source: source,
             origin: origin ?? Self.makeOrigin(fileID: originFileID, function: originFunction, line: originLine)
         )
-        do {
-            let (data, response) = try await session.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse else {
+        // Rate-limit retry loop: 429 responses trigger an exponential backoff
+        // with up to 3 attempts. The first retry waits for the server-specified
+        // Retry-After header (or 5s default), doubling each subsequent attempt.
+        let maxRetries = 3
+        var retryCount = 0
+        var waitSeconds: TimeInterval = 5
+
+        while true {
+            do {
+                let (data, response) = try await session.data(for: request)
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    await debugStore?.fail(
+                        id: entryID ?? UUID(),
+                        errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
+                    )
+                    AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
+                    throw BlueskyAPIError.invalidResponse
+                }
+
+                if httpResponse.statusCode == 429, retryCount < maxRetries {
+                    // Parse server-specified Retry-After (preferred) or use exponential backoff
+                    let retryAfter = httpResponse.value(forHTTPHeaderField: "Retry-After")
+                    if let retrySeconds = retryAfter.flatMap(Double.init) {
+                        waitSeconds = retrySeconds
+                    }
+                    AppLogger.http.info("Rate-limited on \(request.url?.absoluteString ?? "?"), retry \(retryCount + 1)/\(maxRetries) after \(waitSeconds)s")
+                    try await Task.sleep(nanoseconds: UInt64(waitSeconds * 1_000_000_000))
+                    retryCount += 1
+                    waitSeconds *= 2  // exponential backoff
+                    continue
+                }
+
+                if (200 ..< 300).contains(httpResponse.statusCode) {
+                    await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
+                } else {
+                    let bodyPreview = Self.prettyPrintedJSON(from: data) ?? String(data: data, encoding: .utf8) ?? ""
+                    await debugStore?.fail(
+                        id: entryID ?? UUID(),
+                        statusCode: httpResponse.statusCode,
+                        errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
+                        errorResponseJSON: Self.prettyPrintedJSON(from: data)
+                    )
+                    AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
+                }
+                return (data, httpResponse)
+            } catch {
                 await debugStore?.fail(
                     id: entryID ?? UUID(),
-                    errorMessage: AppError.userMessage(from: BlueskyAPIError.invalidResponse)
+                    errorMessage: AppError.userMessage(from: error)
                 )
-                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
-                throw BlueskyAPIError.invalidResponse
+                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
+                throw error
             }
-            if (200 ..< 300).contains(httpResponse.statusCode) {
-                await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
-            } else {
-                let bodyPreview = Self.prettyPrintedJSON(from: data) ?? String(data: data, encoding: .utf8) ?? ""
-                await debugStore?.fail(
-                    id: entryID ?? UUID(),
-                    statusCode: httpResponse.statusCode,
-                    errorMessage: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode),
-                    errorResponseJSON: Self.prettyPrintedJSON(from: data)
-                )
-                AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → HTTP \(httpResponse.statusCode)\n\(bodyPreview.prefix(500))")
-            }
-            return (data, httpResponse)
-        } catch {
-            await debugStore?.fail(
-                id: entryID ?? UUID(),
-                errorMessage: AppError.userMessage(from: error)
-            )
-            AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
-            throw error
         }
     }
 
