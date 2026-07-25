@@ -52,8 +52,12 @@ final class CustomSearchViewModel {
     private var topCursor: String?
     /// Cursor for Newest tab pagination.
     private var newestCursor: String?
-    /// UserDefaults key for search history.
-    private let historyKey = "custom_search_history"
+    /// Protected store for search history (queries may contain handles/DIDs).
+    private let searchHistoryStore = ProtectedDataStore(
+        name: "custom-search-history",
+        legacyKey: "custom_search_history",
+        defaults: .standard
+    )
     /// Maximum number of history entries.
     private let maxHistory = 10
 
@@ -210,13 +214,21 @@ final class CustomSearchViewModel {
         saveHistory()
     }
 
-    /// Loads search history from UserDefaults.
+    /// Loads search history from protected storage.
+    /// Falls back to legacy UserDefaults key on first migration.
     private func loadHistory() {
-        searchHistory = UserDefaults.standard.stringArray(forKey: historyKey) ?? []
+        if let data = searchHistoryStore.data(),
+           let history = try? JSONDecoder().decode([String].self, from: data) {
+            searchHistory = history
+        } else {
+            searchHistory = UserDefaults.standard.stringArray(forKey: "custom_search_history") ?? []
+        }
     }
 
-    /// Persists search history to UserDefaults.
+    /// Persists search history to protected storage.
     private func saveHistory() {
-        UserDefaults.standard.set(searchHistory, forKey: historyKey)
+        if let data = try? JSONEncoder().encode(searchHistory) {
+            searchHistoryStore.set(data)
+        }
     }
 }
