@@ -15,22 +15,56 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
 
     // MARK: - Protocol Forwarding Properties
 
-    var auth: BlueskyAuthServicing { container.auth }
-    var profile: BlueskyProfileInspecting { container.profile }
-    var list: BlueskyListServicing { container.list }
-    var feed: BlueskyFeedServicing { container.feed }
-    var post: BlueskyPostServicing { container.post }
-    var social: BlueskySocialServicing { container.social }
-    var moderation: BlueskyModerationServicing { container.moderation }
-    var clearsky: BlueskyClearSkyServicing { container.clearsky }
-    var notification: BlueskyNotificationServicing { container.notification }
-    var identity: BlueskyIdentityServicing { container.identity }
-    var media: BlueskyMediaServicing { container.media }
+    var auth: BlueskyAuthServicing {
+        container.auth
+    }
+
+    var profile: BlueskyProfileInspecting {
+        container.profile
+    }
+
+    var list: BlueskyListServicing {
+        container.list
+    }
+
+    var feed: BlueskyFeedServicing {
+        container.feed
+    }
+
+    var post: BlueskyPostServicing {
+        container.post
+    }
+
+    var social: BlueskySocialServicing {
+        container.social
+    }
+
+    var moderation: BlueskyModerationServicing {
+        container.moderation
+    }
+
+    var clearsky: BlueskyClearSkyServicing {
+        container.clearsky
+    }
+
+    var notification: BlueskyNotificationServicing {
+        container.notification
+    }
+
+    var identity: BlueskyIdentityServicing {
+        container.identity
+    }
+
+    var media: BlueskyMediaServicing {
+        container.media
+    }
 
     /// Legacy accessor — returns the same LiveBlueskyClient instance.
     /// Prefer using the individual protocol properties above.
     @available(*, deprecated, message: "Use individual protocol properties (container.profile, container.list, etc.)")
-    var blueskyClient: LiveBlueskyClient { liveClient }
+    var blueskyClient: LiveBlueskyClient {
+        liveClient
+    }
 
     // MARK: - Init
 

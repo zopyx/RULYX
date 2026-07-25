@@ -37,7 +37,7 @@ final class NotificationViewModel {
 
     /// Observer for synchronous account-switch resets.
     /// `nonisolated(unsafe)` so `deinit` (nonisolated in Swift 6) can unregister it.
-    nonisolated(unsafe) private var accountSwitchObserver: NSObjectProtocol?
+    private nonisolated(unsafe) var accountSwitchObserver: NSObjectProtocol?
 
     init() {
         accountSwitchObserver = NotificationCenter.default.addObserver(

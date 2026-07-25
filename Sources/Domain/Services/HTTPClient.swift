@@ -215,7 +215,7 @@ struct HTTPClient {
 
     /// Minimum interval between requests to the same host. Prevents 429 bursts
     /// before the server-side rate limiter triggers.
-    private let minimumRequestInterval: TimeInterval = 0.05  // 50ms
+    private let minimumRequestInterval: TimeInterval = 0.05 // 50ms
 
     /// Actor-managed per-host throttle timestamps. Shared across all
     /// HTTPClient instances for preemptive rate limiting.
@@ -354,7 +354,7 @@ struct HTTPClient {
                     AppLogger.http.info("Rate-limited on \(request.url?.absoluteString ?? "?"), retry \(retryCount + 1)/\(maxRetries) after \(waitSeconds)s")
                     try await Task.sleep(nanoseconds: UInt64(waitSeconds * 1_000_000_000))
                     retryCount += 1
-                    waitSeconds *= 2  // exponential backoff
+                    waitSeconds *= 2 // exponential backoff
                     continue
                 }
 

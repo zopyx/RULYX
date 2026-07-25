@@ -115,9 +115,7 @@ final class MediaSelectionState: ObservableObject {
 /// Thumbnail URLs are public CDN content; separating them from
 /// viewer-relative API responses prevents cache pollution and
 /// unwanted cross-account data sharing.
-private let sharedMediaCache: URLCache = {
-    URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
-}()
+private let sharedMediaCache: URLCache = .init(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
 
 /// URLSession with the dedicated media cache. All thumbnail downloads
 /// from `MediaBrowserViewModel` should use this session.

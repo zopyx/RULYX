@@ -356,7 +356,13 @@ struct CustomSearchView: View {
             onAddAllLikersToList: { list in
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
+                likerActions.handleAddAllLikersToList(
+                    postURI: entry.post.uri, list: list,
+                    using: container.blueskyClient,
+                    fetchAccount: account, fetchPassword: appPassword,
+                    activeAccount: account, activePassword: appPassword,
+                    internalListStore: internalListStore
+                )
             },
             onClassify: { likerActions.postToClassify = entry },
             onReportPost: {

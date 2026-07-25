@@ -119,24 +119,46 @@ final class LocalizationManager: ObservableObject {
         case "ru":
             let mod10 = count % 10
             let mod100 = count % 100
-            if mod10 == 1, mod100 != 11 { return .one }
-            if (2 ... 4).contains(mod10), !(12 ... 14).contains(mod100) { return .few }
-            if mod10 == 0 || (5 ... 9).contains(mod10) || (11 ... 14).contains(mod100) { return .many }
+            if mod10 == 1, mod100 != 11 {
+                return .one
+            }
+            if (2 ... 4).contains(mod10), !(12 ... 14).contains(mod100) {
+                return .few
+            }
+            if mod10 == 0 || (5 ... 9).contains(mod10) || (11 ... 14).contains(mod100) {
+                return .many
+            }
             return .other
         case "ar":
             let mod100 = count % 100
-            if count == 0 { return .zero }
-            if count == 1 { return .one }
-            if count == 2 { return .two }
-            if (3 ... 10).contains(mod100) { return .few }
-            if (11 ... 99).contains(mod100) { return .many }
+            if count == 0 {
+                return .zero
+            }
+            if count == 1 {
+                return .one
+            }
+            if count == 2 {
+                return .two
+            }
+            if (3 ... 10).contains(mod100) {
+                return .few
+            }
+            if (11 ... 99).contains(mod100) {
+                return .many
+            }
             return .other
         case "pl":
             let mod10 = count % 10
             let mod100 = count % 100
-            if count == 1 { return .one }
-            if (2 ... 4).contains(mod10), !(12 ... 14).contains(mod100) { return .few }
-            if (0 ... 1).contains(mod10) || (5 ... 9).contains(mod10) || (12 ... 14).contains(mod100) { return .many }
+            if count == 1 {
+                return .one
+            }
+            if (2 ... 4).contains(mod10), !(12 ... 14).contains(mod100) {
+                return .few
+            }
+            if (0 ... 1).contains(mod10) || (5 ... 9).contains(mod10) || (12 ... 14).contains(mod100) {
+                return .many
+            }
             return .other
         default:
             return count == 1 ? .one : .other

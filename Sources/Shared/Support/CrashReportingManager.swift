@@ -18,7 +18,7 @@ final class CrashReportingManager: NSObject, ObservableObject, @preconcurrency M
         }
     }
 
-    private override init() {
+    override private init() {
         isEnabled = UserDefaults.standard.bool(forKey: "crashReportingEnabled")
         super.init()
         if isEnabled {
@@ -28,7 +28,7 @@ final class CrashReportingManager: NSObject, ObservableObject, @preconcurrency M
 
     // MARK: - MXMetricManagerSubscriber
 
-    nonisolated func didReceive(_ payloads: [MXDiagnosticPayload]) {
+    nonisolated func didReceive(_: [MXDiagnosticPayload]) {
         // Diagnostics are automatically delivered to Xcode Organizer → Crashes.
         // No action needed here — MetricKit handles upload to App Store Connect.
     }

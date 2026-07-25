@@ -111,7 +111,8 @@ func postAttributedString(from text: String) -> AttributedString {
 
 /// Regex for matching @mention patterns in post text.
 private enum MentionTextRegex {
-    static let shared = try! NSRegularExpression(
-        pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?"
-    )
+    static let shared: NSRegularExpression = {
+        // swiftlint:disable:next force_try
+        try! NSRegularExpression(pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?")
+    }()
 }

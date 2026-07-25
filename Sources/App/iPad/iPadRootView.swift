@@ -83,7 +83,6 @@ struct iPadRootView: View {
 
     // MARK: - Detail Column
 
-    @ViewBuilder
     private var detailColumn: some View {
         Group {
             if let did = navState.selectedProfileDID {
@@ -107,7 +106,7 @@ struct iPadRootView: View {
 
     /// Common environment objects for every content column view.
     /// Per-view overrides for workspace store and chat store applied at the case level.
-    private func commonModifiers<V: View>(_ view: V) -> some View {
+    private func commonModifiers(_ view: some View) -> some View {
         view
             .environmentObject(accountStore)
             .environmentObject(container.blueskyClient)

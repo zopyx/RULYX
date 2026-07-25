@@ -161,7 +161,7 @@ actor BlueskyAPICache: @preconcurrency CacheMetricsProviding {
         guard let enumerator = fileManager.enumerator(at: root, includingPropertiesForKeys: nil) else { return }
         var legacyFiles: [URL] = []
         for case let fileURL as URL in enumerator {
-            if fileURL.pathExtension == "cache" && fileURL.deletingLastPathComponent() == root {
+            if fileURL.pathExtension == "cache", fileURL.deletingLastPathComponent() == root {
                 // Flat cache file — v1, cannot attribute to account
                 legacyFiles.append(fileURL)
             }

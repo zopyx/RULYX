@@ -313,7 +313,13 @@ struct FeedTimelineView: View {
                       let fetchPassword = accountStore.appPassword(for: fetchAccount),
                       let activeAccount = accountStore.activeAccount,
                       let activePassword = accountStore.appPassword(for: activeAccount) else { return }
-                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+                likerActions.handleAddAllLikersToList(
+                    postURI: entry.post.uri, list: list,
+                    using: container.blueskyClient,
+                    fetchAccount: fetchAccount, fetchPassword: fetchPassword,
+                    activeAccount: activeAccount, activePassword: activePassword,
+                    internalListStore: internalListStore
+                )
             },
             onClassify: { likerActions.postToClassify = entry },
             onBlockAuthor: authorCB.onBlock,

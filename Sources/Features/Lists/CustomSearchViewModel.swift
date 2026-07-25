@@ -218,7 +218,8 @@ final class CustomSearchViewModel {
     /// Falls back to legacy UserDefaults key on first migration.
     private func loadHistory() {
         if let data = searchHistoryStore.data(),
-           let history = try? JSONDecoder().decode([String].self, from: data) {
+           let history = try? JSONDecoder().decode([String].self, from: data)
+        {
             searchHistory = history
         } else {
             searchHistory = UserDefaults.standard.stringArray(forKey: "custom_search_history") ?? []
