@@ -1447,5 +1447,7 @@
   "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
   "settings.delete_all_data.confirm": "Delete All Data?",
   "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
-  "settings.data_deleted": "All data deleted"
+  "settings.data_deleted": "All data deleted",
+  "settings.crash_reporting": "Crash Reporting",
+  "settings.crash_reporting.hint": "Send anonymized crash data to help improve the app"
 }

@@ -189,11 +189,15 @@ struct HTTPClient {
     private let debugStore: HTTPRequestDebugStore?
 
     /// SHA-256 hashes of expected certificate public keys for certificate pinning.
-    /// When empty (the default), certificate pinning is disabled and all TLS connections are allowed.
-    ///
-    /// - Note: Use `CertificatePinningDelegate.pinHashes(from:keyCount:)` to generate
-    ///   hashes from PEM-encoded certificate data.
     private let pinnedHashes: Set<String>
+
+    /// Per-host timestamp of the last request. Used by `throttle(host:)` to
+    /// prevent burst-rate requests to the same endpoint (preemptive rate limiting).
+    private var lastRequestTime: [String: Date] = [:]
+
+    /// Minimum interval between requests to the same host. Prevents 429 bursts
+    /// before the server-side rate limiter triggers.
+    private let minimumRequestInterval: TimeInterval = 0.05  // 50ms
 
     /// Default pinned certificate hashes for known RULYX API endpoints.
     /// These are SHA-256 hashes of the raw public key bytes

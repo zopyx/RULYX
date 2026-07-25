@@ -22,6 +22,7 @@ struct SettingsView: View {
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var internalListStore: InternalListStore
     @EnvironmentObject private var moderationAuditStore: ModerationAuditStore
+    @EnvironmentObject private var crashReportingManager: CrashReportingManager
 
     /// UserDefaults key `"debugMode"`: enables debug tools (HTTP request debug view, etc.).
     @AppStorage("debugMode") private var debugMode = false
@@ -40,6 +41,14 @@ struct SettingsView: View {
     /// Controls the clear cache confirmation dialog.
     @State private var isShowingClearCacheConfirmation = false
     @State private var isShowingDeleteAllDataConfirmation = false
+
+    /// Crash reporting toggle binding — syncs with CrashReportingManager.shared.
+    private var crashReportingEnabled: Binding<Bool> {
+        Binding(
+            get: { crashReportingManager.isEnabled },
+            set: { crashReportingManager.isEnabled = $0 }
+        )
+    }
 
     /// Controls the HTTP request debug view sheet.
     @State private var isShowingHTTPRequestDebugView = false
@@ -201,6 +210,16 @@ struct SettingsView: View {
                             Text(loc("settings.biometric_footer").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
                         }
                     }
+
+                    // Crash Reporting (MetricKit)
+                    Toggle(isOn: crashReportingEnabled) {
+                        Label {
+                            Text(loc("settings.crash_reporting"))
+                        } icon: {
+                            Image(systemName: "ant.circle")
+                        }
+                    }
+                    .accessibilityHint(loc: "settings.crash_reporting.hint")
                 }
 
                 // MARK: AI Section
