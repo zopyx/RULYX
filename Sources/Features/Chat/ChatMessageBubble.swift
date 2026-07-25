@@ -18,18 +18,19 @@ struct ChatMessageBubble: View {
         message.rev == "failed"
     }
 
-    /// Shared time-only formatter for timestamps.
-    private static let timeFormatter: DateFormatter = {
+    /// Time formatter that respects the device's system locale and time preferences.
+    /// Recreated on each access so it stays in sync with system settings changes.
+    private var timeFormatter: DateFormatter {
         let f = DateFormatter()
         f.dateStyle = .none
         f.timeStyle = .short
-        f.locale = Locale(identifier: LocalizationManager.shared.currentLanguage)
+        f.locale = .autoupdatingCurrent
         return f
-    }()
+    }
 
     /// Formatted time string for the message timestamp.
     private var timeString: String {
-        Self.timeFormatter.string(from: message.sentAt)
+        timeFormatter.string(from: message.sentAt)
     }
 
     // MARK: - Body
