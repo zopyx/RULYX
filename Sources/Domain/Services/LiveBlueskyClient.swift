@@ -1192,10 +1192,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     // MARK: - Clearsky Integration
 
-    /// Checks that ClearSky service is available; throws if the heartbeat has failed.
-    private func guardClearskyAvailable() throws {
-        guard clearskyHeartbeat.isClearskyAvailable else {
-            throw BlueskyAPIError.server("ClearSky is temporarily unavailable")
+    /// Logs a warning if the ClearSky heartbeat is currently unavailable.
+    /// Does NOT block data fetches — the heartbeat is a health-check ping
+    /// that may fail independently of the actual data API endpoints.
+    /// Actual API failures are handled by the normal error path.
+    private func guardClearskyAvailable() {
+        if !clearskyHeartbeat.isClearskyAvailable {
+            AppLogger.persistence.warning("ClearSky heartbeat offline — data fetch may fail")
         }
     }
 
@@ -1377,7 +1380,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// Fetches actors that block the account but are not blocked back.
     /// Resolves profiles in parallel batches and sorts by block date descending.
     func fetchUnblockedBlockerActors(account: AppAccount, appPassword _: String?) async throws -> [BlueskyActor] {
-        try guardClearskyAvailable()
+        guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
         // Fetch blocked (actors we block) and blocked-by (actors that block us) in parallel.
@@ -1406,7 +1409,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Public wrapper: fetches DIDs from a ClearSky endpoint (DIDs only, no profile resolution).
     func fetchClearskyBlockDIDs(endpoint: String, for account: AppAccount) async throws -> Set<String> {
-        try guardClearskyAvailable()
+        guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
         return try await fetchClearskyDIDs(actorDID: actorDID, endpoint: endpoint)
     }
@@ -1453,7 +1456,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         endpoint: String,
         onProgress: (@MainActor @Sendable (Int) async -> Void)?
     ) async throws -> ClearskyBlocklistResult {
-        try guardClearskyAvailable()
+        guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
         let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint, onProgress: onProgress)
@@ -1481,7 +1484,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Fetches all ClearSky moderation lists for a given handle with pagination.
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
-        try guardClearskyAvailable()
+        guardClearskyAvailable()
         var allLists: [ClearskyListEntry] = []
         var page = 1
         repeat {
@@ -1589,7 +1592,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Resolves a handle to a DID via the ClearSky `get-did` endpoint.
     private func resolveHandleToDID(handle: String) async throws -> String {
-        try guardClearskyAvailable()
+        guardClearskyAvailable()
         guard let url = URL(string: "https://public.api.clearsky.services/api/v1/anon/get-did/\(handle)") else {
             throw BlueskyAPIError.invalidURL
         }
