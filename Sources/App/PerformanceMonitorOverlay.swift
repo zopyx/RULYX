@@ -214,17 +214,18 @@ struct PerformanceMonitorOverlay: View {
     }
 
     private var cacheHits: Int {
-        cacheMetrics.hitCount
+        cacheMetrics.metricsSnapshot().hitCount
     }
 
     private var cacheMisses: Int {
-        cacheMetrics.missCount
+        cacheMetrics.metricsSnapshot().missCount
     }
 
     private var cacheHitPercent: Int {
-        let total = cacheHits + cacheMisses
+        let snap = cacheMetrics.metricsSnapshot()
+        let total = snap.hitCount + snap.missCount
         guard total > 0 else { return 0 }
-        return Int(Double(cacheHits) / Double(total) * 100)
+        return Int(Double(snap.hitCount) / Double(total) * 100)
     }
 
     private var cacheHitRatioString: String {
