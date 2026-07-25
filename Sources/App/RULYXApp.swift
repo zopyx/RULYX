@@ -244,7 +244,11 @@ struct RULYXApp: App {
                         .onAppear {
                             if hasSplashed {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    withAnimation { showSplash = false }
+                                    if UIAccessibility.isReduceMotionEnabled {
+                                        showSplash = false
+                                    } else {
+                                        withAnimation { showSplash = false }
+                                    }
                                 }
                             }
                             hasSplashed = true

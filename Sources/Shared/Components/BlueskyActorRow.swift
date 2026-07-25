@@ -58,6 +58,7 @@ struct BlueskyActorRow<Extra: View>: View {
             Spacer()
         }
         .padding(.vertical, 2)
+        .accessibilityElement(children: .combine)
         .accessibilityLabel(String.localized("actor_row.label", replacements: ["title": actor.title, "handle": actor.handle]))
     }
 

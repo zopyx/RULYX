@@ -69,7 +69,7 @@ struct iPadRootView: View {
                 .transition(AnyTransition.scale.combined(with: .opacity))
             }
         }
-        .animation(.spring(response: 0.35), value: showCommandPalette)
+        .animation(UIAccessibility.isReduceMotionEnabled ? nil : .spring(response: 0.35), value: showCommandPalette)
         .background {
             Button("") { showCommandPalette.toggle() }
                 .keyboardShortcut("k", modifiers: .command)
