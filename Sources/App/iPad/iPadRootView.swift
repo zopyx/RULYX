@@ -30,7 +30,6 @@ struct iPadRootView: View {
         VStack(spacing: 0) {
             if !clearskyHeartbeat.isClearskyAvailable {
                 ClearskyBanner()
-                    .environmentObject(localizationManager)
             }
 
             NavigationSplitView(columnVisibility: $navState.columnVisibility) {
@@ -65,7 +64,6 @@ struct iPadRootView: View {
                         navState.sidebarSelection = item
                     }
                 )
-                .environmentObject(localizationManager)
                 .transition(AnyTransition.scale.combined(with: .opacity))
             }
         }
@@ -80,114 +78,87 @@ struct iPadRootView: View {
                 navState.sidebarSelection = item
             }
         }
+        .environmentObject(localizationManager)
     }
+
+    // MARK: - Detail Column
 
     @ViewBuilder
     private var detailColumn: some View {
-        if let did = navState.selectedProfileDID {
-            iPadProfileInspector(did: did)
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
-                .environmentObject(navState)
-                .environmentObject(internalListStore)
-        } else if let list = navState.selectedList, navState.sidebarSelection == .allLists {
-            iPadListDetailView(list: list)
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
-                .environmentObject(navState)
-        } else {
-            iPadEmptyDetailPlaceholder()
-                .environmentObject(localizationManager)
+        Group {
+            if let did = navState.selectedProfileDID {
+                iPadProfileInspector(did: did)
+                    .environmentObject(navState)
+                    .environmentObject(internalListStore)
+            } else if let list = navState.selectedList, navState.sidebarSelection == .allLists {
+                iPadListDetailView(list: list)
+                    .environmentObject(navState)
+            } else {
+                iPadEmptyDetailPlaceholder()
+            }
         }
+        .environmentObject(accountStore)
+        .environmentObject(container.blueskyClient)
+        .environmentObject(workspaceStore)
+        .environmentObject(localizationManager)
+    }
+
+    // MARK: - Content Column
+
+    /// Common environment objects for every content column view.
+    /// Per-view overrides for workspace store and chat store applied at the case level.
+    private func commonModifiers<V: View>(_ view: V) -> some View {
+        view
+            .environmentObject(accountStore)
+            .environmentObject(container.blueskyClient)
+            .environmentObject(localizationManager)
     }
 
     @ViewBuilder
     private func contentColumn(for item: SidebarItem?) -> some View {
         switch item {
         case .allLists:
-            iPadListsView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
+            commonModifiers(iPadListsView())
                 .environmentObject(internalListStore)
                 .environmentObject(navState)
         case .templates:
-            ListTemplatesView(onListCreated: { _ in })
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
+            commonModifiers(ListTemplatesView(onListCreated: { _ in }))
                 .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
         case .rules:
-            ModerationRulesView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
+            commonModifiers(ModerationRulesView())
                 .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
         case .dashboard:
-            DashboardView()
-                .environmentObject(accountStore)
+            commonModifiers(DashboardView())
                 .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
         case .relationships:
-            RelationshipsView(mode: .followers, initialCount: nil)
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(localizationManager)
+            commonModifiers(RelationshipsView(mode: .followers, initialCount: nil))
                 .environmentObject(workspaceStore)
         case .customSearch:
-            CustomSearchView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(localizationManager)
+            commonModifiers(CustomSearchView())
         case .bulkLookup:
-            BulkProfileLookupView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(localizationManager)
+            commonModifiers(BulkProfileLookupView())
         case .networkGraph:
-            NetworkGraphView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(localizationManager)
+            commonModifiers(NetworkGraphView())
         case .timeline:
-            iPadTimelineView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
+            commonModifiers(iPadTimelineView())
                 .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
         case .notifications:
-            iPadNotificationsView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(localizationManager)
+            commonModifiers(iPadNotificationsView())
         case .chat:
-            iPadChatView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
+            commonModifiers(iPadChatView())
                 .environmentObject(chatStore)
-                .environmentObject(localizationManager)
         case .settings:
-            SettingsView()
-                .environmentObject(accountStore)
-                .environmentObject(localizationManager)
-                .environmentObject(container.blueskyClient)
+            commonModifiers(SettingsView())
         case .accounts:
-            AccountTabView()
-                .environmentObject(accountStore)
-                .environmentObject(localizationManager)
+            commonModifiers(AccountTabView())
         case .info:
-            InfoView()
-                .environmentObject(localizationManager)
+            commonModifiers(InfoView())
         case nil:
-            iPadEmptyDetailPlaceholder()
-                .environmentObject(localizationManager)
+            commonModifiers(iPadEmptyDetailPlaceholder())
         }
     }
+
+    // MARK: - Onboarding
 
     private var onboardingSheet: some View {
         NavigationStack {
