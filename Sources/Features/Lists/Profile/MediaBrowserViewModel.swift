@@ -110,11 +110,21 @@ final class MediaSelectionState: ObservableObject {
     }
 }
 
-/// A 256MB memory / 2GB disk cache for media thumbnails.
-private let sharedCache: URLCache = {
-    let cache = URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
-    URLCache.shared = cache
-    return cache
+/// A 256MB memory / 2GB disk cache dedicated to media thumbnails.
+/// Uses its own URLSession — does NOT mutate URLCache.shared.
+/// Thumbnail URLs are public CDN content; separating them from
+/// viewer-relative API responses prevents cache pollution and
+/// unwanted cross-account data sharing.
+private let sharedMediaCache: URLCache = {
+    URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
+}()
+
+/// URLSession with the dedicated media cache. All thumbnail downloads
+/// from `MediaBrowserViewModel` should use this session.
+let mediaURLSession: URLSession = {
+    let config = URLSessionConfiguration.default
+    config.urlCache = sharedMediaCache
+    return URLSession(configuration: config)
 }()
 
 /// Browses and downloads media (images and videos) from a user's feed.
@@ -201,7 +211,7 @@ final class MediaBrowserViewModel: ObservableObject {
     init(did: String, downloadService: MediaDownloadService = .shared) {
         self.did = did
         self.downloadService = downloadService
-        _ = sharedCache
+        _ = sharedMediaCache
     }
 
     // MARK: - Selection

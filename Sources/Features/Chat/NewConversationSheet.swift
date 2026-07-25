@@ -10,6 +10,7 @@ struct NewConversationSheet: View {
     @State private var searchQuery = ""
     @State private var searchResults: [BlueskyActor] = []
     @State private var isSearching = false
+    @State private var searchError: String?
     @State private var selectedActor: BlueskyActor?
     @State private var isCreating = false
 
@@ -37,6 +38,21 @@ struct NewConversationSheet: View {
                             ProgressView()
                             Spacer()
                         }
+                    }
+                }
+
+                if let error = searchError {
+                    Section {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(Color.errorRed)
+                            Text(error)
+                                .font(.subheadline)
+                            Spacer()
+                            Button(loc("actions.retry")) { Task { await search() } }
+                                .buttonStyle(.bordered)
+                        }
+                        .padding(.vertical, 4)
                     }
                 }
 
@@ -76,11 +92,13 @@ struct NewConversationSheet: View {
         defer { isSearching = false }
 
         guard let account = accountStore.activeAccount else { return }
+        searchError = nil
         do {
             let pw = accountStore.appPassword(for: account)
             let response = try await container.profile.searchActors(query: searchQuery, account: account, appPassword: pw)
             searchResults = response
         } catch {
+            searchError = AppError.userMessage(from: error)
             searchResults = []
         }
     }

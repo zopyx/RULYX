@@ -92,8 +92,7 @@ final class ArchitectureEnforcementTests: XCTestCase {
     // MARK: - Rule: View-Service Coupling Report (Informational)
 
     /// Reports how many view files still import service implementations directly.
-    /// This is an informational test — it always passes but logs a warning if violations exist.
-    /// After the refactoring is complete, change to a hard assertion.
+    /// Fail if the allowlist grows — each removal should decrease the count.
     func testViewServiceCouplingReport() {
         let viewFiles = sourceFiles.filter {
             $0.contains("/Features/") || $0.contains("/App/")
@@ -106,21 +105,16 @@ final class ArchitectureEnforcementTests: XCTestCase {
         ]
 
         var violations: [(file: String, line: Int, symbol: String)] = []
+        // Files exempt from this check (wiring / DI setup)
         let exemptFiles: Set = [
             "AppDependencies.swift", "RULYXApp.swift", "RootView.swift",
         ]
 
         for file in viewFiles {
             let fileName = (file as NSString).lastPathComponent
-            if exemptFiles.contains(fileName) {
-                continue
-            }
-            if fileName.contains("ViewModel") || fileName.contains("ViewModel+") {
-                continue
-            }
-            if fileName.hasPrefix("iPad") {
-                continue
-            }
+            if exemptFiles.contains(fileName) { continue }
+            if fileName.contains("ViewModel") || fileName.contains("ViewModel+") { continue }
+            if fileName.hasPrefix("iPad") { continue }
 
             guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }
 
@@ -139,9 +133,14 @@ final class ArchitectureEnforcementTests: XCTestCase {
         }
 
         if !violations.isEmpty {
-            print("Note: \(violations.count) view files still reference service implementations directly (refactoring in progress)")
+            print("ARCHITECTURE: \(violations.count) view files still reference service implementations directly")
+            for v in violations.prefix(5) {
+                print("  \(v.file):\(v.line) references \(v.symbol)")
+            }
         }
-        // Not a hard failure during active refactoring
-        XCTAssertTrue(true)
+        // Hard failure: no view file may directly import concrete service types.
+        // When the migration is complete, this line enforces the rule permanently.
+        XCTAssertTrue(violations.isEmpty,
+            "\(violations.count) view files directly reference service implementations. Route through BlueskyServiceContainerWrapper instead.")
     }
 }
