@@ -44,7 +44,7 @@ struct HTTPRequestDebugEntry: Identifiable {
 // MARK: - HTTPRequestDebugStore
 
 /// In-memory store of HTTP request debug entries, with automatic URL sanitization
-/// (redacts Klipy API keys and JWT tokens). Entries older than 3 hours are purged.
+/// (redacts JWT tokens). Entries older than 3 hours are purged.
 /// @unchecked Sendable: ObservableObject with @MainActor-isolated mutable state via @Published.
 final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     static let shared = HTTPRequestDebugStore()
@@ -155,10 +155,9 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
 
     // MARK: - URL Sanitization
 
-    /// Regex patterns for sanitizing URLs (Klipy API keys, JWT tokens).
+    /// Regex patterns for sanitizing URLs (JWT tokens).
     private static let urlSanitizers: [(NSRegularExpression, String)] = {
         let patterns: [(String, String)] = [
-            ("(https?://api\\.klipy\\.com/api/v1/)[A-Za-z0-9]{50,}(/|$)", "$1[REDACTED]$2"),
             ("accessJwt=[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+", "accessJwt=[REDACTED]"),
             ("refreshJwt=[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+", "refreshJwt=[REDACTED]"),
         ]
@@ -178,7 +177,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
         }
     }()
 
-    /// Redact Klipy API keys and JWT tokens from a URL string.
+    /// Redact JWT tokens from a URL string.
     private static func sanitizeURL(_ url: String) -> String {
         var result = url
         let nsRange = NSRange(result.startIndex..., in: result)

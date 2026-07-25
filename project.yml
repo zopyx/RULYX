@@ -9,10 +9,6 @@ settings:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
     DEVELOPMENT_TEAM: "4PC9Z56E47"
-    INFOPLIST_PREPROCESS: YES
-configFiles:
-  Debug: Config/Secrets.xcconfig
-  Release: Config/Secrets.xcconfig
 targets:
   RULYX:
     type: application
@@ -41,7 +37,6 @@ targets:
           - com.ajung.RULYX.autoblockback
         PushNotificationsEnabled: true
         BskyPushServiceDID: did:web:api.bsky.app
-        KlipyAPIKey: "$(KLIPY_API_KEY)"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ajung.RULYX

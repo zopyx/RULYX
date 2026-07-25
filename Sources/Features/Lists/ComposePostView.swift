@@ -4,7 +4,7 @@ import SwiftUI
 import UIKit
 
 /// Full compose view for creating, replying to, quoting, or editing posts.
-/// Supports text, images (up to 4), GIFs (beta), video, alt text, reply controls
+/// Supports text, images (up to 4), video, alt text, reply controls
 /// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
     @Bindable var viewModel: ComposePostViewModel
@@ -65,40 +65,6 @@ struct ComposePostView: View {
                     Text(loc: "compose.text_section")
                 }
 
-                if let previewURL = viewModel.selectedGIFPreviewURL, !previewURL.isEmpty {
-                    Section {
-                        VStack(alignment: .leading, spacing: 8) {
-                            AsyncImage(url: URL(string: previewURL)) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxHeight: 160)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            } placeholder: {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(.quaternary)
-                                    .frame(height: 120)
-                            }
-                            if !viewModel.selectedGIFTitle.isEmpty {
-                                Text(viewModel.selectedGIFTitle)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Button(role: .destructive) {
-                                viewModel.videoAttachment = nil
-                                viewModel.selectedGIFPreviewURL = nil
-                                viewModel.selectedGIFLinkURL = nil
-                                viewModel.selectedGIFTitle = ""
-                            } label: {
-                                Label(loc("actions.remove"), systemImage: "xmark.circle.fill")
-                                    .font(.caption)
-                            }
-                        }
-                    } header: {
-                        Text(loc: "compose.gif_selected")
-                    }
-                }
-
                 imageAttachmentsSection
                 replyControlsSection
                 addMediaSection
@@ -149,11 +115,6 @@ struct ComposePostView: View {
                 Button(loc("actions.ok")) { viewModel.errorMessage = nil }
             } message: {
                 Text(viewModel.errorMessage ?? "")
-            }
-            .sheet(isPresented: $viewModel.showGIFPicker) {
-                GIFPickerView { gif in
-                    Task { await viewModel.handleGIFSelection(gif) }
-                }
             }
             .confirmationDialog(loc("compose.reply_controls"), isPresented: $viewModel.showReplyPicker) {
                 Button(loc("compose.reply_everyone")) { viewModel.replyRule = nil }
@@ -348,25 +309,10 @@ struct ComposePostView: View {
             PhotosPicker(selection: $viewModel.selectedItems, maxSelectionCount: viewModel.maxImages, matching: .images) {
                 Label { Text(verbatim: addImagesText) } icon: { Image(systemName: "photo.on.rectangle.angled") }
             }
-            .disabled(viewModel.selectedImages.count >= viewModel.maxImages || viewModel.videoAttachment != nil || viewModel.selectedGIFLinkURL != nil)
+            .disabled(viewModel.selectedImages.count >= viewModel.maxImages || viewModel.videoAttachment != nil)
             .onChange(of: viewModel.selectedItems) { _, items in
                 Task { await viewModel.loadImages(from: items) }
             }
-
-            Button {
-                viewModel.showGIFPicker = true
-            } label: {
-                HStack {
-                    Label { Text(loc("compose.add_gif")) } icon: { Image(systemName: "play.rectangle") }
-                    Spacer()
-                    if viewModel.isDownloadingGIF {
-                        ProgressView()
-                            .scaleEffect(0.7)
-                    }
-                }
-            }
-            .disabled(viewModel.isDownloadingGIF || viewModel.videoAttachment != nil || viewModel.selectedGIFLinkURL != nil || !viewModel.selectedImages.isEmpty)
-            .foregroundStyle(viewModel.videoAttachment != nil || viewModel.selectedGIFLinkURL != nil ? Color.skyPrimary : .primary)
         }
     }
 

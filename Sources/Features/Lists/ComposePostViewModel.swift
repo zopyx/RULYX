@@ -32,17 +32,12 @@ final class ComposePostViewModel {
     var selectedImages: [(data: Data, mimeType: String)] = []
     var imageAlts: [String] = []
     var videoAttachment: PostVideoAttachment?
-    var selectedGIFPreviewURL: String?
-    var selectedGIFLinkURL: String?
-    var selectedGIFTitle = ""
     var isPosting = false
     var uploadProgress: Double?
     var uploadSpeed: String?
     var errorMessage: String?
     var referencedPost: ThreadPostNode?
     var loadError: String?
-    var showGIFPicker = false
-    var isDownloadingGIF = false
     var isPreloadingEdit = false
     var editReplyTo: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?
     var replyRule: ThreadGateRule?
@@ -280,26 +275,6 @@ final class ComposePostViewModel {
         return result
     }
 
-    // MARK: - GIF handling
-
-    var selectedGIFExternalAttachment: PostExternalAttachment? {
-        guard let selectedGIFLinkURL else { return nil }
-        return PostExternalAttachment(
-            uri: selectedGIFLinkURL,
-            title: selectedGIFTitle.isEmpty ? "GIF" : selectedGIFTitle,
-            description: "GIF"
-        )
-    }
-
-    func handleGIFSelection(_ gif: GIFResult) async {
-        guard !isDownloadingGIF else { return }
-        guard !gif.mp4URL.isEmpty else { return }
-        videoAttachment = nil
-        selectedGIFPreviewURL = gif.previewURL
-        selectedGIFLinkURL = gif.mp4URL
-        selectedGIFTitle = gif.title
-    }
-
     // MARK: - Posting
 
     func post() async {
@@ -349,7 +324,7 @@ final class ComposePostViewModel {
                 text: postText,
                 images: images,
                 video: videoAttachment,
-                external: selectedGIFExternalAttachment,
+                external: nil,
                 replyTo: editReplyTo ?? replyTo,
                 quote: quote,
                 threadGate: replyRule,

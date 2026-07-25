@@ -2,7 +2,7 @@
 import XCTest
 
 /// Tests for ComposePostViewModel — posting logic, image handling,
-/// GIF selection, and error states.
+/// and error states.
 @MainActor
 final class ComposePostViewModelTests: XCTestCase {
     private var viewModel: ComposePostViewModel!
@@ -181,69 +181,6 @@ final class ComposePostViewModelTests: XCTestCase {
         await viewModel.loadUserLists()
 
         XCTAssertTrue(viewModel.userLists.isEmpty, "userLists should be empty after fetch failure")
-    }
-
-    // MARK: - GIF Handling
-
-    func testHandleGIFSelectionSetsPreview() async {
-        let gif = GIFResult(
-            id: "gif1",
-            mp4URL: "https://example.com/video.mp4",
-            previewURL: "https://example.com/preview.gif",
-            width: 320,
-            height: 240,
-            title: "Test GIF"
-        )
-
-        await viewModel.handleGIFSelection(gif)
-
-        XCTAssertEqual(viewModel.selectedGIFPreviewURL, "https://example.com/preview.gif")
-        XCTAssertEqual(viewModel.selectedGIFLinkURL, "https://example.com/video.mp4")
-        XCTAssertEqual(viewModel.selectedGIFTitle, "Test GIF")
-        XCTAssertNil(viewModel.videoAttachment, "Video attachment should be cleared when GIF is selected")
-    }
-
-    func testHandleGIFSelectionDoesNothingWhenDownloading() async {
-        viewModel.isDownloadingGIF = true
-        let gif = GIFResult(id: "g", mp4URL: "m", previewURL: "p", width: 1, height: 1, title: "G")
-
-        await viewModel.handleGIFSelection(gif)
-
-        XCTAssertNil(viewModel.selectedGIFPreviewURL, "Should not update while downloading")
-    }
-
-    func testHandleGIFSelectionIgnoresEmptyMP4() async {
-        let gif = GIFResult(id: "g", mp4URL: "", previewURL: "p", width: 1, height: 1, title: "G")
-
-        await viewModel.handleGIFSelection(gif)
-
-        XCTAssertNil(viewModel.selectedGIFPreviewURL, "Should ignore GIFs with empty mp4 URL")
-    }
-
-    // MARK: - GIF External Attachment
-
-    func testGIFExternalAttachmentWhenLinkSet() {
-        viewModel.selectedGIFLinkURL = "https://example.com/video.mp4"
-        viewModel.selectedGIFTitle = "My GIF"
-
-        let attachment = viewModel.selectedGIFExternalAttachment
-
-        XCTAssertNotNil(attachment)
-        XCTAssertEqual(attachment?.uri, "https://example.com/video.mp4")
-        XCTAssertEqual(attachment?.title, "My GIF")
-    }
-
-    func testGIFExternalAttachmentNilWhenNoLink() {
-        viewModel.selectedGIFLinkURL = nil
-        XCTAssertNil(viewModel.selectedGIFExternalAttachment)
-    }
-
-    func testGIFExternalAttachmentDefaultTitle() {
-        viewModel.selectedGIFLinkURL = "https://example.com/g.mp4"
-        viewModel.selectedGIFTitle = ""
-
-        let attachment = viewModel.selectedGIFExternalAttachment
-        XCTAssertEqual(attachment?.title, "GIF")
     }
 
     // MARK: - Image Validation
