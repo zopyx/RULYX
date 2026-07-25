@@ -191,13 +191,43 @@ struct HTTPClient {
     /// SHA-256 hashes of expected certificate public keys for certificate pinning.
     private let pinnedHashes: Set<String>
 
-    /// Per-host timestamp of the last request. Used by `throttle(host:)` to
-    /// prevent burst-rate requests to the same endpoint (preemptive rate limiting).
-    private var lastRequestTime: [String: Date] = [:]
-
     /// Minimum interval between requests to the same host. Prevents 429 bursts
     /// before the server-side rate limiter triggers.
     private let minimumRequestInterval: TimeInterval = 0.05  // 50ms
+
+    /// Actor-managed per-host throttle timestamps. Shared across all
+    /// HTTPClient instances for preemptive rate limiting.
+    private actor HostThrottle {
+        private var lastRequestTime: [String: Date] = [:]
+
+        func nextAllowedDelay(host: String, minimumInterval: TimeInterval) -> TimeInterval {
+            let now = Date()
+            let delay: TimeInterval
+            if let last = lastRequestTime[host] {
+                let elapsed = now.timeIntervalSince(last)
+                delay = max(0, minimumInterval - elapsed)
+            } else {
+                delay = 0
+            }
+            lastRequestTime[host] = max(lastRequestTime[host] ?? now, now)
+            return delay
+        }
+    }
+
+    private static let hostThrottle = HostThrottle()
+
+    /// Ensures at least `minimumRequestInterval` has passed since the last
+    /// request to `host`. Sleeps briefly if needed — acts as a simple token
+    /// bucket for preemptive rate limiting.
+    private func throttle(host: String) async {
+        let delay = await Self.hostThrottle.nextAllowedDelay(
+            host: host,
+            minimumInterval: minimumRequestInterval
+        )
+        if delay > 0 {
+            try? await Task.sleep(for: .seconds(delay))
+        }
+    }
 
     /// Default pinned certificate hashes for known RULYX API endpoints.
     /// These are SHA-256 hashes of the raw public key bytes
@@ -269,6 +299,11 @@ struct HTTPClient {
             source: source,
             origin: origin ?? Self.makeOrigin(fileID: originFileID, function: originFunction, line: originLine)
         )
+        // Preemptive rate limiting: ensure minimum interval between requests
+        // to the same host to prevent server-side 429 bursts.
+        if let host = request.url?.host {
+            await throttle(host: host)
+        }
         // Rate-limit retry loop: 429 responses trigger an exponential backoff
         // with up to 3 attempts. The first retry waits for the server-specified
         // Retry-After header (or 5s default), doubling each subsequent attempt.
