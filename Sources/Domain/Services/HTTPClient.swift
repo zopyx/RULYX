@@ -184,6 +184,28 @@ private actor InflightManager {
 
 // MARK: - HTTPClient
 
+/// ## TLS and Certificate-Pinning Policy (BET-204)
+///
+/// The app ships with ONE primary HTTP stack used for all outgoing requests:
+///
+/// | Path | Pinning | Rationale |
+/// |------|---------|-----------|
+/// | `bsky.social` entryway / PDS | Platform TLS only | No static pins. User PDS hosts are not own-operated and may change. |
+/// | `api.bsky.app` public AppView | Platform TLS only | Public read-only endpoints; token in Authorization header. |
+/// | `api.clearsky.app` / `public.api.clearsky.services` | Platform TLS only | Third-party service; pins would cause outages on their rotation. |
+///
+/// **What we DO pin**: `HTTPClient.pinnedHashes` (SHA-256 of raw public key bytes)
+/// is provided as an opt-in mechanism intended for debugging and enterprise
+/// deployments. It is NOT populated with production pins in the distributed
+/// binary — the default `Set<String>()` means no pinning occurs.
+///
+/// **Future**: if owned service endpoints are added, ship primary + backup
+/// pins with documented rotation and emergency recovery procedures.
+/// Do NOT pin arbitrary user-selected PDS hosts.
+///
+/// **Test safety**: `BlueskyRequestExecutor` takes an injectable `HTTPClient`.
+/// Tests use mock sessions or `URLProtocol`; no test traffic should escape
+/// to live services because of mismatched pin configurations.
 struct HTTPClient {
     private let session: URLSession
     private let debugStore: HTTPRequestDebugStore?
