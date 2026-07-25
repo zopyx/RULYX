@@ -258,40 +258,96 @@ struct InfoView: View {
 
     // MARK: - Features Tab
 
-    /// Feature cards describing moderation lists, data export, and block management.
+    /// Comprehensive feature cards covering all app functionality.
     private var featuresTab: some View {
         VStack(spacing: 12) {
             featureCard(
                 icon: "checklist.checked",
                 color: .skyPrimary,
-                title: localizationManager.localized("info.feature.lists"),
+                title: loc("info.feature.lists"),
                 items: [
-                    loc("info.feature.lists.browse"),
+                    loc("info.feature.lists.create"),
                     loc("info.feature.lists.bulk"),
+                    loc("info.feature.lists.compare"),
                     loc("info.feature.lists.import"),
                     loc("info.feature.lists.export"),
+                    loc("info.feature.lists.internal"),
                 ]
             )
 
             featureCard(
-                icon: "rectangle.split.3x1",
-                color: .skyOrange,
-                title: localizationManager.localized("info.feature.export"),
-                items: [
-                    loc("info.feature.export.posts"),
-                    loc("info.feature.export.media"),
-                    loc("info.feature.export.download"),
-                ]
-            )
-
-            featureCard(
-                icon: "hand.raised.square.on.square",
+                icon: "person.text.rectangle",
                 color: .skyAccent,
-                title: localizationManager.localized("info.feature.moderation"),
+                title: loc("info.feature.profile"),
                 items: [
-                    loc("info.feature.moderation.block"),
-                    loc("info.feature.moderation.block_all"),
-                    loc("info.feature.moderation.membership"),
+                    loc("info.feature.profile.analysis"),
+                    loc("info.feature.profile.owned"),
+                    loc("info.feature.profile.clearsky"),
+                    loc("info.feature.profile.audit"),
+                    loc("info.feature.profile.media"),
+                    loc("info.feature.profile.followers"),
+                ]
+            )
+
+            featureCard(
+                icon: "arrow.triangle.branch",
+                color: .skyOrange,
+                title: loc("info.feature.batch"),
+                items: [
+                    loc("info.feature.batch.likers"),
+                    loc("info.feature.batch.addtolist"),
+                    loc("info.feature.batch.multiselect"),
+                    loc("info.feature.batch.atomic"),
+                ]
+            )
+
+            featureCard(
+                icon: "rectangle.grid.1x2",
+                color: Color(red: 0.30, green: 0.69, blue: 0.31),
+                title: loc("info.feature.timeline"),
+                items: [
+                    loc("info.feature.timeline.following"),
+                    loc("info.feature.timeline.custom"),
+                    loc("info.feature.timeline.thread"),
+                    loc("info.feature.timeline.replies"),
+                ]
+            )
+
+            featureCard(
+                icon: "message",
+                color: Color(red: 0.61, green: 0.35, blue: 0.71),
+                title: loc("info.feature.chat"),
+                items: [
+                    loc("info.feature.chat.dm"),
+                    loc("info.feature.chat.media"),
+                    loc("info.feature.chat.manage"),
+                    loc("info.feature.chat.notifications"),
+                ]
+            )
+
+            featureCard(
+                icon: "lock.shield",
+                color: Color(red: 0.18, green: 0.68, blue: 0.45),
+                title: loc("info.feature.security"),
+                items: [
+                    loc("info.feature.security.export"),
+                    loc("info.feature.security.biometric"),
+                    loc("info.feature.security.keychain"),
+                    loc("info.feature.security.shield"),
+                    loc("info.feature.security.notracking"),
+                ]
+            )
+
+            featureCard(
+                icon: "ipad.and.iphone",
+                color: .skyPrimary,
+                title: loc("info.feature.platform"),
+                items: [
+                    loc("info.feature.platform.ipad"),
+                    loc("info.feature.platform.shortcuts"),
+                    loc("info.feature.platform.windows"),
+                    loc("info.feature.platform.dragdrop"),
+                    loc("info.feature.platform.a11y"),
                 ]
             )
         }
