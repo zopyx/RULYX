@@ -123,7 +123,7 @@ struct iPadListsView: View {
                     .font(.body.weight(.medium))
                     .lineLimit(1)
                 if let count = list.memberCount {
-                    Text(loc("lists.members.count").replacingOccurrences(of: "{n}", with: "\(count)"))
+                    Text(plural("lists.members.count", count: count))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

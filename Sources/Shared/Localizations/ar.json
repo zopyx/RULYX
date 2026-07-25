@@ -1456,5 +1456,11 @@
   "rel.block_selected": "حظر المحدد ({count})",
   "rel.block_selected.message": "سيؤدي هذا إلى حظر {count} حسابًا. لن يتمكنوا من التفاعل معك.",
   "settings.about": "حول",
-  "onboarding.timeline.desc": "تصفح خطك الزمني في Bluesky واكتشف محتوى جديد"
+  "onboarding.timeline.desc": "تصفح خطك الزمني في Bluesky واكتشف محتوى جديد",
+  "lists.members.count.zero": "لا يوجد أعضاء",
+  "lists.members.count.one": "عضو واحد",
+  "lists.members.count.two": "عضوان",
+  "lists.members.count.few": "{n} أعضاء",
+  "lists.members.count.many": "{n} عضوًا",
+  "lists.members.count.other": "{n} عضو"
 }

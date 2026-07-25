@@ -21,6 +21,7 @@ struct SettingsView: View {
     @EnvironmentObject private var aiService: LiveAIService
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var internalListStore: InternalListStore
+    @EnvironmentObject private var moderationAuditStore: ModerationAuditStore
 
     /// UserDefaults key `"debugMode"`: enables debug tools (HTTP request debug view, etc.).
     @AppStorage("debugMode") private var debugMode = false
@@ -38,6 +39,7 @@ struct SettingsView: View {
 
     /// Controls the clear cache confirmation dialog.
     @State private var isShowingClearCacheConfirmation = false
+    @State private var isShowingDeleteAllDataConfirmation = false
 
     /// Controls the HTTP request debug view sheet.
     @State private var isShowingHTTPRequestDebugView = false
@@ -106,6 +108,7 @@ struct SettingsView: View {
                     .accessibilityHint(loc: "settings.language.hint")
                 } header: {
                     Text(localizationManager.localized("settings.preferences"))
+                        .accessibilityAddTraits(.isHeader)
                 }
 
                 Section {
@@ -164,6 +167,7 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text(loc("settings.moderation"))
+                        .accessibilityAddTraits(.isHeader)
                 } footer: {
                     Text(loc("settings.autoblock.footer"))
                 }
@@ -191,6 +195,7 @@ struct SettingsView: View {
                         }
                     } header: {
                         Text(loc: "settings.security")
+                            .accessibilityAddTraits(.isHeader)
                     } footer: {
                         if appLockManager.isEnabled {
                             Text(loc("settings.biometric_footer").replacingOccurrences(of: "{biometric}", with: appLockManager.biometricLabel))
@@ -214,6 +219,7 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text(localizationManager.localized("settings.ai"))
+                        .accessibilityAddTraits(.isHeader)
                 }
 
                 // MARK: Internal Section
@@ -268,6 +274,19 @@ struct SettingsView: View {
                     }
                     .accessibilityHint(loc: "settings.clear_cache.hint")
 
+                    if debugMode {
+                        Button(role: .destructive) {
+                            isShowingDeleteAllDataConfirmation = true
+                        } label: {
+                            Label {
+                                Text(loc: "settings.delete_all_data")
+                            } icon: {
+                                Image(systemName: "trash.fill")
+                            }
+                        }
+                        .accessibilityHint(loc: "settings.delete_all_data.hint")
+                    }
+
                     if let cacheStatusMessage {
                         Text(cacheStatusMessage)
                             .font(.caption)
@@ -278,6 +297,7 @@ struct SettingsView: View {
                         Text(localizationManager.localized("settings.internal"))
                         Spacer()
                     }
+                    .accessibilityAddTraits(.isHeader)
                     .contentShape(Rectangle())
                     // Hidden gesture: double-tapping the "Internal" section header
                     // opens the HTTP request debug view — gated behind `debugMode`
@@ -323,6 +343,25 @@ struct SettingsView: View {
                 Button(localizationManager.localized("settings.cancel"), role: .cancel) {}
             } message: {
                 Text(localizationManager.localized("settings.clear_cache.message"))
+            }
+
+            // MARK: Confirmation — Delete All Data
+
+            .confirmationDialog(
+                loc("settings.delete_all_data.confirm"),
+                isPresented: $isShowingDeleteAllDataConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(loc("settings.delete_all_data"), role: .destructive) {
+                    moderationAuditStore.clearAll()
+                    container.auth.clearCache()
+                    DashboardCache.clearAll()
+                    RelationshipCache.clearAll()
+                    cacheStatusMessage = loc("settings.data_deleted")
+                }
+                Button(localizationManager.localized("settings.cancel"), role: .cancel) {}
+            } message: {
+                Text(loc("settings.delete_all_data.message"))
             }
         }
     }

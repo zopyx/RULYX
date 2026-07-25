@@ -101,6 +101,69 @@ final class LocalizationManager: ObservableObject {
         bundle = allBundles[currentLanguage] ?? allBundles["en"] ?? [:]
         objectWillChange.send()
     }
+
+    // MARK: - Pluralization
+
+    /// CLDR plural categories. Ordered by priority (first match wins).
+    private enum PluralCategory: String, CaseIterable {
+        case zero, one, two, few, many, other
+    }
+
+    /// Selects the appropriate plural category for a count in the current language.
+    private func pluralCategory(for count: Int, language: String) -> PluralCategory {
+        switch language {
+        case "ja", "zh", "ko", "tr", "th", "vi":
+            return .other
+        case "en", "de", "fr", "it", "es", "pt", "nl":
+            return count == 1 ? .one : .other
+        case "ru":
+            let mod10 = count % 10
+            let mod100 = count % 100
+            if mod10 == 1, mod100 != 11 { return .one }
+            if (2 ... 4).contains(mod10), !(12 ... 14).contains(mod100) { return .few }
+            if mod10 == 0 || (5 ... 9).contains(mod10) || (11 ... 14).contains(mod100) { return .many }
+            return .other
+        case "ar":
+            let mod100 = count % 100
+            if count == 0 { return .zero }
+            if count == 1 { return .one }
+            if count == 2 { return .two }
+            if (3 ... 10).contains(mod100) { return .few }
+            if (11 ... 99).contains(mod100) { return .many }
+            return .other
+        case "pl":
+            let mod10 = count % 10
+            let mod100 = count % 100
+            if count == 1 { return .one }
+            if (2 ... 4).contains(mod10), !(12 ... 14).contains(mod100) { return .few }
+            if (0 ... 1).contains(mod10) || (5 ... 9).contains(mod10) || (12 ... 14).contains(mod100) { return .many }
+            return .other
+        default:
+            return count == 1 ? .one : .other
+        }
+    }
+
+    /// Returns a localized string with proper pluralization for `count`.
+    /// Tries keys suffixed with the CLDR plural category (e.g. `key.one`, `key.few`)
+    /// in the active language, then falls back to the raw key with `{n}` replacement
+    /// (backward-compatible with existing manual plural strings).
+    func pluralized(_ key: String, count: Int) -> String {
+        let cat = pluralCategory(for: count, language: currentLanguage)
+        let suffixedKey = "\(key).\(cat.rawValue)"
+        // Try the plural-specific key first
+        if let pluralValue = allBundles[currentLanguage]?[suffixedKey] ?? allBundles["en"]?[suffixedKey] {
+            return pluralValue.replacingOccurrences(of: "{n}", with: "\(count)")
+        }
+        // Fall back to the raw key with {n} replacement (backward compat)
+        let raw = bundle[key] ?? allBundles["en"]?[key] ?? key
+        return raw.replacingOccurrences(of: "{n}", with: "\(count)")
+    }
+}
+
+/// Convenience global function for plural-aware localization.
+@MainActor
+func plural(_ key: String, count: Int) -> String {
+    LocalizationManager.shared.pluralized(key, count: count)
 }
 
 /// Convenience global function for quick localization lookups.

@@ -1448,5 +1448,9 @@
   "rel.block_selected": "Заблокировать выбранных ({count})",
   "rel.block_selected.message": "Будет заблокировано {count} аккаунтов. Они больше не смогут взаимодействовать с вами.",
   "settings.about": "О приложении",
-  "onboarding.timeline.desc": "Просматривайте свою ленту Bluesky и открывайте новый контент"
+  "onboarding.timeline.desc": "Просматривайте свою ленту Bluesky и открывайте новый контент",
+  "lists.members.count.one": "{n} участник",
+  "lists.members.count.few": "{n} участника",
+  "lists.members.count.many": "{n} участников",
+  "lists.members.count.other": "{n} участников"
 }

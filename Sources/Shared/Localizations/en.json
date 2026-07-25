@@ -1440,5 +1440,12 @@
   "rel.block_selected": "Block Selected ({count})",
   "rel.block_selected.message": "This will block {count} accounts. They will no longer be able to interact with you.",
   "settings.about": "About",
-  "onboarding.timeline.desc": "Browse your Bluesky timeline and discover new content"
+  "onboarding.timeline.desc": "Browse your Bluesky timeline and discover new content",
+  "lists.members.count.one": "1 member",
+  "lists.members.count.other": "{n} members",
+  "settings.delete_all_data": "Delete All Data",
+  "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
+  "settings.delete_all_data.confirm": "Delete All Data?",
+  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
+  "settings.data_deleted": "All data deleted"
 }

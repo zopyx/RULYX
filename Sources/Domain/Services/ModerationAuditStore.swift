@@ -122,6 +122,8 @@ final class ModerationAuditStore: ObservableObject {
         }
 
         load()
+        // Auto-purge entries older than 90 days on every launch.
+        purgeOlderThan(days: 90)
     }
 
     /// The most recent operation that had at least one success or failure. Used for undo.
@@ -141,6 +143,31 @@ final class ModerationAuditStore: ObservableObject {
     }
 
     /// Clears the last undoable operation reference.
+    /// Purges all snapshots and operation log entries older than the given number
+    /// of days. Call this periodically (e.g., on app launch or from Settings) to
+    /// prevent unbounded audit log growth.
+    func purgeOlderThan(days: Int) {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: .now) ?? .now
+        // Purge snapshots
+        for (listID, snapshots) in snapshotsByListID {
+            snapshotsByListID[listID] = snapshots.filter { $0.capturedAt > cutoff }
+        }
+        // Purge operation log
+        operationLog = operationLog.filter { $0.createdAt > cutoff }
+        persistSnapshots()
+        persistOperationLog()
+    }
+
+    /// Clears ALL stored audit data — snapshots and operation log.
+    /// Used for GDPR "right to erasure" and the "Delete All Data" flow.
+    func clearAll() {
+        snapshotsByListID.removeAll()
+        operationLog.removeAll()
+        lastUndoableOperation = nil
+        persistSnapshots()
+        persistOperationLog()
+    }
+
     func clearUndo() {
         lastUndoableOperation = nil
     }
