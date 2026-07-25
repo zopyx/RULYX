@@ -285,6 +285,32 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// session, and all of its on-disk caches. If it was the active or preferred
     /// search account, falls back to the first remaining account.
     ///
+    /// ## Per-account data wiped by this method:
+    ///
+    /// | Component | Location | Method |
+    /// |-----------|----------|--------|
+    /// | Keychain password | `passwordService` | `keychain.delete` |
+    /// | Persisted session | Keychain `persistedSessionService` | `client.deletePersistedSession` |
+    /// | BlueskyAPICache | `~/Library/Caches/...BlueskyAPICache/<SHA256(did)>/` | `BlueskyAPICache.shared.clear(for:)` |
+    /// | DashboardCache | `~/Library/Caches/...dashboard/<SHA256(key)>.json` | `DashboardCache.clear(forKey:)` |
+    /// | RelationshipCache | `~/Library/Caches/...relationships/<SHA256(key)>.json` | `RelationshipCache.clear(forKey:)` |
+    ///
+    /// ## Global data NOT reset by account removal:
+    ///
+    /// - `MutedWordsStore` (user preference, account-independent)
+    /// - `InternalListStore` (app-local lists, shared across accounts)
+    /// - `AnalyticsStore` (engagement snapshots keyed by post URI)
+    /// - `FeedStore` (per-DID keys)
+    /// - `WorkspacePreferencesStore` (saved searches)
+    /// - Media thumbnails (public CDN content)
+    ///
+    /// ## "Delete All App Data" action (Settings > Delete All Data):
+    ///
+    /// Clears ALL stores: audit log, API caches, dashboard/relationship
+    /// caches, internal lists, workspaces preferences, analytics, and
+    /// muted words. Does NOT remove accounts or credentials — those
+    /// require explicit per-account deletion.
+    ///
     /// Cache contract: account removal is a logout — the account's social graph and
     /// moderation data must not linger on disk. Clears the account-keyed entries in
     /// `DashboardCache`/`RelationshipCache` and all `BlueskyAPICache` entries for the
