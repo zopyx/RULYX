@@ -378,7 +378,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// Deprecated: use `switchAccount(to:using:)` instead — this bypass resets all
     /// caches and resettable observers, leading to stale data from the previous
     /// account surfacing in the active view. Kept only for internal migration paths.
-    @available(*, unavailable, message: "Use switchAccount(to:using:) — this method bypasses the transition primitive and ships stale account state.")
+    @available(*, deprecated, message: "Use switchAccount(to:using:) — this method bypasses the transition primitive and ships stale account state. Production code must route through transitionActiveAccount.")
     func setActiveAccount(_ account: AppAccount) {
         guard accounts.contains(account) else { return }
         activeAccountID = account.id
