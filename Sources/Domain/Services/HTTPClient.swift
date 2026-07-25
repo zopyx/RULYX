@@ -21,15 +21,39 @@ private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate, Se
 /// Validates server certificates against pinned SHA-256 public key hashes.
 /// When no pins are configured, all connections are allowed (development mode).
 ///
+/// Pin enforcement is PER-HOST: only hosts under `enforcedHostSuffixes`
+/// (first-party Bluesky/ClearSky/PLC infrastructure) must match a pin.
+/// All other hosts — notably user-configured custom PDS instances — receive
+/// standard TLS validation (`performDefaultHandling`). Pinning must never
+/// break self-hosted PDS deployments.
+///
 /// Use `CertificatePinningDelegate.pinHashes(for:keyCount:)` to generate
 /// pin hashes from PEM-encoded certificate data.
 ///
 /// - Important: Pinning is opt-in. Pass an empty set or omit `pinnedHashes`
 ///   to disable pinning and allow all connections.
-private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
+final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
     /// @unchecked Sendable: NSObject-based URLSession delegate; thread-safety
     /// is guaranteed by URLSession's serial delegate queue.
     private let pinnedHashes: Set<String>
+
+    /// Host suffixes whose TLS chains must match a pin. Matched by exact host
+    /// or subdomain: `bsky.social` also covers `chat.bsky.social`; `bsky.app`
+    /// covers `api.bsky.app` / `public.api.bsky.app`. A lookalike host such as
+    /// `evil-bsky.social` does NOT match (suffix requires a dot boundary).
+    static let enforcedHostSuffixes = [
+        "bsky.social",
+        "bsky.app",
+        "clearsky.app",
+        "clearsky.services",
+        "plc.directory",
+    ]
+
+    /// Returns true when pin enforcement applies to `host`.
+    static func isEnforcedHost(_ host: String) -> Bool {
+        let host = host.lowercased()
+        return enforcedHostSuffixes.contains { host == $0 || host.hasSuffix("." + $0) }
+    }
 
     init(pinnedHashes: Set<String>) {
         self.pinnedHashes = pinnedHashes
@@ -49,6 +73,13 @@ private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @u
 
         // If no pins are configured, allow all (development mode).
         guard !pinnedHashes.isEmpty else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        // Per-host scope: only first-party hosts are pinned. Other hosts
+        // (custom PDS instances) get standard TLS validation.
+        guard Self.isEnforcedHost(challenge.protectionSpace.host) else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
