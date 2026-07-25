@@ -1296,11 +1296,24 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
                 for p in batchStart ... batchEnd {
                     group.addTask { [self] in
-                        let entries = await (try? fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)) ?? []
-                        return (p, entries)
+                        // Retry transient failures up to 2 times with exponential backoff
+                        var lastError: Error?
+                        for attempt in 0 ... 2 {
+                            do {
+                                let entries = try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)
+                                return (p, entries)
+                            } catch {
+                                lastError = error
+                                if attempt < 2 {
+                                    let delay = Double(1 << attempt) * 0.5 // 0.5s, 1.0s
+                                    try? await Task.sleep(for: .seconds(delay))
+                                }
+                            }
+                        }
+                        // After 3 attempts, surface the error instead of returning empty
+                        throw lastError ?? BlueskyAPIError.server("Clearsky page \\(p) failed after retries")
                     }
                 }
-
                 for try await (p, entries) in group {
                     batchResults.append((p, entries))
                 }
