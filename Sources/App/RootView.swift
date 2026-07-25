@@ -300,7 +300,9 @@ struct RootView: View {
                     // MARK: Get Started Button
 
                     Button {
-                        showAddAccountFromOnboarding = true
+                        if !ProcessInfo.processInfo.arguments.contains("--uitesting") {
+                            showAddAccountFromOnboarding = true
+                        }
                         hasSeenOnboarding = true
                     } label: {
                         Text(verbatim: localizationManager.localized("onboarding.get_started"))

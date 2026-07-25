@@ -238,3 +238,24 @@ func mapViewerState(_ viewer: ProfileViewerState?) -> BlueskyViewerState? {
         blockingByListName: [viewer.blockingByList?.name].compactMap(\.self)
     )
 }
+
+// MARK: - ApplyWrites
+
+/// A single write operation within a batch `applyWrites` request.
+struct ApplyWriteOperation: Encodable {
+    let action: String
+    let collection: String
+    let value: SubjectRecord
+}
+
+/// Request body for `com.atproto.repo.applyWrites`.
+struct ApplyWritesRequest: Encodable {
+    let repo: String
+    let writes: [ApplyWriteOperation]
+}
+
+/// Response from `com.atproto.repo.applyWrites`.
+struct ApplyWritesResponse: Decodable {
+    // AT Protocol returns arrays of record URIs; we only need success/failure.
+    // An error response is thrown by the executor.
+}

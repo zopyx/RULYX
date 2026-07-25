@@ -313,37 +313,15 @@ struct BatchOperationProgressView: View {
             return
         }
 
-        // Parallel batches of 5 with 300ms delay between batches
-        let client = container.blueskyClient
-        let batchSize = 5
-        for batchStart in stride(from: 0, to: toProcess.count, by: batchSize) {
-            let batchEnd = min(batchStart + batchSize, toProcess.count)
-            let batch = toProcess[batchStart ..< batchEnd]
-
-            await withTaskGroup(of: (Bool, String).self) { group in
-                for target in batch {
-                    group.addTask {
-                        do {
-                            try await client.blockActor(did: target.did, account: account, appPassword: appPassword)
-                            return (true, target.handle ?? target.did)
-                        } catch {
-                            return (false, target.handle ?? target.did)
-                        }
-                    }
-                }
-                for await (success, handle) in group {
-                    if success {
-                        completedCount += 1
-                    } else {
-                        failedCount += 1
-                    }
-                    currentHandle = "@\(handle)"
-                }
-            }
-
-            if batchEnd < toProcess.count {
-                try? await Task.sleep(for: .milliseconds(300))
-            }
+        // Single atomic request: all targets are blocked in one applyWrites
+        // call. The AT Protocol rejects the entire batch if any write is
+        // invalid — partial blocks are impossible.
+        do {
+            let dids = toProcess.map(\.did)
+            try await container.blueskyClient.batchBlockActors(dids: dids, account: account, appPassword: appPassword)
+            completedCount = toProcess.count
+        } catch {
+            failedCount = toProcess.count
         }
         currentHandle = nil
         isExecuteComplete = true

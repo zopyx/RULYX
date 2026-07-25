@@ -666,6 +666,38 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         invalidateModerationCaches(for: actorDID)
     }
 
+    /// Atomically blocks multiple actors in a single `applyWrites` request
+    /// instead of sequential `createRecord` calls. Partial failure is impossible:
+    /// the AT Protocol server rejects the entire batch if any write is invalid.
+    func batchBlockActors(dids: [String], account: AppAccount, appPassword: String?) async throws {
+        guard !dids.isEmpty else { return }
+        let response: ApplyWritesResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let writes = dids.map { did in
+                ApplyWriteOperation(
+                    action: "create",
+                    collection: "app.bsky.graph.block",
+                    value: SubjectRecord(type: "app.bsky.graph.block", subject: did)
+                )
+            }
+            let body = ApplyWritesRequest(repo: authSession.did, writes: writes)
+            return try await requestExecutor.send(
+                path: "com.atproto.repo.applyWrites",
+                method: "POST",
+                queryItems: [],
+                body: body,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+        // Invalidate caches for every target DID
+        for did in dids {
+            invalidateModerationCaches(for: did)
+        }
+    }
+
     func softBlockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws {
         let uri: String = try await sessionService.performAuthenticatedRequest(
             account: account,

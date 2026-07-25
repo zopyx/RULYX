@@ -66,9 +66,10 @@ final class RULYXUITests: XCTestCase {
                       "Main app with Moderation tab should appear after completing onboarding")
 
         // Verify all expected tabs are present using accessibility identifiers.
+        // Post-UX: 5 tabs + accounts button (Info merged into Settings).
         let expectedTabIDs = [
             "tab-moderation", "tab-timeline", "tab-notifications",
-            "tab-chat", "tab-info", "tab-settings", "tab-accounts"
+            "tab-chat", "tab-settings", "tab-accounts"
         ]
         for tabID in expectedTabIDs {
             XCTAssertTrue(onboardingApp.buttons[tabID].exists,
