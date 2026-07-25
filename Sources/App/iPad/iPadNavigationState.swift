@@ -44,4 +44,11 @@ final class iPadNavigationState: ObservableObject {
     @Published var columnVisibility: NavigationSplitViewVisibility = .all
     @Published var selectedList: BlueskyList?
     @Published var selectedProfileDID: String?
+
+    /// Posts a typed navigation request. Observers (iPadRootView) handle
+    /// the actual sidebar selection change. Prefer this over posting
+    /// `.iPadNavigateTo` directly.
+    static func navigateTo(_ item: SidebarItem) {
+        NotificationCenter.default.post(name: .iPadNavigateTo, object: item)
+    }
 }

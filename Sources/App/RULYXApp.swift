@@ -277,11 +277,11 @@ struct RULYXApp: App {
             // File menu
             CommandGroup(replacing: .newItem) {
                 Button(loc("sidebar.all_lists")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.allLists)
+                    iPadNavigationState.navigateTo( SidebarItem.allLists)
                 }
                 .keyboardShortcut("1", modifiers: .command)
                 Button(loc("sidebar.dashboard")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.dashboard)
+                    iPadNavigationState.navigateTo( SidebarItem.dashboard)
                 }
                 .keyboardShortcut("2", modifiers: .command)
             }
@@ -289,24 +289,24 @@ struct RULYXApp: App {
             // Moderation commands
             CommandMenu(loc("shortcut.menu.moderation")) {
                 Button(loc("sidebar.all_lists")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.allLists)
+                    iPadNavigationState.navigateTo( SidebarItem.allLists)
                 }
                 .keyboardShortcut("l", modifiers: .command)
 
                 Button(loc("sidebar.dashboard")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.dashboard)
+                    iPadNavigationState.navigateTo( SidebarItem.dashboard)
                 }
                 .keyboardShortcut("d", modifiers: .command)
 
                 Button(loc("sidebar.custom_search")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.customSearch)
+                    iPadNavigationState.navigateTo( SidebarItem.customSearch)
                 }
                 .keyboardShortcut("f", modifiers: .command)
 
                 Divider()
 
                 Button(loc("sidebar.relationships")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.relationships)
+                    iPadNavigationState.navigateTo( SidebarItem.relationships)
                 }
                 .keyboardShortcut("r", modifiers: [.command, .shift])
             }
@@ -314,29 +314,29 @@ struct RULYXApp: App {
             // Navigate menu
             CommandMenu(loc("shortcut.menu.navigate")) {
                 Button(loc("sidebar.timeline")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.timeline)
+                    iPadNavigationState.navigateTo( SidebarItem.timeline)
                 }
                 .keyboardShortcut("t", modifiers: .command)
 
                 Button(loc("sidebar.notifications")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.notifications)
+                    iPadNavigationState.navigateTo( SidebarItem.notifications)
                 }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
 
                 Button(loc("sidebar.chat")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.chat)
+                    iPadNavigationState.navigateTo( SidebarItem.chat)
                 }
                 .keyboardShortcut("m", modifiers: .command)
 
                 Divider()
 
                 Button(loc("sidebar.settings")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.settings)
+                    iPadNavigationState.navigateTo( SidebarItem.settings)
                 }
                 .keyboardShortcut(",", modifiers: .command)
 
                 Button(loc("sidebar.accounts")) {
-                    NotificationCenter.default.post(name: .iPadNavigateTo, object: SidebarItem.accounts)
+                    iPadNavigationState.navigateTo( SidebarItem.accounts)
                 }
                 .keyboardShortcut("a", modifiers: [.command, .shift])
             }

@@ -31,10 +31,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// hosts via HTTPClient.defaultPinnedHashes; custom PDS hosts use standard TLS
     /// validation (CertificatePinningDelegate falls back to performDefaultHandling
     /// when no pin matches the host).
-    private let appViewHTTPClient = HTTPClient(session: URLSession.shared, pinnedHashes: HTTPClient.defaultPinnedHashes)
+    let appViewHTTPClient: HTTPClient
     private let session: URLSession
-    private let requestExecutor: BlueskyRequestExecuting
-    private let sessionService: BlueskySessionServicing
+    /// Exposed for protocol service composition (BlueskyServiceContainer).
+    let requestExecutor: BlueskyRequestExecuting
+    /// Exposed for protocol service composition.
+    let sessionService: BlueskySessionServicing
     private let clearskyHeartbeat: ClearskyHeartbeatService
 
     // MARK: - Init
@@ -51,6 +53,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         let clientSession = URLSession.shared
         session = clientSession
         self.httpClient = httpClient ?? HTTPClient(session: clientSession, pinnedHashes: HTTPClient.defaultPinnedHashes)
+        appViewHTTPClient = HTTPClient(session: URLSession.shared, pinnedHashes: HTTPClient.defaultPinnedHashes)
         self.clearskyHeartbeat = clearskyHeartbeat
         let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, httpClient: self.httpClient)
         self.requestExecutor = executor

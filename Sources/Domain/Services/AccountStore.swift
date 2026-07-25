@@ -1,5 +1,22 @@
 import Foundation
 
+/// View models and stores conforming to this protocol have account-scoped state
+/// that must be reset when the active account changes. Register with
+/// `AccountStore.registerForReset(_:)` during init; the store iterates
+/// every registered observer on `switchAccount` BEFORE publishing the new ID.
+/// This replaces the opt-in `NotificationCenter` pattern with a compiler-
+/// enforced contract: any view model that forgets to register will ship stale
+/// data after a switch.
+protocol AccountScopeResettable: AnyObject {
+    func resetAccountScopedState()
+}
+
+/// Weak wrapper for an `AccountScopeResettable` observer; stored in the registry.
+/// Removes the observer automatically when the wrapped object is deallocated.
+private struct WeakResettable {
+    weak var observer: AccountScopeResettable?
+}
+
 /// Manages Bluesky accounts: persistence, activation, authentication, and iCloud sync.
 ///
 /// Responsibilities:
@@ -32,6 +49,12 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     @Published private(set) var isAddingAccount = false
     /// Set of account IDs that have been reported as deactivated (via push notification).
     @Published var deactivatedAccountIDs: Set<UUID> = []
+
+    /// Registry of view models / stores that hold account-scoped state.
+    /// Iterated synchronously on `switchAccount` before the active account ID changes.
+    /// Weak references prevent accidental retain cycles; unregistration happens
+    /// automatically when an observer is deallocated.
+    private var resettableObservers: [WeakResettable] = []
 
     /// The currently active account object. `nil` when no account is active.
     var activeAccount: AppAccount? {
@@ -305,7 +328,10 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         persist()
     }
 
-    /// Sets the active account and updates its `lastUsedAt` timestamp.
+    /// Deprecated: use `switchAccount(to:using:)` instead — this bypass resets all
+    /// caches and resettable observers, leading to stale data from the previous
+    /// account surfacing in the active view. Kept only for internal migration paths.
+    @available(*, deprecated, message: "Use switchAccount(to:using:)")
     func setActiveAccount(_ account: AppAccount) {
         guard accounts.contains(account) else { return }
 
@@ -340,9 +366,16 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         DashboardCache.clearAll()
         RelationshipCache.clearAll()
         ThreadCacheService.shared.invalidateAll()
-        // Notify view models synchronously so every account-scoped counter is zeroed
-        // in the same runloop turn — before any view re-renders or refetches.
+        // Notify old NotificationCenter observers (backward compat). New code
+        // conforms to AccountScopeResettable and registers via registerForReset(_:).
         NotificationCenter.default.post(name: .accountWillSwitch, object: account)
+        // Iterate the compiled registry — every registered observer gets its
+        // reset callback BEFORE the active account ID changes. Prune deallocated
+        // observers in the same pass.
+        resettableObservers.removeAll { $0.observer == nil }
+        for wrapper in resettableObservers {
+            wrapper.observer?.resetAccountScopedState()
+        }
         // Assign last: publishes the change only after every reset above has completed.
         activeAccountID = account.id
         if let index = accounts.firstIndex(of: account) {
@@ -350,6 +383,20 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         }
         persist()
         AppLogger.persistence.info("Account switch completed for \(account.handle)")
+    }
+
+    /// Registers an observer whose `resetAccountScopedState()` will be called
+    /// synchronously on every account switch before the active account ID changes.
+    /// Observers are held weakly — no need to unregister manually.
+    func registerForReset(_ observer: AccountScopeResettable) {
+        // Deduplicate
+        resettableObservers.removeAll { $0.observer === observer || $0.observer == nil }
+        resettableObservers.append(WeakResettable(observer: observer))
+    }
+
+    /// Manually unregisters an observer (optional — weak references auto-clean).
+    func unregisterForReset(_ observer: AccountScopeResettable) {
+        resettableObservers.removeAll { $0.observer === observer }
     }
 
     /// Returns `true` if the given account has been flagged as deactivated.

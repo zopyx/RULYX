@@ -120,6 +120,8 @@ final class AppDependencies: ObservableObject {
 
 // MARK: - Conformance
 
+// Kept for potential future DI consumers; currently no external code references
+// these seam protocols — all view models use the concrete AppDependencies directly.
 extension AppDependencies: AccountServicing {}
 extension AppDependencies: ModerationServicing {}
 extension AppDependencies: AIServicing {}
