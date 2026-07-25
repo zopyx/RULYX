@@ -77,6 +77,50 @@ struct RelationshipsView: View {
     /// DID → block record URI for unblocking (Blocking mode). Only populated when mode == .blocking.
     @State private var blockRecordURIs: [String: String] = [:]
 
+    // MARK: - Multi-Select State
+
+    /// Whether the view is in multi-select mode (checkbox + bulk actions).
+    @State private var isSelectMode = false
+    /// Set of DIDs selected by the user in multi-select mode.
+    @State private var selectedDIDs: Set<String> = []
+    /// Show confirmation dialog before executing bulk block on selected actors.
+    @State private var showBulkBlockConfirm = false
+
+    /// The actors currently selected (derived from selectedDIDs).
+    private var selectedActors: [BlueskyActor] {
+        actors.filter { selectedDIDs.contains($0.did) }
+    }
+
+    /// Renders an actor row with optional checkbox in multi-select mode.
+    @ViewBuilder
+    private func selectableActorRow(actor: BlueskyActor, index: Int) -> some View {
+        if isSelectMode {
+            HStack(spacing: 12) {
+                Image(systemName: selectedDIDs.contains(actor.did) ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(selectedDIDs.contains(actor.did) ? Color.skyPrimary : Color.secondary)
+                    .font(.title2)
+                actorRowLabel(actor: actor, index: index)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if selectedDIDs.contains(actor.did) {
+                    selectedDIDs.remove(actor.did)
+                } else {
+                    selectedDIDs.insert(actor.did)
+                }
+            }
+        } else {
+            actorRowLabel(actor: actor, index: index)
+                .contentShape(Rectangle())
+                .onTapGesture(count: 2) {
+                    Task { await toggleFollow(actor: actor) }
+                }
+                .onTapGesture(count: 1) {
+                    selectedActor = actor
+                }
+        }
+    }
+
     /// Actor selected for profile navigation (single tap).
     @State private var selectedActor: BlueskyActor?
 
@@ -198,14 +242,7 @@ struct RelationshipsView: View {
                         }
                     } else {
                         ForEach(Array(filteredActors.enumerated()), id: \.element.id) { index, actor in
-                            actorRowLabel(actor: actor, index: index)
-                                .contentShape(Rectangle())
-                                .onTapGesture(count: 2) {
-                                    Task { await toggleFollow(actor: actor) }
-                                }
-                                .onTapGesture(count: 1) {
-                                    selectedActor = actor
-                                }
+                            selectableActorRow(actor: actor, index: index)
                                 .appScrollTransition()
                                 .contextMenu {
                                     Button(role: .destructive) {
@@ -392,100 +429,119 @@ struct RelationshipsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 16) {
-                    if !actors.isEmpty, mode == .blockedBy {
-                        bulkAddToListsMenu
-                    }
-                    Menu {
-                        Toggle(isOn: $showActorDescriptions) {
-                            Label {
-                                Text(loc("rel.show_descriptions"))
-                            } icon: {
-                                Image(systemName: "text.alignleft")
-                            }
+                    if isSelectMode {
+                        Button(loc("actions.cancel"), role: .cancel) {
+                            isSelectMode = false
+                            selectedDIDs.removeAll()
                         }
-
-                        if mode == .following {
-                            Toggle(isOn: $showActorStats) {
+                        Button {
+                            showBulkBlockConfirm = true
+                        } label: {
+                            Label(loc("rel.block_selected").replacingOccurrences(of: "{count}", with: "\(selectedDIDs.count)"), systemImage: "hand.raised.fill")
+                        }
+                        .disabled(selectedDIDs.isEmpty)
+                        .buttonStyle(.borderedProminent)
+                    } else {
+                        Button {
+                            isSelectMode = true
+                        } label: {
+                            Text(loc("actions.select"))
+                        }
+                        if !actors.isEmpty, mode == .blockedBy {
+                            bulkAddToListsMenu
+                        }
+                        Menu {
+                            Toggle(isOn: $showActorDescriptions) {
                                 Label {
-                                    Text(loc("rel.show_stats"))
+                                    Text(loc("rel.show_descriptions"))
                                 } icon: {
-                                    Image(systemName: "chart.bar")
+                                    Image(systemName: "text.alignleft")
                                 }
                             }
-                        }
 
-                        Divider()
+                            if mode == .following {
+                                Toggle(isOn: $showActorStats) {
+                                    Label {
+                                        Text(loc("rel.show_stats"))
+                                    } icon: {
+                                        Image(systemName: "chart.bar")
+                                    }
+                                }
+                            }
 
-                        if mode == .following {
+                            Divider()
+
+                            if mode == .following {
+                                Button {
+                                    isShowingJSONImportPicker = true
+                                } label: {
+                                    Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
+                                }
+
+                                Button(role: .destructive) {
+                                    let count = actors.filter { actor in
+                                        guard let stats = profileStats[actor.did] else { return false }
+                                        return stats.posts == 0
+                                    }.count
+                                    blockNoPostsCount = count
+                                    showBlockNoPostsConfirm = true
+                                } label: {
+                                    Label { Text(loc("rel.block_no_posts")) } icon: { Image(systemName: "hand.raised.slash") }
+                                }
+                                .disabled(isLoadingStats || profileStats.isEmpty)
+                            }
+
                             Button {
-                                isShowingJSONImportPicker = true
+                                isExporting = true
+                                Task { await exportAll(format: .csv) }
                             } label: {
-                                Label { Text(loc("rel.import_json")) } icon: { Image(systemName: "square.and.arrow.down") }
+                                Label { Text(loc: "list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
                             }
 
-                            Button(role: .destructive) {
-                                let count = actors.filter { actor in
-                                    guard let stats = profileStats[actor.did] else { return false }
-                                    return stats.posts == 0
-                                }.count
-                                blockNoPostsCount = count
-                                showBlockNoPostsConfirm = true
+                            Button {
+                                isExporting = true
+                                Task { await exportAll(format: .json) }
                             } label: {
-                                Label { Text(loc("rel.block_no_posts")) } icon: { Image(systemName: "hand.raised.slash") }
+                                Label { Text(loc: "list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
                             }
-                            .disabled(isLoadingStats || profileStats.isEmpty)
-                        }
 
-                        Button {
-                            isExporting = true
-                            Task { await exportAll(format: .csv) }
-                        } label: {
-                            Label { Text(loc: "list.search.export_csv_all") } icon: { Image(systemName: "arrow.down.doc") }
-                        }
-
-                        Button {
-                            isExporting = true
-                            Task { await exportAll(format: .json) }
-                        } label: {
-                            Label { Text(loc: "list.search.export_json_all") } icon: { Image(systemName: "arrow.down.doc") }
-                        }
-
-                        Button {
-                            isExporting = true
-                            Task { await exportAll(format: .xlsx) }
-                        } label: {
-                            Label { Text(loc: "list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
-                        }
-
-                        Button {
-                            isExporting = true
-                            Task { await exportAll(format: .ods) }
-                        } label: {
-                            Label { Text(loc: "list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
-                        }
-                    } label: {
-                        if isExporting {
-                            HStack(spacing: 6) {
-                                if let fraction = exportProgressFraction {
-                                    ProgressView(value: fraction)
-                                        .frame(width: 40)
-                                        .scaleEffect(x: 1, y: 0.6)
-                                } else {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                }
-                                if let msg = exportProgressMessage {
-                                    Text(msg)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
+                            Button {
+                                isExporting = true
+                                Task { await exportAll(format: .xlsx) }
+                            } label: {
+                                Label { Text(loc: "list.export.excel") } icon: { Image(systemName: "arrow.down.doc") }
                             }
-                        } else {
-                            Image(systemName: "arrow.down.doc")
+
+                            Button {
+                                isExporting = true
+                                Task { await exportAll(format: .ods) }
+                            } label: {
+                                Label { Text(loc: "list.export.ods") } icon: { Image(systemName: "arrow.down.doc") }
+                            }
+                        } label: {
+                            if isExporting {
+                                HStack(spacing: 6) {
+                                    if let fraction = exportProgressFraction {
+                                        ProgressView(value: fraction)
+                                            .frame(width: 40)
+                                            .scaleEffect(x: 1, y: 0.6)
+                                    } else {
+                                        ProgressView()
+                                            .scaleEffect(0.8)
+                                    }
+                                    if let msg = exportProgressMessage {
+                                        Text(msg)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            } else {
+                                Image(systemName: "arrow.down.doc")
+                            }
                         }
+                        .disabled(isExporting)
                     }
-                    .disabled(isExporting)
-                }
+                } // end else (select mode)
             }
         }
         .refreshable {
@@ -580,6 +636,29 @@ struct RelationshipsView: View {
             }
         } message: {
             Text(loc("rel.block_no_posts.confirm.message"))
+        }
+        .confirmationDialog(
+            loc("rel.block_selected").replacingOccurrences(of: "{count}", with: "\(selectedActors.count)"),
+            isPresented: $showBulkBlockConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(loc("rel.block").replacingOccurrences(of: "{count}", with: "\(selectedActors.count)"), role: .destructive) {
+                guard let account = accountStore.activeAccount,
+                      let appPassword = accountStore.appPassword(for: account) else { return }
+                let targets = selectedActors.map { PendingLikerTarget(did: $0.did, handle: $0.handle) }
+                guard !targets.isEmpty else { return }
+                batchOperationConfig = BatchOperationConfig(
+                    targets: targets,
+                    mode: .block(account: account, appPassword: appPassword)
+                )
+                isSelectMode = false
+                selectedDIDs.removeAll()
+            }
+            Button(loc("actions.cancel"), role: .cancel) {
+                showBulkBlockConfirm = false
+            }
+        } message: {
+            Text(loc("rel.block_selected.message"))
         }
         .alert(Text(loc: "profile.block_back.confirm.first.title"), isPresented: $showBlockBackConfirm1) {
             Button(loc("actions.cancel"), role: .cancel) {}

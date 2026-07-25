@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "ลบบัญชี?",
+  "account.delete.confirm.message": "ข้อมูลประจำตัวและข้อมูลทั้งหมดสำหรับ {handle} จะถูกลบ ไม่สามารถยกเลิกได้",
+  "actions.select": "เลือก",
+  "rel.block_selected": "บล็อกที่เลือก ({count})",
+  "rel.block_selected.message": "การดำเนินการนี้จะบล็อก {count} บัญชี พวกเขาจะไม่สามารถโต้ตอบกับคุณได้อีก",
+  "settings.about": "เกี่ยวกับ",
+  "onboarding.timeline.desc": "เรียกดูไทม์ไลน์ Bluesky ของคุณและค้นพบเนื้อหาใหม่"
 }

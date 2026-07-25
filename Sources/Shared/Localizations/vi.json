@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "Xóa tài khoản?",
+  "account.delete.confirm.message": "Tất cả thông tin đăng nhập và dữ liệu cho {handle} sẽ bị xóa. Không thể hoàn tác.",
+  "actions.select": "Chọn",
+  "rel.block_selected": "Chặn đã chọn ({count})",
+  "rel.block_selected.message": "Hành động này sẽ chặn {count} tài khoản. Họ sẽ không thể tương tác với bạn nữa.",
+  "settings.about": "Giới thiệu",
+  "onboarding.timeline.desc": "Duyệt dòng thời gian Bluesky của bạn và khám phá nội dung mới"
 }

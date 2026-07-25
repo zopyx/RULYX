@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "删除账户？",
+  "account.delete.confirm.message": "{handle} 的所有凭据和数据将被删除。此操作不可撤销。",
+  "actions.select": "选择",
+  "rel.block_selected": "屏蔽所选 ({count})",
+  "rel.block_selected.message": "这将屏蔽 {count} 个账户。他们将无法再与你互动。",
+  "settings.about": "关于",
+  "onboarding.timeline.desc": "浏览你的 Bluesky 时间线并发现新内容"
 }

@@ -1441,5 +1441,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "Удалить аккаунт?",
+  "account.delete.confirm.message": "Все учетные данные и данные для {handle} будут удалены. Это действие необратимо.",
+  "actions.select": "Выбрать",
+  "rel.block_selected": "Заблокировать выбранных ({count})",
+  "rel.block_selected.message": "Будет заблокировано {count} аккаунтов. Они больше не смогут взаимодействовать с вами.",
+  "settings.about": "О приложении",
+  "onboarding.timeline.desc": "Просматривайте свою ленту Bluesky и открывайте новый контент"
 }

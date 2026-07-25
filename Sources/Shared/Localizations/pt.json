@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "Excluir conta?",
+  "account.delete.confirm.message": "Todas as credenciais e dados de {handle} serão excluídos. Esta ação não pode ser desfeita.",
+  "actions.select": "Selecionar",
+  "rel.block_selected": "Bloquear selecionados ({count})",
+  "rel.block_selected.message": "Isso bloqueará {count} contas. Elas não poderão mais interagir com você.",
+  "settings.about": "Sobre",
+  "onboarding.timeline.desc": "Navegue pela sua timeline do Bluesky e descubra novos conteúdos"
 }

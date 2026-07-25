@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "Hesap silinsin mi?",
+  "account.delete.confirm.message": "{handle} için tüm kimlik bilgileri ve veriler silinecek. Bu işlem geri alınamaz.",
+  "actions.select": "Seç",
+  "rel.block_selected": "Seçilenleri engelle ({count})",
+  "rel.block_selected.message": "Bu işlem {count} hesabı engelleyecek. Artık seninle etkileşime geçemeyecekler.",
+  "settings.about": "Hakkında",
+  "onboarding.timeline.desc": "Bluesky zaman akışınızda gezinin ve yeni içerikler keşfedin"
 }

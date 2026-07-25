@@ -66,8 +66,14 @@ struct ConversationListView: View {
         NavigationStack(path: $navPath) {
             Group {
                 if chatStore.isLoadingConvos, chatStore.conversations.isEmpty {
-                    LoadingPanel(message: loc("chat.loading"))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            ForEach(0 ..< 8, id: \.self) { _ in
+                                SkeletonRow()
+                                Divider()
+                            }
+                        }
+                    }
                 } else if let chatError = chatStore.error, chatStore.conversations.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")

@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "계정을 삭제하시겠습니까?",
+  "account.delete.confirm.message": "{handle}의 모든 자격 증명과 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+  "actions.select": "선택",
+  "rel.block_selected": "선택 차단 ({count})",
+  "rel.block_selected.message": "{count}개의 계정을 차단합니다. 더 이상 상호작용할 수 없습니다.",
+  "settings.about": "정보",
+  "onboarding.timeline.desc": "Bluesky 타임라인을 탐색하고 새로운 콘텐츠를 발견하세요"
 }

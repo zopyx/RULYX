@@ -1449,5 +1449,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "حذف الحساب؟",
+  "account.delete.confirm.message": "سيتم حذف جميع بيانات الاعتماد والبيانات الخاصة بـ {handle}. لا يمكن التراجع عن هذا الإجراء.",
+  "actions.select": "تحديد",
+  "rel.block_selected": "حظر المحدد ({count})",
+  "rel.block_selected.message": "سيؤدي هذا إلى حظر {count} حسابًا. لن يتمكنوا من التفاعل معك.",
+  "settings.about": "حول",
+  "onboarding.timeline.desc": "تصفح خطك الزمني في Bluesky واكتشف محتوى جديد"
 }

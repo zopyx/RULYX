@@ -31,6 +31,7 @@ struct ListsView: View {
     @State private var showInternalListsHelp = false
     @State private var internalListName = ""
     @State private var internalListColor = InternalListColor.blue
+    @State private var showAddAccount = false
 
     // MARK: - Body
 
@@ -38,12 +39,38 @@ struct ListsView: View {
         NavigationStack {
             Group {
                 if accountStore.accounts.isEmpty {
-                    EmptyStatePanel(
-                        title: localizationManager.localized("lists.no_account.title"),
-                        message: localizationManager.localized("lists.no_account.desc")
-                    )
+                    VStack(spacing: 16) {
+                        EmptyStatePanel(
+                            title: localizationManager.localized("lists.no_account.title"),
+                            message: localizationManager.localized("lists.no_account.desc")
+                        )
+                        Button {
+                            showAddAccount = true
+                        } label: {
+                            Label(localizationManager.localized("account.manage.add"), systemImage: "plus")
+                                .frame(maxWidth: 200)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .sheet(isPresented: $showAddAccount) {
+                        AddAccountView()
+                            .environmentObject(accountStore)
+                            .environmentObject(container)
+                            .environmentObject(localizationManager)
+                    }
                 } else if viewModel.isLoading, !viewModel.isRefreshing, viewModel.listsByKind.isEmpty {
-                    LoadingPanel(message: localizationManager.localized("lists.loading"))
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            // Skeleton card for the account summary
+                            SkeletonCard()
+                            Divider()
+                            // Skeleton rows for list items
+                            ForEach(0 ..< 6, id: \.self) { _ in
+                                SkeletonRow()
+                                Divider()
+                            }
+                        }
+                    }
                 } else {
                     List {
                         if let activeAccount = accountStore.activeAccount {

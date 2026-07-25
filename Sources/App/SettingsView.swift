@@ -289,6 +289,14 @@ struct SettingsView: View {
                     }
                 }
             }
+            Section(localizationManager.localized("settings.about")) {
+                NavigationLink {
+                    InfoView()
+                        .environmentObject(localizationManager)
+                } label: {
+                    Label(localizationManager.localized("tab.info"), systemImage: "sparkles.rectangle.stack")
+                }
+            }
             .pageTitle(localizationManager.localized("settings.title"))
 
             // MARK: Sheet — HTTP Request Debug View

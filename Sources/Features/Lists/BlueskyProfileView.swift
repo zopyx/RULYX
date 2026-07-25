@@ -1349,7 +1349,14 @@ struct BlueskyProfileView: View {
                     }
                 }
             } else if viewModel.isLoading {
-                LoadingPanel(message: loc("profile.loading"))
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(0 ..< 5, id: \.self) { _ in
+                            SkeletonCard()
+                            Divider()
+                        }
+                    }
+                }
             }
 
             if let errorMessage = viewModel.errorMessage {

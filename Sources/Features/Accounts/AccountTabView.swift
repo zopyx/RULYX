@@ -12,6 +12,7 @@ struct AccountTabView: View {
     @State private var editingLabelAccount: AppAccount?
     @State private var editLabelText = ""
     @State private var editMode: EditMode = .inactive
+    @State private var accountToDelete: AppAccount?
     @State private var switchingAccountID: AppAccount.ID?
     @State private var showPreferredSearchInfo = false
     @State private var showImportPicker = false
@@ -82,9 +83,8 @@ struct AccountTabView: View {
                         }
                         .onMove(perform: accountStore.moveAccount)
                         .onDelete { indexSet in
-                            for index in indexSet {
-                                let account = accountStore.accounts[index]
-                                accountStore.removeAccount(account, client: container.blueskyClient)
+                            if let index = indexSet.first {
+                                accountToDelete = accountStore.accounts[index]
                             }
                         }
                     } header: {
@@ -200,6 +200,31 @@ struct AccountTabView: View {
                 await accountStore.refreshAccountProfiles(using: container.blueskyClient)
             }
             .environment(\.editMode, $editMode)
+            .confirmationDialog(
+                Text(loc("account.delete.confirm.title")),
+                isPresented: Binding<Bool>(
+                    get: { accountToDelete != nil },
+                    set: {
+                        if !$0 {
+                            accountToDelete = nil
+                        }
+                    }
+                )
+            ) {
+                Button(loc("actions.delete"), role: .destructive) {
+                    if let account = accountToDelete {
+                        accountStore.removeAccount(account, client: container.blueskyClient)
+                        accountToDelete = nil
+                    }
+                }
+                Button(loc("actions.cancel"), role: .cancel) {
+                    accountToDelete = nil
+                }
+            } message: {
+                if let handle = accountToDelete?.handle {
+                    Text(loc("account.delete.confirm.message").replacingOccurrences(of: "{handle}", with: handle))
+                }
+            }
             .sheet(isPresented: $isPresentingAddAccount) {
                 AddAccountView()
                     .environmentObject(accountStore)

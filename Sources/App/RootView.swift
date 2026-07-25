@@ -45,6 +45,8 @@ struct RootView: View {
     @AppStorage("performanceOverlayEnabled") private var performanceOverlayEnabled = false
     /// Tracks three-finger triple-tap to toggle overlay visibility.
     @State private var overlayVisible = false
+    /// When true, the Add Account sheet opens after onboarding dismisses.
+    @State private var showAddAccountFromOnboarding = false
 
     /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
     /// Returns `.light`, `.dark`, or `nil` for system-following mode.
@@ -61,7 +63,6 @@ struct RootView: View {
         TabBarItem(tab: .timeline, icon: "clock.arrow.circlepath", label: "tab.timeline"),
         TabBarItem(tab: .notifications, icon: "bell", label: "tab.notifications"),
         TabBarItem(tab: .chat, icon: "bubble.left.and.bubble.right", label: "tab.chat"),
-        TabBarItem(tab: .info, icon: "sparkles.rectangle.stack", label: "tab.info"),
         TabBarItem(tab: .settings, icon: "gearshape", label: "tab.settings"),
     ]
 
@@ -238,6 +239,12 @@ struct RootView: View {
         .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
             onboardingContent
         }
+        .sheet(isPresented: $showAddAccountFromOnboarding) {
+            AddAccountView()
+                .environmentObject(accountStore)
+                .environmentObject(container)
+                .environmentObject(localizationManager)
+        }
         .overlay(alignment: .top) {
             if overlayVisible || performanceOverlayEnabled {
                 PerformanceMonitorOverlay()
@@ -285,14 +292,15 @@ struct RootView: View {
 
                     VStack(alignment: .leading, spacing: 16) {
                         OnboardingRow(icon: "checklist.checked", color: .skyPrimary, title: localizationManager.localized("tab.moderation"), description: localizationManager.localized("onboarding.moderation.desc"))
+                        OnboardingRow(icon: "clock.arrow.circlepath", color: .skyPrimary, title: localizationManager.localized("tab.timeline"), description: localizationManager.localized("onboarding.timeline.desc"))
                         OnboardingRow(icon: "person.circle", color: .skyPrimary, title: localizationManager.localized("tab.accounts"), description: localizationManager.localized("onboarding.accounts.desc"))
                         OnboardingRow(icon: "gearshape", color: .orange, title: localizationManager.localized("tab.settings"), description: localizationManager.localized("onboarding.settings.desc"))
-                        OnboardingRow(icon: "sparkles.rectangle.stack", color: .purple, title: localizationManager.localized("tab.info"), description: localizationManager.localized("onboarding.info.desc"))
                     }
 
                     // MARK: Get Started Button
 
                     Button {
+                        showAddAccountFromOnboarding = true
                         hasSeenOnboarding = true
                     } label: {
                         Text(verbatim: localizationManager.localized("onboarding.get_started"))

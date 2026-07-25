@@ -1433,5 +1433,12 @@
   "a11y.not_selected": "Not selected",
   "actions.dismiss": "Dismiss",
   "actor_search.select.label": "Select {handle}",
-  "actor_search.deselect.label": "Deselect {handle}"
+  "actor_search.deselect.label": "Deselect {handle}",
+  "account.delete.confirm.title": "Delete Account?",
+  "account.delete.confirm.message": "This will delete all credentials and data for {handle}. This cannot be undone.",
+  "actions.select": "Select",
+  "rel.block_selected": "Block Selected ({count})",
+  "rel.block_selected.message": "This will block {count} accounts. They will no longer be able to interact with you.",
+  "settings.about": "About",
+  "onboarding.timeline.desc": "Browse your Bluesky timeline and discover new content"
 }

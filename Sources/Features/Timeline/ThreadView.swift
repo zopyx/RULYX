@@ -31,7 +31,14 @@ struct ThreadView: View {
     var body: some View {
         Group {
             if viewModel.isLoading {
-                LoadingPanel(message: loc("profile.posts.loading"))
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(0 ..< 4, id: \.self) { _ in
+                            SkeletonRow()
+                            Divider()
+                        }
+                    }
+                }
             } else if let error = viewModel.errorMessage {
                 ContentUnavailableView(
                     loc("list.detail.alert_title"),

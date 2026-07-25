@@ -1433,5 +1433,12 @@
   "rel.unfollow_all_confirm2": "Are you sure?",
   "rel.unfollow_all_confirm2.message": "This action cannot be undone.",
   "settings.dangerous_operations": "Show Dangerous Operations",
-  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow"
+  "settings.dangerous_operations.hint": "Shows destructive swipe actions like block and unfollow",
+  "account.delete.confirm.title": "アカウントを削除しますか？",
+  "account.delete.confirm.message": "{handle} のすべての認証情報とデータが削除されます。この操作は元に戻せません。",
+  "actions.select": "選択",
+  "rel.block_selected": "選択をブロック ({count})",
+  "rel.block_selected.message": "{count}件のアカウントをブロックします。これらのアカウントはあなたとやり取りできなくなります。",
+  "settings.about": "このアプリについて",
+  "onboarding.timeline.desc": "Blueskyのタイムラインを閲覧し、新しいコンテンツを発見"
 }

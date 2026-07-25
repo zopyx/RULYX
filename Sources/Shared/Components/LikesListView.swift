@@ -24,7 +24,14 @@ struct LikesListView: View {
         NavigationStack {
             Group {
                 if isLoading {
-                    LoadingPanel(message: loc("timeline.loading"))
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            ForEach(0 ..< 6, id: \.self) { _ in
+                                SkeletonRow()
+                                Divider()
+                            }
+                        }
+                    }
                 } else if let error = errorMessage {
                     ContentUnavailableView(
                         loc("list.detail.alert_title"),
