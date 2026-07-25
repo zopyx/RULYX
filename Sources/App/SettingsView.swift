@@ -225,23 +225,43 @@ struct SettingsView: View {
                 // MARK: AI Section
 
                 Section {
-                    NavigationLink {
-                        AIModelManagementView()
-                            .environmentObject(aiService)
-                            .environmentObject(localizationManager)
-                    } label: {
-                        Label {
-                            Text(localizationManager.localized("ai.models.title"))
-                        } icon: {
-                            Image(systemName: "brain")
+                        NavigationLink {
+                            AIModelManagementView()
+                                .environmentObject(aiService)
+                                .environmentObject(localizationManager)
+                        } label: {
+                            Label {
+                                Text(localizationManager.localized("ai.models.title"))
+                            } icon: {
+                                Image(systemName: "brain.head.profile")
+                            }
                         }
+                    } header: {
+                        Text(localizationManager.localized("settings.ai"))
+                            .accessibilityAddTraits(.isHeader)
                     }
-                } header: {
-                    Text(localizationManager.localized("settings.ai"))
-                        .accessibilityAddTraits(.isHeader)
-                }
 
-                // MARK: Internal Section
+                    // MARK: About Section — prominent info link
+
+                    Section {
+                        NavigationLink {
+                            InfoView()
+                                .environmentObject(localizationManager)
+                        } label: {
+                            Label {
+                                Text(localizationManager.localized("tab.info"))
+                                    .fontWeight(.medium)
+                            } icon: {
+                                Image(systemName: "info.circle.fill")
+                                    .foregroundStyle(Color.skyPrimary)
+                            }
+                        }
+                    } header: {
+                        Text(localizationManager.localized("settings.about"))
+                            .accessibilityAddTraits(.isHeader)
+                    }
+
+                    // MARK: Internal Section
 
                 Section {
                     Toggle(isOn: $debugMode) {
@@ -326,14 +346,6 @@ struct SettingsView: View {
                         guard debugMode else { return }
                         isShowingHTTPRequestDebugView = true
                     }
-                }
-            }
-            Section(localizationManager.localized("settings.about")) {
-                NavigationLink {
-                    InfoView()
-                        .environmentObject(localizationManager)
-                } label: {
-                    Label(localizationManager.localized("tab.info"), systemImage: "sparkles.rectangle.stack")
                 }
             }
             .pageTitle(localizationManager.localized("settings.title"))
