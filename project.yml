@@ -32,7 +32,7 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         NSFaceIDUsageDescription: "Rulyx uses Face ID to protect your accounts and moderation data."
-        UIBackgroundModes: [fetch]
+        UIBackgroundModes: [fetch, remote-notification]
         BGTaskSchedulerPermittedIdentifiers:
           - com.ajung.RULYX.autoblockback
         PushNotificationsEnabled: true

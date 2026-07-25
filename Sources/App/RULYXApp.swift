@@ -220,9 +220,7 @@ struct RULYXApp: App {
                     // On entering background: locks the app (if biometric lock is enabled),
                     // stops the Clearsky heartbeat, and pauses chat polling to save resources.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
-                        DispatchQueue.main.async {
-                            // Cover all content before iOS captures the app-switcher
-                            // snapshot — regardless of app-lock state or timeout.
+                        Task { @MainActor in
                             showPrivacyShield = true
                             appLockManager.appDidEnterBackground()
                             deps.clearskyHeartbeat.stop()
@@ -234,7 +232,7 @@ struct RULYXApp: App {
                     // heartbeat, re-registers push notifications, resumes chat polling,
                     // triggers an immediate log sync, and performs auto-block-back check.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             showPrivacyShield = false
                             appLockManager.appDidBecomeActive()
                             deps.clearskyHeartbeat.start()
