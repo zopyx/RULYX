@@ -7,7 +7,6 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case dashboard
     case relationships
     case customSearch
-    case mentionsSearch
     case bulkLookup
     case networkGraph
     case timeline
@@ -21,7 +20,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         switch self {
         case .allLists, .templates, .rules, .dashboard, .relationships:
             .moderation
-        case .customSearch, .mentionsSearch, .bulkLookup, .networkGraph:
+        case .customSearch, .bulkLookup, .networkGraph:
             .searchProfiles
         case .timeline, .notifications, .chat:
             .social

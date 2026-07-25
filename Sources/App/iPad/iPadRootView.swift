@@ -144,11 +144,6 @@ struct iPadRootView: View {
                 .environmentObject(accountStore)
                 .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
-        case .mentionsSearch:
-            iPadMentionsSearchWrapper()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(localizationManager)
         case .bulkLookup:
             BulkProfileLookupView()
                 .environmentObject(accountStore)

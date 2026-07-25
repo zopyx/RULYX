@@ -69,7 +69,6 @@ struct iPadSidebar: View {
         case .dashboard: loc("sidebar.dashboard")
         case .relationships: loc("sidebar.relationships")
         case .customSearch: loc("sidebar.custom_search")
-        case .mentionsSearch: loc("sidebar.mentions_search")
         case .bulkLookup: loc("sidebar.bulk_lookup")
         case .networkGraph: loc("sidebar.network_graph")
         case .timeline: loc("sidebar.timeline")
@@ -89,7 +88,6 @@ struct iPadSidebar: View {
         case .dashboard: "chart.bar.xaxis"
         case .relationships: "arrow.left.arrow.right"
         case .customSearch: "magnifyingglass"
-        case .mentionsSearch: "at"
         case .bulkLookup: "person.2.fill"
         case .networkGraph: "point.3.connected.trianglepath.dotted"
         case .timeline: "clock.arrow.circlepath"
@@ -113,7 +111,7 @@ struct iPadSidebar: View {
 
 extension SidebarSection {
     static let moderationItems: [SidebarItem] = [.allLists, .templates, .rules, .dashboard, .relationships]
-    static let searchItems: [SidebarItem] = [.customSearch, .mentionsSearch, .bulkLookup, .networkGraph]
+    static let searchItems: [SidebarItem] = [.customSearch, .bulkLookup, .networkGraph]
     static let socialItems: [SidebarItem] = [.timeline, .notifications, .chat]
     static let systemItems: [SidebarItem] = [.settings, .accounts, .info]
 }

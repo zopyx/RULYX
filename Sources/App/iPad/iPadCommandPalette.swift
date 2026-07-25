@@ -23,7 +23,6 @@ struct iPadCommandPalette: View {
             CommandEntry(item: .dashboard, label: loc("sidebar.dashboard"), icon: "chart.bar.xaxis"),
             CommandEntry(item: .relationships, label: loc("sidebar.relationships"), icon: "arrow.left.arrow.right"),
             CommandEntry(item: .customSearch, label: loc("sidebar.custom_search"), icon: "magnifyingglass"),
-            CommandEntry(item: .mentionsSearch, label: loc("sidebar.mentions_search"), icon: "at"),
             CommandEntry(item: .bulkLookup, label: loc("sidebar.bulk_lookup"), icon: "person.2.fill"),
             CommandEntry(item: .networkGraph, label: loc("sidebar.network_graph"), icon: "point.3.connected.trianglepath.dotted"),
             CommandEntry(item: .timeline, label: loc("sidebar.timeline"), icon: "clock.arrow.circlepath"),
