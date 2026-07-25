@@ -50,6 +50,11 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// Set of account IDs that have been reported as deactivated (via push notification).
     @Published var deactivatedAccountIDs: Set<UUID> = []
 
+    /// Set when the resolved PDS URL for an account's DID differs from the
+    /// last-known value. Indicates a potential handle takeover or PDS migration.
+    /// The associated DID is the affected account.
+    @Published var pdsMigrationDetected: String?
+
     /// Registry of view models / stores that hold account-scoped state.
     /// Iterated synchronously on `switchAccount` before the active account ID changes.
     /// Weak references prevent accidental retain cycles; unregistration happens
@@ -189,6 +194,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
                 entrywayURL: entrywayURL,
                 authFactorToken: nil
             )
+            // Detect PDS migration on every authentication
+            recordPDSURL(session.pdsURL, forDID: session.did)
             let account = AppAccount(
                 handle: session.handle,
                 displayName: session.handle,
@@ -331,15 +338,34 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// Deprecated: use `switchAccount(to:using:)` instead — this bypass resets all
     /// caches and resettable observers, leading to stale data from the previous
     /// account surfacing in the active view. Kept only for internal migration paths.
-    @available(*, deprecated, message: "Use switchAccount(to:using:)")
+    @available(*, deprecated, message: "Use switchAccount(to:using:) to ensure cache resets.")
     func setActiveAccount(_ account: AppAccount) {
         guard accounts.contains(account) else { return }
-
         activeAccountID = account.id
         if let index = accounts.firstIndex(of: account) {
             accounts[index].lastUsedAt = .now
         }
         persist()
+    }
+
+    /// Records the resolved PDS URL for a DID. If a previous PDS URL exists
+    /// and differs from the new one, sets `pdsMigrationDetected` to flag a
+    /// potential handle takeover or PDS migration.
+    func recordPDSURL(_ url: URL, forDID did: String) {
+        let key = "pds.known.\(did)"
+        if let previous = UserDefaults.standard.string(forKey: key),
+           let previousURL = URL(string: previous),
+           previousURL.absoluteString != url.absoluteString
+        {
+            AppLogger.persistence.warning("PDS URL changed for \(did): \(previous) → \(url)")
+            pdsMigrationDetected = did
+        }
+        UserDefaults.standard.set(url.absoluteString, forKey: key)
+    }
+
+    /// Dismisses the PDS migration warning.
+    func dismissPDSMigrationWarning() {
+        pdsMigrationDetected = nil
     }
 
     /// Switches the active account and clears all account-scoped caches and state.

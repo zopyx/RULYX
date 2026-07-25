@@ -117,6 +117,21 @@ struct RULYXApp: App {
                         Text(loc: "settings.icloud.privacy.message")
                     }
 
+                    // PDS Migration Warning
+                    .alert(
+                        Text(loc("pds.migration.title")),
+                        isPresented: Binding(
+                            get: { deps.accountStore.pdsMigrationDetected != nil },
+                            set: { if !$0 { deps.accountStore.dismissPDSMigrationWarning() } }
+                        )
+                    ) {
+                        Button(loc("actions.ok")) {
+                            deps.accountStore.dismissPDSMigrationWarning()
+                        }
+                    } message: {
+                        Text(loc("pds.migration.message"))
+                    }
+
                     // MARK: Lifecycle — URL Cache
 
                     // Sets up the shared URL cache with increased capacity on first appearance.

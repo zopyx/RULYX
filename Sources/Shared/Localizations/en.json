@@ -1449,5 +1449,7 @@
   "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
   "settings.data_deleted": "All data deleted",
   "settings.crash_reporting": "Crash Reporting",
-  "settings.crash_reporting.hint": "Send anonymized crash data to help improve the app"
+  "settings.crash_reporting.hint": "Send anonymized crash data to help improve the app",
+  "pds.migration.title": "PDS Change Detected",
+  "pds.migration.message": "The server for your account has changed since your last login. This could indicate a PDS migration or a potential security issue. Your account was re-authenticated successfully."
 }
