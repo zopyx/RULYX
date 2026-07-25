@@ -18,6 +18,13 @@ struct AccountTabView: View {
     @State private var exportFileURL: URL?
     @State private var importError: String?
     @State private var importSuccess: String?
+    @State private var showExportPassphrasePrompt = false
+    @State private var exportPassphrase = ""
+    @State private var exportPassphraseConfirm = ""
+    @State private var exportPassphraseMismatch = false
+    @State private var showImportPassphrasePrompt = false
+    @State private var importPassphrase = ""
+    @State private var pendingImportData: Data?
 
     // MARK: - Body
 
@@ -276,12 +283,36 @@ struct AccountTabView: View {
             }
             .sheet(isPresented: .init(get: { exportFileURL != nil }, set: {
                 if !$0 {
+                    // Delete the encrypted export from the temp directory once
+                    // the share sheet is dismissed — never leave it on disk.
+                    if let url = exportFileURL {
+                        try? FileManager.default.removeItem(at: url)
+                    }
                     exportFileURL = nil
                 }
             })) {
                 if let url = exportFileURL {
                     ShareSheet(activityItems: [url])
                 }
+            }
+            .alert(loc("account.export.passphrase.title"), isPresented: $showExportPassphrasePrompt) {
+                SecureField(loc("account.export.passphrase.field"), text: $exportPassphrase)
+                SecureField(loc("account.export.passphrase.confirm"), text: $exportPassphraseConfirm)
+                Button(loc("account.export")) { confirmExportPassphrase() }
+                Button(loc("actions.cancel"), role: .cancel) {}
+            } message: {
+                Text(exportPassphraseMismatch
+                    ? loc("account.export.passphrase.mismatch")
+                    : loc("account.export.passphrase.message"))
+            }
+            .alert(loc("account.import.passphrase.title"), isPresented: $showImportPassphrasePrompt) {
+                SecureField(loc("account.export.passphrase.field"), text: $importPassphrase)
+                Button(loc("account.import")) { confirmImportPassphrase() }
+                Button(loc("actions.cancel"), role: .cancel) {
+                    pendingImportData = nil
+                }
+            } message: {
+                Text(loc("account.import.passphrase.message"))
             }
             .alert(loc("account.import.error"), isPresented: .constant(importError != nil)) {
                 Button(loc("actions.ok")) { importError = nil }
@@ -306,7 +337,21 @@ struct AccountTabView: View {
     }
 
     private func exportAccounts() async {
-        guard await AppLockManager.shared.authenticateSensitive() else { return }
+        // Biometrics-only: a shoulder-surfed device passcode must not be enough
+        // to exfiltrate every app password.
+        guard await AppLockManager.shared.authenticateBiometricOnly() else { return }
+        exportPassphrase = ""
+        exportPassphraseConfirm = ""
+        exportPassphraseMismatch = false
+        showExportPassphrasePrompt = true
+    }
+
+    private func confirmExportPassphrase() {
+        guard !exportPassphrase.isEmpty, exportPassphrase == exportPassphraseConfirm else {
+            exportPassphraseMismatch = true
+            showExportPassphrasePrompt = true
+            return
+        }
         var entries: [[String: String]] = []
         for account in accountStore.accounts {
             let password = accountStore.appPassword(for: account) ?? ""
@@ -322,9 +367,12 @@ struct AccountTabView: View {
         }
 
         do {
-            let data = try JSONSerialization.data(withJSONObject: entries, options: [.prettyPrinted, .sortedKeys])
+            let plaintext = try JSONSerialization.data(withJSONObject: entries, options: [.prettyPrinted, .sortedKeys])
+            let encrypted = try AccountExportCrypto.encrypt(plaintext, passphrase: exportPassphrase)
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("bluesky_accounts.json")
-            try data.write(to: tempURL, options: .atomic)
+            try encrypted.write(to: tempURL, options: [.atomic, .completeFileProtection])
+            exportPassphrase = ""
+            exportPassphraseConfirm = ""
             exportFileURL = tempURL
         } catch {
             importError = error.localizedDescription
@@ -341,45 +389,74 @@ struct AccountTabView: View {
                 }
                 defer { url.stopAccessingSecurityScopedResource() }
                 let data = try Data(contentsOf: url)
-                guard let entries = try JSONSerialization.jsonObject(with: data) as? [[String: String]] else {
-                    importError = loc("account.import.invalid_format")
+                if AccountExportCrypto.isEncrypted(data) {
+                    // Encrypted backup — ask for the passphrase first.
+                    importPassphrase = ""
+                    pendingImportData = data
+                    showImportPassphrasePrompt = true
                     return
                 }
-                Task {
-                    var added = 0
-                    var skipped = 0
-                    for entry in entries {
-                        guard let handle = entry["handle"], !handle.isEmpty,
-                              let password = entry["appPassword"], !password.isEmpty
-                        else {
-                            skipped += 1
-                            continue
-                        }
-                        let entrywayHost = entry["entrywayURL"]
-                        let entrywayURL = entrywayHost.flatMap { URL(string: "https://\($0)") }
-                        let result = await accountStore.addAccount(
-                            handle: handle,
-                            appPassword: password,
-                            entrywayURL: entrywayURL,
-                            client: container.blueskyClient
-                        )
-                        if result == .success {
-                            added += 1
-                        } else {
-                            skipped += 1
-                        }
-                    }
-                    if added > 0 {
-                        importSuccess = loc("account.import.count").replacingOccurrences(of: "{n}", with: "\(added)")
-                    }
-                    if skipped > 0 {
-                        importError = loc("account.import.skipped").replacingOccurrences(of: "{n}", with: "\(skipped)")
-                    }
-                }
+                importEntries(from: data)
             } catch {
                 importError = error.localizedDescription
             }
         case let .failure(error):
+            importError = error.localizedDescription
+        }
+    }
+
+    private func confirmImportPassphrase() {
+        guard let data = pendingImportData else { return }
+        do {
+            let decrypted = try AccountExportCrypto.decrypt(data, passphrase: importPassphrase)
+            importPassphrase = ""
+            pendingImportData = nil
+            importEntries(from: decrypted)
+        } catch {
+            importPassphrase = ""
+            pendingImportData = nil
+            importError = loc("account.import.decrypt_error")
+        }
+    }
+
+    private func importEntries(from data: Data) {
+        do {
+            guard let entries = try JSONSerialization.jsonObject(with: data) as? [[String: String]] else {
+                importError = loc("account.import.invalid_format")
+                return
+            }
+            Task {
+                var added = 0
+                var skipped = 0
+                for entry in entries {
+                    guard let handle = entry["handle"], !handle.isEmpty,
+                          let password = entry["appPassword"], !password.isEmpty
+                    else {
+                        skipped += 1
+                        continue
+                    }
+                    let entrywayHost = entry["entrywayURL"]
+                    let entrywayURL = entrywayHost.flatMap { URL(string: "https://\($0)") }
+                    let result = await accountStore.addAccount(
+                        handle: handle,
+                        appPassword: password,
+                        entrywayURL: entrywayURL,
+                        client: container.blueskyClient
+                    )
+                    if result == .success {
+                        added += 1
+                    } else {
+                        skipped += 1
+                    }
+                }
+                if added > 0 {
+                    importSuccess = loc("account.import.count").replacingOccurrences(of: "{n}", with: "\(added)")
+                }
+                if skipped > 0 {
+                    importError = loc("account.import.skipped").replacingOccurrences(of: "{n}", with: "\(skipped)")
+                }
+            }
+        } catch {
             importError = error.localizedDescription
         }
     }

@@ -267,6 +267,32 @@ Row 2: @handle
 - **Bluesky passwords/sessions**: `KeychainService` (`Sources/Domain/Services/KeychainService.swift`) using Security framework
 - **No secrets in UserDefaults**
 
+## Sensitive Data at Rest — ProtectedDataStore
+- `ProtectedDataStore` (`Sources/Domain/Services/ProtectedDataStore.swift`) is the ONLY persistence channel for sensitive non-secret payloads: internal lists (`InternalListStore`), moderation audit log + snapshots (`ModerationAuditStore`), saved/recent searches + last query (`WorkspacePreferencesStore`), engagement snapshots (`AnalyticsStore`)
+- Files live in `Application Support/ProtectedStores/` with `.completeFileProtection` + `isExcludedFromBackup` — never in UserDefaults, never in iCloud/iTunes backups
+- **Test seam**: injecting a non-`.standard` UserDefaults suite routes the store to legacy UserDefaults (test isolation); `.standard` routes to protected files. New stores MUST follow this pattern (injectable `defaults:` init)
+- One-time migration from UserDefaults keys happens automatically on first load
+
+## Authentication Chain — Trusted Resolver Only
+- The PDS endpoint for login is resolved EXCLUSIVELY from the verified DID document (`#atproto_pds` service) via a trusted resolver — never derived from the handle's domain
+- bsky.social handles short-circuit to the bsky.social entryway (no resolution needed); user-entered custom PDS URLs are honored but HTTPS-enforced
+- Rationale: a handle-derived PDS URL would send the app password to an attacker-controlled domain
+
+## Account Removal — Data Wipe Contract
+- `AccountStore.removeAccount()` deletes: Keychain credentials, persisted session, and all per-DID on-disk caches (DashboardCache per-key, RelationshipCache own-DID keys, BlueskyAPICache per-DID); full cache wipe when the last account is removed
+- New account-scoped caches MUST register here AND in `switchAccount` (see Account Switch contract)
+
+## App-Switcher Privacy Shield
+- `RULYXApp` shows an opaque shield view on `didEnterBackgroundNotification` (unconditional, independent of app-lock), removed on `didBecomeActiveNotification` — the system app-switcher snapshot never contains content
+
+## Account Export Encryption
+- Export is AES-256-GCM encrypted with a user passphrase (PBKDF2-HMAC-SHA256, 210k iterations, random 16-byte salt) via `AccountExportCrypto` — never plaintext
+- Export requires BIOMETRICS-ONLY auth (`AppLockManager.authenticateBiometricOnly()`, no passcode fallback); the temp file is written with `.completeFileProtection` and DELETED when the share sheet dismisses
+- Import auto-detects encrypted envelopes and prompts for the passphrase; legacy plaintext exports still import
+
+## Log Hygiene
+- Never pass handles, search queries, list names, conversation IDs, cache keys, or response bodies through `privacy: .public` — os_log persists to `log show`/sysdiagnose. Error descriptions may stay public
+
 ## HTTP Debug & URL Sanitization
 - `HTTPRequestDebugStore` logs all HTTP request URLs for debugging in `HTTPRequestDebugView`
 - URLs containing JWT tokens (`accessJwt`/`refreshJwt` query params) are **automatically redacted** via `sanitizeURL()` in `HTTPRequestDebugStore.begin()` — replaced with `[REDACTED]` before storage

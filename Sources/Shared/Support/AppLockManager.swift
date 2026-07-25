@@ -174,6 +174,25 @@ final class AppLockManager: ObservableObject {
         }
     }
 
+    /// Authenticate with biometrics ONLY — no device-passcode fallback.
+    /// Reserved for the account export, which decrypts all app passwords onto
+    /// disk: a shoulder-surfed passcode must not be enough to exfiltrate them.
+    /// Does NOT set `isLocked`.
+    func authenticateBiometricOnly() async -> Bool {
+        isAuthenticating = true
+        defer { isAuthenticating = false }
+        let context = LAContext()
+        context.localizedReason = String.localized("biometric.auth_reason")
+        do {
+            return try await context.evaluatePolicy(
+                .deviceOwnerAuthenticationWithBiometrics,
+                localizedReason: String.localized("biometric.auth_reason")
+            )
+        } catch {
+            return false
+        }
+    }
+
     // MARK: - Keychain Persistence
 
     /// Persists lockout state to Keychain so it survives app termination.

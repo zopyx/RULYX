@@ -81,6 +81,7 @@
 		2D62F0DC9DC51FFDC4B29ED3 /* TimelineTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9BA969D52386356D4AD1C /* TimelineTab.swift */; };
 		2DF00A71562D916B2C7CADC0 /* TimelineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DC5D9D6263FDF264240662 /* TimelineState.swift */; };
 		30C6532847608A3368F1EF6D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8919369DD4F6A15D621740D0 /* AppLogger.swift */; };
+		336F9D2C896621BCF0C0E603 /* AccountExportCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB10B7768A8586C8B8F46D8 /* AccountExportCrypto.swift */; };
 		339AA5C3F49E505FF803E3A6 /* ListDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B71515BB0ED6F71B12B6A1 /* ListDTOs.swift */; };
 		33B496A58DA931824C864548 /* ClearskyHeartbeatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0230DA7EE94FF126CB5EF0B /* ClearskyHeartbeatService.swift */; };
 		34400D24383390F3F173D351 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6E935CDEF1D4A0995B5A76 /* TestHelpers.swift */; };
@@ -132,6 +133,7 @@
 		551D3F996C88CB63CC914C99 /* ClearskyHeartbeatServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D190E910C369BA689CA28DA /* ClearskyHeartbeatServiceTests.swift */; };
 		574E7B89AFEA877046E57551 /* ProfileInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6578B3A3E0D7B991826A37B9 /* ProfileInspectorView.swift */; };
 		580ECD61C1B323F245F5E349 /* DateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE61BB0D0695717F8D386676 /* DateFormatters.swift */; };
+		58831C0239E2021777485C03 /* AccountExportCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077C5779CD3EB9B1DE710FA /* AccountExportCryptoTests.swift */; };
 		58F40A634244FD0E9CA72366 /* ListBatchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463861EF57B66C6208DE4BFA /* ListBatchController.swift */; };
 		5990E10D0CA7076A4796925B /* ProtectedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E945BB0EF8A767684EAB1225 /* ProtectedDataStore.swift */; };
 		59A432DA1F2D1777A8098127 /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A01CF9D21FCBD47F2A951D /* ScreenshotTests.swift */; };
@@ -467,6 +469,7 @@
 		4DDA82F772411DBDF26E3BB4 /* AppStyling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStyling.swift; sourceTree = "<group>"; };
 		4E5900990CDF329A0C4D223C /* vi.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vi.json; sourceTree = "<group>"; };
 		4F9ACE422B7A3A392487CBA6 /* DirectionalSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionalSymbol.swift; sourceTree = "<group>"; };
+		5077C5779CD3EB9B1DE710FA /* AccountExportCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountExportCryptoTests.swift; sourceTree = "<group>"; };
 		508715CD7E0027FA670DFD70 /* ModerationDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModerationDTOs.swift; sourceTree = "<group>"; };
 		508D94F9EB9CF5F38E7E6A63 /* ListImportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListImportController.swift; sourceTree = "<group>"; };
 		52463180B718A02DC76271D5 /* ModerationAuditStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModerationAuditStoreTests.swift; sourceTree = "<group>"; };
@@ -497,6 +500,7 @@
 		69F8F1371F6F8074F5048F5A /* ChatMessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageBubble.swift; sourceTree = "<group>"; };
 		6A1FD266CC2B518115D5012C /* MockClearSkyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockClearSkyService.swift; sourceTree = "<group>"; };
 		6A51D1ED23582FC6DE7F21F3 /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
+		6AB10B7768A8586C8B8F46D8 /* AccountExportCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountExportCrypto.swift; sourceTree = "<group>"; };
 		6B8CF1E13517791FA8B217E9 /* fr.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fr.json; sourceTree = "<group>"; };
 		6C3A1037F26DBBCB58FD4674 /* BlueskyProfileActionsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyProfileActionsViewModelTests.swift; sourceTree = "<group>"; };
 		6F06C6FC7BB816D0B1E03F9F /* AppAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAccount.swift; sourceTree = "<group>"; };
@@ -745,6 +749,7 @@
 			isa = PBXGroup;
 			children = (
 				C404CBEBC69F9BC0B7D6ABD3 /* AccountContextRoutingTests.swift */,
+				5077C5779CD3EB9B1DE710FA /* AccountExportCryptoTests.swift */,
 				AD6571FE9481793C96679D91 /* AccountStoreTests.swift */,
 				B9F8024F2606E01EAC5C0AF3 /* ActionQueueStoreTests.swift */,
 				D0F93F56EE9AC382E61F61C5 /* AppErrorTests.swift */,
@@ -1158,6 +1163,7 @@
 		EAE7D9D65F7205564534D4B2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				6AB10B7768A8586C8B8F46D8 /* AccountExportCrypto.swift */,
 				824692A0A8442A52D569C6EC /* AccountStore.swift */,
 				6F2A9EDCEB9A1DCC7D7C6EDC /* ActionQueueStore.swift */,
 				D2AA2C4EF26C742918C3B0D4 /* AnalyticsStore.swift */,
@@ -1472,6 +1478,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B9EA7D9C1525A1772459B11E /* AccountContextRoutingTests.swift in Sources */,
+				58831C0239E2021777485C03 /* AccountExportCryptoTests.swift in Sources */,
 				23E168529534A0F98C8FE234 /* AccountStoreTests.swift in Sources */,
 				D82407480CC64963EB48674F /* ActionQueueStoreTests.swift in Sources */,
 				680E3BB4754FCFB8FAEB3436 /* AppErrorTests.swift in Sources */,
@@ -1540,6 +1547,7 @@
 				C9B6583F87B221546ED26059 /* AIModelManagementView.swift in Sources */,
 				45A7E7C06D1F9E112A1F4EDD /* AIPostBadge.swift in Sources */,
 				12EC3A41111AD27C0857E402 /* AccountChip.swift in Sources */,
+				336F9D2C896621BCF0C0E603 /* AccountExportCrypto.swift in Sources */,
 				26CCA5FE15C841ECBCDB8A37 /* AccountQuickSwitcherSheet.swift in Sources */,
 				1D3B724B2DFFFFB3889C410A /* AccountRowView.swift in Sources */,
 				24A9806D5010F4F7233F1BD5 /* AccountStore.swift in Sources */,
