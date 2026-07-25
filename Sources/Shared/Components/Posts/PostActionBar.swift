@@ -39,6 +39,7 @@ struct PostActionBar: View {
         HStack(spacing: 24) {
             if let onReply = callbacks.onReply {
                 actionButton(icon: "bubble.left", count: replyCount, action: onReply)
+                    .accessibilityLabel(loc("post.reply"))
             }
             if let onRepost = callbacks.onRepost {
                 Button(action: { onRepost() }) {
@@ -52,6 +53,7 @@ struct PostActionBar: View {
                     }
                     .foregroundStyle(isReposted ? Color.green : Color(.secondaryLabel))
                 }
+                .accessibilityLabel(isReposted ? loc("post.unrepost") : loc("post.repost"))
                 .buttonStyle(.plain)
             }
             // Heart icon – always toggles like
@@ -63,6 +65,7 @@ struct PostActionBar: View {
                         .scaleEffect(isLiked ? 1.1 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
                 }
+                .accessibilityLabel(isLiked ? loc("post.unlike") : loc("post.like"))
                 .buttonStyle(.plain)
             }
 
@@ -72,11 +75,13 @@ struct PostActionBar: View {
                     Text("\(count)")
                         .font(.callout)
                 }
+                .accessibilityLabel(loc("post.likes_count"))
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
             }
             if let onQuote = callbacks.onQuote {
                 actionButton(icon: "quote.bubble", count: nil, action: onQuote)
+                    .accessibilityLabel(loc("post.quote"))
             }
             Spacer()
             if hasGearMenuItems {

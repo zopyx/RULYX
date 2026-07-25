@@ -1488,5 +1488,12 @@
   "info.feature.platform.shortcuts": "Keyboard shortcuts (Cmd+L, Cmd+D, Cmd+K)",
   "info.feature.platform.windows": "Multi-window profile viewing",
   "info.feature.platform.dragdrop": "Drag and drop list management",
-  "info.feature.platform.a11y": "VoiceOver, ReduceMotion, Dynamic Type support"
+  "info.feature.platform.a11y": "VoiceOver, ReduceMotion, Dynamic Type support",
+  "post.reply": "Reply",
+  "post.repost": "Repost",
+  "post.unrepost": "Undo Repost",
+  "post.like": "Like",
+  "post.unlike": "Unlike",
+  "post.likes_count": "Likes",
+  "post.quote": "Quote Post"
 }

@@ -147,53 +147,35 @@ struct RULYXApp: App {
                     // is enabled in Accessibility settings.
                     .animation(UIAccessibility.isReduceMotionEnabled ? nil : .default, value: appLockManager.isLocked)
 
-                    // MARK: Lifecycle — Step 1: Session Restoration
+                    // MARK: Lifecycle — Startup Coordinator
 
-                    // Restores AT Protocol sessions from Keychain for all saved accounts.
-                    // Must complete before any authenticated API call.
+                    // Single ordered startup sequence. Dependencies:
+                    //   1. Restore sessions (prerequisite for authenticated calls)
+                    //   2. Test account (if launched with --test-account)
+                    //   3. Push notifications (requires session from step 1)
+                    //   4. Clearsky heartbeat (independent)
+                    //   5. Chat init (requires active account)
                     .task {
+                        // Step 1: Restore AT Protocol sessions from Keychain
                         await deps.blueskyClient.restoreSessions(for: deps.accountStore.accounts)
-                    }
 
-                    // MARK: Lifecycle — Step 2: Test Account (UI Tests)
-
-                    // When launched with `--test-account` (screenshot tests), reads
-                    // `TEST_HANDLE`, `TEST_PASSWORD`, and optional `TEST_PDS` from the
-                    // environment to create a live test account.
-                    .task {
-                        guard CommandLine.arguments.contains("--test-account"),
-                              let handle = ProcessInfo.processInfo.environment["TEST_HANDLE"],
-                              let password = ProcessInfo.processInfo.environment["TEST_PASSWORD"] else { return }
-                        guard !deps.accountStore.accounts.contains(where: { $0.handle == handle }) else { return }
-                        let pdsURL = ProcessInfo.processInfo.environment["TEST_PDS"].flatMap { URL(string: $0) }
-                        _ = await deps.accountStore.addAccount(handle: handle, appPassword: password, entrywayURL: pdsURL, client: deps.blueskyClient)
-                    }
-
-                    // MARK: Lifecycle — Step 3: Push Notifications
-
-                    // Starts the push notification coordinator, which registers with APNs
-                    // and syncs the device token with the Bluesky PDS for remote updates.
-                    .task {
-                        DispatchQueue.main.async {
-                            deps.pushNotificationCoordinator.start()
+                        // Step 2: Test account (UI test / screenshot mode)
+                        if CommandLine.arguments.contains("--test-account"),
+                           let handle = ProcessInfo.processInfo.environment["TEST_HANDLE"],
+                           let password = ProcessInfo.processInfo.environment["TEST_PASSWORD"],
+                           !deps.accountStore.accounts.contains(where: { $0.handle == handle })
+                        {
+                            let pdsURL = ProcessInfo.processInfo.environment["TEST_PDS"].flatMap { URL(string: $0) }
+                            _ = await deps.accountStore.addAccount(handle: handle, appPassword: password, entrywayURL: pdsURL, client: deps.blueskyClient)
                         }
-                    }
 
-                    // MARK: Lifecycle — Step 4: Clearsky Heartbeat
+                        // Step 3: Push notifications (after sessions restored)
+                        deps.pushNotificationCoordinator.start()
 
-                    // Begins periodic health checks on the Clearsky API. When Clearsky is
-                    // unreachable, the app displays a red warning banner and disables
-                    // Clearsky-dependent features.
-                    .task {
-                        DispatchQueue.main.async {
-                            deps.clearskyHeartbeat.start()
-                        }
-                    }
+                        // Step 4: Clearsky health heartbeat
+                        deps.clearskyHeartbeat.start()
 
-                    // MARK: Lifecycle — Step 5: Chat (per Active Account)
-
-                    // Initial chat setup for the active account.
-                    .task {
+                        // Step 5: Initial chat load for active account
                         await reloadChatForActiveAccount(showPrompts: deps.accountStore.activeAccount != nil)
                     }
                     // AccountStore is a nested ObservableObject owned by AppDependencies;
@@ -248,26 +230,14 @@ struct RULYXApp: App {
 
                 // MARK: Splash Screen
 
-                // Splash animation overlay rendered above the main content (`zIndex: 100`).
-                // On first-ever launch, plays the full animation. On subsequent launches,
-                // shows briefly (0.5s) then fades out for a snappier feel.
-                if showSplash {
+                // First-launch splash animation. On subsequent launches the
+                // system launch screen provides the transition — no artificial
+                // delay is added.
+                if showSplash, !hasSplashed {
                     SplashScreenView(isActive: $showSplash)
                         .transition(.opacity)
-                        // Ensures the splash is always rendered above the main ZStack content.
                         .zIndex(100)
-                        .onAppear {
-                            if hasSplashed {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    if UIAccessibility.isReduceMotionEnabled {
-                                        showSplash = false
-                                    } else {
-                                        withAnimation { showSplash = false }
-                                    }
-                                }
-                            }
-                            hasSplashed = true
-                        }
+                        .onDisappear { hasSplashed = true }
                 }
 
                 // MARK: Privacy Shield
