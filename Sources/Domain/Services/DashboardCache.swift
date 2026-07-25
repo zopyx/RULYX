@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// Data persisted by the dashboard cache, containing lists, profile, and
@@ -14,16 +15,18 @@ struct DashboardCacheData: Codable {
 }
 
 /// JSON file-based cache for dashboard data, keyed by account identifier.
-/// Stores/loads data from the app's caches directory.
+/// Keys are SHA-256 hashed to prevent filesystem-incompatible characters
+/// (DIDs contain colons, handles can contain dots and slashes).
 enum DashboardCache {
-    /// Dedicated subdirectory so `clearAll()` cannot delete sibling cache files.
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("com.ajung.RULYX/dashboard")
     }
 
     private static func fileURL(forKey key: String) -> URL {
-        cachesDirectory.appendingPathComponent("dashboard_\(key).json")
+        let hashed = SHA256.hash(data: Data(key.utf8))
+            .map { String(format: "%02x", $0) }.joined()
+        return cachesDirectory.appendingPathComponent("\(hashed).json")
     }
 
     static func load(forKey key: String) -> DashboardCacheData? {
@@ -31,8 +34,11 @@ enum DashboardCache {
         do {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode(DashboardCacheData.self, from: data)
+        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileReadNoSuchFileError {
+            // Normal cache miss — no log needed
+            return nil
         } catch {
-            AppLogger.persistence.error("DashboardCache load failed for key \(key): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache load failed: \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
@@ -44,7 +50,7 @@ enum DashboardCache {
             let encoded = try JSONEncoder().encode(data)
             try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("DashboardCache save failed for key \(key): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache save failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -52,14 +58,18 @@ enum DashboardCache {
         let url = fileURL(forKey: key)
         do {
             try FileManager.default.removeItem(at: url)
+        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
+            // Already gone — no-op
         } catch {
-            AppLogger.persistence.error("DashboardCache clear failed for key \(key): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache clear failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     static func clearAll() {
         do {
             try FileManager.default.removeItem(at: cachesDirectory)
+        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
+            // Already gone
         } catch {
             AppLogger.persistence.error("DashboardCache clearAll failed: \(error.localizedDescription, privacy: .public)")
         }

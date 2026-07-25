@@ -1,17 +1,19 @@
+import CryptoKit
 import Foundation
 
 /// JSON file-based cache for relationship data (followers/following lists),
-/// keyed by account identifier and relationship type. Stores data in the
-/// app's caches directory.
+/// keyed by account identifier and relationship type. Keys are SHA-256 hashed
+/// to prevent filesystem-incompatible characters.
 enum RelationshipCache {
-    /// Dedicated subdirectory so `clearAll()` cannot delete sibling cache files.
     private static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("com.ajung.RULYX/relationships")
     }
 
     private static func fileURL(forKey key: String) -> URL {
-        cachesDirectory.appendingPathComponent("\(key).json")
+        let hashed = SHA256.hash(data: Data(key.utf8))
+            .map { String(format: "%02x", $0) }.joined()
+        return cachesDirectory.appendingPathComponent("\(hashed).json")
     }
 
     static func load(forKey key: String) -> [BlueskyActor] {
@@ -19,8 +21,10 @@ enum RelationshipCache {
         do {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode([BlueskyActor].self, from: data)
+        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileReadNoSuchFileError {
+            return []
         } catch {
-            AppLogger.persistence.error("RelationshipCache load failed for key \(key): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache load failed: \(error.localizedDescription, privacy: .public)")
             return []
         }
     }
@@ -32,7 +36,7 @@ enum RelationshipCache {
             let data = try JSONEncoder().encode(actors)
             try data.write(to: url, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("RelationshipCache save failed for key \(key): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache save failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -40,14 +44,18 @@ enum RelationshipCache {
         let url = fileURL(forKey: key)
         do {
             try FileManager.default.removeItem(at: url)
+        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
+            // Already gone
         } catch {
-            AppLogger.persistence.error("RelationshipCache clear failed for key \(key): \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache clear failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     static func clearAll() {
         do {
             try FileManager.default.removeItem(at: cachesDirectory)
+        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
+            // Already gone
         } catch {
             AppLogger.persistence.error("RelationshipCache clearAll failed: \(error.localizedDescription, privacy: .public)")
         }
