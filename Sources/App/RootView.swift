@@ -1,21 +1,9 @@
 import SwiftUI
 
-// MARK: - Tab Bar Item Data
-
-private struct TabBarItem: Identifiable {
-    let tab: WorkspaceTab
-    let icon: String
-    let label: String
-
-    var id: WorkspaceTab {
-        tab
-    }
-}
-
 // MARK: - Root View
 
-/// The main tab-based view hierarchy with a custom bottom bar that includes
-/// the account switcher as an integrated tab item.
+/// Main iPhone tab navigation using native TabView.
+/// Each tab has its own NavigationStack for state preservation across switches.
 struct RootView: View {
     // MARK: - Properties
 
@@ -30,118 +18,19 @@ struct RootView: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    /// UserDefaults key `"hasSeenOnboarding"`: whether the first-launch onboarding
-    /// has been shown. Suppresses the onboarding sheet on subsequent launches.
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
-
-    /// Controls the account switcher sheet from the tab bar.
-    @State private var showAccountSwitcher = false
-
-    /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
-    /// Values: `"light"`, `"dark"`, or `"system"` (default).
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
-
-    /// UserDefaults key `"performanceOverlayEnabled"`: show the performance monitor overlay.
     @AppStorage("performanceOverlayEnabled") private var performanceOverlayEnabled = false
-    /// Tracks three-finger triple-tap to toggle overlay visibility.
+
+    @State private var showAccountSwitcher = false
     @State private var overlayVisible = false
-    /// When true, the Add Account sheet opens after onboarding dismisses.
     @State private var showAddAccountFromOnboarding = false
 
-    /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
-    /// Returns `.light`, `.dark`, or `nil` for system-following mode.
     private var preferredScheme: ColorScheme? {
         switch appearanceMode {
         case "light": .light
         case "dark": .dark
         default: nil
-        }
-    }
-
-    private let tabBarItems: [TabBarItem] = [
-        TabBarItem(tab: .moderation, icon: "checklist.checked", label: "tab.moderation"),
-        TabBarItem(tab: .timeline, icon: "clock.arrow.circlepath", label: "tab.timeline"),
-        TabBarItem(tab: .notifications, icon: "bell", label: "tab.notifications"),
-        TabBarItem(tab: .chat, icon: "bubble.left.and.bubble.right", label: "tab.chat"),
-        TabBarItem(tab: .settings, icon: "gearshape", label: "tab.settings"),
-    ]
-
-    private struct TabBarItemView: View {
-        let item: TabBarItem
-        let isSelected: Bool
-        let localizationManager: LocalizationManager
-        let tint: Color
-
-        var body: some View {
-            VStack(spacing: 4) {
-                Image(systemName: item.icon)
-                    .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
-                Text(localizationManager.localized(item.label))
-                    .font(.caption2)
-                    .lineLimit(1)
-            }
-            .foregroundStyle(isSelected ? tint : .secondary)
-        }
-    }
-
-    /// The account switcher button in the bottom tab bar.
-    /// Uses ExclusiveGesture: double-tap switches to previous account (takes priority);
-    /// single-tap opens the account switcher sheet.
-    private var accountSwitcherButton: some View {
-        let buttonTint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
-        return VStack(spacing: 4) {
-            if let account = accountStore.activeAccount {
-                AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 24)
-                    .overlay {
-                        Circle()
-                            .stroke(buttonTint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
-                    }
-                    // Visual indicator: small chevron when quick-switch is available
-                    .overlay(alignment: .bottomTrailing) {
-                        if accountStore.previousActiveAccountID != nil {
-                            Image(systemName: "chevron.left.2")
-                                .font(.caption2.weight(.bold))
-                                .imageScale(.small)
-                                .foregroundStyle(.secondary)
-                                .padding(2)
-                                .background(Circle().fill(.bar))
-                                .offset(x: 4, y: 4)
-                        }
-                    }
-            } else {
-                Image(systemName: "person.crop.circle")
-                    .font(.system(size: 22))
-            }
-            Text(localizationManager.localized("tab.accounts"))
-                .font(.caption2)
-                .lineLimit(1)
-        }
-        .foregroundStyle(workspaceStore.selectedTab == .account ? buttonTint : .secondary)
-        // ExclusiveGesture: double-tap takes priority; single-tap only fires if no second tap follows
-        .gesture(
-            TapGesture(count: 2)
-                .onEnded {
-                    guard let prevID = accountStore.previousActiveAccountID,
-                          let prevAccount = accountStore.accounts.first(where: { $0.id == prevID })
-                    else { return }
-                    let generator = UIImpactFeedbackGenerator(style: .rigid)
-                    generator.prepare()
-                    generator.impactOccurred()
-                    switchAccount(prevAccount)
-                }
-                .exclusively(before: TapGesture(count: 1).onEnded {
-                    showAccountSwitcher = true
-                })
-        )
-    }
-
-    private func switchAccount(_ account: AppAccount) {
-        let generator = UISelectionFeedbackGenerator()
-        generator.prepare()
-        Task {
-            await accountStore.switchAccount(to: account, using: container.blueskyClient)
-            workspaceStore.returnToModerationRoot()
-            generator.selectionChanged()
         }
     }
 
@@ -163,71 +52,107 @@ struct RootView: View {
         }
     }
 
+    // MARK: - Compact (iPhone) Body
+
     private var compactBody: some View {
-        let tint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
+        let tint: Color = clearskyHeartbeat.isClearskyAvailable
+            ? .skyPrimary : Color.red.opacity(0.7)
 
-        return VStack(spacing: 0) {
-            if !clearskyHeartbeat.isClearskyAvailable {
-                ClearskyBanner()
-                    .environmentObject(localizationManager)
-            }
-
-            ZStack {
-                switch workspaceStore.selectedTab {
-                case .moderation: ModerationSplitView()
-                case .timeline: TimelineTab()
-                case .notifications: NotificationTab()
-                case .chat: ChatTab()
-                case .info: InfoView()
-                case .settings: SettingsView()
-                case .account: AccountTabView()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 8)
-        }
-        .safeAreaInset(edge: .top) {
-            if let statusMessage = chatStore.statusMessage {
-                ChatStatusBanner(message: statusMessage)
-            }
-        }
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 0) {
-                ForEach(tabBarItems) { item in
-                    Button {
-                        if workspaceStore.selectedTab == item.tab, item.tab == .moderation {
-                            workspaceStore.returnToModerationRoot()
-                        } else {
-                            workspaceStore.selectedTab = item.tab
-                        }
-                    } label: {
-                        TabBarItemView(
-                            item: item,
-                            isSelected: workspaceStore.selectedTab == item.tab,
-                            localizationManager: localizationManager,
-                            tint: tint
-                        )
+        return ZStack {
+            TabView(selection: Binding(
+                get: { workspaceStore.selectedTab },
+                set: { newTab in
+                    if workspaceStore.selectedTab == .moderation, newTab == .moderation {
+                        workspaceStore.returnToModerationRoot()
                     }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .accessibilityIdentifier("tab-\(item.tab.rawValue)")
+                    workspaceStore.selectedTab = newTab
                 }
+            )) {
+                NavigationStack {
+                    ModerationSplitView()
+                        .navigationTitle(loc("tab.moderation"))
+                }
+                .tabItem {
+                    Label(loc("tab.moderation"), systemImage: "checklist.checked")
+                }
+                .tag(WorkspaceTab.moderation)
 
-                accountSwitcherButton
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .accessibilityIdentifier("tab-accounts")
+                NavigationStack {
+                    TimelineTab()
+                        .navigationTitle(loc("tab.timeline"))
+                }
+                .tabItem {
+                    Label(loc("tab.timeline"), systemImage: "clock.arrow.circlepath")
+                }
+                .tag(WorkspaceTab.timeline)
+
+                NavigationStack {
+                    NotificationTab()
+                        .navigationTitle(loc("tab.notifications"))
+                }
+                .tabItem {
+                    Label(loc("tab.notifications"), systemImage: "bell")
+                }
+                .tag(WorkspaceTab.notifications)
+
+                NavigationStack {
+                    ChatTab()
+                        .navigationTitle(loc("tab.chat"))
+                }
+                .tabItem {
+                    Label(loc("tab.chat"), systemImage: "bubble.left.and.bubble.right")
+                }
+                .tag(WorkspaceTab.chat)
+
+                NavigationStack {
+                    SettingsView()
+                        .navigationTitle(loc("tab.settings"))
+                }
+                .tabItem {
+                    Label(loc("tab.settings"), systemImage: "gearshape")
+                }
+                .tag(WorkspaceTab.settings)
+
+                NavigationStack {
+                    InfoView()
+                        .navigationTitle(loc("tab.info"))
+                }
+                .tabItem {
+                    Label(loc("tab.info"), systemImage: "sparkles.rectangle.stack")
+                }
+                .tag(WorkspaceTab.info)
+
+                NavigationStack {
+                    AccountTabView()
+                        .navigationTitle(loc("tab.accounts"))
+                }
+                .tabItem {
+                    Label(loc("tab.accounts"), systemImage: "person.circle")
+                }
+                .tag(WorkspaceTab.account)
             }
-            .padding(.horizontal, 4)
-            .padding(.top, 6)
-            .padding(.bottom, 4)
-            .background(.bar)
+            .tint(tint)
+            .preferredColorScheme(preferredScheme)
+            .environment(\.locale, localizationManager.locale)
+            .environment(\.layoutDirection, localizationManager.layoutDirection)
+
+            // Banner overlay
+            VStack(spacing: 0) {
+                if !clearskyHeartbeat.isClearskyAvailable {
+                    ClearskyBanner()
+                }
+                if let statusMessage = chatStore.statusMessage {
+                    ChatStatusBanner(message: statusMessage)
+                }
+                Spacer()
+            }
+
+            // Performance overlay
+            if overlayVisible || performanceOverlayEnabled {
+                PerformanceMonitorOverlay()
+                    .environmentObject(HTTPRequestDebugStore.shared)
+            }
         }
-        .preferredColorScheme(preferredScheme)
-        .environment(\.locale, localizationManager.locale)
-        .environment(\.layoutDirection, localizationManager.layoutDirection)
         .sheet(isPresented: $showAccountSwitcher) {
             AccountSwitcherTabSheet(
                 accountStore: accountStore,
@@ -236,7 +161,10 @@ struct RootView: View {
                 onSwitch: switchAccount
             )
         }
-        .sheet(isPresented: .init(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })) {
+        .sheet(isPresented: .init(
+            get: { !hasSeenOnboarding },
+            set: { hasSeenOnboarding = !$0 }
+        )) {
             onboardingContent
         }
         .sheet(isPresented: $showAddAccountFromOnboarding) {
@@ -245,17 +173,23 @@ struct RootView: View {
                 .environmentObject(container)
                 .environmentObject(localizationManager)
         }
-        .overlay(alignment: .top) {
-            if overlayVisible || performanceOverlayEnabled {
-                PerformanceMonitorOverlay()
-                    .environmentObject(HTTPRequestDebugStore.shared)
-            }
-        }
         .highPriorityGesture(threeFingerGesture)
     }
 
-    /// Three-finger triple-tap gesture that toggles the performance overlay.
-    /// Disabled when VoiceOver is running.
+    // MARK: - Account Switching
+
+    private func switchAccount(_ account: AppAccount) {
+        let generator = UISelectionFeedbackGenerator()
+        generator.prepare()
+        Task {
+            await accountStore.switchAccount(to: account, using: container.blueskyClient)
+            workspaceStore.returnToModerationRoot()
+            generator.selectionChanged()
+        }
+    }
+
+    // MARK: - Gestures
+
     private var threeFingerGesture: some Gesture {
         if UIAccessibility.isVoiceOverRunning {
             return TapGesture().onEnded {}
@@ -264,12 +198,12 @@ struct RootView: View {
             .onEnded { overlayVisible.toggle() }
     }
 
+    // MARK: - Onboarding
+
     private var onboardingContent: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    // MARK: Header
-
                     VStack(spacing: 8) {
                         Image(systemName: "checklist.checked")
                             .font(.system(size: 48))
@@ -288,16 +222,12 @@ struct RootView: View {
                     }
                     .padding(.top, 32)
 
-                    // MARK: Feature Rows
-
                     VStack(alignment: .leading, spacing: 16) {
                         OnboardingRow(icon: "checklist.checked", color: .skyPrimary, title: localizationManager.localized("tab.moderation"), description: localizationManager.localized("onboarding.moderation.desc"))
                         OnboardingRow(icon: "clock.arrow.circlepath", color: .skyPrimary, title: localizationManager.localized("tab.timeline"), description: localizationManager.localized("onboarding.timeline.desc"))
                         OnboardingRow(icon: "person.circle", color: .skyPrimary, title: localizationManager.localized("tab.accounts"), description: localizationManager.localized("onboarding.accounts.desc"))
                         OnboardingRow(icon: "gearshape", color: .orange, title: localizationManager.localized("tab.settings"), description: localizationManager.localized("onboarding.settings.desc"))
                     }
-
-                    // MARK: Get Started Button
 
                     Button {
                         if !ProcessInfo.processInfo.arguments.contains("--uitesting") {
@@ -311,8 +241,6 @@ struct RootView: View {
                             .padding()
                     }
                     .buttonStyle(.borderedProminent)
-                    // Custom glass-material prominent button style used consistently
-                    // throughout the app for primary action buttons.
                     .glassProminentButton()
                     .padding(.horizontal)
                 }
@@ -329,18 +257,6 @@ struct RootView: View {
                 }
             }
         }
-    }
-
-    // MARK: - Private Helpers
-
-    /// The bottom safe area inset for the custom tab bar.
-    private var safeAreaBottomInset: CGFloat {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first
-        {
-            window.safeAreaInsets.bottom
-        }
-        return 0
     }
 }
 
@@ -393,7 +309,6 @@ private struct AccountSwitcherRow: View {
 
 // MARK: - Account Switcher Sheet
 
-/// Compact sheet for switching accounts from the tab bar.
 private struct AccountSwitcherTabSheet: View {
     @ObservedObject var accountStore: AccountStore
     @ObservedObject var workspaceStore: ModerationWorkspaceStore
@@ -409,7 +324,8 @@ private struct AccountSwitcherTabSheet: View {
                         account: acct,
                         isActive: acct.id == accountStore.activeAccountID,
                         isDeactivated: accountStore.isDeactivated(acct),
-                        action: { onSwitch(acct)
+                        action: {
+                            onSwitch(acct)
                             dismiss()
                         }
                     )
@@ -437,7 +353,8 @@ private struct AccountSwitcherTabSheet: View {
     }
 }
 
-/// Renders an account avatar (async image or initial-letter placeholder).
+// MARK: - Account Avatar
+
 private struct AccountAvatarView: View {
     let account: AppAccount
     let tint: Color
