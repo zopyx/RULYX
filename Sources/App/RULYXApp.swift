@@ -90,6 +90,7 @@ struct RULYXApp: App {
                     .environmentObject(deps.autoBlockBackService)
                     .environmentObject(deps.serviceContainer)
                     .environmentObject(deps.appEnvironment)
+                    .environmentObject(CrashReportingManager.shared)
                     .environmentObject(appLockManager)
                     .environmentObject(iCloudAccountSync.shared)
                     // Lock screen overlay
