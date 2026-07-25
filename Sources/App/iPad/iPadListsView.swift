@@ -12,6 +12,8 @@ struct iPadListsView: View {
 
     @State private var showCreateList = false
     @State private var showInternalListCreate = false
+    @State private var newInternalListName = ""
+    @State private var newInternalListColor: InternalListColor = .blue
 
     var body: some View {
         Group {
@@ -155,16 +157,36 @@ struct iPadListsView: View {
     private var internalListCreateSheet: some View {
         NavigationStack {
             List {
-                TextField(loc("internal_list.name_placeholder"), text: .constant(""))
-                ColorPicker(loc("internal_list.color"), selection: .constant(.blue))
+                TextField(loc("internal_list.name_placeholder"), text: $newInternalListName)
+                Picker(loc("internal_list.color"), selection: $newInternalListColor) {
+                    ForEach(InternalListColor.allCases, id: \.self) { color in
+                        HStack {
+                            Circle().fill(color.colorValue).frame(width: 16, height: 16)
+                            Text(loc("color.\(color.rawValue)"))
+                        }
+                        .tag(color)
+                    }
+                }
             }
             .navigationTitle(loc("internal_list.new"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(loc("actions.cancel")) { showInternalListCreate = false }
+                    Button(loc("actions.cancel")) {
+                        newInternalListName = ""
+                        showInternalListCreate = false
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(loc("actions.save")) { showInternalListCreate = false }
+                    Button(action: {
+                        let trimmed = newInternalListName.trimmingCharacters(in: .whitespaces)
+                        guard !trimmed.isEmpty else { return }
+                        internalListStore.addList(name: trimmed, color: newInternalListColor)
+                        newInternalListName = ""
+                        showInternalListCreate = false
+                    }) {
+                        Text(loc: "actions.save")
+                    }
+                    .disabled(newInternalListName.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
         }

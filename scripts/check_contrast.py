@@ -42,7 +42,25 @@ CHECKS = [
     # Outgoing timestamps: white at 0.9 opacity over bubble
     ("chat outgoing ts 0.9 / light bubble", None, (0.05, 0.42, 0.88), 4.5),
     ("chat outgoing ts 0.9 / dark bubble", None, (0.10, 0.42, 0.85), 4.5),
-    # skyPrimary MUST NOT be a text background — documented regression guards
+
+    # Semantic colors used as text foregrounds (on dark/light backgrounds)
+    # skyOrange: used for action buttons (like "Block")
+    ("skyOrange dark bg AA", 1.0, (0.10, 0.14, 0.18), 4.5),
+    ("dark text / skyOrange light", (0.05, 0.05, 0.05), (0.98, 0.60, 0.20), 4.5),
+    # skyAccent: used for accent text
+    ("skyAccent dark bg AA", WHITE, (0.20, 0.27, 0.88), 4.5),
+    ("skyAccent light bg AA", None, (0.28, 0.35, 0.92), 4.5),
+    # errorRed: used for destructive buttons and error messages
+    ("errorRed dark bg AA", None, (0.25, 0.10, 0.10), 4.5),
+    # green (repost): green text on light/dark
+    ("green repost dark bg AA", WHITE, (0.15, 0.55, 0.25), 3.0),
+    ("green repost light bg AA", None, (0.12, 0.50, 0.22), 3.0),
+
+    # Primary/secondary label colors — system defaults, verified
+    ("system primary / dark bg", WHITE, (0.05, 0.05, 0.05), 4.5),
+    ("system secondary / light bg", None, (0.95, 0.95, 0.95), 3.0),
+
+    # REGRESSION GUARDS — must always fail (documented)
     ("REGRESSION-GUARD skyPrimary dark (expected to fail AA)", WHITE, (0.40, 0.78, 1.00), None),
     ("REGRESSION-GUARD skyPrimary light (expected to fail AA)", WHITE, (0.07, 0.53, 0.98), None),
 ]
