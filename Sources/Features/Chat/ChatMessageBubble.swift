@@ -93,7 +93,8 @@ struct ChatMessageBubble: View {
                 }
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.top, 8)
+            .padding(.bottom, 14)  // extra 6pt for the bubble tail
             .background(isOutgoing ? Color.chatBubbleOutgoing : Color(.systemGray5))
             .opacity(isPending ? 0.6 : 1.0)
             .clipShape(BubbleShape(isOutgoing: isOutgoing))
