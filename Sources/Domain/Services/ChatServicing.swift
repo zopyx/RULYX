@@ -4,7 +4,7 @@ import Foundation
 /// Implementations handle listing conversations, fetching messages, sending messages,
 /// managing read state, and conversation lifecycle (leave, mute, unmute).
 @MainActor
-protocol ChatServicing {
+protocol ChatServicing: Sendable {
     /// Clears any in-memory caches used by the chat service.
     func clearCaches()
 

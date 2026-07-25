@@ -1432,7 +1432,7 @@ struct BlueskyProfileView: View {
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
                 async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: container.blueskyClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
-                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: container.blueskyClient)
+                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: container.list)
                     async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password, targetDID: did)
 
                     _ = await (blocks, clearsky, owned, subscribed)

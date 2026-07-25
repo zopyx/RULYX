@@ -155,7 +155,7 @@ final class BlueskyProfileViewModel {
     // MARK: - List Data Fetching
 
     /// Fetches lists that the profile owns/created.
-    func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+    func fetchOwnedLists(did: String, account: AppAccount, appPassword: String, using client: any BlueskyListServicing) async {
         isFetchingOwnedLists = true
         do {
             ownedLists = try await client.fetchActorLists(actor: did, account: account, appPassword: appPassword)
