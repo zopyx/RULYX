@@ -319,7 +319,7 @@ struct ProfileEditView: View {
             description = profile.description ?? ""
             currentBannerURL = profile.bannerURL
         } catch {
-            AppLogger.moderation.error("Failed to fetch profile for edit: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to fetch profile for edit: \(error.localizedDescription, privacy: .private)")
         }
 
         // Fetch raw profile record to get current blob refs
@@ -330,7 +330,7 @@ struct ProfileEditView: View {
             }
         } catch {
             // Record may not exist yet (new accounts); that's fine
-            AppLogger.moderation.debug("No existing profile record: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.debug("No existing profile record: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -410,7 +410,7 @@ struct ProfileEditView: View {
         } catch {
             errorMessage = AppError.userMessage(from: error)
             showError = true
-            AppLogger.moderation.error("Profile save failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Profile save failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

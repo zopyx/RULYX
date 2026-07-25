@@ -121,7 +121,7 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
             throw BlueskyAPIError.invalidResponse
         }
 
-        AppLogger.performance.debug("\(method, privacy: .public) \(path, privacy: .public) took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s (\(httpResponse.statusCode))")
+        AppLogger.performance.debug("\(method, privacy: .private) \(path, privacy: .private) took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s (\(httpResponse.statusCode))")
 
         do {
             let decodedData = data.isEmpty ? Data("{ }".utf8) : data
@@ -129,7 +129,7 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
         } catch {
             let bodyPreview = String(decoding: data.prefix(500), as: UTF8.self)
             AppLogger.performance.debug(
-                "Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public). Body: \(bodyPreview)"
+                "Decoding failure for \(path, privacy: .private): \(error.localizedDescription, privacy: .private). Body: \(bodyPreview)"
             )
             throw BlueskyAPIError.invalidResponse
         }

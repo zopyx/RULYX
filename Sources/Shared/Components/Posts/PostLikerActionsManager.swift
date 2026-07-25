@@ -26,7 +26,7 @@ class PostLikerActionsManager: ObservableObject {
         do {
             lists = try await blueskyClient.fetchLists(for: account, appPassword: appPassword)
         } catch {
-            AppLogger.moderation.error("Failed to load available target lists: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load available target lists: \(error.localizedDescription, privacy: .private)")
         }
         if let internalListStore {
             let internalLists = internalListStore.lists.map { internalList in
@@ -152,7 +152,7 @@ class PostLikerActionsManager: ObservableObject {
             reportEvidence = ""
             reportReason = .simplifiedDefault
         } catch {
-            AppLogger.moderation.error("Post report failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Post report failed: \(error.localizedDescription, privacy: .private)")
         }
         isSubmittingReport = false
     }

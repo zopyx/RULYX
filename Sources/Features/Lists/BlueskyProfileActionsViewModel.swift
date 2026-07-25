@@ -219,7 +219,7 @@ final class BlueskyProfileActionsViewModel {
         } catch {
             // If the PDS query fails, fall back to ClearSky data alone (no pre-filter)
             existingBlockedDIDs = []
-            AppLogger.moderation.error("Failed to fetch existing blocked DIDs: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to fetch existing blocked DIDs: \(error.localizedDescription, privacy: .private)")
         }
 
         let filteredToBlock = toBlock.filter { !existingBlockedDIDs.contains($0.did) }

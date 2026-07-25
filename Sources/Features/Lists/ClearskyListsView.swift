@@ -114,7 +114,7 @@ struct ClearskyListsView: View {
                 }
             }
         } catch {
-            AppLogger.performance.error("Failed to fetch owner handles: \(error.localizedDescription, privacy: .public)")
+            AppLogger.performance.error("Failed to fetch owner handles: \(error.localizedDescription, privacy: .private)")
         }
     }
 

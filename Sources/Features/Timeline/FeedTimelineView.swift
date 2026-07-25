@@ -466,7 +466,7 @@ struct FeedTimelineView: View {
             if let removedIndex {
                 viewModel.insertEntry(entry, at: removedIndex)
             }
-            AppLogger.moderation.error("Failed to delete post: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to delete post: \(error.localizedDescription, privacy: .private)")
         }
         await refresh()
     }
@@ -532,7 +532,7 @@ struct FeedTimelineView: View {
             try await container.social.muteActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Muted @\(handle)")
         } catch {
-            AppLogger.moderation.error("Failed to mute @\(handle): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to mute @\(handle): \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -544,7 +544,7 @@ struct FeedTimelineView: View {
             try await container.social.blockActor(did: did, account: account, appPassword: appPassword)
             AppLogger.moderation.info("Blocked @\(handle)")
         } catch {
-            AppLogger.moderation.error("Failed to block @\(handle): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to block @\(handle): \(error.localizedDescription, privacy: .private)")
         }
     }
 

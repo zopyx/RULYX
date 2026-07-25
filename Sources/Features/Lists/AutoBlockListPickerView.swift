@@ -133,7 +133,7 @@ struct AutoBlockListPickerView: View {
             do {
                 lists = try await container.list.fetchLists(for: account, appPassword: appPassword)
             } catch {
-                AppLogger.moderation.error("Failed to load lists for auto-block picker: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Failed to load lists for auto-block picker: \(error.localizedDescription, privacy: .private)")
             }
         }
 

@@ -292,7 +292,7 @@ struct ReplyComposerView: View {
             dismiss()
         } catch {
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Reply failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Reply failed: \(error.localizedDescription, privacy: .private)")
         }
         isPosting = false
     }

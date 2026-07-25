@@ -273,7 +273,7 @@ final class MediaBrowserViewModel: ObservableObject {
             return
         } catch {
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load media: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load media: \(error.localizedDescription, privacy: .private)")
         }
     }
 

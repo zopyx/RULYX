@@ -280,7 +280,7 @@ struct ThumbnailImageView<Placeholder: View>: View {
         } catch let error as URLError where error.code == .cancelled {
             return
         } catch {
-            AppLogger.performance.debug("Thumbnail load failed for \(url.absoluteString, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.performance.debug("Thumbnail load failed for \(url.absoluteString, privacy: .private): \(error.localizedDescription, privacy: .private)")
         }
     }
 }

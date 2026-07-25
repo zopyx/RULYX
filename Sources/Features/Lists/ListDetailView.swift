@@ -721,7 +721,7 @@ struct ListDetailView: View {
             let actors = try await LiveBlueskyClient.fetchProfileBatch(identifiers: [did], httpClient: HTTPClient())
             ownerActor = actors.first
         } catch {
-            AppLogger.performance.error("Failed to fetch list owner: \(error.localizedDescription, privacy: .public)")
+            AppLogger.performance.error("Failed to fetch list owner: \(error.localizedDescription, privacy: .private)")
         }
     }
 

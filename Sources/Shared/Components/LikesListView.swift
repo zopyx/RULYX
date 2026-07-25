@@ -140,7 +140,7 @@ struct LikesListView: View {
             cursor = response.cursor
         } catch {
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load likes: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load likes: \(error.localizedDescription, privacy: .private)")
         }
         isLoading = false
     }
@@ -155,7 +155,7 @@ struct LikesListView: View {
             likes += response.likes
             self.cursor = response.cursor
         } catch {
-            AppLogger.moderation.error("Failed to load more likes: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more likes: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

@@ -124,7 +124,7 @@ final class ComposePostViewModel {
             referencedPost = response.thread.post
         } catch {
             loadError = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load referenced post: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load referenced post: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -150,7 +150,7 @@ final class ComposePostViewModel {
                     selectedImages.append((stripped, mimeType))
                     imageAlts.append(img.alt ?? "")
                 } catch {
-                    AppLogger.moderation.error("Failed to download image for edit: \(error.localizedDescription, privacy: .public)")
+                    AppLogger.moderation.error("Failed to download image for edit: \(error.localizedDescription, privacy: .private)")
                 }
             }
         }
@@ -167,7 +167,7 @@ final class ComposePostViewModel {
         do {
             userLists = try await listService.fetchLists(for: account, appPassword: appPassword)
         } catch {
-            AppLogger.moderation.error("Failed to load lists: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load lists: \(error.localizedDescription, privacy: .private)")
         }
     }
 

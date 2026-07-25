@@ -70,7 +70,7 @@ final class DirectRepliesViewModel {
             feedCursor = nil
             hasMore = false
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load direct replies: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load direct replies: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -94,7 +94,7 @@ final class DirectRepliesViewModel {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load more direct replies: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more direct replies: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -122,7 +122,7 @@ final class DirectRepliesViewModel {
             guard !AppError.isCancellation(error) else { return }
             feedCursor = oldCursor
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to refresh direct replies: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to refresh direct replies: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -212,7 +212,7 @@ final class DirectRepliesViewModel {
         do {
             response = try await client.fetchPostThread(uri: uri, depth: 3, account: account, appPassword: appPassword)
         } catch {
-            AppLogger.moderation.error("Thread fetch failed for \(uri): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Thread fetch failed for \(uri): \(error.localizedDescription, privacy: .private)")
             return []
         }
 

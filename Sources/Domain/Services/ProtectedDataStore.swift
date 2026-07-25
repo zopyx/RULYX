@@ -75,7 +75,7 @@ final class ProtectedDataStore {
             try? directory.setResourceValues(resourceValues)
             try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("ProtectedDataStore write failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("ProtectedDataStore write failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

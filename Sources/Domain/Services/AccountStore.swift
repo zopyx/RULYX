@@ -565,7 +565,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
                     didChange = true
                 }
             } catch {
-                AppLogger.moderation.error("Failed to refresh profile for \(account.handle, privacy: .private): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Failed to refresh profile for \(account.handle, privacy: .private): \(error.localizedDescription, privacy: .private)")
                 continue
             }
         }

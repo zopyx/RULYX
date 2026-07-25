@@ -174,7 +174,7 @@ final class AutoBlockBackService: ObservableObject {
             } catch {
                 existingBlockedDIDs = []
                 AppLogger.moderation.error(
-                    "Auto-block-back: failed to fetch existing block DIDs, falling back to ClearSky data: \(error.localizedDescription, privacy: .public)"
+                    "Auto-block-back: failed to fetch existing block DIDs, falling back to ClearSky data: \(error.localizedDescription, privacy: .private)"
                 )
             }
             let filteredToBlock = toBlock.filter { !existingBlockedDIDs.contains($0.did) }
@@ -217,7 +217,7 @@ final class AutoBlockBackService: ObservableObject {
                                 let underlyingErrors = nsError.underlyingErrors.map(\.localizedDescription).joined(separator: "; ")
                                 let detail = underlyingErrors.isEmpty ? "" : " [underlying: \(underlyingErrors)]"
                                 AppLogger.moderation.error(
-                                    "Auto-block-back failed for \(actor.handle): \(errorDesc, privacy: .public)\(detail, privacy: .public)"
+                                    "Auto-block-back failed for \(actor.handle): \(errorDesc, privacy: .private)\(detail, privacy: .private)"
                                 )
                                 return (false, actor)
                             }
@@ -240,7 +240,7 @@ final class AutoBlockBackService: ObservableObject {
                                     )
                                 } catch {
                                     AppLogger.moderation.error(
-                                        "Auto-block-back: failed to add \(actor.handle) to list \(list.name): \(error.localizedDescription, privacy: .public)"
+                                        "Auto-block-back: failed to add \(actor.handle) to list \(list.name): \(error.localizedDescription, privacy: .private)"
                                     )
                                 }
                             }
@@ -285,7 +285,7 @@ final class AutoBlockBackService: ObservableObject {
             )
         } catch {
             AppLogger.moderation.error(
-                "Auto-block-back fetch failed: \(error.localizedDescription, privacy: .public)"
+                "Auto-block-back fetch failed: \(error.localizedDescription, privacy: .private)"
             )
         }
     }
@@ -301,7 +301,7 @@ final class AutoBlockBackService: ObservableObject {
             try BGTaskScheduler.shared.submit(request)
         } catch {
             AppLogger.moderation.error(
-                "Failed to schedule auto-block-back BGTask: \(error.localizedDescription, privacy: .public)"
+                "Failed to schedule auto-block-back BGTask: \(error.localizedDescription, privacy: .private)"
             )
         }
     }
@@ -339,7 +339,7 @@ final class AutoBlockBackService: ObservableObject {
             allLists = try await listService.fetchLists(for: account, appPassword: appPassword)
         } catch {
             AppLogger.moderation.error(
-                "Auto-block-back: failed to fetch lists for target list matching: \(error.localizedDescription, privacy: .public)"
+                "Auto-block-back: failed to fetch lists for target list matching: \(error.localizedDescription, privacy: .private)"
             )
         }
         if let store = internalListStore {

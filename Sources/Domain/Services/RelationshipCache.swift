@@ -24,7 +24,7 @@ enum RelationshipCache {
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileReadNoSuchFileError {
             return []
         } catch {
-            AppLogger.persistence.error("RelationshipCache load failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache load failed: \(error.localizedDescription, privacy: .private)")
             return []
         }
     }
@@ -36,7 +36,7 @@ enum RelationshipCache {
             let data = try JSONEncoder().encode(actors)
             try data.write(to: url, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("RelationshipCache save failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache save failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -47,7 +47,7 @@ enum RelationshipCache {
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
             // Already gone
         } catch {
-            AppLogger.persistence.error("RelationshipCache clear failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache clear failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -57,7 +57,7 @@ enum RelationshipCache {
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
             // Already gone
         } catch {
-            AppLogger.persistence.error("RelationshipCache clearAll failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("RelationshipCache clearAll failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

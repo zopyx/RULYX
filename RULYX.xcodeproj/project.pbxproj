@@ -36,7 +36,6 @@
 		12EC3A41111AD27C0857E402 /* AccountChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D7D4BAE9F0AD56786F4933 /* AccountChip.swift */; };
 		1370599E19A7BB3F8ACD310B /* iPadMentionsSearchWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39B2D684253070A871359D9 /* iPadMentionsSearchWrapper.swift */; };
 		145B9D2CC63CD099C6EA044A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5995EE83C727D765A13173CF /* SettingsView.swift */; };
-		1478355C6A190158A9A2E20A /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 95B17DA86E920AD852D10B39 /* Localizable.xcstrings */; };
 		15397DA83E567549872CA358 /* AIBatchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D9DCAC6950B4FCB372EAB7 /* AIBatchScreenView.swift */; };
 		15AB1FEEC8DCC27546765682 /* ThumbnailImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961692AE7CB3E6367FB4AE60 /* ThumbnailImageView.swift */; };
 		162DB300DD90FEA3D5BAC00F /* PendingActionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81C8701DE6159917DAB0491 /* PendingActionsSheet.swift */; };
@@ -574,7 +573,6 @@
 		94BB725A8F6B3EFC048C931E /* ListBatchControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListBatchControllerTests.swift; sourceTree = "<group>"; };
 		94DD900CFBAABB505A3F261D /* BlueskyServiceContainerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyServiceContainerWrapper.swift; sourceTree = "<group>"; };
 		9528F0C053027D36B0AA7372 /* ViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelTests.swift; sourceTree = "<group>"; };
-		95B17DA86E920AD852D10B39 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		961692AE7CB3E6367FB4AE60 /* ThumbnailImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailImageView.swift; sourceTree = "<group>"; };
 		96219F3100D954B9C36729AD /* ListTimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTimelineViewModel.swift; sourceTree = "<group>"; };
 		97444FC4D28FC65FB64F4BC5 /* ChatAPIDTOsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAPIDTOsTests.swift; sourceTree = "<group>"; };
@@ -904,7 +902,6 @@
 				3F6E3A18492F55905E358DCD /* it.json */,
 				83B3F04F6B6A8D971735B290 /* ja.json */,
 				A5F24AD4EB062C2CA37E1AED /* ko.json */,
-				95B17DA86E920AD852D10B39 /* Localizable.xcstrings */,
 				711DCF22B063A86DE35A6B6C /* LocalizationManager.swift */,
 				64E0E9C888D2514617D3E9C0 /* nl.json */,
 				BCCD30322305917D698AC804 /* pl.json */,
@@ -1416,22 +1413,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
-				ar,
-				de,
 				en,
-				es,
-				fr,
-				it,
-				ja,
-				ko,
-				nl,
-				pl,
-				pt,
-				ru,
-				th,
-				tr,
-				vi,
-				zh,
 			);
 			mainGroup = F80DD5E31866BC289CC97FED;
 			minimizedProjectReferenceProxies = 1;
@@ -1453,7 +1435,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA04D87E3C7B396CEDABD0EE /* Assets.xcassets in Resources */,
-				1478355C6A190158A9A2E20A /* Localizable.xcstrings in Resources */,
 				02A00E5236C6A0DF59848B98 /* PrivacyInfo.xcprivacy in Resources */,
 				F0DD8B53FB468D3E5BA59847 /* ar.json in Resources */,
 				645653A99CD1D0035946DA31 /* de.json in Resources */,

@@ -103,7 +103,7 @@ final class ListImportController {
             }
         }
 
-        AppLogger.performance.debug("Import preview for '\(sourceDescription, privacy: .public)' with \(tokens.count) tokens took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
+        AppLogger.performance.debug("Import preview for '\(sourceDescription, privacy: .private)' with \(tokens.count) tokens took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
 
         return ImportPreview(
             sourceDescription: sourceDescription,

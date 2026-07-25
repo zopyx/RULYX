@@ -416,7 +416,7 @@ struct ThreadView: View {
                 }
                 reloadThread()
             } catch {
-                AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .private)")
             }
         }
     }
@@ -435,7 +435,7 @@ struct ThreadView: View {
                 }
                 reloadThread()
             } catch {
-                AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .private)")
             }
         }
     }
@@ -494,7 +494,7 @@ final class ThreadViewModel: ObservableObject {
             thread = response.thread
         } catch {
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load thread: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load thread: \(error.localizedDescription, privacy: .private)")
         }
         isLoading = false
     }

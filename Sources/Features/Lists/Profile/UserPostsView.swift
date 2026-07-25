@@ -616,9 +616,9 @@ struct UserPostsView: View {
               let did else { return }
         do {
             try await container.social.muteActor(did: did, account: account, appPassword: appPassword)
-            AppLogger.moderation.info("Muted @\(handle, privacy: .public)")
+            AppLogger.moderation.info("Muted @\(handle, privacy: .private)")
         } catch {
-            AppLogger.moderation.error("Failed to mute @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to mute @\(handle, privacy: .private): \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -628,9 +628,9 @@ struct UserPostsView: View {
               let did else { return }
         do {
             try await container.social.blockActor(did: did, account: account, appPassword: appPassword)
-            AppLogger.moderation.info("Blocked @\(handle, privacy: .public)")
+            AppLogger.moderation.info("Blocked @\(handle, privacy: .private)")
         } catch {
-            AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to block @\(handle, privacy: .private): \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -808,7 +808,7 @@ struct ComposeSheetsModifier: ViewModifier {
         do {
             _ = try await blueskyClient.deleteRecord(recordURI: entryURI, account: account, appPassword: appPassword)
         } catch {
-            AppLogger.moderation.error("Failed to delete post from sheets: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to delete post from sheets: \(error.localizedDescription, privacy: .private)")
         }
         await refresh()
     }

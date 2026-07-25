@@ -41,7 +41,7 @@ extension ListDetailViewModel {
             members = []
         }
 
-        AppLogger.performance.debug("loadMembers for '\(list.name, privacy: .public)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
+        AppLogger.performance.debug("loadMembers for '\(list.name, privacy: .private)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
         isLoadingMembers = false
     }
 
@@ -229,7 +229,7 @@ extension ListDetailViewModel {
             selectedComparisonActorDIDs = []
         }
 
-        AppLogger.performance.debug("compare for '\(currentList.name, privacy: .public)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
+        AppLogger.performance.debug("compare for '\(currentList.name, privacy: .private)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
     }
 
     /// Clears the current comparison report.

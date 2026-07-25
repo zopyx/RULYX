@@ -72,7 +72,7 @@ final class MentionsSearchViewModel {
             cursor = nil
             hasMore = false
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load mentions: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load mentions: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -98,7 +98,7 @@ final class MentionsSearchViewModel {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load more mentions: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more mentions: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -129,7 +129,7 @@ final class MentionsSearchViewModel {
             guard !AppError.isCancellation(error) else { return }
             cursor = oldCursor
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to refresh mentions: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to refresh mentions: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

@@ -161,7 +161,7 @@ final class BlueskyProfileViewModel {
             ownedLists = try await client.fetchActorLists(actor: did, account: account, appPassword: appPassword)
                 .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         } catch {
-            AppLogger.moderation.error("Owned lists fetch failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Owned lists fetch failed: \(error.localizedDescription, privacy: .private)")
             ownedLists = []
         }
         isFetchingOwnedLists = false
@@ -198,7 +198,7 @@ final class BlueskyProfileViewModel {
                                 account: account, appPassword: appPassword
                             )
                         } catch {
-                            AppLogger.moderation.error("Failed to fetch list members page: \(error.localizedDescription, privacy: .public)")
+                            AppLogger.moderation.error("Failed to fetch list members page: \(error.localizedDescription, privacy: .private)")
                             break
                         }
                         found = page.members.contains(where: { $0.actor.did == targetDID })
@@ -216,7 +216,7 @@ final class BlueskyProfileViewModel {
                 recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
             }
         } catch {
-            AppLogger.moderation.error("Subscribed lists fetch failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Subscribed lists fetch failed: \(error.localizedDescription, privacy: .private)")
             subscribedLists = []
         }
         isFetchingSubscribedLists = false
@@ -230,7 +230,7 @@ final class BlueskyProfileViewModel {
             clearskyLists = try await client.fetchClearskyLists(handle: handle)
         } catch {
             listError = error.localizedDescription
-            AppLogger.moderation.error("Clearsky lists failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Clearsky lists failed: \(error.localizedDescription, privacy: .private)")
         }
         isFetchingLists = false
     }
@@ -535,7 +535,7 @@ final class BlueskyProfileViewModel {
         do {
             try FileManager.default.createDirectory(at: targetDir, withIntermediateDirectories: true)
         } catch {
-            AppLogger.moderation.error("Failed to create image download directory: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to create image download directory: \(error.localizedDescription, privacy: .private)")
         }
 
         var allImageURLs: [String] = []
@@ -812,7 +812,7 @@ final class BlueskyProfileViewModel {
             } catch is CancellationError {
                 return nil
             } catch {
-                AppLogger.moderation.error("Export page \(pageCount) failed: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Export page \(pageCount) failed: \(error.localizedDescription, privacy: .private)")
                 if cursor == nil {
                     exportError = AppError.userMessage(from: error)
                     return nil

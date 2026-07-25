@@ -492,7 +492,7 @@ struct ListTimelineView: View {
         do {
             _ = try await container.post.deleteRecord(recordURI: entryURI, account: account, appPassword: appPassword)
         } catch {
-            AppLogger.moderation.error("Failed to delete post: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to delete post: \(error.localizedDescription, privacy: .private)")
         }
         await refresh()
     }
@@ -509,9 +509,9 @@ struct ListTimelineView: View {
               let did else { return }
         do {
             try await container.social.muteActor(did: did, account: account, appPassword: appPassword)
-            AppLogger.moderation.info("Muted @\(handle, privacy: .public)")
+            AppLogger.moderation.info("Muted @\(handle, privacy: .private)")
         } catch {
-            AppLogger.moderation.error("Failed to mute @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to mute @\(handle, privacy: .private): \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -521,9 +521,9 @@ struct ListTimelineView: View {
               let did else { return }
         do {
             try await container.social.blockActor(did: did, account: account, appPassword: appPassword)
-            AppLogger.moderation.info("Blocked @\(handle, privacy: .public)")
+            AppLogger.moderation.info("Blocked @\(handle, privacy: .private)")
         } catch {
-            AppLogger.moderation.error("Failed to block @\(handle, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to block @\(handle, privacy: .private): \(error.localizedDescription, privacy: .private)")
         }
     }
 

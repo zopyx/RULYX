@@ -111,7 +111,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             if AppError.isCancellation(error) {
                 return
             }
-            AppLogger.moderation.debug("Polling check failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.debug("Polling check failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -153,7 +153,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             inlineThreads[uri] = response.thread
             expandedThreadURIs.insert(uri)
         } catch {
-            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -209,7 +209,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             if wasLiked {
                 optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
             }
-            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -234,7 +234,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             if wasReposted {
                 optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
             }
-            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -266,7 +266,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             state = .failed(AppError.userMessage(from: error))
-            AppLogger.moderation.error("Failed to load timeline: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load timeline: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -303,7 +303,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             guard !AppError.isCancellation(error) else { return }
             cursor = oldCursor
             state = (previousState == .initialLoading) ? .failed(AppError.userMessage(from: error)) : previousState
-            AppLogger.moderation.error("Failed to refresh timeline: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to refresh timeline: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -367,7 +367,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             state = .loadMoreFailed(AppError.userMessage(from: error))
-            AppLogger.moderation.error("Failed to load more timeline: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more timeline: \(error.localizedDescription, privacy: .private)")
         }
     }
 

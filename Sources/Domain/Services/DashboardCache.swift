@@ -38,7 +38,7 @@ enum DashboardCache {
             // Normal cache miss — no log needed
             return nil
         } catch {
-            AppLogger.persistence.error("DashboardCache load failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache load failed: \(error.localizedDescription, privacy: .private)")
             return nil
         }
     }
@@ -50,7 +50,7 @@ enum DashboardCache {
             let encoded = try JSONEncoder().encode(data)
             try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         } catch {
-            AppLogger.persistence.error("DashboardCache save failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache save failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -61,7 +61,7 @@ enum DashboardCache {
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
             // Already gone — no-op
         } catch {
-            AppLogger.persistence.error("DashboardCache clear failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache clear failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -71,7 +71,7 @@ enum DashboardCache {
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
             // Already gone
         } catch {
-            AppLogger.persistence.error("DashboardCache clearAll failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("DashboardCache clearAll failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

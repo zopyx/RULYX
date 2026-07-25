@@ -156,7 +156,7 @@ class LiveAIService: ObservableObject {
             rebuildStates()
             throw error
         }
-        AppLogger.persistence.info("SHA-256 integrity check passed for \(model.id, privacy: .public)")
+        AppLogger.persistence.info("SHA-256 integrity check passed for \(model.id, privacy: .private)")
 
         rebuildStates()
     }
@@ -233,7 +233,7 @@ class LiveAIService: ObservableObject {
         do {
             return try loadCatalogFromBundle()
         } catch {
-            AppLogger.persistence.error("Falling back to built-in AI catalog: \(error.localizedDescription, privacy: .public)")
+            AppLogger.persistence.error("Falling back to built-in AI catalog: \(error.localizedDescription, privacy: .private)")
             return defaultCatalog
         }
     }

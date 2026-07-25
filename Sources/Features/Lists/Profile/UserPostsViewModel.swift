@@ -137,7 +137,7 @@ final class UserPostsViewModel {
             cursor = oldCursor
             hasMore = oldHasMore
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to refresh posts: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to refresh posts: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -156,7 +156,7 @@ final class UserPostsViewModel {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load posts: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load posts: \(error.localizedDescription, privacy: .private)")
         }
         await autoExpandThreads(account: account, appPassword: appPassword, using: client)
     }
@@ -175,7 +175,7 @@ final class UserPostsViewModel {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load more posts: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more posts: \(error.localizedDescription, privacy: .private)")
         }
         await autoExpandThreads(account: account, appPassword: appPassword, using: client)
     }
@@ -203,7 +203,7 @@ final class UserPostsViewModel {
             if wasLiked {
                 optimisticLikeURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myLikeURI
             }
-            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -228,7 +228,7 @@ final class UserPostsViewModel {
             if wasReposted {
                 optimisticRepostURIs[uri] = posts.first(where: { $0.post.uri == uri })?.post.myRepostURI
             }
-            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -281,7 +281,7 @@ final class UserPostsViewModel {
             inlineThreads[uri] = response.thread
             expandedThreadURIs.insert(uri)
         } catch {
-            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -329,7 +329,7 @@ final class UserPostsViewModel {
                     expandedThreadURIs.insert(uri)
                 }
             } catch {
-                AppLogger.moderation.error("Thread fetch failed for \(uri): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Thread fetch failed for \(uri): \(error.localizedDescription, privacy: .private)")
             }
         }
     }

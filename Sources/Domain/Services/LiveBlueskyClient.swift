@@ -959,7 +959,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             let decodedData = data.isEmpty ? Data("{}".utf8) : data
             return try JSONDecoder().decode(Response.self, from: decodedData)
         } catch {
-            AppLogger.performance.debug("Decoding failure for \(path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.performance.debug("Decoding failure for \(path, privacy: .private): \(error.localizedDescription, privacy: .private)")
             throw BlueskyAPIError.invalidResponse
         }
     }
@@ -1440,7 +1440,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     do {
                         return try await Self.fetchProfileBatch(identifiers: chunk, httpClient: httpClient)
                     } catch {
-                        AppLogger.performance.error("Profile batch lookup failed: \(error.localizedDescription, privacy: .public)")
+                        AppLogger.performance.error("Profile batch lookup failed: \(error.localizedDescription, privacy: .private)")
                         return []
                     }
                 }
@@ -1799,7 +1799,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 }
                 lastError = nil
             } catch {
-                AppLogger.moderation.error("fetchFollowers page \(pageCount) failed: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("fetchFollowers page \(pageCount) failed: \(error.localizedDescription, privacy: .private)")
                 // Retry once on transient failure
                 if cursor != nil, lastError == nil {
                     lastError = error
@@ -1872,7 +1872,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 }
                 lastError = nil
             } catch {
-                AppLogger.moderation.error("fetchFollowing page \(pageCount) failed: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("fetchFollowing page \(pageCount) failed: \(error.localizedDescription, privacy: .private)")
                 // Retry once on transient failure
                 if cursor != nil, lastError == nil {
                     lastError = error

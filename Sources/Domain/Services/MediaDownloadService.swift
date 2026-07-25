@@ -258,7 +258,7 @@ actor MediaDownloadService {
             }
         } catch {
             let message = AppError.userMessage(from: error)
-            AppLogger.performance.error("Media download failed for \(asset.filenameStem, privacy: .public): \(message, privacy: .public)")
+            AppLogger.performance.error("Media download failed for \(asset.filenameStem, privacy: .private): \(message, privacy: .private)")
             return MediaAssetDownloadOutcome(index: asset.index, savedFilename: nil, error: message)
         }
     }
@@ -316,11 +316,11 @@ actor MediaDownloadService {
             do {
                 initSegmentData = try await downloadInitSegment(initSegment, using: httpClient)
             } catch {
-                AppLogger.performance.debug("Init segment download failed for \(filenameStem, privacy: .public): \(error.localizedDescription) — continuing without")
+                AppLogger.performance.debug("Init segment download failed for \(filenameStem, privacy: .private): \(error.localizedDescription) — continuing without")
             }
         }
         if initSegmentData == nil {
-            AppLogger.performance.debug("No init segment for \(filenameStem, privacy: .public) — stream may be TS-based")
+            AppLogger.performance.debug("No init segment for \(filenameStem, privacy: .private) — stream may be TS-based")
         }
 
         let segmentFiles = await downloadVideoSegments(
@@ -371,7 +371,7 @@ actor MediaDownloadService {
         try outputHandle.close()
 
         let concatSize = (try? FileManager.default.attributesOfItem(atPath: transportStreamURL.path)[.size] as? Int) ?? 0
-        AppLogger.performance.debug("Concatenated \(concatSize) bytes for \(filenameStem, privacy: .public) (\(segments.count) segments, init=no)")
+        AppLogger.performance.debug("Concatenated \(concatSize) bytes for \(filenameStem, privacy: .private) (\(segments.count) segments, init=no)")
 
         // Use AVAssetExportSession with passthrough for robust remux.
         // Handles common TS timestamp discontinuities better than manual reader/writer.
@@ -383,11 +383,11 @@ actor MediaDownloadService {
         let asset = AVAsset(url: transportStreamURL)
         var export = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough)
         if export == nil {
-            AppLogger.performance.debug("Passthrough unavailable for \(filenameStem, privacy: .public) — falling back to highest quality")
+            AppLogger.performance.debug("Passthrough unavailable for \(filenameStem, privacy: .private) — falling back to highest quality")
             export = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)
         }
         guard let export else {
-            AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .public): AVAssetExportSession could not be created")
+            AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .private): AVAssetExportSession could not be created")
             return transportStreamURL.lastPathComponent
         }
         export.outputURL = mp4URL
@@ -399,7 +399,7 @@ actor MediaDownloadService {
         guard export.status == .completed else {
             try? FileManager.default.removeItem(at: mp4URL)
             let reason = export.error?.localizedDescription
-            AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .public): export status=\(export.status.rawValue), error=\(reason ?? "none", privacy: .public)")
+            AppLogger.performance.error("Falling back to transport stream for \(filenameStem, privacy: .private): export status=\(export.status.rawValue), error=\(reason ?? "none", privacy: .private)")
             return transportStreamURL.lastPathComponent
         }
 

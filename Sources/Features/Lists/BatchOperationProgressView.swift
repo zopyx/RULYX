@@ -291,7 +291,7 @@ struct BatchOperationProgressView: View {
             blockedDIDs = Set(blockedResult.actors.map(\.did))
         } catch {
             blockedDIDs = []
-            AppLogger.moderation.error("Failed to fetch blocked actors: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to fetch blocked actors: \(error.localizedDescription, privacy: .private)")
         }
 
         var toProcess: [PendingLikerTarget] = []
@@ -336,7 +336,7 @@ struct BatchOperationProgressView: View {
             memberDIDs = Set(members.map(\.actor.did))
         } catch {
             memberDIDs = []
-            AppLogger.moderation.error("Failed to fetch list members: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to fetch list members: \(error.localizedDescription, privacy: .private)")
         }
 
         var toProcess: [PendingLikerTarget] = []

@@ -76,7 +76,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             state = .failed(AppError.userMessage(from: error))
-            AppLogger.moderation.error("Failed to load list timeline: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load list timeline: \(error.localizedDescription, privacy: .private)")
             await loadMemberOwnPostsFallback(account: account, appPassword: appPassword, using: client)
         }
     }
@@ -109,7 +109,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             state = .loadMoreFailed(AppError.userMessage(from: error))
-            AppLogger.moderation.error("Failed to load more list timeline: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more list timeline: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -175,7 +175,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             if AppError.isCancellation(error) {
                 return
             }
-            AppLogger.moderation.debug("List polling check failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.debug("List polling check failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -207,7 +207,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             if wasLiked {
                 optimisticLikeURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myLikeURI
             }
-            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Like failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -232,7 +232,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             if wasReposted {
                 optimisticRepostURIs[uri] = entries.first(where: { $0.post.uri == uri })?.post.myRepostURI
             }
-            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Repost failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -285,7 +285,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             inlineThreads[uri] = response.thread
             expandedThreadURIs.insert(uri)
         } catch {
-            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load thread for inline expansion: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -335,7 +335,7 @@ final class ListTimelineViewModel: TimelineViewModelProtocol {
             if state != .failed("") { // Don't overwrite a specific error with fallback error
                 state = .failed(AppError.userMessage(from: error))
             }
-            AppLogger.moderation.error("Failed to load fallback list timeline: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load fallback list timeline: \(error.localizedDescription, privacy: .private)")
         }
     }
 

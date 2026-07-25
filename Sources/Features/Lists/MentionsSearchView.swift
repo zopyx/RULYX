@@ -436,7 +436,7 @@ struct MentionsSearchView: View {
                 }
         } catch {
             availableTargetLists = []
-            AppLogger.moderation.error("Failed to load available target lists: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load available target lists: \(error.localizedDescription, privacy: .private)")
         }
         let internalLists = internalListStore.lists.map { internalList in
             BlueskyList(

@@ -58,7 +58,7 @@ final class PushNotificationCoordinator: ObservableObject {
         NotificationCenter.default.publisher(for: .pushRegistrationDidFail)
             .sink { notification in
                 let error = notification.userInfo?["error"] as? Error
-                AppLogger.moderation.error("APNs registration failed: \(error?.localizedDescription ?? "unknown", privacy: .public)")
+                AppLogger.moderation.error("APNs registration failed: \(error?.localizedDescription ?? "unknown", privacy: .private)")
             }
             .store(in: &cancellables)
 
@@ -100,7 +100,7 @@ final class PushNotificationCoordinator: ObservableObject {
 
             UIApplication.shared.registerForRemoteNotifications()
         } catch {
-            AppLogger.moderation.error("Notification authorization failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Notification authorization failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -125,7 +125,7 @@ final class PushNotificationCoordinator: ObservableObject {
                     appPassword: accountStore.appPassword(for: account)
                 )
             } catch {
-                AppLogger.moderation.error("Push unregister failed for removed account \(account.handle): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Push unregister failed for removed account \(account.handle): \(error.localizedDescription, privacy: .private)")
             }
         }
 
@@ -141,7 +141,7 @@ final class PushNotificationCoordinator: ObservableObject {
                 )
                 successfulRegistrations[account.id] = account
             } catch {
-                AppLogger.moderation.error("Push register failed for \(account.handle): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Push register failed for \(account.handle): \(error.localizedDescription, privacy: .private)")
             }
         }
 
@@ -149,7 +149,7 @@ final class PushNotificationCoordinator: ObservableObject {
     }
 
     private func handlePushPayload(_ payload: [AnyHashable: Any], shouldNavigate: Bool) async {
-        AppLogger.moderation.debug("Received push payload with keys: \(payload.keys.map { String(describing: $0) }.joined(separator: ","), privacy: .public)")
+        AppLogger.moderation.debug("Received push payload with keys: \(payload.keys.map { String(describing: $0) }.joined(separator: ","), privacy: .private)")
 
         if let activeAccount = accountStore.activeAccount {
             let appPassword = accountStore.appPassword(for: activeAccount)

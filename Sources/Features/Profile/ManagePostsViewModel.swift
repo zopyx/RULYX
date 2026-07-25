@@ -141,7 +141,7 @@ final class ManagePostsViewModel {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load posts: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load posts: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -160,7 +160,7 @@ final class ManagePostsViewModel {
         } catch {
             guard !AppError.isCancellation(error) else { return }
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to load more posts: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to load more posts: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -186,7 +186,7 @@ final class ManagePostsViewModel {
             cursor = oldCursor
             hasMore = oldHasMore
             errorMessage = AppError.userMessage(from: error)
-            AppLogger.moderation.error("Failed to refresh posts: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to refresh posts: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -205,7 +205,7 @@ final class ManagePostsViewModel {
             if !posts.contains(where: { $0.post.uri == uri }) {
                 posts.append(entry)
             }
-            AppLogger.moderation.error("Failed to delete post: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to delete post: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -227,7 +227,7 @@ final class ManagePostsViewModel {
             do {
                 _ = try await client.deleteRecord(recordURI: uri, account: account, appPassword: appPassword)
             } catch {
-                AppLogger.moderation.error("Failed to delete post \(uri): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Failed to delete post \(uri): \(error.localizedDescription, privacy: .private)")
             }
         }
 
@@ -254,7 +254,7 @@ final class ManagePostsViewModel {
                 pageCursor = next
             } catch {
                 guard !AppError.isCancellation(error) else { return }
-                AppLogger.moderation.error("Failed to load page for nuclear delete: \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Failed to load page for nuclear delete: \(error.localizedDescription, privacy: .private)")
                 break
             }
         }
@@ -273,7 +273,7 @@ final class ManagePostsViewModel {
             do {
                 _ = try await client.deleteRecord(recordURI: uri, account: account, appPassword: appPassword)
             } catch {
-                AppLogger.moderation.error("Failed to delete post \(uri): \(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Failed to delete post \(uri): \(error.localizedDescription, privacy: .private)")
             }
         }
 

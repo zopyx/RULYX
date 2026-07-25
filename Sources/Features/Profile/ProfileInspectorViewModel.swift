@@ -132,7 +132,7 @@ final class ProfileInspectorViewModel {
             }
 
             let appError = AppError.from(error)
-            AppLogger.search.error("Profile search for '\(requestQuery)' failed: \(appError.message, privacy: .public)")
+            AppLogger.search.error("Profile search for '\(requestQuery)' failed: \(appError.message, privacy: .private)")
             errorMessage = appError.message
             searchResults = []
         }

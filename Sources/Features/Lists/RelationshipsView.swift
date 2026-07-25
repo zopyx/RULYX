@@ -1018,7 +1018,7 @@ struct RelationshipsView: View {
             do {
                 lists = try await container.list.fetchLists(for: account, appPassword: appPassword)
             } catch {
-                AppLogger.moderation.error("Failed to load available target lists: \\(error.localizedDescription, privacy: .public)")
+                AppLogger.moderation.error("Failed to load available target lists: \\(error.localizedDescription, privacy: .private)")
             }
         }
         let internalLists = internalListStore.lists.map { internalList in

@@ -59,7 +59,7 @@ extension ListDetailViewModel {
             hasMoreSearchResults = false
         }
 
-        AppLogger.performance.debug("search for '\(trimmed, privacy: .public)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
+        AppLogger.performance.debug("search for '\(trimmed, privacy: .private)' took \(CFAbsoluteTimeGetCurrent() - start, format: .fixed(precision: 2))s")
         isSearching = false
     }
 

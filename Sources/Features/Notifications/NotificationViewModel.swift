@@ -113,7 +113,7 @@ final class NotificationViewModel {
             }
             unreadCount = 0
         } catch {
-            AppLogger.moderation.error("Failed to mark notifications as read: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Failed to mark notifications as read: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -195,7 +195,7 @@ final class NotificationViewModel {
                 resolvedPosts[post.uri] = post
             }
         } catch {
-            AppLogger.moderation.error("Batch notification post fetch failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Batch notification post fetch failed: \(error.localizedDescription, privacy: .private)")
         }
 
         // Individually fetch any URIs that were missing from the batch result
