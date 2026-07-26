@@ -15,10 +15,9 @@ final class ChatService: ChatServicing {
     /// HTTP client for performing requests.
     private let httpClient: HTTPClient
 
-    /// Creates the chat service with its required dependencies.
-    /// The default HTTP client pins first-party Bluesky/ClearSky hosts
-    /// (per-host enforcement — custom PDS hosts use standard TLS).
-    init(requestExecutor _: BlueskyRequestExecuting, sessionService: BlueskySessionServicing, httpClient: HTTPClient = HTTPClient(pinnedHashes: HTTPClient.defaultPinnedHashes)) {
+    /// Creates the chat service with its required dependencies. The default
+    /// HTTP client uses platform TLS; callers may inject enterprise pinning.
+    init(requestExecutor _: BlueskyRequestExecuting, sessionService: BlueskySessionServicing, httpClient: HTTPClient = HTTPClient()) {
         self.sessionService = sessionService
         self.httpClient = httpClient
     }

@@ -156,6 +156,17 @@ struct ConversationListView: View {
             }
             .pageTitle(Text(loc: "tab.chat"))
             .toolbar {
+                if navPath.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            SettingsView()
+                                .navigationTitle(loc("tab.settings"))
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel(loc("tab.settings"))
+                    }
+                }
                 if !chatStore.conversations.isEmpty {
                     ToolbarItem(placement: .topBarLeading) {
                         if editMode.isEditing {

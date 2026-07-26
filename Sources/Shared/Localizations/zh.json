@@ -1382,7 +1382,7 @@
   "settings.delete_all_data": "Delete All Data",
   "settings.delete_all_data.confirm": "Delete All Data?",
   "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
-  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
+  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, cached data, and account credentials.",
   "settings.icloud": "iCloud",
   "settings.icloud.disabled_footer": "启用以保持您的帐户配置在不同设备上保持一致。",
   "settings.icloud.enabled_footer": "帐户句柄和标签在您的设备之间同步。为了安全起见，应用程序密码保留在每台设备上。",

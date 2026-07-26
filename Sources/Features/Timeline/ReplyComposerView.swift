@@ -5,10 +5,15 @@ import SwiftUI
 
 /// Composes a reply to a post — shows the parent post preview, a text editor
 /// with character count, optional images, and posts via the Bluesky API.
+@MainActor
 struct ReplyComposerView: View {
     let account: AppAccount
     let appPassword: String
-    let blueskyClient: LiveBlueskyClient
+    /// The reply flow only needs post and media capabilities.  Keeping this
+    /// dependency protocol-based allows previews and tests to supply a
+    /// lightweight implementation without coupling the view to the concrete
+    /// production client.
+    let blueskyClient: any BlueskyPostServicing & BlueskyMediaServicing
     let parentURI: String
     let parentCID: String
     let rootURI: String
@@ -32,6 +37,7 @@ struct ReplyComposerView: View {
     // MARK: - Body
 
     var body: some View {
+        let addImagesLabel = loc("compose.add_images")
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
@@ -91,7 +97,7 @@ struct ReplyComposerView: View {
                             maxSelectionCount: maxImages - selectedImages.count,
                             matching: .images
                         ) {
-                            Label(loc("compose.add_images"), systemImage: "photo.on.rectangle.angled")
+                            Label(addImagesLabel, systemImage: "photo.on.rectangle.angled")
                                 .font(.subheadline)
                                 .foregroundStyle(Color.skyPrimary)
                         }
@@ -243,7 +249,12 @@ struct ReplyComposerView: View {
     /// Fetches the parent post from the API to display as context.
     private func loadParentPost() async {
         do {
-            let response = try await blueskyClient.fetchPostThread(uri: parentURI, account: account, appPassword: appPassword)
+            let response = try await blueskyClient.fetchPostThread(
+                uri: parentURI,
+                depth: nil,
+                account: account,
+                appPassword: appPassword
+            )
             let node = response.thread
             parentPost = RichPost(
                 uri: node.post.uri ?? parentURI,
@@ -272,7 +283,13 @@ struct ReplyComposerView: View {
             // Upload images first
             var attachments: [PostImageAttachment] = []
             for img in selectedImages {
-                let response = try await blueskyClient.uploadBlob(data: img.data, mimeType: img.mimeType, account: account, appPassword: appPassword)
+                let response = try await blueskyClient.uploadBlob(
+                    data: img.data,
+                    mimeType: img.mimeType,
+                    account: account,
+                    appPassword: appPassword,
+                    progress: nil
+                )
                 attachments.append(PostImageAttachment(blob: response.blob, alt: ""))
             }
 

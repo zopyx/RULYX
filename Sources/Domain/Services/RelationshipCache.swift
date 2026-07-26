@@ -22,7 +22,14 @@ enum RelationshipCache {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode([BlueskyActor].self, from: data)
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileReadNoSuchFileError {
-            return []
+            guard !key.contains("/"), key != ".." else { return [] }
+            let legacyURL = cachesDirectory.appendingPathComponent("\(key).json")
+            guard let data = try? Data(contentsOf: legacyURL),
+                  let decoded = try? JSONDecoder().decode([BlueskyActor].self, from: data)
+            else { return [] }
+            save(decoded, forKey: key)
+            try? FileManager.default.removeItem(at: legacyURL)
+            return decoded
         } catch {
             AppLogger.persistence.error("RelationshipCache load failed: \(error.localizedDescription, privacy: .private)")
             return []

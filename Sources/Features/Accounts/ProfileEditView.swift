@@ -4,6 +4,7 @@ import SwiftUI
 /// A sheet for editing the authenticated account's profile: display name,
 /// description, avatar, and banner. Fetches the current profile record on
 /// appear so existing blob refs can be preserved when fields are not changed.
+@MainActor
 struct ProfileEditView: View {
     let account: AppAccount
     let appPassword: String?
@@ -95,8 +96,10 @@ struct ProfileEditView: View {
 
     // MARK: - Sections
 
+    @MainActor
     private var avatarSection: some View {
-        Section {
+        let avatarChangeLabel = loc("profile.edit.avatar.change")
+        return Section {
             VStack(alignment: .center, spacing: 12) {
                 // Preview
                 Group {
@@ -136,7 +139,7 @@ struct ProfileEditView: View {
                         matching: .images,
                         photoLibrary: .shared()
                     ) {
-                        Label(loc("profile.edit.avatar.change"), systemImage: "photo")
+                        Label(avatarChangeLabel, systemImage: "photo")
                             .font(.subheadline)
                     }
                     .onChange(of: avatarPickerItem) { _, newItem in
@@ -165,8 +168,10 @@ struct ProfileEditView: View {
         }
     }
 
+    @MainActor
     private var bannerSection: some View {
-        Section {
+        let bannerChangeLabel = loc("profile.edit.banner.change")
+        return Section {
             VStack(alignment: .center, spacing: 12) {
                 // Preview
                 Group {
@@ -212,7 +217,7 @@ struct ProfileEditView: View {
                         matching: .images,
                         photoLibrary: .shared()
                     ) {
-                        Label(loc("profile.edit.banner.change"), systemImage: "photo")
+                        Label(bannerChangeLabel, systemImage: "photo")
                             .font(.subheadline)
                     }
                     .onChange(of: bannerPickerItem) { _, newItem in

@@ -112,9 +112,15 @@ final class ArchitectureEnforcementTests: XCTestCase {
 
         for file in viewFiles {
             let fileName = (file as NSString).lastPathComponent
-            if exemptFiles.contains(fileName) { continue }
-            if fileName.contains("ViewModel") || fileName.contains("ViewModel+") { continue }
-            if fileName.hasPrefix("iPad") { continue }
+            if exemptFiles.contains(fileName) {
+                continue
+            }
+            if fileName.contains("ViewModel") || fileName.contains("ViewModel+") {
+                continue
+            }
+            if fileName.hasPrefix("iPad") {
+                continue
+            }
 
             guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }
 
@@ -140,7 +146,30 @@ final class ArchitectureEnforcementTests: XCTestCase {
         }
         // Hard failure: no view file may directly import concrete service types.
         // When the migration is complete, this line enforces the rule permanently.
-        XCTAssertTrue(violations.isEmpty,
-            "\(violations.count) view files directly reference service implementations. Route through BlueskyServiceContainerWrapper instead.")
+        XCTAssertTrue(
+            violations.isEmpty,
+            "\(violations.count) view files directly reference service implementations. Route through BlueskyServiceContainerWrapper instead."
+        )
+    }
+
+    // MARK: - Rule: Legacy client accessor migration guard
+
+    /// iPad views must use protocol capabilities rather than the deprecated
+    /// concrete-client facade. This guard prevents regressions.
+    func testLegacyBlueskyClientAccessorDoesNotGrow() {
+        var actualByFile: [String: Int] = [:]
+        for file in sourceFiles where file.contains("/App/iPad/") {
+            let fileName = (file as NSString).lastPathComponent
+            guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }
+            let count = content.components(separatedBy: "container.blueskyClient").count - 1
+            if count > 0 {
+                actualByFile[fileName] = count
+            }
+        }
+
+        XCTAssertTrue(
+            actualByFile.isEmpty,
+            "iPad views must use protocol capabilities; remaining legacy references: \(actualByFile)"
+        )
     }
 }

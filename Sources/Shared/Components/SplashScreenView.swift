@@ -185,7 +185,8 @@ struct SplashScreenView: View {
         }
 
         if dismissAutomatically {
-            try? await Task.sleep(for: .seconds(3.0))
+            // Keep the branding animation visible briefly without blocking app startup.
+            try? await Task.sleep(for: .seconds(0.8))
 
             withAnimation(.easeOut(duration: 0.3)) {
                 isActive = false

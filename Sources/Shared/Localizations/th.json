@@ -1382,7 +1382,7 @@
   "settings.delete_all_data": "Delete All Data",
   "settings.delete_all_data.confirm": "Delete All Data?",
   "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
-  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
+  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, cached data, and account credentials.",
   "settings.icloud": "ไอคลาวด์",
   "settings.icloud.disabled_footer": "เปิดใช้งานเพื่อให้การกำหนดค่าบัญชีของคุณสอดคล้องกันในอุปกรณ์ต่างๆ",
   "settings.icloud.enabled_footer": "การจัดการบัญชีและป้ายกำกับจะซิงค์กับอุปกรณ์ของคุณ รหัสผ่านสำหรับแอปจะคงอยู่ในอุปกรณ์แต่ละเครื่องเพื่อความปลอดภัย",

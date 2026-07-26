@@ -24,6 +24,14 @@ final class ProtectedDataStore {
     private let defaults: UserDefaults
     private let useFileStorage: Bool
 
+    /// Removes every production protected store. Used only by the explicit
+    /// destructive "Delete All Data" action.
+    static func eraseAll() {
+        let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("com.ajung.RULYX/ProtectedStores", isDirectory: true)
+        try? FileManager.default.removeItem(at: directory)
+    }
+
     init(name: String, legacyKey: String, defaults: UserDefaults = .standard, directory: URL? = nil) {
         self.legacyKey = legacyKey
         self.defaults = defaults

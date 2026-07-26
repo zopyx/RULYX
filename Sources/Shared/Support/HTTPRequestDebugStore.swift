@@ -428,6 +428,13 @@ extension HTTPRequestDebugStore {
     func writeExportCSV(fileName: String = "http_debug_export.csv") -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
         try? csvString.write(to: url, atomically: true, encoding: .utf8)
+        // Debug exports can contain request metadata; protect them at rest while
+        // the share sheet is open. Callers remain responsible for deleting them
+        // after the share completes.
+        try? FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.complete],
+            ofItemAtPath: url.path
+        )
         return url
     }
 

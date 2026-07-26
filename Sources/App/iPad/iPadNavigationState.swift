@@ -42,6 +42,9 @@ final class iPadNavigationState: ObservableObject {
     @Published var sidebarSelection: SidebarItem? = .allLists
     @Published var columnVisibility: NavigationSplitViewVisibility = .all
     @Published var selectedList: BlueskyList?
+    /// Selected app-local list. Kept separate from BlueskyList because the
+    /// two models have intentionally different identity and detail actions.
+    @Published var selectedInternalList: InternalList?
     @Published var selectedProfileDID: String?
 
     /// Posts a typed navigation request. Observers (iPadRootView) handle

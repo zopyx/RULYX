@@ -79,11 +79,12 @@ private struct InlineAnimatedMediaWebView: UIViewRepresentable {
 
     /// Cancels every navigation action: the media page is fully self-contained
     /// and must never navigate away (link clicks, redirects, JS-less tricks).
+    @MainActor
     final class Coordinator: NSObject, WKNavigationDelegate {
         func webView(
             _: WKWebView,
             decidePolicyFor navigationAction: WKNavigationAction,
-            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+            decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void
         ) {
             if navigationAction.navigationType == .other {
                 decisionHandler(.allow)

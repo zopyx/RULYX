@@ -36,7 +36,7 @@ struct PostActionBar: View {
     }
 
     var body: some View {
-        HStack(spacing: 24) {
+        HStack(spacing: 0) {
             if let onReply = callbacks.onReply {
                 actionButton(icon: "bubble.left", count: replyCount, action: onReply)
                     .accessibilityLabel(loc("post.reply"))
@@ -49,9 +49,13 @@ struct PostActionBar: View {
                         if let count = effectiveRepostCount {
                             Text("\(count)")
                                 .font(.callout)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
                         }
                     }
                     .foregroundStyle(isReposted ? Color.green : Color(.secondaryLabel))
+                    .frame(width: 44, height: 44)
+                    .clipped()
                 }
                 .accessibilityLabel(isReposted ? loc("post.unrepost") : loc("post.repost"))
                 .buttonStyle(.plain)
@@ -64,6 +68,7 @@ struct PostActionBar: View {
                         .foregroundStyle(isLiked ? Color.red : Color(.secondaryLabel))
                         .scaleEffect(isLiked ? 1.1 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isLiked)
+                        .frame(width: 44, height: 44)
                 }
                 .accessibilityLabel(isLiked ? loc("post.unlike") : loc("post.like"))
                 .buttonStyle(.plain)
@@ -74,6 +79,9 @@ struct PostActionBar: View {
                 Button(action: { callbacks.onShowLikes?() }) {
                     Text("\(count)")
                         .font(.callout)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(width: 44, height: 44)
                 }
                 .accessibilityLabel(loc("post.likes_count"))
                 .buttonStyle(.plain)
@@ -88,6 +96,7 @@ struct PostActionBar: View {
                 gearMenu
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.secondary)
     }
 
@@ -290,6 +299,8 @@ struct PostActionBar: View {
             Image(systemName: "gearshape")
                 .font(.body.weight(.medium))
                 .foregroundStyle(.secondary)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
         .accessibilityLabel(loc("post.gear_menu"))
     }
@@ -308,8 +319,12 @@ struct PostActionBar: View {
                     if let count {
                         Text("\(count)")
                             .font(.callout)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                     }
                 }
+                .frame(width: 44, height: 44)
+                .clipped()
             }
             .buttonStyle(.plain)
         } else {
@@ -319,8 +334,12 @@ struct PostActionBar: View {
                 if let count {
                     Text("\(count)")
                         .font(.callout)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
+            .frame(width: 44, height: 44)
+            .clipped()
         }
     }
 }

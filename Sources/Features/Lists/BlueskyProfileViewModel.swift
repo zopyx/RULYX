@@ -1,6 +1,9 @@
 import Foundation
 import Observation
 
+/// Capabilities needed by profile inspection and moderation workflows.
+typealias BlueskyProfileDataService = any BlueskyClearSkyServicing & BlueskyFeedServicing & BlueskyIdentityServicing & BlueskyListServicing & BlueskyMediaServicing & BlueskyProfileInspecting & BlueskySocialServicing
+
 /// Metadata about a moderation list that is blocking the inspected profile.
 struct BlockingListInfo: Identifiable, Hashable {
     let id: String
@@ -169,7 +172,7 @@ final class BlueskyProfileViewModel {
 
     /// Fetches the viewer's subscribed moderation lists and checks if the target profile appears in any of them.
     /// - Parameter targetDID: The profile DID to check against each list; if nil, skips membership checking.
-    func fetchSubscribedLists(account: AppAccount, appPassword: String, using client: LiveBlueskyClient, targetDID: String? = nil) async {
+    func fetchSubscribedLists(account: AppAccount, appPassword: String, using client: BlueskyProfileDataService, targetDID: String? = nil) async {
         isFetchingSubscribedLists = true
         do {
             subscribedLists = try await client.fetchSubscribedModerationLists(account: account, appPassword: appPassword)
@@ -223,7 +226,7 @@ final class BlueskyProfileViewModel {
     }
 
     /// Fetches ClearSky public lists that contain the given handle.
-    func fetchClearskyLists(handle: String, using client: LiveBlueskyClient) async {
+    func fetchClearskyLists(handle: String, using client: BlueskyProfileDataService) async {
         isFetchingLists = true
         listError = nil
         do {
@@ -267,7 +270,7 @@ final class BlueskyProfileViewModel {
         viewerPassword: String,
         dataAccount: AppAccount,
         dataPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         guard !hasLoadedOnce else { return }
         await load(did: actorDID, account: viewerAccount, viewerPassword: viewerPassword, dataAccount: dataAccount, dataPassword: dataPassword, using: client)
@@ -284,7 +287,7 @@ final class BlueskyProfileViewModel {
         viewerPassword: String,
         dataAccount: AppAccount,
         dataPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         isLoading = true
         errorMessage = nil
@@ -348,7 +351,7 @@ final class BlueskyProfileViewModel {
     /// - Caps at 1000 posts (10 pages of 100) to bound execution time
     /// - Caches results in `BlueskyAPICache` with 5-minute TTL
     /// - Checks cache before scanning; skips entirely on cache hit
-    private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+    private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: BlueskyProfileDataService) async {
         let cacheKey = "mediaScan_\(did)"
 
         // Check cache first
@@ -413,7 +416,7 @@ final class BlueskyProfileViewModel {
     func toggleMute(
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         guard let profile else { return }
         let isCurrentlyMuted = pendingMuteState ?? profile.viewerState?.muted ?? false
@@ -450,7 +453,7 @@ final class BlueskyProfileViewModel {
     }
 
     /// Submits a moderation report for the profile with the selected reason.
-    func reportAccount(reason: String?, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+    func reportAccount(reason: String?, account: AppAccount, appPassword: String, using client: BlueskyProfileDataService) async {
         guard let profile else { return }
 
         isReporting = true
@@ -479,7 +482,7 @@ final class BlueskyProfileViewModel {
     func toggleFollow(
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         guard let profile else { return }
         let isCurrentlyFollowing = pendingFollowingState ?? profile.viewerState?.isFollowing ?? false
@@ -525,7 +528,7 @@ final class BlueskyProfileViewModel {
 
     /// Downloads up to 500 images from the profile's recent posts to the specified directory.
     /// - Parameter directory: The parent directory; images are saved to `directory/handle/`.
-    func downloadLatestImages(to directory: URL, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
+    func downloadLatestImages(to directory: URL, account: AppAccount, appPassword: String, using client: BlueskyProfileDataService) async {
         guard let profile else { return }
 
         isDownloadingImages = true
@@ -595,7 +598,7 @@ final class BlueskyProfileViewModel {
     func toggleBlock(
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         guard let profile else { return }
         let isCurrentlyBlocking = pendingBlockState ?? profile.viewerState?.isBlocking ?? false
@@ -648,7 +651,7 @@ final class BlueskyProfileViewModel {
     func blockAllFollowers(
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient,
+        using client: BlueskyProfileDataService,
         queue: ActionQueueStore
     ) async {
         guard let profile else { return }
@@ -691,7 +694,7 @@ final class BlueskyProfileViewModel {
         _ membership: ProfileListMembership,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         guard let profile else { return }
         let isCurrentlyMember = pendingListMemberStates[membership.listURI] ?? membership.isMember
@@ -744,7 +747,7 @@ final class BlueskyProfileViewModel {
         kind: BlueskyList.Kind,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: BlueskyProfileDataService
     ) async {
         guard let profile else { return }
 
@@ -786,7 +789,7 @@ final class BlueskyProfileViewModel {
 
     /// Enumerates all pages of the profile's posts and exports them as CSV or JSON.
     /// - Returns: The file URL of the exported file, or nil if cancelled or failed.
-    func exportPosts(as format: ExportFileFormat, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async -> URL? {
+    func exportPosts(as format: ExportFileFormat, account: AppAccount, appPassword: String, using client: BlueskyProfileDataService) async -> URL? {
         guard let profile else { return nil }
         isExportingPosts = true
         exportError = nil

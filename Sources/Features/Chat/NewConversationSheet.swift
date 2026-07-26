@@ -57,12 +57,18 @@ struct NewConversationSheet: View {
                 }
 
                 if !searchResults.isEmpty {
-                    Section("chat.new.results") {
+                    Section {
                         ForEach(searchResults) { actor in
-                            ActorSearchRow(actor: actor, isSelected: selectedActor?.did == actor.did)
-                                .contentShape(Rectangle())
-                                .onTapGesture { selectedActor = actor }
+                            Button {
+                                selectedActor = actor
+                            } label: {
+                                ActorSearchRow(actor: actor, isSelected: selectedActor?.did == actor.did)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
                         }
+                    } header: {
+                        Text(loc("chat.new.results"))
                     }
                 }
             }

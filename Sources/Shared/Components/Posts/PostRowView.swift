@@ -69,6 +69,7 @@ struct PostRowView: View {
                         onTapImage: callbacks.onTapImage,
                         onPlayVideo: callbacks.onPlayVideo
                     )
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 4)
                 }
 
@@ -84,6 +85,7 @@ struct PostRowView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: - Card Layout

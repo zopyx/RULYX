@@ -27,7 +27,7 @@ struct iPadListsView: View {
             await viewModel.load(
                 for: accountStore.activeAccount,
                 appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
-                using: container.blueskyClient
+                using: container.dashboardData
             )
         }
         .onChange(of: accountStore.activeAccountID) { _, _ in
@@ -35,6 +35,12 @@ struct iPadListsView: View {
             // detail-column selection (the selected list belongs to the old account).
             viewModel.reset()
             navState.selectedList = nil
+            navState.selectedInternalList = nil
+        }
+        .onChange(of: navState.selectedList) { _, newSelection in
+            if newSelection != nil {
+                navState.selectedInternalList = nil
+            }
         }
     }
 
@@ -104,7 +110,6 @@ struct iPadListsView: View {
                 navState.selectedList = list
             })
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
             .environmentObject(workspaceStore)
             .environmentObject(localizationManager)
         }
@@ -137,19 +142,25 @@ struct iPadListsView: View {
     private var internalListRows: some View {
         let lists = internalListStore.lists
         return ForEach(lists, id: \.id) { list in
-            HStack(spacing: 10) {
-                Circle()
-                    .fill(list.color.colorValue)
-                    .frame(width: 12, height: 12)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(list.name)
-                        .font(.body.weight(.medium))
-                        .lineLimit(1)
-                    Text(loc("lists.members.count").replacingOccurrences(of: "{n}", with: "\(list.memberCount)"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            Button {
+                navState.selectedList = nil
+                navState.selectedInternalList = list
+            } label: {
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(list.color.colorValue)
+                        .frame(width: 12, height: 12)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(list.name)
+                            .font(.body.weight(.medium))
+                            .lineLimit(1)
+                        Text(loc("lists.members.count").replacingOccurrences(of: "{n}", with: "\(list.memberCount)"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
+            .buttonStyle(.plain)
             .padding(.vertical, 4)
         }
     }

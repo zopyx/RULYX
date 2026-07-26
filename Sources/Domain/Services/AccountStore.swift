@@ -207,9 +207,9 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             try await client.persistSession(session, for: account)
             accounts.insert(account, at: 0)
             errorMessage = nil
-            // Route through the single transition primitive for cache clear + reset
-            // contract. No previous account exists, so cache clear is a no-op.
-            await transitionActiveAccount(to: account, using: nil, reason: "account added")
+            // Route through the single transition primitive so a newly added
+            // account cannot inherit response/cache state from another account.
+            await transitionActiveAccount(to: account, using: client as? LiveBlueskyClient, reason: "account added")
             return .success
         } catch BlueskyAPIError.authFactorTokenRequired {
             return .needsAuthFactorToken
@@ -266,7 +266,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             try await client.persistSession(session, for: account)
             accounts.insert(account, at: 0)
             errorMessage = nil
-            await transitionActiveAccount(to: account, using: nil, reason: "2FA completed")
+            await transitionActiveAccount(to: account, using: client as? LiveBlueskyClient, reason: "2FA completed")
             return true
         } catch let caughtError as BlueskyAPIError {
             if case .authFactorTokenRequired = caughtError {
@@ -317,6 +317,25 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     /// account DID. When the LAST account is removed, both caches are wiped entirely
     /// (they also contain entries keyed by inspected third-party subjects).
     func removeAccount(_ account: AppAccount, client: BlueskyAuthenticating? = nil) {
+        let fallback = removeAccountState(account, client: client)
+        if let fallback, let liveClient = client as? LiveBlueskyClient {
+            Task { [weak self] in
+                await self?.transitionActiveAccount(to: fallback, using: liveClient, reason: "active account removed")
+            }
+        }
+    }
+
+    /// Async removal variant. Callers that need the fallback account transition
+    /// and cache cleanup to be complete should await this overload.
+    func removeAccount(_ account: AppAccount, client: BlueskyAuthenticating? = nil) async {
+        let fallback = removeAccountState(account, client: client)
+        if let fallback, let liveClient = client as? LiveBlueskyClient {
+            await transitionActiveAccount(to: fallback, using: liveClient, reason: "active account removed")
+        }
+    }
+
+    @discardableResult
+    private func removeAccountState(_ account: AppAccount, client: BlueskyAuthenticating?) -> AppAccount? {
         do {
             try keychain.delete(service: passwordService, account: account.id.uuidString)
         } catch {
@@ -333,12 +352,12 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         // synchronous but the transition primitive is async.
         let liveClient = client as? LiveBlueskyClient
 
+        var fallbackAccount: AppAccount?
         if activeAccountID == account.id {
             if let fallback = accounts.first {
-                if let liveClient {
-                    Task { [weak self] in
-                        await self?.transitionActiveAccount(to: fallback, using: liveClient, reason: "active account removed")
-                    }
+                fallbackAccount = fallback
+                if liveClient != nil {
+                    // The caller performs the awaited transition.
                 } else {
                     activeAccountID = fallback.id
                 }
@@ -373,6 +392,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         }
 
         persist()
+        return fallbackAccount
     }
 
     /// Deprecated: use `switchAccount(to:using:)` instead — this bypass resets all
@@ -408,8 +428,9 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         pdsMigrationDetected = nil
     }
 
-    /// Serializes account transitions. Non-nil while a transition is in
-    /// progress; concurrent switch attempts are rejected.
+    /// Generation token for account transitions. A newer request supersedes an
+    /// in-flight transition; the older request checks this token before it can
+    /// publish stale account state.
     private var activeTransitionToken: UUID?
 
     /// Single private primitive for all active-account-ID changes.
@@ -437,11 +458,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         guard accounts.contains(account) else { return }
         guard account.id != activeAccountID else { return } // no-op if already active
 
-        // Serialize: reject concurrent transitions
-        guard activeTransitionToken == nil else {
-            AppLogger.persistence.warning("Account switch rejected — transition already in progress")
-            return
-        }
+        // Latest request wins. Replacing the token invalidates any older
+        // transition that is suspended in cache cleanup.
         let token = UUID()
         activeTransitionToken = token
 
@@ -451,6 +469,12 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         // Clear ALL caches — await URL/API cache, Dashboard/Relationship cache, thread cache
         if let client {
             await client.clearAllCaches()
+        } else {
+            // Authentication clients used by previews/tests do not expose the
+            // LiveBlueskyClient cache API, but account activation must still
+            // invalidate shared response caches.
+            URLCache.shared.removeAllCachedResponses()
+            await BlueskyAPICache.shared.clearAll()
         }
         DashboardCache.clearAll()
         RelationshipCache.clearAll()

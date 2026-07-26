@@ -35,8 +35,15 @@ enum DashboardCache {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode(DashboardCacheData.self, from: data)
         } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileReadNoSuchFileError {
-            // Normal cache miss — no log needed
-            return nil
+            // One-time migration from the pre-hash filename layout.
+            guard !key.contains("/"), key != ".." else { return nil }
+            let legacyURL = cachesDirectory.appendingPathComponent("\(key).json")
+            guard let data = try? Data(contentsOf: legacyURL),
+                  let decoded = try? JSONDecoder().decode(DashboardCacheData.self, from: data)
+            else { return nil }
+            save(decoded, forKey: key)
+            try? FileManager.default.removeItem(at: legacyURL)
+            return decoded
         } catch {
             AppLogger.persistence.error("DashboardCache load failed: \(error.localizedDescription, privacy: .private)")
             return nil

@@ -95,29 +95,34 @@ struct RelationshipsView: View {
     @ViewBuilder
     private func selectableActorRow(actor: BlueskyActor, index: Int) -> some View {
         if isSelectMode {
-            HStack(spacing: 12) {
-                Image(systemName: selectedDIDs.contains(actor.did) ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(selectedDIDs.contains(actor.did) ? Color.skyPrimary : Color.secondary)
-                    .font(.title2)
-                actorRowLabel(actor: actor, index: index)
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
+            Button {
                 if selectedDIDs.contains(actor.did) {
                     selectedDIDs.remove(actor.did)
                 } else {
                     selectedDIDs.insert(actor.did)
                 }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: selectedDIDs.contains(actor.did) ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(selectedDIDs.contains(actor.did) ? Color.skyPrimary : Color.secondary)
+                        .font(.title2)
+                    actorRowLabel(actor: actor, index: index)
+                }
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(selectedDIDs.contains(actor.did) ? loc("actions.remove") : loc("actions.select"))
         } else {
-            actorRowLabel(actor: actor, index: index)
-                .contentShape(Rectangle())
-                .onTapGesture(count: 2) {
-                    Task { await toggleFollow(actor: actor) }
+            HStack(spacing: 8) {
+                Button { selectedActor = actor } label: {
+                    actorRowLabel(actor: actor, index: index)
                 }
-                .onTapGesture(count: 1) {
-                    selectedActor = actor
+                .buttonStyle(.plain)
+                Button { Task { await toggleFollow(actor: actor) } } label: {
+                    Image(systemName: "person.badge.plus")
                 }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(loc("lists.following"))
+            }
         }
     }
 

@@ -59,9 +59,17 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
         container.media
     }
 
-    /// Legacy accessor — returns the same LiveBlueskyClient instance.
-    /// Prefer using the individual protocol properties above.
-    @available(*, deprecated, message: "Use individual protocol properties (container.profile, container.list, etc.)")
+    /// Composite capability used by profile inspection workflows.
+    var profileData: BlueskyProfileDataService {
+        liveClient
+    }
+
+    var dashboardData: DashboardDataService {
+        liveClient
+    }
+
+    /// Legacy compatibility accessor — returns the same LiveBlueskyClient instance.
+    /// New code should use the individual protocol properties above.
     var blueskyClient: LiveBlueskyClient {
         liveClient
     }

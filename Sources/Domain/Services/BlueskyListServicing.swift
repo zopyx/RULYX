@@ -110,6 +110,11 @@ protocol BlueskyListServicing: Sendable {
     /// Fetches all lists the given actor is a member of.
     func fetchActorLists(actor: String, account: AppAccount, appPassword: String?) async throws -> [BlueskyList]
 
+    /// Checks which of the account's lists contain a given actor.
+    /// Implementations may override this with a more efficient endpoint-specific
+    /// implementation; the default walks the account's lists and their members.
+    func fetchListMemberships(for targetDID: String, account: AppAccount, appPassword: String?) async -> [ProfileListMembership]
+
     /// Fetches full list details including the creator.
     func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor)
 
@@ -124,4 +129,51 @@ protocol BlueskyListServicing: Sendable {
 
     /// Unsubscribes from a moderation list.
     func unsubscribeFromModerationList(_ listURI: String, account: AppAccount, appPassword: String?) async throws
+}
+
+extension BlueskyListServicing {
+    func fetchListMemberships(
+        for targetDID: String,
+        account: AppAccount,
+        appPassword: String?
+    ) async -> [ProfileListMembership] {
+        guard let lists = try? await fetchLists(for: account, appPassword: appPassword) else {
+            return []
+        }
+
+        var memberships: [ProfileListMembership] = []
+        memberships.reserveCapacity(lists.count)
+        for list in lists {
+            var cursor: String?
+            var found = false
+            var pagesChecked = 0
+
+            while !found, pagesChecked < 2 {
+                guard let page = try? await fetchListMembersPage(
+                    list: list,
+                    cursor: cursor,
+                    account: account,
+                    appPassword: appPassword
+                ) else {
+                    break
+                }
+                found = page.members.contains { $0.actor.did == targetDID }
+                cursor = page.cursor
+                pagesChecked += 1
+                if cursor == nil {
+                    break
+                }
+            }
+
+            memberships.append(ProfileListMembership(
+                listURI: list.id,
+                name: list.name,
+                kind: list.kind,
+                memberCount: list.memberCount,
+                isMember: found,
+                listItemRecordURI: nil
+            ))
+        }
+        return memberships
+    }
 }

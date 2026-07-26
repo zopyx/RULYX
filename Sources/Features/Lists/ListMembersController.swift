@@ -14,7 +14,7 @@ final class ListMembersController {
         for list: BlueskyList,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: any BlueskyListServicing
     ) async throws -> [BlueskyListMember] {
         cursor = nil
         hasMore = false
@@ -35,7 +35,7 @@ final class ListMembersController {
         for list: BlueskyList,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: any BlueskyListServicing
     ) async throws -> [BlueskyListMember] {
         guard hasMore, let currentCursor = cursor else {
             return []

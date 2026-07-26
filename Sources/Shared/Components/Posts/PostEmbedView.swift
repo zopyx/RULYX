@@ -26,6 +26,7 @@ struct PostEmbedView: View {
 
         if let images = embed.images, !images.isEmpty {
             imageGrid(images: images)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, contentLeadingPadding)
         }
 
@@ -117,8 +118,12 @@ struct PostEmbedView: View {
                             Rectangle().fill(Color.skyPrimary.opacity(0.08))
                         }
                         .aspectRatio(contentMode: isSingle ? .fit : .fill)
-                        .frame(height: isSingle ? nil : 130)
-                        .frame(maxHeight: isSingle ? 300 : nil)
+                        // Keep image cells at a deterministic height. An unconstrained
+                        // single-image height makes SwiftUI's List self-sizing pass
+                        // oscillate between the image's ideal size and the row width,
+                        // which can trigger UICollectionView's recursive layout crash.
+                        .frame(maxWidth: .infinity)
+                        .frame(height: isSingle ? 220 : 130)
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         // Pin the button's tappable region to the visible (clipped) frame —
@@ -142,6 +147,7 @@ struct PostEmbedView: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }

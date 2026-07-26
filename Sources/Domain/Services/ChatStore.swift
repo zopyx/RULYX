@@ -70,6 +70,8 @@ final class ChatStore: ObservableObject {
     private var chatVisibleTokens: Set<String> = []
     /// Current polling interval. Defaults to 30s and switches to 5s while chat is visible.
     private var currentPollingInterval: UInt64 = 30_000_000_000
+    /// Account currently undergoing a rebuild, used to coalesce duplicate lifecycle requests.
+    private var rebuildingAccountID: UUID?
 
     // MARK: - Init
 
@@ -101,6 +103,15 @@ final class ChatStore: ObservableObject {
     /// Switches chat to `account` by discarding every cached conversation/message and
     /// rebuilding the visible conversation list from the chat service response.
     func rebuildConversations(for account: AppAccount?, appPassword: String?, clearCaches: Bool = false, showPrompts: Bool = false) async {
+        if let rebuildingAccountID, rebuildingAccountID == account?.id {
+            return
+        }
+        rebuildingAccountID = account?.id
+        defer {
+            if rebuildingAccountID == account?.id {
+                rebuildingAccountID = nil
+            }
+        }
         AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none"); clearCaches=\(clearCaches, privacy: .private); showPrompts=\(showPrompts, privacy: .private)")
         activeAccountID = account?.id
         activeAccount = account
@@ -130,7 +141,6 @@ final class ChatStore: ObservableObject {
         if showPrompts {
             try? await Task.sleep(nanoseconds: 1_200_000_000)
             guard context.map(isCurrentContext) ?? false else { return }
-            setStatusMessage("Reloading for \(account.handle)", autoDismiss: false)
         }
 
         await loadConvos()

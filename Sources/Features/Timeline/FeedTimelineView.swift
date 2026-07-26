@@ -211,55 +211,59 @@ struct FeedTimelineView: View {
     // MARK: - List content
 
     private var listContent: some View {
-        List {
-            ForEach(viewModel.visibleEntries, id: \.post.uri) { entry in
-                postRowView(for: entry)
-            }
-            if viewModel.state.hasMore {
-                Color.clear
-                    .frame(height: 1)
-                    .listRowSeparator(.hidden)
-                    .onAppear {
-                        Task { await loadMore() }
-                    }
-            }
-            if viewModel.state == .loadingMore {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Spacer()
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(viewModel.visibleEntries, id: \.post.uri) { entry in
+                    postRowView(for: entry)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 20)
+                        .overlay(alignment: .bottom) {
+                            Divider()
+                                .padding(.leading, 20)
+                        }
                 }
-                .listRowSeparator(.hidden)
-            }
-            if viewModel.state == .exhausted {
-                Text(loc: "timeline.end")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if viewModel.state.hasMore {
+                    Color.clear
+                        .frame(height: 1)
+                        .onAppear {
+                            Task { await loadMore() }
+                        }
+                }
+                if viewModel.state == .loadingMore {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Spacer()
+                    }
+                }
+                if viewModel.state == .exhausted {
+                    Text(loc: "timeline.end")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+                if case let .loadMoreFailed(msg) = viewModel.state {
+                    VStack(spacing: 8) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .foregroundStyle(Color.warningOrange)
+                            Text(msg)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Button(loc("actions.retry")) {
+                            Task { await loadMore() }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
                     .frame(maxWidth: .infinity)
-                    .listRowSeparator(.hidden)
-            }
-            if case let .loadMoreFailed(msg) = viewModel.state {
-                VStack(spacing: 8) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .foregroundStyle(Color.warningOrange)
-                        Text(msg)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Button(loc("actions.retry")) {
-                        Task { await loadMore() }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                    .padding(.vertical, 8)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-                .listRowSeparator(.hidden)
             }
         }
-        .listStyle(.plain)
         .refreshable {
             await refresh()
         }

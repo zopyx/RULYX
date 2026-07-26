@@ -58,7 +58,6 @@ translations-repair:
 
 translations-validate:
 	@printf 'Validating translations...\n'
-	python3 scripts/sync-xcstrings-from-json.py
 	python3 scripts/validate-translations.py
 
 translations-validate-ci: translations-validate

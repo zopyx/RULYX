@@ -408,32 +408,6 @@ struct ManagePostsView: View {
     /// A single post row with optional selection checkbox.
     private func postRow(for entry: RichFeedEntry) -> some View {
         HStack(spacing: 12) {
-            if viewModel.isSelecting {
-                Image(
-                    systemName: viewModel.selectedURIs.contains(entry.post.uri)
-                        ? "checkmark.circle.fill"
-                        : "circle"
-                )
-                .foregroundStyle(
-                    viewModel.selectedURIs.contains(entry.post.uri)
-                        ? AnyShapeStyle(Color.accentColor)
-                        : AnyShapeStyle(.tertiary)
-                )
-                .font(.title3)
-                .accessibilityAddTraits(.isButton)
-                .accessibilityLabel(
-                    viewModel.selectedURIs.contains(entry.post.uri)
-                        ? loc("a11y.selected")
-                        : loc("a11y.not_selected")
-                )
-                .onTapGesture {
-                    if viewModel.selectedURIs.contains(entry.post.uri) {
-                        viewModel.selectedURIs.remove(entry.post.uri)
-                    } else {
-                        viewModel.selectedURIs.insert(entry.post.uri)
-                    }
-                }
-            }
             let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
             return PostRowView(
                 entry: entry,
@@ -446,6 +420,35 @@ struct ManagePostsView: View {
                     isReposted: entry.post.isRepostedByMe
                 )
             )
+            .overlay(alignment: .leading) {
+                if viewModel.isSelecting {
+                    Button {
+                        if viewModel.selectedURIs.contains(entry.post.uri) {
+                            viewModel.selectedURIs.remove(entry.post.uri)
+                        } else {
+                            viewModel.selectedURIs.insert(entry.post.uri)
+                        }
+                    } label: {
+                        Image(
+                            systemName: viewModel.selectedURIs.contains(entry.post.uri)
+                                ? "checkmark.circle.fill"
+                                : "circle"
+                        )
+                        .foregroundStyle(
+                            viewModel.selectedURIs.contains(entry.post.uri)
+                                ? AnyShapeStyle(Color.accentColor)
+                                : AnyShapeStyle(.tertiary)
+                        )
+                        .font(.title3)
+                        .accessibilityLabel(
+                            viewModel.selectedURIs.contains(entry.post.uri)
+                                ? loc("a11y.selected")
+                                : loc("a11y.not_selected")
+                        )
+                    }
+                    .padding(.leading, 8)
+                }
+            }
         }
     }
 

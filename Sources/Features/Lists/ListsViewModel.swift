@@ -1,4 +1,6 @@
 import Foundation
+
+typealias DashboardDataService = any BlueskyClearSkyServicing & BlueskyListServicing & BlueskyProfileInspecting
 import Observation
 
 /// Manages the moderation dashboard: lists grouped by kind, active profile info, and blocking counts.
@@ -34,7 +36,8 @@ final class ListsViewModel {
     // MARK: - Init
 
     /// Observer for synchronous account-switch resets.
-    /// `nonisolated(unsafe)` so `deinit` (nonisolated in Swift 6) can unregister it.
+    /// Nonisolated so `deinit` can unregister the observer in Swift 6.
+    @ObservationIgnored
     private nonisolated(unsafe) var accountSwitchObserver: NSObjectProtocol?
 
     init() {
@@ -78,7 +81,7 @@ final class ListsViewModel {
     func load(
         for account: AppAccount?,
         appPassword: String?,
-        using client: LiveBlueskyClient,
+        using client: DashboardDataService,
         isExplicitRefresh: Bool = false
     ) async {
         guard let account else {
@@ -129,7 +132,7 @@ final class ListsViewModel {
         // Fire all four fetches in parallel with cooperative cancellation.
         // If fetchLists throws, the group cancels the remaining tasks.
         let clientRef = client
-        try? await withThrowingTaskGroup(of: Void.self) { group in
+        await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
                 let lists = try await clientRef.fetchLists(for: account, appPassword: appPassword)
                 try Task.checkCancellation()

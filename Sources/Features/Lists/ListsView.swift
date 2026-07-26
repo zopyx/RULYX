@@ -539,6 +539,19 @@ struct ListsView: View {
                     .environmentObject(container.blueskyClient)
                 }
             }
+            .toolbar {
+                if !presentationState.isShowingNavigationDestination {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            SettingsView()
+                                .navigationTitle(loc("tab.settings"))
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel(loc("tab.settings"))
+                    }
+                }
+            }
         }
         .id(workspaceStore.moderationNavigationResetToken)
         .onChange(of: workspaceStore.moderationNavigationResetToken) { _, _ in

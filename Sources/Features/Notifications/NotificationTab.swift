@@ -54,6 +54,19 @@ struct NotificationTab: View {
                         .environmentObject(analyticsStore)
                 }
             }
+            .toolbar {
+                if navigationPath.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            SettingsView()
+                                .navigationTitle(loc("tab.settings"))
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel(loc("tab.settings"))
+                    }
+                }
+            }
             .sheet(item: $selectedActor) { actor in
                 NavigationStack {
                     BlueskyProfileView(

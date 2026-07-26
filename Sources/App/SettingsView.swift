@@ -385,9 +385,20 @@ struct SettingsView: View {
             ) {
                 Button(loc("settings.delete_all_data"), role: .destructive) {
                     moderationAuditStore.clearAll()
+                    internalListStore.lists.removeAll()
                     container.auth.clearCache()
                     DashboardCache.clearAll()
                     RelationshipCache.clearAll()
+                    ProtectedDataStore.eraseAll()
+                    Task {
+                        for account in accountStore.accounts {
+                            await accountStore.removeAccount(account, client: container.blueskyClient)
+                        }
+                        await httpRequestDebugStore.clear()
+                        UserDefaults.standard.removePersistentDomain(
+                            forName: Bundle.main.bundleIdentifier ?? "com.ajung.RULYX"
+                        )
+                    }
                     cacheStatusMessage = loc("settings.data_deleted")
                 }
                 Button(localizationManager.localized("settings.cancel"), role: .cancel) {}

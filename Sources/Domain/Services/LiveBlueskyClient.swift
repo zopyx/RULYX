@@ -27,10 +27,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// The default base URL for the Bluesky PDS.
     private let baseURL: URL
     private let httpClient: HTTPClient
-    /// HTTP client for AppView-proxied PDS requests. Pins known Bluesky/ClearSky
-    /// hosts via HTTPClient.defaultPinnedHashes; custom PDS hosts use standard TLS
-    /// validation (CertificatePinningDelegate falls back to performDefaultHandling
-    /// when no pin matches the host).
+    /// HTTP client for AppView-proxied PDS requests. Uses platform TLS by default;
+    /// enterprise callers may inject an explicitly pinned HTTPClient.
     let appViewHTTPClient: HTTPClient
     private let session: URLSession
     /// Exposed for protocol service composition (BlueskyServiceContainer).
@@ -52,8 +50,8 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         self.baseURL = baseURL
         let clientSession = URLSession.shared
         session = clientSession
-        self.httpClient = httpClient ?? HTTPClient(session: clientSession, pinnedHashes: HTTPClient.defaultPinnedHashes)
-        appViewHTTPClient = HTTPClient(session: URLSession.shared, pinnedHashes: HTTPClient.defaultPinnedHashes)
+        self.httpClient = httpClient ?? HTTPClient(session: clientSession)
+        appViewHTTPClient = HTTPClient(session: URLSession.shared)
         self.clearskyHeartbeat = clearskyHeartbeat
         let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, httpClient: self.httpClient)
         self.requestExecutor = executor
@@ -671,7 +669,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// the AT Protocol server rejects the entire batch if any write is invalid.
     func batchBlockActors(dids: [String], account: AppAccount, appPassword: String?) async throws {
         guard !dids.isEmpty else { return }
-        let response: ApplyWritesResponse = try await sessionService.performAuthenticatedRequest(
+        let _: ApplyWritesResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
         ) { authSession in
@@ -1255,7 +1253,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// Page 1 is fetched first; if it has 100 entries, remaining pages
     /// are fetched in mini-batches of 5 via TaskGroup (parallel within batch).
     /// Once a page returns < 100 entries, remaining batches are skipped.
-    /// On cancellation or errors, returns whatever was collected so far.
+    /// Errors and cancellation are surfaced; incomplete results are never cached.
     private func fetchClearskyEntries(
         actorDID: String,
         endpoint: String,
@@ -1286,11 +1284,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         var page = 2
 
         // Step 2: fetch remaining pages in mini-batches (parallel within batch)
-        while page <= 50 {
+        var foundLastPage = false
+        while !foundLastPage {
             try Task.checkCancellation()
 
             let batchStart = page
-            let batchEnd = min(page + batchSize - 1, 50)
+            let batchEnd = page + batchSize - 1
             var batchResults: [(Int, [ClearskyBlocklistEntry])] = []
 
             try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
@@ -1302,11 +1301,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                             do {
                                 let entries = try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)
                                 return (p, entries)
+                            } catch is CancellationError {
+                                throw CancellationError()
                             } catch {
                                 lastError = error
                                 if attempt < 2 {
-                                    let delay = Double(1 << attempt) * 0.5 // 0.5s, 1.0s
-                                    try? await Task.sleep(for: .seconds(delay))
+                                    let delay = Double(1 << attempt) * 0.5 + Double.random(in: 0 ... 0.25)
+                                    try await Task.sleep(for: .seconds(delay))
                                 }
                             }
                         }
@@ -1320,7 +1321,6 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             }
 
             // Process batch results, sorted by page number
-            var foundLast = false
             for (p, entries) in batchResults.sorted(by: { $0.0 < $1.0 }) {
                 allEntries.append(contentsOf: entries)
                 for entry in entries {
@@ -1328,15 +1328,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 }
                 if entries.count < 100 {
                     AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(p) (\(entries.count) entries)")
-                    foundLast = true
+                    foundLastPage = true
                     break
                 }
             }
             await onProgress?(seenDIDs.count)
-            if foundLast {
-                break
-            }
-
             page = batchEnd + 1
         }
 
@@ -1358,11 +1354,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Fetches a single page from ClearSky. Returns the parsed entries or
-    /// an empty array if the page doesn't exist (non-2xx / decode failure).
+    /// Throws for transport, HTTP, decoding, and cancellation failures.
     private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry] {
-        if Task.isCancelled {
-            return []
-        }
+        try Task.checkCancellation()
         let urlString = page == 1
             ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
             : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
@@ -1373,17 +1367,16 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         let (data, httpResponse): (Data, HTTPURLResponse)
         do {
             (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
-        } catch is CancellationError {
-            return []
-        }
+        } catch is CancellationError { throw CancellationError() }
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → HTTP \(httpResponse.statusCode)")
-            return []
+            throw BlueskyAPIError.server("Clearsky page \(page) returned HTTP \(httpResponse.statusCode)")
         }
-        guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
-            let body = (try? String(data: data, encoding: .utf8)) ?? "empty"
-            AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → decode failed: \(body.prefix(200))")
-            return []
+        let decoded: ClearskyBlocklistResponse
+        do { decoded = try JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) }
+        catch {
+            AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → decode failed")
+            throw BlueskyAPIError.server("Clearsky page \(page) response could not be decoded")
         }
         let entries = decoded.data.blocklist ?? []
         AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page): \(entries.count) entries")

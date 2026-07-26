@@ -222,7 +222,15 @@ final class CustomSearchViewModel {
         {
             searchHistory = history
         } else {
-            searchHistory = UserDefaults.standard.stringArray(forKey: "custom_search_history") ?? []
+            // Legacy history was stored as a property-list array rather than Data,
+            // so ProtectedDataStore cannot migrate it generically. Move it once
+            // and remove the plaintext UserDefaults value immediately.
+            let defaults = UserDefaults.standard
+            searchHistory = defaults.stringArray(forKey: "custom_search_history") ?? []
+            if !searchHistory.isEmpty {
+                saveHistory()
+            }
+            defaults.removeObject(forKey: "custom_search_history")
         }
     }
 

@@ -17,7 +17,7 @@ extension ListDetailViewModel {
         for list: BlueskyList,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: any BlueskyListServicing
     ) async {
         let start = CFAbsoluteTimeGetCurrent()
         isLoadingMembers = true
@@ -51,7 +51,7 @@ extension ListDetailViewModel {
         list: BlueskyList,
         account: AppAccount,
         appPassword: String,
-        using client: LiveBlueskyClient
+        using client: any BlueskyListServicing
     ) async {
         guard let currentMember,
               hasMoreMembers,

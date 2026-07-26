@@ -25,7 +25,7 @@ func makeAuthorCallbacks(
             if list.kind == .internal {
                 internalListStore.addMember(did: authorDID, handle: author.handle ?? authorDID, displayName: author.displayName, avatarURL: author.avatar, to: internalListStore.listID(from: list.id))
             } else {
-                try? await blueskyClient.addActor(did: authorDID, to: list, account: account, appPassword: password)
+                _ = try? await blueskyClient.addActor(did: authorDID, to: list, account: account, appPassword: password)
             }
         }
     }

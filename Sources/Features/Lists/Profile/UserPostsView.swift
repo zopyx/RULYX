@@ -156,56 +156,64 @@ struct UserPostsView: View {
 
     /// Main list with search bar, date filter, and paginated post rows.
     private var listContent: some View {
-        List {
-            searchSection
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                searchSection
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 20)
 
-            if viewModel.isScanning, let label = viewModel.scanProgressLabel {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .scaleEffect(0.7)
-                    Text(label)
+                if viewModel.isScanning, let label = viewModel.scanProgressLabel {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                        Text(label)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 20)
+                }
+
+                ForEach(viewModel.sortedFilteredPosts, id: \.post.uri) { entry in
+                    postRowView(for: entry)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 20)
+                        .overlay(alignment: .bottom) {
+                            Divider()
+                                .padding(.leading, 20)
+                        }
+                        .postInfiniteScroll(
+                            entry: entry,
+                            entries: viewModel.sortedFilteredPosts,
+                            hasMore: viewModel.hasMore,
+                            isLoadingMore: viewModel.isLoadingMore,
+                            loadMore: { await loadMore() }
+                        )
+                }
+                if viewModel.isLoadingMore {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Spacer()
+                    }
+                }
+                if !viewModel.hasMore, !viewModel.posts.isEmpty {
+                    Text(loc("profile.posts.end"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
                 }
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-            }
-
-            ForEach(viewModel.sortedFilteredPosts, id: \.post.uri) { entry in
-                postRowView(for: entry)
-                    .postInfiniteScroll(
-                        entry: entry,
-                        entries: viewModel.sortedFilteredPosts,
-                        hasMore: viewModel.hasMore,
-                        isLoadingMore: viewModel.isLoadingMore,
-                        loadMore: { await loadMore() }
-                    )
-            }
-            if viewModel.isLoadingMore {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Spacer()
+                if !viewModel.searchText.isEmpty, viewModel.sortedFilteredPosts.isEmpty {
+                    Text(loc("profile.posts.no_matches"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
                 }
-                .listRowSeparator(.hidden)
-            }
-            if !viewModel.hasMore, !viewModel.posts.isEmpty {
-                Text(loc("profile.posts.end"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .listRowSeparator(.hidden)
-            }
-            if !viewModel.searchText.isEmpty, viewModel.sortedFilteredPosts.isEmpty {
-                Text(loc("profile.posts.no_matches"))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .listRowSeparator(.hidden)
             }
         }
-        .listStyle(.plain)
         .refreshable {
             await refresh()
         }

@@ -58,7 +58,7 @@ CHECKS = [
 
     # Primary/secondary label colors — system defaults, verified
     ("system primary / dark bg", WHITE, (0.05, 0.05, 0.05), 4.5),
-    ("system secondary / light bg", None, (0.95, 0.95, 0.95), 3.0),
+    ("system secondary / light bg", (0.25, 0.25, 0.25), (0.95, 0.95, 0.95), 3.0),
 
     # REGRESSION GUARDS — must always fail (documented)
     ("REGRESSION-GUARD skyPrimary dark (expected to fail AA)", WHITE, (0.40, 0.78, 1.00), None),
@@ -70,6 +70,8 @@ for name, fg, bg, minimum in CHECKS:
     bg_lum = luminance(*bg)
     if fg is None:
         fg_lum = blend_over(WHITE, 0.9, bg_lum)
+    elif isinstance(fg, tuple):
+        fg_lum = luminance(*fg)
     else:
         fg_lum = fg
     ratio = contrast(fg_lum, bg_lum)

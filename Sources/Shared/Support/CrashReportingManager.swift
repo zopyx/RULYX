@@ -4,7 +4,7 @@ import MetricKit
 /// Manages opt-in crash and performance diagnostics via MetricKit.
 /// Toggle on/off from Settings. Zero-cost when disabled — no third-party SDK.
 @MainActor
-final class CrashReportingManager: NSObject, ObservableObject, @preconcurrency MXMetricManagerSubscriber {
+final class CrashReportingManager: NSObject, ObservableObject, MXMetricManagerSubscriber {
     static let shared = CrashReportingManager()
 
     @Published var isEnabled: Bool {

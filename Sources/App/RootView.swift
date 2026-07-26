@@ -62,6 +62,12 @@ struct RootView: View {
             TabView(selection: Binding(
                 get: { workspaceStore.selectedTab },
                 set: { newTab in
+                    // The fifth tab is an action, not a persisted workspace tab.
+                    // Keep the current content selected while presenting the switcher.
+                    if newTab == .account {
+                        showAccountSwitcher = true
+                        return
+                    }
                     if workspaceStore.selectedTab == .moderation, newTab == .moderation {
                         workspaceStore.returnToModerationRoot()
                     }
@@ -104,32 +110,14 @@ struct RootView: View {
                 }
                 .tag(WorkspaceTab.chat)
 
-                NavigationStack {
-                    SettingsView()
-                        .navigationTitle(loc("tab.settings"))
-                }
-                .tabItem {
-                    Label(loc("tab.settings"), systemImage: "gearshape")
-                }
-                .tag(WorkspaceTab.settings)
-
-                NavigationStack {
-                    InfoView()
-                        .navigationTitle(loc("tab.info"))
-                }
-                .tabItem {
-                    Label(loc("tab.info"), systemImage: "sparkles.rectangle.stack")
-                }
-                .tag(WorkspaceTab.info)
-
-                NavigationStack {
-                    AccountTabView()
-                        .navigationTitle(loc("tab.accounts"))
-                }
-                .tabItem {
-                    Label(loc("tab.accounts"), systemImage: "person.circle")
-                }
-                .tag(WorkspaceTab.account)
+                // Keep this as a native tab item so all five bottom-bar items
+                // receive equal width and the account action never moves into More.
+                Color.clear
+                    .accessibilityHidden(true)
+                    .tabItem {
+                        Label(loc("tab.accounts"), systemImage: "person.crop.circle")
+                    }
+                    .tag(WorkspaceTab.account)
             }
             .tint(tint)
             .preferredColorScheme(preferredScheme)
@@ -156,8 +144,7 @@ struct RootView: View {
         .sheet(isPresented: $showAccountSwitcher) {
             AccountSwitcherTabSheet(
                 accountStore: accountStore,
-                workspaceStore: workspaceStore,
-                blueskyClient: container.blueskyClient,
+                container: container,
                 onSwitch: switchAccount
             )
         }
@@ -311,8 +298,7 @@ private struct AccountSwitcherRow: View {
 
 private struct AccountSwitcherTabSheet: View {
     @ObservedObject var accountStore: AccountStore
-    @ObservedObject var workspaceStore: ModerationWorkspaceStore
-    let blueskyClient: LiveBlueskyClient
+    let container: BlueskyServiceContainerWrapper
     let onSwitch: (AppAccount) -> Void
     @Environment(\.dismiss) private var dismiss
 
@@ -331,12 +317,10 @@ private struct AccountSwitcherTabSheet: View {
                     )
                 }
 
-                Button {
-                    dismiss()
-                    Task { @MainActor in
-                        try? await Task.sleep(for: .milliseconds(300))
-                        workspaceStore.selectedTab = .account
-                    }
+                NavigationLink {
+                    AccountTabView()
+                        .environmentObject(accountStore)
+                        .environmentObject(container)
                 } label: {
                     Label(loc("account.switcher.manage"), systemImage: "slider.horizontal.3")
                         .foregroundStyle(.primary)

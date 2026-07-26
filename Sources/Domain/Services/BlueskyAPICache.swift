@@ -6,9 +6,9 @@ import Foundation
 /// Protocol exposing cache hit/miss statistics for the performance monitor overlay.
 protocol CacheMetricsProviding: AnyObject, Sendable {
     /// Returns an immutable snapshot of current cache metrics.
-    func metricsSnapshot() -> CacheMetrics
+    func metricsSnapshot() async -> CacheMetrics
     /// Reset all counters without clearing the cache entries.
-    func resetMetrics()
+    func resetMetrics() async
 }
 
 /// Immutable snapshot of cache statistics (cross-actor safe).
@@ -51,7 +51,7 @@ private struct CachedResponse: Codable {
 /// - LRU eviction when total size exceeds 10 MB
 /// - Actor-isolated metrics (no `@unchecked Sendable`)
 /// - Stale-while-revalidate: returns stale data with `isStale` flag
-actor BlueskyAPICache: @preconcurrency CacheMetricsProviding {
+actor BlueskyAPICache: CacheMetricsProviding {
     static let shared = BlueskyAPICache()
 
     // MARK: - Constants
@@ -75,13 +75,17 @@ actor BlueskyAPICache: @preconcurrency CacheMetricsProviding {
     private var hitCount = 0
     private var missCount = 0
 
+    init() {
+        migrateFromV1()
+    }
+
     // MARK: - CacheMetricsProviding
 
-    func metricsSnapshot() -> CacheMetrics {
+    func metricsSnapshot() async -> CacheMetrics {
         CacheMetrics(hitCount: hitCount, missCount: missCount)
     }
 
-    func resetMetrics() {
+    func resetMetrics() async {
         hitCount = 0
         missCount = 0
     }
@@ -151,7 +155,8 @@ actor BlueskyAPICache: @preconcurrency CacheMetricsProviding {
     /// Migrate old flat-directory cache files to the new per-account layout.
     /// Old files (single directory, SHA256(did|url) filenames) are deleted
     /// since they cannot be attributed to a specific account.
-    func migrateFromV1() {
+    nonisolated func migrateFromV1() {
+        let fileManager = FileManager.default
         guard let root = cacheRootDirectory() else { return }
         let versionMarker = root.appendingPathComponent(Self.versionFile)
         guard !fileManager.fileExists(atPath: versionMarker.path) else { return }
@@ -176,7 +181,8 @@ actor BlueskyAPICache: @preconcurrency CacheMetricsProviding {
     // MARK: - Private Helpers
 
     /// Root cache directory: ~/Library/Caches/com.ajung.RULYX.BlueskyAPICache/
-    private func cacheRootDirectory() -> URL? {
+    private nonisolated func cacheRootDirectory() -> URL? {
+        let fileManager = FileManager.default
         guard let cachesDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else { return nil }
         let dir = cachesDir.appendingPathComponent(Self.cacheSubdir)
         try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)

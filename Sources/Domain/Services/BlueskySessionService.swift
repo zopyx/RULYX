@@ -104,7 +104,7 @@ final class BlueskySessionService: BlueskySessionServicing {
             )
         } catch let BlueskyAPIError.server(message) where message.contains("404") || message.contains("not found") {
             throw BlueskyAPIError.pdsUnreachable(authURL.host ?? "unknown")
-        } catch let BlueskyAPIError.invalidResponse {
+        } catch BlueskyAPIError.invalidResponse {
             // createSession returning 404 with no parseable body → PDS unreachable
             throw BlueskyAPIError.pdsUnreachable(authURL.host ?? "unknown")
         } catch let error as URLError {
@@ -165,10 +165,6 @@ final class BlueskySessionService: BlueskySessionServicing {
         operation: (BlueskySession) async throws -> Response
     ) async throws -> Response {
         var authSession = try await cachedSession(for: account)
-        // Reduce memory exposure: shadow appPassword after initial session acquisition.
-        // recreateSession() reads credentials from Keychain directly if a retry is needed.
-        let _appPassword: String? = nil
-
         for attempt in 0 ..< 3 {
             do {
                 let response = try await operation(authSession)

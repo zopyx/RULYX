@@ -36,7 +36,8 @@ final class NotificationViewModel {
     // MARK: - Init
 
     /// Observer for synchronous account-switch resets.
-    /// `nonisolated(unsafe)` so `deinit` (nonisolated in Swift 6) can unregister it.
+    /// Nonisolated so `deinit` can unregister the observer in Swift 6.
+    @ObservationIgnored
     private nonisolated(unsafe) var accountSwitchObserver: NSObjectProtocol?
 
     init() {

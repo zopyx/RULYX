@@ -206,9 +206,12 @@ final class MediaBrowserViewModel: ObservableObject {
 
     // MARK: - Init
 
-    init(did: String, downloadService: MediaDownloadService = .shared) {
+    init(did: String, downloadService: MediaDownloadService? = nil) {
         self.did = did
-        self.downloadService = downloadService
+        // Media downloads use the dedicated media URLSession/cache. Keeping
+        // this separate from URLSession.shared prevents viewer-relative API
+        // responses from being mixed with public CDN media.
+        self.downloadService = downloadService ?? MediaDownloadService(session: mediaURLSession)
         _ = sharedMediaCache
     }
 

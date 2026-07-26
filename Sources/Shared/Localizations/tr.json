@@ -1382,7 +1382,7 @@
   "settings.delete_all_data": "Delete All Data",
   "settings.delete_all_data.confirm": "Delete All Data?",
   "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
-  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
+  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, cached data, and account credentials.",
   "settings.icloud": "iCloud'da",
   "settings.icloud.disabled_footer": "Hesap yapılandırmanızın cihazlar arasında tutarlı kalmasını sağlamak için etkinleştirin.",
   "settings.icloud.enabled_footer": "Hesap tanıtıcıları ve etiketleri cihazlarınız arasında senkronize edilir. Uygulama şifreleri güvenlik amacıyla her cihazda kalır.",

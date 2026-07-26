@@ -8,7 +8,6 @@ import sys
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCALIZATIONS_DIR = os.path.join(PROJECT_ROOT, "Sources", "Shared", "Localizations")
-XCSTRINGS_PATH = os.path.join(LOCALIZATIONS_DIR, "Localizable.xcstrings")
 
 SUPPORTED_LANGUAGES = [
     "en", "de", "fr", "it", "ja", "zh", "es", "pt",
@@ -30,9 +29,6 @@ def main():
 
     with open(en_path) as f:
         en = json.load(f)
-
-    with open(XCSTRINGS_PATH) as f:
-        xcstrings = json.load(f).get("strings", {})
 
     bundles = {"en": en}
     for lang in SUPPORTED_LANGUAGES:
@@ -72,18 +68,6 @@ def main():
                     f"{lang}.json: placeholder mismatch for {key}: "
                     f"expected {sorted(placeholders(en_value))}, got {sorted(placeholders(localized_value))}"
                 )
-
-    for key, en_value in en.items():
-        xc_entry = xcstrings.get(key)
-        if not xc_entry:
-            issues.append(f"Localizable.xcstrings: missing key {key}")
-            continue
-        localizations = xc_entry.get("localizations", {})
-        for lang in SUPPORTED_LANGUAGES:
-            value = localizations.get(lang, {}).get("stringUnit", {}).get("value")
-            expected = bundles[lang].get(key)
-            if value != expected:
-                issues.append(f"Localizable.xcstrings: {key}/{lang} out of sync")
 
     if issues:
         for i in issues:

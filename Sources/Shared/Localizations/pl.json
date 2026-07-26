@@ -1388,7 +1388,7 @@
   "settings.delete_all_data": "Delete All Data",
   "settings.delete_all_data.confirm": "Delete All Data?",
   "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
-  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
+  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, cached data, and account credentials.",
   "settings.icloud": "iCloud",
   "settings.icloud.disabled_footer": "Włącz, aby zachować spójność konfiguracji konta na wszystkich urządzeniach.",
   "settings.icloud.enabled_footer": "Uchwyty kont i etykiety synchronizują się na Twoich urządzeniach. Ze względów bezpieczeństwa hasła do aplikacji pozostają na każdym urządzeniu.",

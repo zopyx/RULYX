@@ -21,6 +21,7 @@ struct PerformanceMonitorOverlay: View {
     @State private var refreshTimer: Timer?
     /// Incremented on each tick to force view refresh.
     @State private var refreshTick = 0
+    @State private var cacheSnapshot = CacheMetrics(hitCount: 0, missCount: 0)
 
     private let cacheMetrics: CacheMetricsProviding = BlueskyAPICache.shared
 
@@ -45,8 +46,12 @@ struct PerformanceMonitorOverlay: View {
         .transition(.move(edge: .top).combined(with: .opacity))
         .onAppear {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
-                Task { @MainActor in refreshTick += 1 }
+                Task { @MainActor in
+                    refreshTick += 1
+                    cacheSnapshot = await cacheMetrics.metricsSnapshot()
+                }
             }
+            Task { @MainActor in cacheSnapshot = await cacheMetrics.metricsSnapshot() }
         }
         .onDisappear {
             refreshTimer?.invalidate()
@@ -214,15 +219,15 @@ struct PerformanceMonitorOverlay: View {
     }
 
     private var cacheHits: Int {
-        cacheMetrics.metricsSnapshot().hitCount
+        cacheSnapshot.hitCount
     }
 
     private var cacheMisses: Int {
-        cacheMetrics.metricsSnapshot().missCount
+        cacheSnapshot.missCount
     }
 
     private var cacheHitPercent: Int {
-        let snap = cacheMetrics.metricsSnapshot()
+        let snap = cacheSnapshot
         let total = snap.hitCount + snap.missCount
         guard total > 0 else { return 0 }
         return Int(Double(snap.hitCount) / Double(total) * 100)

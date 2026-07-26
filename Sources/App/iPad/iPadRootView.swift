@@ -2,7 +2,6 @@ import SwiftUI
 
 struct iPadRootView: View {
     @EnvironmentObject private var accountStore: AccountStore
-    @EnvironmentObject private var container: BlueskyServiceContainerWrapper
     @EnvironmentObject private var workspaceStore: ModerationWorkspaceStore
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var mutedWordsStore: MutedWordsStore
@@ -92,12 +91,14 @@ struct iPadRootView: View {
             } else if let list = navState.selectedList, navState.sidebarSelection == .allLists {
                 iPadListDetailView(list: list)
                     .environmentObject(navState)
+            } else if let list = navState.selectedInternalList, navState.sidebarSelection == .allLists {
+                InternalListDetailView(list: list)
+                    .environmentObject(internalListStore)
             } else {
                 iPadEmptyDetailPlaceholder()
             }
         }
         .environmentObject(accountStore)
-        .environmentObject(container.blueskyClient)
         .environmentObject(workspaceStore)
         .environmentObject(localizationManager)
     }
@@ -109,7 +110,6 @@ struct iPadRootView: View {
     private func commonModifiers(_ view: some View) -> some View {
         view
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
             .environmentObject(localizationManager)
     }
 

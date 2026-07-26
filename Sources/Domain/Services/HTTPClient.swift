@@ -96,10 +96,9 @@ final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @unchecked
         }
 
         // Check each certificate in the chain against the pinned hashes.
-        let certificateCount = SecTrustGetCertificateCount(serverTrust)
         var checkedHashes: [String] = []
-        for index in 0 ..< certificateCount {
-            guard let certificate = SecTrustGetCertificateAtIndex(serverTrust, index) else { continue }
+        let certificates = (SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate]) ?? []
+        for certificate in certificates {
             let publicKeyHash = Self.sha256PublicKeyHash(for: certificate)
             checkedHashes.append(publicKeyHash)
             if pinnedHashes.contains(publicKeyHash) {

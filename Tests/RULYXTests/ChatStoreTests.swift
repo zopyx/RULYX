@@ -45,33 +45,33 @@ final class ChatStoreTests: XCTestCase {
 private final class MockChatService: ChatServicing {
     func clearCaches() {}
 
-    func listConvos(account: AppAccount, appPassword: String?, status: String?, cursor: String?) async throws -> PagedConvos {
+    func listConvos(account _: AppAccount, appPassword _: String?, status _: String?, cursor _: String?) async throws -> PagedConvos {
         PagedConvos(conversations: [], cursor: nil)
     }
 
-    func getConvo(convoId: String, account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+    func getConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws -> ChatConversation {
         throw NSError(domain: "mock", code: -1)
     }
 
-    func getConvoForMembers(members: [String], account: AppAccount, appPassword: String?) async throws -> ChatConversation {
+    func getConvoForMembers(members _: [String], account _: AppAccount, appPassword _: String?) async throws -> ChatConversation {
         throw NSError(domain: "mock", code: -1)
     }
 
-    func getMessages(convoId: String, cursor: String?, limit: Int, account: AppAccount, appPassword: String?) async throws -> PagedMessages {
+    func getMessages(convoId _: String, cursor _: String?, limit _: Int, account _: AppAccount, appPassword _: String?) async throws -> PagedMessages {
         PagedMessages(messages: [], cursor: nil)
     }
 
-    func sendMessage(convoId: String, text: String, account: AppAccount, appPassword: String?) async throws -> ChatMessageSendResult {
+    func sendMessage(convoId _: String, text _: String, account _: AppAccount, appPassword _: String?) async throws -> ChatMessageSendResult {
         fatalError("not tested")
     }
 
-    func updateRead(convoId: String, messageId: String?, account: AppAccount, appPassword: String?) async throws {}
+    func updateRead(convoId _: String, messageId _: String?, account _: AppAccount, appPassword _: String?) async throws {}
 
-    func leaveConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {}
-    func muteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {}
-    func unmuteConvo(convoId: String, account: AppAccount, appPassword: String?) async throws {}
+    func leaveConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func muteConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
+    func unmuteConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {}
 
-    func getLog(cursor: String?, account: AppAccount, appPassword: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {
+    func getLog(cursor _: String?, account _: AppAccount, appPassword _: String?) async throws -> (events: [ChatLogEvent], cursor: String?) {
         ([], nil)
     }
 }

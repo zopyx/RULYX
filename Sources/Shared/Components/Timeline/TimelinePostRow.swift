@@ -75,6 +75,12 @@ struct TimelinePostRow: View {
 
             inlineThreadSection
         }
+        // Bind the row to the List's actual viewport. Without this, embedded
+        // media/text can report an intrinsic width larger than the viewport,
+        // centering the row and clipping the avatar on both sides.
+        .containerRelativeFrame(.horizontal)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     // MARK: - Context Menu

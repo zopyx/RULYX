@@ -52,7 +52,7 @@ struct RULYXApp: App {
 
     /// UserDefaults key `"hasSplashed"`: tracks whether the splash animation
     /// has been shown at least once. On subsequent launches, the splash is
-    /// shown briefly (0.5s) then fades out.
+    /// shown briefly then fades out.
     @AppStorage("hasSplashed") private var hasSplashed = false
 
     /// Controls whether the splash screen overlay is currently rendered on top
@@ -64,6 +64,9 @@ struct RULYXApp: App {
     /// DMs or moderation data. Shown unconditionally — independent of whether
     /// biometric app lock is enabled.
     @State private var showPrivacyShield = false
+
+    /// Guards the ordered startup sequence against repeated view-task launches.
+    @State private var startupCompleted = false
 
     // MARK: - Scene
 
@@ -142,9 +145,7 @@ struct RULYXApp: App {
 
                     // Sets up the shared URL cache with increased capacity on first appearance.
                     .onAppear {
-                        DispatchQueue.main.async {
-                            configureCache()
-                        }
+                        configureCache()
                     }
 
                     // Suppresses the lock/unlock transition animation when Reduce Motion
@@ -160,6 +161,7 @@ struct RULYXApp: App {
                     //   4. Clearsky heartbeat (independent)
                     //   5. Chat init (requires active account)
                     .task {
+                        guard !startupCompleted else { return }
                         // Step 1: Restore AT Protocol sessions from Keychain
                         await deps.blueskyClient.restoreSessions(for: deps.accountStore.accounts)
 
@@ -181,11 +183,13 @@ struct RULYXApp: App {
 
                         // Step 5: Initial chat load for active account
                         await reloadChatForActiveAccount(showPrompts: deps.accountStore.activeAccount != nil)
+                        startupCompleted = true
                     }
                     // AccountStore is a nested ObservableObject owned by AppDependencies;
                     // subscribe directly so chat reloads are not dependent on App body
                     // re-evaluation.
                     .onReceive(deps.accountStore.$activeAccountID.removeDuplicates().dropFirst()) { _ in
+                        guard startupCompleted else { return }
                         Task { @MainActor in
                             await reloadChatForActiveAccount(showPrompts: deps.accountStore.activeAccount != nil)
                         }
@@ -206,29 +210,26 @@ struct RULYXApp: App {
                     // On entering background: locks the app (if biometric lock is enabled),
                     // stops the Clearsky heartbeat, and pauses chat polling to save resources.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
-                        Task { @MainActor in
-                            showPrivacyShield = true
-                            appLockManager.appDidEnterBackground()
-                            deps.clearskyHeartbeat.stop()
-                            deps.chatStore.stopPolling()
-                            deps.autoBlockBackService.scheduleBackgroundTask()
-                        }
+                        // Mutate synchronously so the app-switcher snapshot cannot capture content.
+                        showPrivacyShield = true
+                        appLockManager.appDidEnterBackground()
+                        deps.clearskyHeartbeat.stop()
+                        deps.chatStore.stopPolling()
+                        deps.autoBlockBackService.scheduleBackgroundTask()
                     }
                     // On becoming active: attempts biometric unlock, resumes the Clearsky
                     // heartbeat, re-registers push notifications, resumes chat polling,
                     // triggers an immediate log sync, and performs auto-block-back check.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                        Task { @MainActor in
-                            showPrivacyShield = false
-                            appLockManager.appDidBecomeActive()
-                            deps.clearskyHeartbeat.start()
-                            deps.pushNotificationCoordinator.start()
-                            deps.chatStore.startPolling()
-                            deps.chatStore.signalSync()
-                            Task {
-                                await deps.autoBlockBackService.performAutoBlockBack()
-                                await deps.accountStore.refreshAccountProfiles(using: deps.blueskyClient)
-                            }
+                        showPrivacyShield = false
+                        appLockManager.appDidBecomeActive()
+                        deps.clearskyHeartbeat.start()
+                        deps.pushNotificationCoordinator.start()
+                        deps.chatStore.startPolling()
+                        deps.chatStore.signalSync()
+                        Task {
+                            await deps.autoBlockBackService.performAutoBlockBack()
+                            await deps.accountStore.refreshAccountProfiles(using: deps.blueskyClient)
                         }
                     }
 
@@ -453,8 +454,9 @@ private struct ProfileWindowContentView: View {
                 description: profile.description
             )
         } catch {
-            // Use basic DID-based actor as fallback
-            actor = BlueskyActor(did: did, handle: did.replacingOccurrences(of: "did:", with: ""))
+            // Do not fabricate profile data from a DID; keep the not-found state
+            // so callers can distinguish a failed lookup from a real actor.
+            actor = nil
         }
         isLoading = false
     }

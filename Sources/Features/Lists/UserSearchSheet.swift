@@ -42,17 +42,25 @@ struct UserSearchSheet: View {
                 }
 
                 ForEach(results) { actor in
-                    VStack(alignment: .leading, spacing: 2) {
-                        BlueskyActorRow(actor: actor)
-                        MemberFollowBadgesView(viewerState: effectiveViewerState(for: actor))
-                            .padding(.leading, 46)
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: 2) {
-                        Task { await toggleFollow(actor: actor) }
-                    }
-                    .onTapGesture(count: 1) {
-                        profileActor = actor
+                    HStack(spacing: 8) {
+                        Button {
+                            profileActor = actor
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                BlueskyActorRow(actor: actor)
+                                MemberFollowBadgesView(viewerState: effectiveViewerState(for: actor))
+                                    .padding(.leading, 46)
+                            }
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            Task { await toggleFollow(actor: actor) }
+                        } label: {
+                            Image(systemName: isFollowing(actor) ? "person.badge.minus" : "person.badge.plus")
+                        }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(loc(isFollowing(actor) ? "profile.following" : "lists.following"))
                     }
                 }
 
@@ -124,14 +132,18 @@ struct UserSearchSheet: View {
         return state
     }
 
+    private func isFollowing(_ actor: BlueskyActor) -> Bool {
+        pendingFollowActions.contains(actor.did)
+            || (actor.viewerState?.isFollowing == true && !pendingUnfollowActions.contains(actor.did))
+    }
+
     private func toggleFollow(actor: BlueskyActor) async {
         guard let activeAccount = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: activeAccount)
         else { return }
 
         let did = actor.did
-        let isCurrentlyFollowing = pendingFollowActions.contains(did)
-            || (actor.viewerState?.isFollowing == true && !pendingUnfollowActions.contains(did))
+        let isCurrentlyFollowing = isFollowing(actor)
 
         if isCurrentlyFollowing {
             pendingUnfollowActions.insert(did)

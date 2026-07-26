@@ -19,6 +19,11 @@ final class PushNotificationCoordinator: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     private var deviceTokenHex: String?
     private var registeredAccountsByToken: [String: [UUID: AppAccount]] = [:]
+    private var registrationRetryAfterByToken: [String: [UUID: Date]] = [:]
+    private var isSyncingRegistrations = false
+    private var syncRequestedWhileBusy = false
+    private var hasRequestedRemoteRegistration = false
+    private var isConfiguringRemoteRegistration = false
 
     init(
         pushService: BlueskyPushNotificationServicing,
@@ -40,7 +45,7 @@ final class PushNotificationCoordinator: ObservableObject {
 
     func syncAccounts() {
         guard isPushNotificationsEnabled else { return }
-        Task { await syncRegistrations() }
+        requestRegistrationSync()
     }
 
     private func observeAppNotifications() {
@@ -49,9 +54,11 @@ final class PushNotificationCoordinator: ObservableObject {
                 guard let self,
                       let tokenData = notification.userInfo?["deviceToken"] as? Data
                 else { return }
-                deviceTokenHex = tokenData.map { String(format: "%02x", $0) }.joined()
+                let token = tokenData.map { String(format: "%02x", $0) }.joined()
+                guard deviceTokenHex != token else { return }
+                deviceTokenHex = token
                 AppLogger.moderation.debug("Received APNs device token for push registration.")
-                Task { await self.syncRegistrations() }
+                requestRegistrationSync()
             }
             .store(in: &cancellables)
 
@@ -84,6 +91,10 @@ final class PushNotificationCoordinator: ObservableObject {
     private func configureRemoteNotificationsIfPossible() async {
         guard isPushNotificationsEnabled else { return }
         guard !serviceDID.isEmpty, !appID.isEmpty, !accountStore.accounts.isEmpty else { return }
+        guard !hasRequestedRemoteRegistration else { return }
+        guard !isConfiguringRemoteRegistration else { return }
+        isConfiguringRemoteRegistration = true
+        defer { isConfiguringRemoteRegistration = false }
 
         do {
             let center = UNUserNotificationCenter.current()
@@ -98,14 +109,35 @@ final class PushNotificationCoordinator: ObservableObject {
                 break
             }
 
+            hasRequestedRemoteRegistration = true
             UIApplication.shared.registerForRemoteNotifications()
         } catch {
             AppLogger.moderation.error("Notification authorization failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
+    private func requestRegistrationSync() {
+        guard !isSyncingRegistrations else {
+            syncRequestedWhileBusy = true
+            return
+        }
+        Task { await syncRegistrations() }
+    }
+
     private func syncRegistrations() async {
         guard isPushNotificationsEnabled else { return }
+        guard !isSyncingRegistrations else {
+            syncRequestedWhileBusy = true
+            return
+        }
+        isSyncingRegistrations = true
+        defer {
+            isSyncingRegistrations = false
+            if syncRequestedWhileBusy {
+                syncRequestedWhileBusy = false
+                requestRegistrationSync()
+            }
+        }
         await configureRemoteNotificationsIfPossible()
 
         guard let token = deviceTokenHex, !token.isEmpty else { return }
@@ -129,8 +161,16 @@ final class PushNotificationCoordinator: ObservableObject {
             }
         }
 
-        var successfulRegistrations: [UUID: AppAccount] = [:]
-        for account in accountStore.accounts {
+        var successfulRegistrations = previouslyRegistered
+        for accountID in previouslyRegistered.keys where !currentAccountIDs.contains(accountID) {
+            successfulRegistrations.removeValue(forKey: accountID)
+        }
+        let now = Date()
+        var retryAfter = registrationRetryAfterByToken[token] ?? [:]
+        for account in accountStore.accounts
+            where previouslyRegistered[account.id] == nil
+            && (retryAfter[account.id] ?? .distantPast) <= now
+        {
             do {
                 try await pushService.registerPush(
                     serviceDID: serviceDID,
@@ -140,12 +180,17 @@ final class PushNotificationCoordinator: ObservableObject {
                     appPassword: accountStore.appPassword(for: account)
                 )
                 successfulRegistrations[account.id] = account
+                retryAfter.removeValue(forKey: account.id)
             } catch {
+                // APNs registration endpoints commonly return transient 5xx errors.
+                // Avoid retrying the same account on every accounts/lifecycle event.
+                retryAfter[account.id] = now.addingTimeInterval(60)
                 AppLogger.moderation.error("Push register failed for \(account.handle): \(error.localizedDescription, privacy: .private)")
             }
         }
 
         registeredAccountsByToken[token] = successfulRegistrations
+        registrationRetryAfterByToken[token] = retryAfter
     }
 
     private func handlePushPayload(_ payload: [AnyHashable: Any], shouldNavigate: Bool) async {

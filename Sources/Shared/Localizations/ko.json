@@ -1382,7 +1382,7 @@
   "settings.delete_all_data": "Delete All Data",
   "settings.delete_all_data.confirm": "Delete All Data?",
   "settings.delete_all_data.hint": "Permanently removes all stored moderation logs, snapshots, and caches",
-  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, and cached data. Account credentials are not affected.",
+  "settings.delete_all_data.message": "This permanently erases all moderation history, snapshots, cached data, and account credentials.",
   "settings.icloud": "아이클라우드",
   "settings.icloud.disabled_footer": "여러 장치에서 계정 구성을 일관되게 유지하려면 활성화하세요.",
   "settings.icloud.enabled_footer": "계정 핸들과 라벨은 여러 기기에서 동기화됩니다. 보안을 위해 앱 비밀번호는 각 기기에 유지됩니다.",

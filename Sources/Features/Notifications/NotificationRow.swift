@@ -21,31 +21,33 @@ struct NotificationRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .center, spacing: 6) {
-                avatarView
-                    .frame(width: 32, height: 32)
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        Text(notification.author.displayName.flatMap { $0.isEmpty ? nil : $0 } ?? notification.author.handle)
-                            .font(.subheadline.weight(.semibold))
-                            .lineLimit(1)
-                        Text(reasonText)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                        if !notification.isRead {
-                            Circle()
-                                .fill(Color.skyPrimary)
-                                .frame(width: 8, height: 8)
+            Button(action: onAuthorTap) {
+                HStack(alignment: .center, spacing: 6) {
+                    avatarView
+                        .frame(width: 32, height: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 4) {
+                            Text(notification.author.displayName.flatMap { $0.isEmpty ? nil : $0 } ?? notification.author.handle)
+                                .font(.subheadline.weight(.semibold))
+                                .lineLimit(1)
+                            Text(reasonText)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                            if !notification.isRead {
+                                Circle()
+                                    .fill(Color.skyPrimary)
+                                    .frame(width: 8, height: 8)
+                            }
                         }
+                        Text(relativeTime)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    Text(relativeTime)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture(perform: onAuthorTap)
+            .buttonStyle(.plain)
+            .accessibilityLabel(notification.author.displayName ?? notification.author.handle)
 
             if let relatedPost {
                 relatedPostCard(relatedPost)

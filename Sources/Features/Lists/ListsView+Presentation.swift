@@ -20,5 +20,10 @@ extension ListsView {
         var showCustomSearch = false // Navigation to CustomSearchView
         var showDirectReplies = false // Navigation to DirectRepliesView
         var isShowingCreateInternalList = false // Internal list creation sheet
+
+        var isShowingNavigationDestination: Bool {
+            showProfile || showFollowers || showFollowing || showBlocking || showBlockedBy ||
+                showMentionsSearch || showCustomSearch || showDirectReplies
+        }
     }
 }
