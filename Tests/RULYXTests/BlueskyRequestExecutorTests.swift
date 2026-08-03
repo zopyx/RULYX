@@ -59,7 +59,10 @@ final class BlueskyRequestExecutorTests: XCTestCase {
                 httpVersion: nil,
                 headerFields: nil
             )!
-            return (response, Data())
+            let data = """
+            {"error":"ExpiredToken","message":"Token has expired"}
+            """.data(using: .utf8)!
+            return (response, data)
         }
 
         do {
@@ -72,13 +75,43 @@ final class BlueskyRequestExecutorTests: XCTestCase {
             )
             XCTFail("Expected error")
         } catch let error as BlueskyAPIError {
-            if case .unauthorized = error {
-                // expected
+            if case let .unauthorized(message) = error {
+                XCTAssertEqual(message, "Token has expired")
             } else {
                 XCTFail("Expected unauthorized, got \(error)")
             }
         } catch {
             XCTFail("Expected BlueskyAPIError, got \(error)")
+        }
+    }
+
+    func testAuthFactorRequirementPreservesDeliveryMessage() async {
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(
+                url: request.url!,
+                statusCode: 401,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+            let data = """
+            {"error":"AuthFactorTokenRequired","message":"Check your verified email address for a sign-in code."}
+            """.data(using: .utf8)!
+            return (response, data)
+        }
+
+        do {
+            let _: EmptyTestResponse = try await executor.send(
+                path: "com.atproto.server.createSession",
+                method: "POST",
+                queryItems: [],
+                accessToken: nil,
+                hostURL: nil
+            )
+            XCTFail("Expected auth-factor error")
+        } catch let BlueskyAPIError.authFactorTokenRequired(message) {
+            XCTAssertEqual(message, "Check your verified email address for a sign-in code.")
+        } catch {
+            XCTFail("Expected auth-factor error, got \(error)")
         }
     }
 

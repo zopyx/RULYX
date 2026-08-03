@@ -97,10 +97,12 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
                     throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
                 }
                 if errorCode == "AuthFactorTokenRequired" {
-                    throw BlueskyAPIError.authFactorTokenRequired
+                    throw BlueskyAPIError.authFactorTokenRequired(errorPayload.message)
                 }
             }
-            throw BlueskyAPIError.unauthorized
+            throw BlueskyAPIError.unauthorized(
+                (try? JSONDecoder().decode(APIErrorPayload.self, from: data))?.message
+            )
         }
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
@@ -110,7 +112,7 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
                     throw BlueskyAPIError.deactivated(errorPayload.message ?? errorCode)
                 }
                 if errorCode == "AuthFactorTokenRequired" {
-                    throw BlueskyAPIError.authFactorTokenRequired
+                    throw BlueskyAPIError.authFactorTokenRequired(errorPayload.message)
                 }
                 throw BlueskyAPIError.server(errorPayload.message ?? errorCode)
             }

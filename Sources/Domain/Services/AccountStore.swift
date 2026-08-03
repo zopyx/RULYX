@@ -180,7 +180,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             persist()
             errorMessage = nil
             return .success
-        } catch BlueskyAPIError.authFactorTokenRequired {
+        } catch let BlueskyAPIError.authFactorTokenRequired(message) {
+            errorMessage = AppError.userMessage(from: BlueskyAPIError.authFactorTokenRequired(message))
             return .needsAuthFactorToken
         } catch let caughtError {
             errorMessage = AppError.userMessage(from: caughtError)
@@ -239,8 +240,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             errorMessage = nil
             return true
         } catch let caughtError as BlueskyAPIError {
-            if case .authFactorTokenRequired = caughtError {
-                errorMessage = AppError.userMessage(from: BlueskyAPIError.authFactorTokenRequired)
+            if case let BlueskyAPIError.authFactorTokenRequired(message) = caughtError {
+                errorMessage = AppError.userMessage(from: BlueskyAPIError.authFactorTokenRequired(message))
             } else {
                 errorMessage = AppError.userMessage(from: caughtError)
             }
@@ -248,6 +249,69 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
         } catch let genericError {
             errorMessage = AppError.userMessage(from: genericError)
             return false
+        }
+    }
+
+    /// The result of re-authenticating an existing account.
+    enum ReauthenticationResult {
+        /// Credentials and session were updated successfully.
+        case success
+        /// Bluesky sent an email verification code that must be entered next.
+        case needsAuthFactorToken
+        /// Authentication failed; `errorMessage` contains the reason.
+        case failure
+    }
+
+    /// Re-authenticates an existing account with a replacement app password
+    /// and, when required, an email verification code.
+    /// The new password and session replace the stale Keychain values before the
+    /// account-scoped caches are cleared, so subsequent requests use fresh credentials.
+    func reauthenticate(
+        account: AppAccount,
+        appPassword: String,
+        authFactorToken: String? = nil,
+        client: BlueskyAuthenticating
+    ) async -> ReauthenticationResult {
+        let trimmedPassword = appPassword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPassword.isEmpty else {
+            errorMessage = String.localized("account.error.handle_and_password_required")
+            return .failure
+        }
+
+        do {
+            let session = try await client.authenticate(
+                handle: account.handle,
+                appPassword: trimmedPassword,
+                entrywayURL: account.entrywayURL ?? account.pdsURL,
+                authFactorToken: authFactorToken?.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+            try keychain.save(trimmedPassword, service: passwordService, account: account.id.uuidString)
+            try await client.persistSession(session, for: account)
+            if let liveClient = client as? LiveBlueskyClient {
+                await liveClient.clearAllCaches()
+            }
+
+            var updatedAccount = account
+            updatedAccount.handle = session.handle
+            updatedAccount.did = session.did
+            updatedAccount.pdsURL = session.pdsURL
+            if let index = accounts.firstIndex(where: { $0.id == account.id }) {
+                accounts[index] = updatedAccount
+            }
+            persist()
+            errorMessage = nil
+            NotificationCenter.default.post(
+                name: .accountReauthenticated,
+                object: updatedAccount,
+                userInfo: ["accountID": account.id.uuidString]
+            )
+            return .success
+        } catch let BlueskyAPIError.authFactorTokenRequired(message) {
+            errorMessage = AppError.userMessage(from: BlueskyAPIError.authFactorTokenRequired(message))
+            return .needsAuthFactorToken
+        } catch {
+            errorMessage = AppError.userMessage(from: error)
+            return .failure
         }
     }
 

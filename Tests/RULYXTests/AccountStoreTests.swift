@@ -97,6 +97,35 @@ final class AccountStoreTests: XCTestCase {
         XCTAssertTrue(store.accounts.isEmpty)
     }
 
+    func testReauthenticateSupportsEmailAuthFactor() async {
+        let (store, _) = makeStore()
+        let client = MockAuthenticatingClient()
+        await addTestAccount(store: store, client: client)
+        guard let account = store.activeAccount else { return XCTFail("Expected active account") }
+
+        client.requiresAuthFactor = true
+        client.receivedAuthFactorTokens.removeAll()
+        let factorResult = await store.reauthenticate(
+            account: account,
+            appPassword: "new-password",
+            client: client
+        )
+        guard case .needsAuthFactorToken = factorResult else {
+            return XCTFail("Expected an email auth-factor challenge")
+        }
+
+        let successResult = await store.reauthenticate(
+            account: account,
+            appPassword: "new-password",
+            authFactorToken: "123456",
+            client: client
+        )
+        guard case .success = successResult else {
+            return XCTFail("Expected re-authentication to succeed with the code")
+        }
+        XCTAssertEqual(client.receivedAuthFactorTokens, [nil, "123456"])
+    }
+
     // MARK: - Remove Account
 
     func testRemoveAccountRemovesFromStore() async {
@@ -676,14 +705,20 @@ private final class MockKeychainService: KeychainServicing, @unchecked Sendable 
 private final class MockAuthenticatingClient: BlueskyAuthenticating {
     let shouldFailAuth: Bool
     var didDeleteSession = false
+    var requiresAuthFactor = false
+    var receivedAuthFactorTokens: [String?] = []
 
     init(shouldFailAuth: Bool = false) {
         self.shouldFailAuth = shouldFailAuth
     }
 
-    func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil, authFactorToken _: String? = nil) async throws -> BlueskySession {
+    func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil, authFactorToken: String? = nil) async throws -> BlueskySession {
+        receivedAuthFactorTokens.append(authFactorToken)
         if shouldFailAuth {
-            throw BlueskyAPIError.unauthorized
+            throw BlueskyAPIError.unauthorized(nil)
+        }
+        if requiresAuthFactor, authFactorToken == nil {
+            throw BlueskyAPIError.authFactorTokenRequired(nil)
         }
         return BlueskySession(
             did: "did:plc:test",

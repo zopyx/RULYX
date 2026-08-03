@@ -74,7 +74,7 @@ final class MockSessionService: BlueskySessionServicing {
 
     func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil, authFactorToken _: String? = nil) async throws -> BlueskySession {
         if shouldFailAuth {
-            throw shouldFailAuthWith ?? BlueskyAPIError.unauthorized
+            throw shouldFailAuthWith ?? BlueskyAPIError.unauthorized(nil)
         }
         return sessionToReturn ?? BlueskySession(
             did: "did:plc:session",

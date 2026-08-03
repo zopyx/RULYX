@@ -901,7 +901,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         )
 
         if httpResponse.statusCode == 401 {
-            throw BlueskyAPIError.unauthorized
+            throw BlueskyAPIError.unauthorized(
+                (try? JSONDecoder().decode(APIErrorPayload.self, from: data))?.message
+            )
         }
 
         guard (200 ..< 300).contains(httpResponse.statusCode) else {

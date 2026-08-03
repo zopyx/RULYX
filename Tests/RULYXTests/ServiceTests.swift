@@ -325,6 +325,11 @@ final class BlueskySessionServiceTests: XCTestCase {
             service: "com.ajung.RULYX.session",
             account: account.id.uuidString
         )
+        try keychain.save(
+            "password",
+            service: "com.ajung.RULYX.password",
+            account: account.id.uuidString
+        )
 
         executor.onSend = { path, _, _, _, _, _ in
             XCTAssertEqual(path, "com.atproto.server.createSession")

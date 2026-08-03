@@ -7,13 +7,15 @@ enum BlueskyAPIError: LocalizedError {
     /// The API response could not be parsed or was unexpected.
     case invalidResponse
     /// Authentication failed (invalid credentials or expired token).
-    case unauthorized
+    /// The associated value contains the server-provided reason when available.
+    case unauthorized(String?)
     /// No saved credentials were found for the requested account.
     case missingCredentials
     /// The server's SSL certificate did not match the pinned fingerprint.
     case sslPinFailure
     /// Email 2FA verification code is required to complete authentication.
-    case authFactorTokenRequired
+    /// The associated value contains the server-provided delivery message.
+    case authFactorTokenRequired(String?)
     /// The account has been deactivated (includes server message).
     case deactivated(String)
     /// A generic server-side error (includes server message).
@@ -27,10 +29,14 @@ enum BlueskyAPIError: LocalizedError {
             "The Bluesky endpoint URL is invalid."
         case .invalidResponse:
             "Bluesky returned an unexpected response."
-        case .unauthorized:
-            "Bluesky rejected the credentials. Check the handle and app password."
-        case .authFactorTokenRequired:
-            "A verification code has been sent to your email."
+        case let .unauthorized(message):
+            if let message, !message.isEmpty {
+                message
+            } else {
+                "Bluesky rejected the credentials. Check the handle and app password."
+            }
+        case let .authFactorTokenRequired(message):
+            message.flatMap { $0.isEmpty ? nil : $0 } ?? "A verification code has been sent to your email."
         case .missingCredentials:
             "No saved app password was found for this account."
         case .sslPinFailure:

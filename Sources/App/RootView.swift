@@ -37,6 +37,11 @@ struct RootView: View {
     /// Controls the account switcher sheet from the tab bar.
     @State private var showAccountSwitcher = false
 
+    /// Account that needs a fresh app password after an authentication failure.
+    @State private var reauthRequest: ReauthenticationRequest?
+    /// Keeps the shared auth-failure state subscribed before any error surface renders.
+    @ObservedObject private var reauthenticationState = ReauthenticationPromptState.shared
+
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"` (default).
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
@@ -147,19 +152,63 @@ struct RootView: View {
     // MARK: - Body
 
     var body: some View {
-        if horizontalSizeClass == .regular {
-            iPadRootView()
-                .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
-                .environmentObject(workspaceStore)
-                .environmentObject(localizationManager)
-                .environmentObject(mutedWordsStore)
-                .environmentObject(analyticsStore)
-                .environmentObject(chatStore)
-                .environmentObject(clearskyHeartbeat)
-        } else {
-            compactBody
+        Group {
+            if horizontalSizeClass == .regular {
+                iPadRootView()
+                    .environmentObject(accountStore)
+                    .environmentObject(container.blueskyClient)
+                    .environmentObject(workspaceStore)
+                    .environmentObject(localizationManager)
+                    .environmentObject(mutedWordsStore)
+                    .environmentObject(analyticsStore)
+                    .environmentObject(chatStore)
+                    .environmentObject(clearskyHeartbeat)
+            } else {
+                compactBody
+            }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .authenticationFailed)) { notification in
+            presentReauthentication(for: notification)
+        }
+        .onAppear {
+            presentReauthenticationIfNeeded()
+        }
+        .onChange(of: reauthenticationState.isAuthFailure) { _, isAuthFailure in
+            if isAuthFailure {
+                presentReauthenticationIfNeeded()
+            }
+        }
+        .sheet(item: $reauthRequest) { request in
+            ReauthenticationSheet(request: request)
+        }
+    }
+
+    private func presentReauthentication(for notification: Notification) {
+        let accountID = (notification.userInfo?["accountID"] as? String).flatMap(UUID.init)
+        presentReauthentication(
+            accountID: accountID,
+            reason: notification.userInfo?["message"] as? String
+        )
+    }
+
+    private func presentReauthenticationIfNeeded() {
+        guard reauthenticationState.isAuthFailure else { return }
+        presentReauthentication(
+            accountID: reauthenticationState.failedAccountID,
+            reason: reauthenticationState.reason
+        )
+    }
+
+    private func presentReauthentication(accountID: UUID?, reason: String?) {
+        guard reauthRequest == nil else { return }
+        let account = accountID.flatMap { id in
+            accountStore.accounts.first { $0.id == id }
+        } ?? accountStore.activeAccount
+        guard let account else { return }
+        reauthRequest = ReauthenticationRequest(
+            account: account,
+            reason: reason
+        )
     }
 
     private var compactBody: some View {
@@ -434,35 +483,20 @@ private struct AccountAvatarView: View {
     let size: CGFloat
 
     var body: some View {
-        if let avatarURL = account.avatarURL {
-            AsyncImage(url: avatarURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Circle()
-                    .fill(tint)
-                    .overlay {
-                        Text(account.displayName.prefix(1).uppercased())
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.white)
-                    }
-            }
-            .frame(width: size, height: size)
-            .clipShape(Circle())
-            .overlay {
-                Circle()
-                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-            }
-        } else {
+        FreshAvatarImage(url: account.avatarURL) {
             Circle()
                 .fill(tint)
-                .frame(width: size, height: size)
                 .overlay {
                     Text(account.displayName.prefix(1).uppercased())
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.white)
                 }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+        .overlay {
+            Circle()
+                .stroke(Color.white.opacity(0.2), lineWidth: 1)
         }
     }
 }

@@ -31,6 +31,7 @@ struct ListTimelineView: View {
     @State private var profileToShow: BlueskyActor?
     @StateObject private var likerActions = PostLikerActionsManager()
     @State private var aiClassifications: [String: [String: Double]] = [:]
+    @ObservedObject private var reauthenticationState = ReauthenticationPromptState.shared
 
     init(list: BlueskyList) {
         self.list = list
@@ -44,11 +45,27 @@ struct ListTimelineView: View {
             if viewModel.state == .initialLoading {
                 skeletonContent
             } else if case let .failed(msg) = viewModel.state, viewModel.entries.isEmpty {
-                ContentUnavailableView(
-                    loc("list.detail.alert_title"),
-                    systemImage: "exclamationmark.bubble",
-                    description: Text(msg)
-                )
+                VStack(spacing: 12) {
+                    ContentUnavailableView(
+                        loc("list.detail.alert_title"),
+                        systemImage: "exclamationmark.bubble",
+                        description: Text(msg)
+                    )
+                    HStack(spacing: 8) {
+                        Button(loc("actions.retry")) {
+                            Task { await loadInitial() }
+                        }
+                        .buttonStyle(.bordered)
+                        if reauthenticationState.isAuthFailure || isAuthenticationMessage(msg) {
+                            Button {
+                                reauthenticationState.presentReauthentication()
+                            } label: {
+                                Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                }
             } else if viewModel.entries.isEmpty {
                 ContentUnavailableView(
                     loc("list.timeline.empty"),
@@ -266,6 +283,15 @@ struct ListTimelineView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
+                    if reauthenticationState.isAuthFailure || isAuthenticationMessage(msg) {
+                        Button {
+                            reauthenticationState.presentReauthentication()
+                        } label: {
+                            Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -380,6 +406,18 @@ struct ListTimelineView: View {
             }
         }
         .listStyle(.plain)
+    }
+
+    private func isAuthenticationMessage(_ message: String) -> Bool {
+        let normalizedMessage = message.lowercased()
+        return [
+            "token",
+            "credential",
+            "unauthorized",
+            "authentication",
+            "app password",
+            "login",
+        ].contains { normalizedMessage.contains($0) }
     }
 
     private var newPostsBanner: some View {

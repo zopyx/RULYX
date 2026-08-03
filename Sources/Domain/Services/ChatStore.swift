@@ -140,6 +140,16 @@ final class ChatStore: ObservableObject {
         }
     }
 
+    /// Drops all in-memory chat state after credentials are rejected, preventing
+    /// stale conversations from being presented while re-authentication is pending.
+    func invalidateForAuthenticationFailure(message: String?) {
+        stopPolling()
+        resetConversationState(isLoading: false)
+        let authError = BlueskyAPIError.unauthorized(message)
+        error = authError
+        messageError = authError
+    }
+
     // MARK: - Conversations
 
     /// Loads the first page of conversations.

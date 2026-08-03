@@ -260,9 +260,12 @@ final class ChatService: ChatServicing {
                         || errorCode.lowercased().contains("auth")
                         || errorCode.lowercased().contains("unauthorized")
                     if isAuthError {
-                        throw BlueskyAPIError.unauthorized
+                        throw BlueskyAPIError.unauthorized(errorPayload.message)
                     }
                     throw BlueskyAPIError.server(errorPayload.message ?? errorCode)
+                }
+                if httpResponse.statusCode == 401 {
+                    throw BlueskyAPIError.unauthorized(nil)
                 }
                 throw BlueskyAPIError.invalidResponse
             }

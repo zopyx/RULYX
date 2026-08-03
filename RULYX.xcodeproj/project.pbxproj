@@ -142,6 +142,7 @@
 		5A64C4FD3DB769CA13549E32 /* BlueskyProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6410F5E8B465A4948FA8CE8D /* BlueskyProfile.swift */; };
 		5AFE6FC6ACAD37C7E198DB3C /* BlueskyIdentityServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC35C82F57D17D996D5A1B28 /* BlueskyIdentityServicing.swift */; };
 		5B4C23380734C07FA3F6D87F /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C653D72FC931E1C3CCFE6 /* SnapshotHelper.swift */; };
+		5B6B69A16CACCA8ACE50A551 /* ReauthenticationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EF5DB95F2D06DB9B6024BC /* ReauthenticationSheet.swift */; };
 		5C98188CF411ABB9EBC2E739 /* BlueskyModerationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE36799F5E7CF051ED4E65E /* BlueskyModerationServicing.swift */; };
 		5CE364B178AB794B461C5F99 /* NewConversationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D74D2314222D92AA8ED0E4 /* NewConversationSheet.swift */; };
 		5CE8DDD51EF703D3FD66A4A9 /* iPadDragDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97730E70ACB6A0120946A2AF /* iPadDragDrop.swift */; };
@@ -472,6 +473,7 @@
 		508D94F9EB9CF5F38E7E6A63 /* ListImportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListImportController.swift; sourceTree = "<group>"; };
 		52463180B718A02DC76271D5 /* ModerationAuditStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModerationAuditStoreTests.swift; sourceTree = "<group>"; };
 		52B7DD20B3AC717E85BF2EBB /* AccountTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountTabView.swift; sourceTree = "<group>"; };
+		52EF5DB95F2D06DB9B6024BC /* ReauthenticationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReauthenticationSheet.swift; sourceTree = "<group>"; };
 		5311D291F3EA560A387AEF73 /* MockListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockListService.swift; sourceTree = "<group>"; };
 		546629FC07E6BD75F71D6733 /* ListDetailSubscribeSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailSubscribeSection.swift; sourceTree = "<group>"; };
 		547649B68D511304DB5515F5 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
@@ -1085,6 +1087,7 @@
 				C945DD5E8035F761BB15518F /* ModelDownloadIndicator.swift */,
 				410CE5B162163F64F1707CFC /* OfflineBanner.swift */,
 				38E33392E147CCE40701D6B6 /* PageTitleModifier.swift */,
+				52EF5DB95F2D06DB9B6024BC /* ReauthenticationSheet.swift */,
 				CC6C6354A3B0AAD68494A616 /* SkeletonRow.swift */,
 				A244B2F96EE4EBBE75E6E9CF /* SplashScreenView.swift */,
 				57053C65176DBDA9C7D5E7E9 /* StatePanels.swift */,
@@ -1755,6 +1758,7 @@
 				3CC2E4A396F61A12A0B58983 /* PushNotificationCoordinator.swift in Sources */,
 				F779CA470E42CDE03028B86D /* PushNotificationRoute.swift in Sources */,
 				CB92F8BAC45E4EDD80C3DFE2 /* RULYXApp.swift in Sources */,
+				5B6B69A16CACCA8ACE50A551 /* ReauthenticationSheet.swift in Sources */,
 				5508A861BFC224F7CFDBF650 /* RelationshipCache.swift in Sources */,
 				4160D219B6BFFD02231A897A /* RelationshipsView.swift in Sources */,
 				24488F154C53147D5126ED66 /* ReplyComposerView.swift in Sources */,

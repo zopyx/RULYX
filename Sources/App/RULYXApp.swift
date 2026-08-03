@@ -47,6 +47,10 @@ struct RULYXApp: App {
     /// stores, and managers used throughout the app.
     @StateObject private var deps = AppDependencies()
 
+    /// Installs the auth-failure observer before session restoration can emit a
+    /// notification, even when `RootView` has not been created yet.
+    @ObservedObject private var reauthenticationState = ReauthenticationPromptState.shared
+
     /// Singleton managing biometric app lock (Face ID / Touch ID) and auto-lock timeout.
     @ObservedObject private var appLockManager = AppLockManager.shared
 
@@ -132,6 +136,12 @@ struct RULYXApp: App {
                         await deps.blueskyClient.restoreSessions(for: deps.accountStore.accounts)
                     }
 
+                    // Refresh profile metadata in the background so the account switcher
+                    // has the active account's avatar available after a cold launch.
+                    .task {
+                        await deps.accountStore.refreshAccountProfiles(using: deps.blueskyClient)
+                    }
+
                     // MARK: Lifecycle — Step 2: Test Account (UI Tests)
 
                     // When launched with `--test-account` (screenshot tests), reads
@@ -180,6 +190,25 @@ struct RULYXApp: App {
                         Task { @MainActor in
                             await reloadChatForActiveAccount(showPrompts: deps.accountStore.activeAccount != nil)
                         }
+                    }
+
+                    // A successful re-authentication replaces the chat session as well.
+                    .onReceive(NotificationCenter.default.publisher(for: .accountReauthenticated)) { notification in
+                        guard let account = notification.object as? AppAccount,
+                              account.id == deps.accountStore.activeAccountID else { return }
+                        Task { @MainActor in
+                            await reloadChatForActiveAccount(showPrompts: true)
+                        }
+                    }
+
+                    // Do not leave revoked-token chat data visible while the re-login
+                    // sheet is open; the next chat retry must use the new session.
+                    .onReceive(NotificationCenter.default.publisher(for: .authenticationFailed)) { notification in
+                        let accountID = (notification.userInfo?["accountID"] as? String).flatMap(UUID.init)
+                        guard accountID == deps.accountStore.activeAccountID else { return }
+                        deps.chatStore.invalidateForAuthenticationFailure(
+                            message: notification.userInfo?["message"] as? String
+                        )
                     }
 
                     // MARK: Lifecycle — Push Account Sync

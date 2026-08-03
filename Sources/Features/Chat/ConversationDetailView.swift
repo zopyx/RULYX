@@ -56,6 +56,14 @@ struct ConversationDetailView: View {
                         Task { await chatStore.loadMessages(convoId: conversation.id) }
                     }
                     .buttonStyle(.bordered)
+                    if AppError.isAuthenticationFailure(error) {
+                        Button {
+                            ReauthenticationPromptState.shared.presentReauthentication()
+                        } label: {
+                            Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)

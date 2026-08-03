@@ -15,7 +15,12 @@ final class BlueskySessionService401RetryTests: XCTestCase {
         service = BlueskySessionService(requestExecutor: requestExecutor, keychain: keychain)
         let session = makeSession()
         account = makeAccount(handle: session.handle, did: session.did)
-        try? keychain.save(try! JSONEncoder().encode(session).utf8String, service: "com.ajung.RULYX.session", account: account.id.uuidString)
+        if let data = try? JSONEncoder().encode(session),
+           let encodedSession = String(data: data, encoding: .utf8)
+        {
+            try? keychain.save(encodedSession, service: "com.ajung.RULYX.session", account: account.id.uuidString)
+        }
+        try? keychain.save("test-password", service: "com.ajung.RULYX.password", account: account.id.uuidString)
     }
 
     override func tearDown() {
@@ -46,7 +51,7 @@ final class BlueskySessionService401RetryTests: XCTestCase {
             operation: { _ in
                 operationAttempt += 1
                 if operationAttempt == 1 {
-                    throw BlueskyAPIError.unauthorized
+                    throw BlueskyAPIError.unauthorized(nil)
                 }
                 return EmptyTestResponse()
             }
@@ -57,7 +62,10 @@ final class BlueskySessionService401RetryTests: XCTestCase {
 
     func test401WithRecoveryFailureThrowsUnauthorized() async {
         requestExecutor.onSend = { _, _, _, _, _, _ in
-            throw BlueskyAPIError.unauthorized
+            throw BlueskyAPIError.unauthorized(nil)
+        }
+        let notificationExpectation = expectation(forNotification: .authenticationFailed, object: nil) { notification in
+            (notification.userInfo?["accountID"] as? String) == self.account.id.uuidString
         }
 
         do {
@@ -65,15 +73,16 @@ final class BlueskySessionService401RetryTests: XCTestCase {
                 account: account,
                 appPassword: "test-password",
                 operation: { _ in
-                    throw BlueskyAPIError.unauthorized
+                    throw BlueskyAPIError.unauthorized(nil)
                 }
             )
             XCTFail("Expected unauthorized error")
-        } catch BlueskyAPIError.unauthorized {
+        } catch BlueskyAPIError.unauthorized(nil) {
             // expected
         } catch {
             XCTFail("Expected unauthorized, got \(error)")
         }
+        await fulfillment(of: [notificationExpectation], timeout: 1)
     }
 
     func testNoRetryOnNon401Error() async {
@@ -91,6 +100,58 @@ final class BlueskySessionService401RetryTests: XCTestCase {
         } catch {
             XCTFail("Expected server error, got \(error)")
         }
+    }
+
+    func testRevokedTokenRequiresExplicitReauthentication() async {
+        requestExecutor.onSend = { path, _, _, _, _, _ in
+            if path == "com.atproto.server.refreshSession" {
+                throw NSError(domain: "Test", code: 1, userInfo: [NSLocalizedDescriptionKey: "Refresh must not run for a revoked token"])
+            }
+            throw BlueskyAPIError.unauthorized("Token has been revoked")
+        }
+        let notificationExpectation = expectation(forNotification: .authenticationFailed, object: nil) { notification in
+            notification.userInfo?["message"] as? String == "Token has been revoked"
+        }
+
+        do {
+            let _: EmptyTestResponse = try await service.performAuthenticatedRequest(
+                account: account,
+                appPassword: "test-password",
+                operation: { _ in
+                    throw BlueskyAPIError.unauthorized("Token has been revoked")
+                }
+            )
+            XCTFail("Expected revoked token error")
+        } catch let BlueskyAPIError.unauthorized(message) {
+            XCTAssertEqual(message, "Token has been revoked")
+        } catch {
+            XCTFail("Expected revoked token error, got \(error)")
+        }
+
+        await fulfillment(of: [notificationExpectation], timeout: 1)
+    }
+
+    func testExpiredServerMessageRequiresExplicitReauthentication() async {
+        let notificationExpectation = expectation(forNotification: .authenticationFailed, object: nil) { notification in
+            notification.userInfo?["message"] as? String == "Token has expired"
+        }
+
+        do {
+            let _: EmptyTestResponse = try await service.performAuthenticatedRequest(
+                account: account,
+                appPassword: "test-password",
+                operation: { _ in
+                    throw BlueskyAPIError.server("Token has expired")
+                }
+            )
+            XCTFail("Expected expired token error")
+        } catch let BlueskyAPIError.server(message) {
+            XCTAssertEqual(message, "Token has expired")
+        } catch {
+            XCTFail("Expected expired token error, got \(error)")
+        }
+
+        await fulfillment(of: [notificationExpectation], timeout: 1)
     }
 }
 

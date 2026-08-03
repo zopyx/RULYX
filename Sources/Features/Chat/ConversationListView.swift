@@ -83,6 +83,14 @@ struct ConversationListView: View {
                             Task { await chatStore.loadConvos() }
                         }
                         .buttonStyle(.bordered)
+                        if AppError.isAuthenticationFailure(chatError) {
+                            Button {
+                                ReauthenticationPromptState.shared.presentReauthentication()
+                            } label: {
+                                Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding()

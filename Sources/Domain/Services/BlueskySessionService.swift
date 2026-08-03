@@ -124,7 +124,7 @@ final class BlueskySessionService: BlueskySessionServicing {
 
     func persistSession(_ authSession: BlueskySession, for account: AppAccount) async throws {
         guard session(authSession, belongsTo: account) else {
-            throw BlueskyAPIError.unauthorized
+            throw BlueskyAPIError.unauthorized(nil)
         }
         let data = try JSONEncoder().encode(authSession)
         guard let value = String(data: data, encoding: .utf8) else {
@@ -154,7 +154,16 @@ final class BlueskySessionService: BlueskySessionServicing {
         appPassword _: String?,
         operation: (BlueskySession) async throws -> Response
     ) async throws -> Response {
-        var authSession = try await cachedSession(for: account)
+        let initialSession: BlueskySession
+        do {
+            initialSession = try await cachedSession(for: account)
+        } catch let error as BlueskyAPIError where AppError.isAuthenticationFailure(error) {
+            await invalidateAuthenticationState()
+            postAuthenticationFailure(for: account, error: error)
+            throw error
+        }
+
+        var authSession = initialSession
         // Reduce memory exposure: shadow appPassword after initial session acquisition.
         // recreateSession() reads credentials from Keychain directly if a retry is needed.
         let _appPassword: String? = nil
@@ -175,12 +184,27 @@ final class BlueskySessionService: BlueskySessionServicing {
                     userInfo: ["accountID": account.id.uuidString]
                 )
                 throw BlueskyAPIError.deactivated(message)
-            } catch BlueskyAPIError.unauthorized {
-                guard attempt < 2 else { throw BlueskyAPIError.unauthorized }
-                authSession = try await recoverSession(
-                    currentSession: authSession,
-                    for: account
-                )
+            } catch let authError as BlueskyAPIError where AppError.isAuthenticationFailure(authError) {
+                if requiresExplicitReauthentication(authError) {
+                    await invalidateAuthenticationState()
+                    postAuthenticationFailure(for: account, error: authError)
+                    throw authError
+                }
+                guard attempt < 2 else {
+                    await invalidateAuthenticationState()
+                    postAuthenticationFailure(for: account, error: authError)
+                    throw authError
+                }
+                do {
+                    authSession = try await recoverSession(
+                        currentSession: authSession,
+                        for: account
+                    )
+                } catch let recoveryError as BlueskyAPIError where AppError.isAuthenticationFailure(recoveryError) {
+                    await invalidateAuthenticationState()
+                    postAuthenticationFailure(for: account, error: recoveryError)
+                    throw recoveryError
+                }
                 let delay = pow(2.0, Double(attempt)) * Double.random(in: 0.8 ..< 1.2)
                 try? await Task.sleep(for: .seconds(delay))
             } catch {
@@ -195,7 +219,54 @@ final class BlueskySessionService: BlueskySessionServicing {
             }
         }
 
-        throw BlueskyAPIError.unauthorized
+        throw BlueskyAPIError.unauthorized(nil)
+    }
+
+    /// Removes every account-dependent cache before notifying the UI that credentials
+    /// must be entered again. A subsequent Retry therefore cannot reuse a revoked token.
+    private func invalidateAuthenticationState() async {
+        cachedSessions.removeAll()
+        URLCache.shared.removeAllCachedResponses()
+        await BlueskyAPICache.shared.clearAll()
+        DashboardCache.clearAll()
+        RelationshipCache.clearAll()
+        ThreadCacheService.shared.invalidateAll()
+    }
+
+    /// A revoked token is a server-side invalidation, not a transient access-token
+    /// expiry. Never retry it with the old session or silently reuse the stored password.
+    private func requiresExplicitReauthentication(_ error: BlueskyAPIError) -> Bool {
+        let message: String? = switch error {
+        case let .unauthorized(message):
+            message
+        case let .server(message):
+            message
+        default:
+            nil
+        }
+        let normalized = message?.lowercased() ?? ""
+        return normalized.contains("revoked") || normalized.contains("invalidated") || normalized.contains("expired")
+    }
+
+    /// Posts one account-scoped notification after credentials can no longer recover the session.
+    private func postAuthenticationFailure(for account: AppAccount, error: BlueskyAPIError) {
+        var userInfo: [AnyHashable: Any] = ["accountID": account.id.uuidString]
+        let message: String? = switch error {
+        case let .unauthorized(message):
+            message
+        case let .server(message):
+            message
+        default:
+            nil
+        }
+        if let message, !message.isEmpty {
+            userInfo["message"] = message
+        }
+        NotificationCenter.default.post(
+            name: .authenticationFailed,
+            object: nil,
+            userInfo: userInfo
+        )
     }
 
     private func cachedSession(
@@ -245,7 +316,11 @@ final class BlueskySessionService: BlueskySessionServicing {
             throw BlueskyAPIError.missingCredentials
         }
 
-        let newSession = try await authenticate(handle: account.handle, appPassword: value)
+        let newSession = try await authenticate(
+            handle: account.handle,
+            appPassword: value,
+            entrywayURL: account.entrywayURL ?? account.pdsURL
+        )
         try await persistSession(newSession, for: account)
         return newSession
     }
@@ -296,7 +371,7 @@ final class BlueskySessionService: BlueskySessionServicing {
                 refreshJWT: response.refreshJWT ?? refreshJWT,
                 pdsURL: pdsURL
             )
-        } catch BlueskyAPIError.unauthorized {
+        } catch BlueskyAPIError.unauthorized(_) {
             return nil
         }
     }
@@ -501,4 +576,6 @@ struct DIDService: Codable {
 extension Notification.Name {
     static let accountDeactivated = Notification.Name("accountDeactivated")
     static let accountReactivated = Notification.Name("accountReactivated")
+    static let authenticationFailed = Notification.Name("authenticationFailed")
+    static let accountReauthenticated = Notification.Name("accountReauthenticated")
 }

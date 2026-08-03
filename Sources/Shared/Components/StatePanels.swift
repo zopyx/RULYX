@@ -75,6 +75,24 @@ struct ErrorRetryBanner: View {
     let message: String
     /// Closure invoked when the retry button is tapped.
     let retry: () -> Void
+    @ObservedObject private var reauthenticationState = ReauthenticationPromptState.shared
+
+    /// Covers auth errors that arrived as a generic server error and therefore
+    /// did not emit `.authenticationFailed` at the service boundary.
+    private var shouldOfferReauthentication: Bool {
+        if reauthenticationState.isAuthFailure {
+            return true
+        }
+        let normalizedMessage = message.lowercased()
+        return [
+            "token",
+            "credential",
+            "unauthorized",
+            "authentication",
+            "app password",
+            "login",
+        ].contains { normalizedMessage.contains($0) }
+    }
 
     // MARK: - Body
 
@@ -89,12 +107,24 @@ struct ErrorRetryBanner: View {
                 Spacer()
             }
 
-            Button(action: retry) {
-                Label(loc("actions.retry"), systemImage: "arrow.clockwise")
+            HStack(spacing: 8) {
+                Button(action: retry) {
+                    Label(loc("actions.retry"), systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+                .glassBorderedButton()
+                .accessibilityHint(loc("common.retry.hint"))
+
+                if shouldOfferReauthentication {
+                    Button {
+                        reauthenticationState.presentReauthentication()
+                    } label: {
+                        Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .glassProminentButton()
+                }
             }
-            .buttonStyle(.bordered)
-            .glassBorderedButton()
-            .accessibilityHint(loc("common.retry.hint"))
         }
         .padding()
         .appCardStyle(cornerRadius: 12, style: .subtle)

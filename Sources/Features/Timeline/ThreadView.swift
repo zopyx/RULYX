@@ -22,6 +22,7 @@ struct ThreadView: View {
     @State private var composeContext: ComposeContext?
     @State private var profileToShow: BlueskyActor?
     @StateObject private var likerActions = PostLikerActionsManager()
+    @ObservedObject private var reauthenticationState = ReauthenticationPromptState.shared
 
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
@@ -33,11 +34,27 @@ struct ThreadView: View {
             if viewModel.isLoading {
                 LoadingPanel(message: loc("profile.posts.loading"))
             } else if let error = viewModel.errorMessage {
-                ContentUnavailableView(
-                    loc("list.detail.alert_title"),
-                    systemImage: "exclamationmark.bubble",
-                    description: Text(error)
-                )
+                VStack(spacing: 12) {
+                    ContentUnavailableView(
+                        loc("list.detail.alert_title"),
+                        systemImage: "exclamationmark.bubble",
+                        description: Text(error)
+                    )
+                    HStack(spacing: 8) {
+                        Button(loc("actions.retry")) {
+                            reloadThread()
+                        }
+                        .buttonStyle(.bordered)
+                        if reauthenticationState.isAuthFailure || isAuthenticationMessage(error) {
+                            Button {
+                                reauthenticationState.presentReauthentication()
+                            } label: {
+                                Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                }
             } else if let thread = viewModel.thread {
                 if thread.post.isBlocked {
                     ContentUnavailableView(
@@ -191,6 +208,18 @@ struct ThreadView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return nil }
         return (account, appPassword)
+    }
+
+    private func isAuthenticationMessage(_ message: String) -> Bool {
+        let normalizedMessage = message.lowercased()
+        return [
+            "token",
+            "credential",
+            "unauthorized",
+            "authentication",
+            "app password",
+            "login",
+        ].contains { normalizedMessage.contains($0) }
     }
 
     private func extractHandle(from uri: String) -> String {

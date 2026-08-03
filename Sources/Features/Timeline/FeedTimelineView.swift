@@ -30,6 +30,7 @@ struct FeedTimelineView: View {
     @State private var postToShare: RichFeedEntry?
     @EnvironmentObject private var localizationManager: LocalizationManager
     @EnvironmentObject private var internalListStore: InternalListStore
+    @ObservedObject private var reauthenticationState = ReauthenticationPromptState.shared
     @StateObject private var likerActions = PostLikerActionsManager()
     @State private var aiClassifications: [String: [String: Double]] = [:]
 
@@ -41,11 +42,27 @@ struct FeedTimelineView: View {
             case .initialLoading:
                 skeletonContent
             case let .failed(msg):
-                ContentUnavailableView(
-                    loc("list.detail.alert_title"),
-                    systemImage: "exclamationmark.bubble",
-                    description: Text(msg)
-                )
+                VStack(spacing: 12) {
+                    ContentUnavailableView(
+                        loc("list.detail.alert_title"),
+                        systemImage: "exclamationmark.bubble",
+                        description: Text(msg)
+                    )
+                    HStack(spacing: 8) {
+                        Button(loc("actions.retry")) {
+                            Task { await loadInitial() }
+                        }
+                        .buttonStyle(.bordered)
+                        if reauthenticationState.isAuthFailure {
+                            Button {
+                                reauthenticationState.presentReauthentication()
+                            } label: {
+                                Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                }
             case .empty:
                 emptyStateContent
             default:
@@ -253,6 +270,15 @@ struct FeedTimelineView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
+                    if reauthenticationState.isAuthFailure {
+                        Button {
+                            reauthenticationState.presentReauthentication()
+                        } label: {
+                            Label(loc("account.reauth.relogin"), systemImage: "person.crop.circle.badge.exclamationmark")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -313,7 +339,16 @@ struct FeedTimelineView: View {
                       let fetchPassword = accountStore.appPassword(for: fetchAccount),
                       let activeAccount = accountStore.activeAccount,
                       let activePassword = accountStore.appPassword(for: activeAccount) else { return }
-                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword, activeAccount: activeAccount, activePassword: activePassword, internalListStore: internalListStore)
+                likerActions.handleAddAllLikersToList(
+                    postURI: entry.post.uri,
+                    list: list,
+                    using: container.blueskyClient,
+                    fetchAccount: fetchAccount,
+                    fetchPassword: fetchPassword,
+                    activeAccount: activeAccount,
+                    activePassword: activePassword,
+                    internalListStore: internalListStore
+                )
             },
             onClassify: { likerActions.postToClassify = entry },
             onBlockAuthor: authorCB.onBlock,

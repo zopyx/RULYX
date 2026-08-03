@@ -22,9 +22,15 @@ final class AppErrorTests: XCTestCase {
     }
 
     func testAppErrorFromBlueskyAPIUnauthorized() {
-        let error = BlueskyAPIError.unauthorized
+        let error = BlueskyAPIError.unauthorized(nil)
         let result = AppError.from(error)
         XCTAssertEqual(result.category, .authentication)
+    }
+
+    func testAppErrorFromBlueskyAPIUnauthorizedPreservesServerMessage() {
+        let result = AppError.from(BlueskyAPIError.unauthorized("Token has expired"))
+        XCTAssertEqual(result.category, .authentication)
+        XCTAssertEqual(result.message, "Token has expired")
     }
 
     func testAppErrorFromBlueskyAPIMissingCredentials() {
@@ -38,6 +44,13 @@ final class AppErrorTests: XCTestCase {
         let result = AppError.from(error)
         XCTAssertEqual(result.category, .server)
         XCTAssertTrue(result.message.contains("Rate limited"))
+    }
+
+    func testAppErrorFromBlueskyAPIServerTokenExpiryIsAuthentication() {
+        let result = AppError.from(BlueskyAPIError.server("Token has expired"))
+        XCTAssertEqual(result.category, .authentication)
+        XCTAssertEqual(result.message, "Token has expired")
+        XCTAssertTrue(AppError.isAuthenticationFailure(BlueskyAPIError.server("Token has expired")))
     }
 
     func testAppErrorFromDecodingError() {
@@ -91,11 +104,11 @@ final class AppErrorTests: XCTestCase {
     }
 
     func testIsCancellationWithNonCancellation() {
-        XCTAssertFalse(AppError.isCancellation(BlueskyAPIError.unauthorized))
+        XCTAssertFalse(AppError.isCancellation(BlueskyAPIError.unauthorized(nil)))
     }
 
     func testUserMessageDelegates() {
-        let error = BlueskyAPIError.unauthorized
+        let error = BlueskyAPIError.unauthorized(nil)
         let message = AppError.userMessage(from: error)
         XCTAssertEqual(message, AppError.from(error).message)
     }

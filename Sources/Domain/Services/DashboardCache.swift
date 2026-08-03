@@ -58,6 +58,7 @@ enum DashboardCache {
     }
 
     static func clearAll() {
+        guard FileManager.default.fileExists(atPath: cachesDirectory.path) else { return }
         do {
             try FileManager.default.removeItem(at: cachesDirectory)
         } catch {

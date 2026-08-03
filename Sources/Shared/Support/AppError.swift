@@ -55,7 +55,13 @@ struct AppError: LocalizedError, Equatable {
                 return AppError(category: .validation, message: apiError.localizedDescription)
             case .invalidResponse:
                 return AppError(category: .decoding, message: apiError.localizedDescription)
-            case .unauthorized, .missingCredentials:
+            case let .unauthorized(message):
+                return AppError(
+                    category: .authentication,
+                    message: message.flatMap { $0.isEmpty ? nil : $0 }
+                        ?? "Bluesky rejected the credentials. Check the handle and app password."
+                )
+            case .missingCredentials:
                 return AppError(category: .authentication, message: apiError.localizedDescription)
             case .authFactorTokenRequired:
                 return AppError(category: .authentication, message: apiError.localizedDescription)
@@ -63,6 +69,8 @@ struct AppError: LocalizedError, Equatable {
                 return AppError(category: .network, message: apiError.localizedDescription)
             case .deactivated:
                 return AppError(category: .authentication, message: apiError.localizedDescription)
+            case let .server(message) where isAuthenticationMessage(message):
+                return AppError(category: .authentication, message: message)
             case .server:
                 return AppError(category: .server, message: apiError.localizedDescription)
             case .pdsUnreachable:
@@ -102,6 +110,31 @@ struct AppError: LocalizedError, Equatable {
     /// Extract a user-facing message string from any error.
     static func userMessage(from error: Error) -> String {
         from(error).message
+    }
+
+    /// Returns whether the error can be resolved by entering the app password again.
+    static func isAuthenticationFailure(_ error: Error) -> Bool {
+        guard let apiError = error as? BlueskyAPIError else { return false }
+        switch apiError {
+        case .unauthorized, .missingCredentials:
+            return true
+        case let .server(message):
+            return isAuthenticationMessage(message)
+        default:
+            return false
+        }
+    }
+
+    private static func isAuthenticationMessage(_ message: String) -> Bool {
+        let normalizedMessage = message.lowercased()
+        return [
+            "token",
+            "credential",
+            "unauthorized",
+            "authentication",
+            "app password",
+            "login",
+        ].contains { normalizedMessage.contains($0) }
     }
 
     /// Check whether an error represents a cancellation (Swift `CancellationError` or `URLError.cancelled`).
