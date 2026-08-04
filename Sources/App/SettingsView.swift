@@ -30,7 +30,7 @@ struct SettingsView: View {
 
     /// UserDefaults key `"autoBlockBackIntervalMinutes"`: how often to check for new blockers.
     /// 0 = never, 5/20/60/360/1440 minutes.
-    @AppStorage("autoBlockBackIntervalMinutes") private var autoBlockBackInterval = 30
+    @AppStorage("autoBlockBackIntervalMinutes") private var autoBlockBackInterval = AutoBlockBackService.Interval.twentyMinutes.rawValue
 
     /// UserDefaults key `"appearanceMode"`: the user's preferred color scheme.
     /// Values: `"light"`, `"dark"`, or `"system"`.
@@ -56,6 +56,21 @@ struct SettingsView: View {
 
     /// Transient status message shown after clearing the cache (e.g. "Cache cleared").
     @State private var cacheStatusMessage: String?
+
+    /// The auto-block-back interval binding, clamped to a valid `Interval` raw value.
+    /// A legacy stored value without a matching case (e.g. the removed 30-minute
+    /// option) would otherwise trigger a SwiftUI "selection is invalid" fault.
+    private var sanitizedIntervalBinding: Binding<Int> {
+        Binding(
+            get: {
+                guard AutoBlockBackService.Interval(rawValue: autoBlockBackInterval) != nil else {
+                    return AutoBlockBackService.Interval.twentyMinutes.rawValue
+                }
+                return autoBlockBackInterval
+            },
+            set: { autoBlockBackInterval = $0 }
+        )
+    }
 
     // MARK: - Body
 
@@ -119,7 +134,7 @@ struct SettingsView: View {
                     .accessibilityHint(loc("settings.autoblock.hint"))
 
                     if autoBlockBackEnabled {
-                        Picker(selection: $autoBlockBackInterval) {
+                        Picker(selection: sanitizedIntervalBinding) {
                             ForEach(AutoBlockBackService.Interval.allCases) { interval in
                                 Text(loc(interval.labelKey))
                                     .tag(interval.rawValue)

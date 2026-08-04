@@ -12,7 +12,7 @@ import UserNotifications
 ///
 /// Controlled by:
 /// - `@AppStorage("autoBlockBackEnabled")` (default: `true`)
-/// - `@AppStorage("autoBlockBackIntervalMinutes")` (default: `30`)
+/// - `@AppStorage("autoBlockBackIntervalMinutes")` (default: `20`)
 /// - `@AppStorage("autoBlockTargetListIDs")` — JSON-encoded `[String]` of list IDs
 ///
 /// Interval options (in minutes):
@@ -59,7 +59,20 @@ final class AutoBlockBackService: ObservableObject {
     // MARK: - Properties
 
     @AppStorage("autoBlockBackEnabled") var isEnabled = true
-    @AppStorage("autoBlockBackIntervalMinutes") var intervalMinutes = 30
+    @AppStorage("autoBlockBackIntervalMinutes") var intervalMinutes = AutoBlockBackService.Interval.twentyMinutes.rawValue
+
+    /// The stored interval mapped to a valid `Interval` case. Legacy stored values
+    /// without a matching case (e.g. the removed 30-minute option) are migrated to
+    /// the closest valid option and the corrected value is persisted.
+    private var validIntervalMinutes: Int {
+        guard Interval(rawValue: intervalMinutes) != nil else {
+            let valid = Interval.twentyMinutes.rawValue
+            intervalMinutes = valid
+            return valid
+        }
+        return intervalMinutes
+    }
+
     @AppStorage("autoBlockTargetListIDs") private var targetListIDsData = Data()
 
     @Published private(set) var isRunning = false
@@ -130,11 +143,12 @@ final class AutoBlockBackService: ObservableObject {
         guard !isRunning else { return }
 
         // Check interval: skip if not enough time has passed since last run
-        if intervalMinutes > 0 {
+        let minutes = validIntervalMinutes
+        if minutes > 0 {
             let lastRun = UserDefaults.standard.double(forKey: Self.lastRunKey)
             if lastRun > 0 {
                 let elapsed = Date.now.timeIntervalSince1970 - lastRun
-                let minimumInterval = Double(intervalMinutes) * 60.0
+                let minimumInterval = Double(minutes) * 60.0
                 if elapsed < minimumInterval {
                     return
                 }
@@ -294,9 +308,10 @@ final class AutoBlockBackService: ObservableObject {
     func scheduleBackgroundTask() {
         guard isEnabled else { return }
         // Never run in background if interval is 0
-        guard intervalMinutes > 0 else { return }
+        let minutes = validIntervalMinutes
+        guard minutes > 0 else { return }
         let request = BGAppRefreshTaskRequest(identifier: Self.taskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: Double(intervalMinutes) * 60.0)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: Double(minutes) * 60.0)
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
