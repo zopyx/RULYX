@@ -19,7 +19,6 @@ class iCloudAccountSync: ObservableObject {
     /// Whether to show the privacy alert before enabling.
     @Published var showPrivacyAlert = false
 
-    private let store = NSUbiquitousKeyValueStore.default
     private let accountKey = "syncedAccounts"
 
     // MARK: - Init
@@ -28,7 +27,7 @@ class iCloudAccountSync: ObservableObject {
         isEnabled = UserDefaults.standard.object(forKey: "iCloudSyncEnabled") as? Bool ?? false
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-            object: store,
+            object: nil,
             queue: .main,
             using: { [weak self] _ in
                 Task { @MainActor in
@@ -36,7 +35,17 @@ class iCloudAccountSync: ObservableObject {
                 }
             }
         )
-        store.synchronize()
+    }
+
+    /// The shared KVS store, only reachable when the app has the
+    /// `com.apple.developer.ubiquity-kvstore-identifier` entitlement and the user is
+    /// signed in to iCloud. Accessing `NSUbiquitousKeyValueStore.default` without the
+    /// entitlement logs "Unable to find entitlement for KVS store" plus a
+    /// "BUG IN CLIENT OF KVS" fault on every launch, so the store must never be
+    /// touched unconditionally.
+    private var store: NSUbiquitousKeyValueStore? {
+        guard FileManager.default.ubiquityIdentityToken != nil else { return nil }
+        return NSUbiquitousKeyValueStore.default
     }
 
     /// Show a privacy alert before enabling iCloud sync.
@@ -48,6 +57,8 @@ class iCloudAccountSync: ObservableObject {
     func confirmEnable() {
         isEnabled = true
         showPrivacyAlert = false
+        // Pull any state that changed on other devices while sync was off.
+        store?.synchronize()
     }
 
     /// Called when the user cancels the privacy alert.
@@ -58,7 +69,7 @@ class iCloudAccountSync: ObservableObject {
 
     /// Encode and push accounts to iCloud key-value store.
     func pushAccounts(_ accounts: [AppAccount]) {
-        guard isEnabled else { return }
+        guard isEnabled, let store else { return }
         let data: [[String: String]] = accounts.compactMap { account in
             guard let did = account.did else { return nil }
             return [
@@ -81,7 +92,7 @@ class iCloudAccountSync: ObservableObject {
 
     /// Pull account data from iCloud and post a notification for the `AccountStore` to consume.
     func pullFromCloud() {
-        guard isEnabled else { return }
+        guard isEnabled, let store else { return }
         guard let json = store.string(forKey: accountKey),
               let data = json.data(using: .utf8),
               let entries = try? JSONSerialization.jsonObject(with: data) as? [[String: String]]

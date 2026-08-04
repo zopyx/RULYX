@@ -98,6 +98,14 @@ final class PushNotificationCoordinator: ObservableObject {
                 break
             }
 
+            // Without the aps-environment entitlement (e.g. simulator/dev builds
+            // without a push provisioning profile) registration fails loudly on
+            // every launch — skip it entirely in that case.
+            guard hasAPNsEntitlement else {
+                AppLogger.moderation.debug("APNs entitlement missing — skipping remote notification registration.")
+                return
+            }
+
             UIApplication.shared.registerForRemoteNotifications()
         } catch {
             AppLogger.moderation.error("Notification authorization failed: \(error.localizedDescription, privacy: .public)")
@@ -178,6 +186,31 @@ final class PushNotificationCoordinator: ObservableObject {
 
     private var isPushNotificationsEnabled: Bool {
         Bundle.main.object(forInfoDictionaryKey: "PushNotificationsEnabled") as? Bool ?? false
+    }
+
+    /// Whether the running build carries the `aps-environment` entitlement.
+    /// `registerForRemoteNotifications()` faults with "Keine gültige aps-environment-
+    /// Entitlement-Zeichenkette" when it is absent (simulator/dev builds without a
+    /// push provisioning profile). The entitlement is read from the embedded
+    /// provisioning profile — on the simulator none exists, so registration is skipped.
+    private var hasAPNsEntitlement: Bool {
+        #if targetEnvironment(simulator)
+            return false
+        #else
+            guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+                  let data = try? Data(contentsOf: url)
+            else { return false }
+            // The profile is a CMS signature; the entitlements plist is embedded between
+            // the first "<?xml" marker and the closing "</plist>".
+            guard let xmlStart = data.range(of: Data("<?xml".utf8)),
+                  let xmlEnd = data.range(of: Data("</plist>".utf8), in: xmlStart.lowerBound ..< data.endIndex)
+            else { return false }
+            let plistData = data.subdata(in: xmlStart.lowerBound ..< xmlEnd.upperBound)
+            guard let plist = try? PropertyListSerialization.propertyList(from: plistData, options: [], format: nil) as? [String: Any],
+                  let entitlements = plist["Entitlements"] as? [String: Any]
+            else { return false }
+            return (entitlements["aps-environment"] as? String)?.isEmpty == false
+        #endif
     }
 
     private var serviceDID: String {
