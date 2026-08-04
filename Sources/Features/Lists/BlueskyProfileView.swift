@@ -858,14 +858,16 @@ struct BlueskyProfileView: View {
                                             }
                                         }
                                     )) {
-                                        Text(membership.name)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(membership.name)
+                                            if let count = membership.memberCount {
+                                                Text("(\(count))")
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
                                     }
                                     .disabled(viewModel.isUpdatingListMembership)
-                                    if let count = membership.memberCount {
-                                        Text("(\(count))")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
                                 }
                             }
                         }
@@ -908,14 +910,16 @@ struct BlueskyProfileView: View {
                                             }
                                         }
                                     )) {
-                                        Text(membership.name)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(membership.name)
+                                            if let count = membership.memberCount {
+                                                Text("(\(count))")
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
                                     }
                                     .disabled(viewModel.isUpdatingListMembership)
-                                    if let count = membership.memberCount {
-                                        Text("(\(count))")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
                                 }
                             }
                         }
