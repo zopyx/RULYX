@@ -236,6 +236,9 @@ struct ThumbnailImageView<Placeholder: View>: View {
     let maxPixelSize: CGFloat
     /// Time-to-live in seconds for the disk cache entry (default 86400 = 24h).
     var cacheTTL: TimeInterval = 86400
+    /// Optional callback delivering the loaded image's pixel aspect ratio (width / height),
+    /// so callers can pre-compute stable integral display sizes.
+    var onLoadedAspectRatio: ((CGFloat) -> Void)?
     /// Placeholder view shown while loading.
     @ViewBuilder let placeholder: () -> Placeholder
 
@@ -273,8 +276,10 @@ struct ThumbnailImageView<Placeholder: View>: View {
             image = nil
         }
         do {
-            image = try await ThumbnailPipeline.shared.image(for: url, maxPixelSize: maxPixelSize, scale: displayScale, ttl: cacheTTL)
+            let loaded = try await ThumbnailPipeline.shared.image(for: url, maxPixelSize: maxPixelSize, scale: displayScale, ttl: cacheTTL)
+            image = loaded
             loadedTaskID = taskID
+            onLoadedAspectRatio?(loaded.size.width / max(loaded.size.height, 1))
         } catch is CancellationError {
             return
         } catch let error as URLError where error.code == .cancelled {

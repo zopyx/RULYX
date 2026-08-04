@@ -9,7 +9,23 @@ struct PostEmbedView: View {
     /// Leading padding applied to all embed content so it aligns with the post text.
     var contentLeadingPadding: CGFloat = 0
     @State private var altTextToShow: String?
+    /// Aspect ratio (width / height) of the loaded single image, reported by `ThumbnailImageView`.
+    @State private var singleImageRatio: CGFloat?
+    /// Measured width of the single-image slot, used to compute its integral display height.
+    @State private var singleImageWidth: CGFloat = 0
     @Environment(\.openURL) private var openURL
+
+    /// Integral display height for a single full-width image.
+    ///
+    /// Snapping to a whole point keeps the row height constant across layout passes.
+    /// Aspect-fitting a fractional-width column (e.g. 370.333pt with insetGrouped lists)
+    /// yields a fractional row height (481.5pt) that flips between 481 and 482 on every
+    /// pass — UIKit detects this as a recursive layout loop and crashes with
+    /// `_UICollectionViewFeedbackLoopDebugger` fatal errors.
+    private var snappedSingleImageHeight: CGFloat? {
+        guard let ratio = singleImageRatio, ratio > 0, singleImageWidth > 0 else { return nil }
+        return min(300, singleImageWidth / ratio).rounded()
+    }
 
     var body: some View {
         if let video = embed.video {
@@ -113,37 +129,85 @@ struct PostEmbedView: View {
                     Button {
                         onTapImage?(index)
                     } label: {
-                        ThumbnailImageView(url: item.thumb.flatMap(URL.init) ?? previewURL, maxPixelSize: 512) {
-                            Rectangle().fill(Color.skyPrimary.opacity(0.08))
-                        }
-                        .aspectRatio(contentMode: isSingle ? .fit : .fill)
-                        .frame(height: isSingle ? nil : 130)
-                        .frame(maxHeight: isSingle ? 300 : nil)
-                        .clipped()
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        // Pin the button's tappable region to the visible (clipped) frame —
-                        // resizable images can otherwise inflate hit-testing over the action bar.
-                        .contentShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(alignment: .topLeading) {
-                            if let alt = item.alt, !alt.isEmpty {
-                                Button {
-                                    altTextToShow = alt
-                                } label: {
-                                    Text("ALT")
-                                        .font(.caption2.weight(.bold))
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 3)
-                                        .background(.black.opacity(0.5), in: Capsule())
-                                }
-                                .buttonStyle(.plain)
-                                .padding(6)
-                            }
+                        if isSingle {
+                            singleImageContent(item: item, previewURL: previewURL)
+                        } else {
+                            gridImageContent(item: item, previewURL: previewURL)
                         }
                     }
                     .buttonStyle(.plain)
                 }
             }
+        }
+    }
+
+    /// Single full-width image. The displayed height is snapped to a whole point
+    /// (see `snappedSingleImageHeight`) so the row height stays constant between
+    /// layout passes — aspect-fit heights derived from fractional column widths
+    /// oscillate and trigger UIKit's recursive-layout-loop crash.
+    private func singleImageContent(item: RichEmbedImage, previewURL: URL) -> some View {
+        ThumbnailImageView(
+            url: item.thumb.flatMap(URL.init) ?? previewURL,
+            maxPixelSize: 512,
+            onLoadedAspectRatio: { ratio in
+                singleImageRatio = ratio
+            },
+            placeholder: {
+                Rectangle().fill(Color.skyPrimary.opacity(0.08))
+            }
+        )
+        .scaledToFill()
+        .frame(height: snappedSingleImageHeight)
+        .frame(maxHeight: 300)
+        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        // Pin the button's tappable region to the visible (clipped) frame —
+        // resizable images can otherwise inflate hit-testing over the action bar.
+        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { singleImageWidth = geo.size.width }
+                    .onChange(of: geo.size.width) { _, newWidth in singleImageWidth = newWidth }
+            }
+        )
+        .overlay(alignment: .topLeading) {
+            altTextOverlay(item: item)
+        }
+    }
+
+    /// 2-column grid cell with a fixed 130pt height.
+    private func gridImageContent(item: RichEmbedImage, previewURL: URL) -> some View {
+        ThumbnailImageView(url: item.thumb.flatMap(URL.init) ?? previewURL, maxPixelSize: 512) {
+            Rectangle().fill(Color.skyPrimary.opacity(0.08))
+        }
+        .aspectRatio(contentMode: .fill)
+        .frame(height: 130)
+        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        // Pin the button's tappable region to the visible (clipped) frame —
+        // resizable images can otherwise inflate hit-testing over the action bar.
+        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(alignment: .topLeading) {
+            altTextOverlay(item: item)
+        }
+    }
+
+    @ViewBuilder
+    private func altTextOverlay(item: RichEmbedImage) -> some View {
+        if let alt = item.alt, !alt.isEmpty {
+            Button {
+                altTextToShow = alt
+            } label: {
+                Text("ALT")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(.black.opacity(0.5), in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .padding(6)
         }
     }
 
