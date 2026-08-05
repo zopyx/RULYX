@@ -18,13 +18,11 @@ struct ModerationSplitView: View {
         if horizontalSizeClass == .regular {
             ListsView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         } else {
             ListsView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         }

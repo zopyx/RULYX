@@ -82,7 +82,7 @@ struct AccountQuickSwitcherSheet: View {
         let generator = UIImpactFeedbackGenerator(style: .rigid)
         generator.prepare()
         Task { @MainActor in
-            await accountStore.switchAccount(to: account, using: container.blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.liveClient)
             workspaceStore.returnToModerationRoot()
             generator.impactOccurred()
             switchingAccountID = nil

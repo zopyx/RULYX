@@ -116,10 +116,10 @@ struct AddAccountView: View {
                                     appPassword: appPassword,
                                     authFactorToken: authFactorToken,
                                     entrywayURL: entrywayURL,
-                                    client: container.blueskyClient
+                                    client: container.authenticating
                                 )
                                 if success {
-                                    await accountStore.refreshAccountProfiles(using: container.blueskyClient)
+                                    await accountStore.refreshAccountProfiles(using: container.profile)
                                     dismiss()
                                 }
                             }
@@ -137,11 +137,11 @@ struct AddAccountView: View {
                                     handle: handle,
                                     appPassword: appPassword,
                                     entrywayURL: entrywayURL,
-                                    client: container.blueskyClient
+                                    client: container.authenticating
                                 )
                                 switch result {
                                 case .success:
-                                    await accountStore.refreshAccountProfiles(using: container.blueskyClient)
+                                    await accountStore.refreshAccountProfiles(using: container.profile)
                                     dismiss()
                                 case .needsAuthFactorToken:
                                     needsAuthFactorToken = true

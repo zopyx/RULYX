@@ -58,13 +58,12 @@ struct PostLikerActionsViewModifier: ViewModifier {
                     onSubmit: {
                         guard let account = accountStore.activeAccount,
                               let appPassword = accountStore.appPassword(for: account) else { return }
-                        Task { await manager.submitPostReport(using: container.blueskyClient, account: account, appPassword: appPassword) }
+                        Task { await manager.submitPostReport(using: container.liveClient, account: account, appPassword: appPassword) }
                     }
                 )
             }
             .sheet(item: $manager.batchOperationConfig) { config in
                 BatchOperationProgressView(config: config)
-                    .environmentObject(container.blueskyClient)
             }
             .alert(
                 loc("post.block_likers.confirm_title")

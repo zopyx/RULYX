@@ -77,7 +77,6 @@ struct UserSearchSheet: View {
                     list: nil
                 )
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .onChange(of: searchQuery) { _, query in
@@ -104,7 +103,7 @@ struct UserSearchSheet: View {
 
         isSearching = true
         do {
-            results = try await container.blueskyClient.searchActorsFull(query: trimmed, account: account, appPassword: appPassword)
+            results = try await container.liveClient.searchActorsFull(query: trimmed, account: account, appPassword: appPassword)
         } catch {
             results = []
         }

@@ -40,7 +40,7 @@ struct ProfileInspectorView: View {
                                         actor: actor,
                                         account: accountStore.activeAccount,
                                         appPassword: activePassword,
-                                        using: container.blueskyClient
+                                        using: container.profile
                                     )
                                 }
                             } label: {
@@ -62,7 +62,7 @@ struct ProfileInspectorView: View {
                             await viewModel.inspect(
                                 account: accountStore.activeAccount,
                                 appPassword: activePassword,
-                                using: container.blueskyClient
+                                using: container.profile
                             )
                         }
                     } label: {
@@ -114,7 +114,7 @@ struct ProfileInspectorView: View {
                             await viewModel.search(
                                 account: accountStore.activeAccount,
                                 appPassword: activePassword,
-                                using: container.blueskyClient
+                                using: container.profile
                             )
                         }
                     }
@@ -352,7 +352,7 @@ struct ProfileInspectorView: View {
             .toolbar {
                 accountSwitcherToolbar(
                     accountStore: accountStore,
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     workspaceStore: workspaceStore,
                     localizationManager: localizationManager,
                     onManageAccounts: openAccountManagement
@@ -361,7 +361,6 @@ struct ProfileInspectorView: View {
             .sheet(isPresented: $isShowingAccountManagement) {
                 AccountSwitcherSheet(isPresented: $isShowingAccountManagement)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
             .sheet(isPresented: $isShowingReportSheet) {
                 if let inspection = viewModel.inspection,
@@ -405,14 +404,14 @@ struct ProfileInspectorView: View {
                 await viewModel.search(
                     account: accountStore.activeAccount,
                     appPassword: activePassword,
-                    using: container.blueskyClient
+                    using: container.profile
                 )
             }
             .refreshable {
                 await viewModel.search(
                     account: accountStore.activeAccount,
                     appPassword: activePassword,
-                    using: container.blueskyClient
+                    using: container.profile
                 )
             }
             .onChange(of: viewModel.query) { _, newValue in

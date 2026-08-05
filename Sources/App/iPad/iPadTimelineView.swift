@@ -9,7 +9,6 @@ struct iPadTimelineView: View {
     var body: some View {
         TimelineTab()
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
             .environmentObject(workspaceStore)
             .environmentObject(localizationManager)
     }

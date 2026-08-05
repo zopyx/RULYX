@@ -34,7 +34,6 @@ struct ClearskyListsView: View {
                                 onListUpdated: { _ in }
                             )
                             .environmentObject(accountStore)
-                            .environmentObject(container.blueskyClient)
                         } label: {
                             rowContent(entry)
                         }
@@ -128,7 +127,7 @@ struct ClearskyListsView: View {
                 guard let atURI = atURI(from: entry.url, ownerDID: entry.did) else { continue }
                 group.addTask {
                     do {
-                        let (list, _) = try await container.blueskyClient.fetchListDetails(
+                        let (list, _) = try await container.list.fetchListDetails(
                             uri: atURI,
                             account: account,
                             appPassword: appPassword

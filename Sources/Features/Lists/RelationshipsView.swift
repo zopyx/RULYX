@@ -95,8 +95,8 @@ struct RelationshipsView: View {
     private func wireActionsVM() {
         let vm = actionsVM ?? {
             let v = BlueskyProfileActionsViewModel(
-                profileService: container.blueskyClient,
-                clearskyService: container.blueskyClient,
+                profileService: container.profile,
+                clearskyService: container.clearsky,
                 accountStore: accountStore
             )
             v.resultDisplayDuration = 0 // fast transition in list view
@@ -105,8 +105,8 @@ struct RelationshipsView: View {
         }()
         // Ensure dependencies are current (safe to call if already wired)
         vm.reconfigure(
-            profileService: container.blueskyClient,
-            clearskyService: container.blueskyClient,
+            profileService: container.profile,
+            clearskyService: container.clearsky,
             accountStore: accountStore
         )
     }
@@ -615,9 +615,8 @@ struct RelationshipsView: View {
                let account = accountStore.activeAccount,
                let appPassword = accountStore.appPassword(for: account)
             {
-                ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: container.blueskyClient)
+                ListPickerSheet(actor: actor, account: account, appPassword: appPassword, client: container.liveClient)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: .init(get: { shareFileURL != nil }, set: {
@@ -631,7 +630,6 @@ struct RelationshipsView: View {
         }
         .sheet(item: $batchOperationConfig) { config in
             BatchOperationProgressView(config: config)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         }
         .task {

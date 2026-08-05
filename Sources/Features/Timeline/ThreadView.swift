@@ -126,29 +126,26 @@ struct ThreadView: View {
         .sheet(item: $showLikesForURI) { uri in
             LikesListView(uri: uri)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
         }
         .sheet(item: $composeContext) { context in
             if context.isReply {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     account: context.account,
                     appPassword: context.appPassword,
                     onComplete: { reloadThread() },
                     replyTo: (context.parentURI, context.parentCID, context.rootURI, context.rootCID)
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             } else {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     account: context.account,
                     appPassword: context.appPassword,
                     onComplete: { reloadThread() },
                     quote: (context.uri, context.cid)
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $profileToShow) { actor in
@@ -172,12 +169,12 @@ struct ThreadView: View {
                 viewModel.handleMissingCredentials()
                 return
             }
-            await viewModel.loadThread(uri: postURI, account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.loadThread(uri: postURI, account: account, appPassword: appPassword, using: container.liveClient)
         }
         .task {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
-            await likerActions.loadAvailableTargetLists(using: container.blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            await likerActions.loadAvailableTargetLists(using: container.liveClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
         }
         .postLikerActions(manager: likerActions)
     }
@@ -197,7 +194,7 @@ struct ThreadView: View {
     private func reloadThread() {
         guard let (account, appPassword) = readCredentials else { return }
         Task {
-            await viewModel.loadThread(uri: postURI, account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.loadThread(uri: postURI, account: account, appPassword: appPassword, using: container.liveClient)
         }
     }
 
@@ -310,7 +307,7 @@ struct ThreadView: View {
     // MARK: - Callbacks
 
     private func threadCallbacks(for post: ThreadPostNode) -> PostRowCallbacks {
-        let authorCB = makeAuthorCallbacks(author: post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
+        let authorCB = makeAuthorCallbacks(author: post.author, accountStore: accountStore, blueskyClient: container.liveClient, internalListStore: internalListStore)
         return PostRowCallbacks(
             onTapImage: { index in
                 let allImages = post.embed?.images ?? []
@@ -354,13 +351,13 @@ struct ThreadView: View {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account),
                       let uri = post.uri else { return }
-                likerActions.handleBlockAllLikers(postURI: uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
+                likerActions.handleBlockAllLikers(postURI: uri, using: container.liveClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
             },
             onAddAllLikersToList: { list in
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account),
                       let uri = post.uri else { return }
-                likerActions.handleAddAllLikersToList(postURI: uri, list: list, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
+                likerActions.handleAddAllLikersToList(postURI: uri, list: list, using: container.liveClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
             },
             onClassify: {
                 likerActions.postToClassify = RichFeedEntry(threadPost: post)

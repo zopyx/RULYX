@@ -4,7 +4,7 @@ import Foundation
 /// Implementations handle API calls for fetching, creating, updating, deleting
 /// lists, managing list members, and reporting lists via the AT Protocol.
 @MainActor
-protocol BlueskyListServicing {
+protocol BlueskyListServicing: Sendable {
     // MARK: - List Fetching
 
     /// Fetches all lists owned by the given account.

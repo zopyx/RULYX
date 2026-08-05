@@ -55,7 +55,7 @@ struct AccountSwitcherSheet: View {
                             .accessibilityHint("Switches the active account to \(account.label ?? account.handle)")
                             .contextMenu {
                                 Button(role: .destructive) {
-                                    accountStore.removeAccount(account, client: container.blueskyClient)
+                                    accountStore.removeAccount(account, client: container.authenticating)
                                 } label: {
                                     Label(loc("account.remove"), systemImage: "trash")
                                 }
@@ -74,7 +74,7 @@ struct AccountSwitcherSheet: View {
                         .onDelete { indexSet in
                             for index in indexSet {
                                 let account = accountStore.accounts[index]
-                                accountStore.removeAccount(account, client: container.blueskyClient)
+                                accountStore.removeAccount(account, client: container.authenticating)
                             }
                         }
                     } header: {
@@ -90,7 +90,7 @@ struct AccountSwitcherSheet: View {
             .environment(\.defaultMinListHeaderHeight, 0)
             .pageTitle(loc("account.manage.title"))
             .task {
-                await accountStore.refreshAccountProfiles(using: container.blueskyClient)
+                await accountStore.refreshAccountProfiles(using: container.profile)
             }
             .environment(\.editMode, $editMode)
             .toolbar {
@@ -115,7 +115,6 @@ struct AccountSwitcherSheet: View {
             .sheet(isPresented: $isPresentingAddAccount) {
                 AddAccountView()
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
             .sheet(isPresented: $showAccountHelp) {
                 NavigationStack {
@@ -200,7 +199,7 @@ struct AccountSwitcherSheet: View {
         let generator = UIImpactFeedbackGenerator(style: .rigid)
         generator.prepare()
         Task { @MainActor in
-            await accountStore.switchAccount(to: account, using: container.blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.liveClient)
             workspaceStore.returnToModerationRoot()
             generator.impactOccurred()
             switchingAccountID = nil

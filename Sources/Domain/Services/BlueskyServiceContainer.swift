@@ -5,6 +5,7 @@ import Foundation
 @MainActor
 struct BlueskyServiceContainer {
     let auth: BlueskyAuthServicing
+    let authenticating: BlueskyAuthenticating
     let profile: BlueskyProfileInspecting
     let list: BlueskyListServicing
     let feed: BlueskyFeedServicing
@@ -19,6 +20,7 @@ struct BlueskyServiceContainer {
 
     init(liveClient: LiveBlueskyClient, accountStore: AccountStoreProtocol) {
         auth = liveClient
+        authenticating = liveClient
         profile = liveClient
         list = liveClient
         feed = liveClient
@@ -34,6 +36,7 @@ struct BlueskyServiceContainer {
 
     init(
         auth: BlueskyAuthServicing,
+        authenticating: BlueskyAuthenticating,
         profile: BlueskyProfileInspecting,
         list: BlueskyListServicing,
         feed: BlueskyFeedServicing,
@@ -47,6 +50,7 @@ struct BlueskyServiceContainer {
         accountStore: AccountStoreProtocol
     ) {
         self.auth = auth
+        self.authenticating = authenticating
         self.profile = profile
         self.list = list
         self.feed = feed

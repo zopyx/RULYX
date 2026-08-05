@@ -102,7 +102,7 @@ struct BulkProfileLookupView: View {
         await viewModel.lookup(
             account: accountStore.activeAccount,
             appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
-            using: container.blueskyClient
+            using: container.liveClient
         )
     }
 }

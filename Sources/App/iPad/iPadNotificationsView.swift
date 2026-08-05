@@ -8,7 +8,6 @@ struct iPadNotificationsView: View {
     var body: some View {
         NotificationTab()
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
             .environmentObject(localizationManager)
     }
 }

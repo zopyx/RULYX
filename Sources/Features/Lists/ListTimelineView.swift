@@ -86,7 +86,6 @@ struct ListTimelineView: View {
             NavigationStack {
                 ThreadView(postURI: uri)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton()
@@ -110,14 +109,13 @@ struct ListTimelineView: View {
         .sheet(item: $showLikesForURI) { uri in
             LikesListView(uri: uri)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
         }
         .sheet(item: $composeContext) { context in
             if context.isReply {
                 ReplyComposerView(
                     account: context.account,
                     appPassword: context.appPassword,
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     parentURI: context.parentURI,
                     parentCID: context.parentCID,
                     rootURI: context.rootURI,
@@ -126,39 +124,36 @@ struct ListTimelineView: View {
                 )
             } else {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     account: context.account,
                     appPassword: context.appPassword,
                     onComplete: { Task { await refresh() } },
                     quote: (context.uri, context.cid)
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showNewPostComposer) {
             if let account = accountStore.activeAccount, let appPassword = accountStore.appPassword(for: account) {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     account: account,
                     appPassword: appPassword,
                     onComplete: { Task { await refresh() } }
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $editPostEntry) { entry in
             if let account = accountStore.activeAccount, let appPassword = accountStore.appPassword(for: account) {
                 ComposePostView(viewModel: ComposePostViewModel(
-                    blueskyClient: container.blueskyClient,
+                    blueskyClient: container.liveClient,
                     account: account,
                     appPassword: appPassword,
                     onComplete: { Task { await refresh() } },
                     editPost: entry
                 ))
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $profileToShow) { actor in
@@ -173,7 +168,6 @@ struct ListTimelineView: View {
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(item: $postToShare) { entry in
@@ -208,7 +202,7 @@ struct ListTimelineView: View {
             await loadInitial()
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
-            viewModel.startPolling(account: account, appPassword: appPassword, using: container.blueskyClient)
+            viewModel.startPolling(account: account, appPassword: appPassword, using: container.liveClient)
         }
         .onDisappear {
             initialLoadTask?.cancel()
@@ -218,7 +212,7 @@ struct ListTimelineView: View {
         .task {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account) else { return }
-            await likerActions.loadAvailableTargetLists(using: container.blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+            await likerActions.loadAvailableTargetLists(using: container.liveClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
         }
         .postLikerActions(manager: likerActions)
         .task(id: viewModel.entries.count) {
@@ -316,7 +310,7 @@ struct ListTimelineView: View {
     // MARK: - Post row
 
     private func postRowView(for entry: RichFeedEntry) -> some View {
-        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
+        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.liveClient, internalListStore: internalListStore)
         let postCallbacks = PostRowCallbacks(
             onTapThread: { navigationPath.append(TimelineRoute.thread(postURI: entry.post.uri)) },
             onTapImage: { index in
@@ -345,7 +339,7 @@ struct ListTimelineView: View {
             onBlockAllLikers: {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
+                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.liveClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
             },
             onAddAllLikersToList: { list in
                 guard let fetchAccount = accountStore.activeAccount,
@@ -353,7 +347,7 @@ struct ListTimelineView: View {
                       let activeAccount = accountStore.activeAccount,
                       let activePassword = accountStore.appPassword(for: activeAccount) else { return }
                 likerActions.handleAddAllLikersToList(
-                    postURI: entry.post.uri, list: list, using: container.blueskyClient,
+                    postURI: entry.post.uri, list: list, using: container.liveClient,
                     fetchAccount: fetchAccount, fetchPassword: fetchPassword,
                     activeAccount: activeAccount, activePassword: activePassword,
                     internalListStore: internalListStore
@@ -381,7 +375,7 @@ struct ListTimelineView: View {
             onToggleInlineThread: {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                Task { await viewModel.toggleInlineThread(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient) }
+                Task { await viewModel.toggleInlineThread(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.liveClient) }
             }
         )
 
@@ -463,7 +457,7 @@ struct ListTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         Task {
-            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.liveClient)
         }
     }
 
@@ -471,7 +465,7 @@ struct ListTimelineView: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         Task {
-            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.toggleRepost(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.liveClient)
         }
     }
 
@@ -493,7 +487,7 @@ struct ListTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         initialLoadTask?.cancel()
         let task = Task {
-            await viewModel.loadTimeline(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.loadTimeline(account: account, appPassword: appPassword, using: container.liveClient)
         }
         initialLoadTask = task
         await task.value
@@ -504,7 +498,7 @@ struct ListTimelineView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.liveClient)
         }
         loadMoreTask = task
         await task.value
@@ -514,7 +508,7 @@ struct ListTimelineView: View {
     private func refresh() async {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.liveClient)
     }
 
     private func isOwnPost(_ entry: RichFeedEntry) -> Bool {

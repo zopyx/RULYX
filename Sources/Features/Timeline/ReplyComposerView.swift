@@ -86,12 +86,15 @@ struct ReplyComposerView: View {
                     }
 
                     if selectedImages.count < maxImages {
+                        // `loc` is resolved here (MainActor) because PhotosPicker's
+                        // label closure is nonisolated in the SDK.
+                        let addImagesTitle = loc("compose.add_images")
                         PhotosPicker(
                             selection: $selectedItems,
                             maxSelectionCount: maxImages - selectedImages.count,
                             matching: .images
                         ) {
-                            Label(loc("compose.add_images"), systemImage: "photo.on.rectangle.angled")
+                            Label(addImagesTitle, systemImage: "photo.on.rectangle.angled")
                                 .font(.subheadline)
                                 .foregroundStyle(Color.skyPrimary)
                         }

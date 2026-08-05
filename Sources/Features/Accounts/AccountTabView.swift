@@ -77,7 +77,7 @@ struct AccountTabView: View {
                         .onDelete { indexSet in
                             for index in indexSet {
                                 let account = accountStore.accounts[index]
-                                accountStore.removeAccount(account, client: container.blueskyClient)
+                                accountStore.removeAccount(account, client: container.authenticating)
                             }
                         }
                     } header: {
@@ -190,13 +190,12 @@ struct AccountTabView: View {
                 }
             }
             .task {
-                await accountStore.refreshAccountProfiles(using: container.blueskyClient)
+                await accountStore.refreshAccountProfiles(using: container.profile)
             }
             .environment(\.editMode, $editMode)
             .sheet(isPresented: $isPresentingAddAccount) {
                 AddAccountView()
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
             .alert(Text(loc: "account.manage.title"), isPresented: .constant(accountStore.errorMessage != nil), actions: {
                 Button(loc("actions.ok")) {
@@ -361,7 +360,7 @@ struct AccountTabView: View {
                             handle: handle,
                             appPassword: password,
                             entrywayURL: entrywayURL,
-                            client: container.blueskyClient
+                            client: container.authenticating
                         )
                         if result == .success {
                             added += 1
@@ -411,7 +410,7 @@ struct AccountTabView: View {
         let generator = UIImpactFeedbackGenerator(style: .rigid)
         generator.prepare()
         Task { @MainActor in
-            await accountStore.switchAccount(to: account, using: container.blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.liveClient)
             generator.impactOccurred()
             switchingAccountID = nil
         }

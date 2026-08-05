@@ -214,12 +214,12 @@ struct ReauthenticationSheet: View {
             account: request.account,
             appPassword: appPassword,
             authFactorToken: needsAuthFactorToken && !forceResend ? authFactorToken : nil,
-            client: container.blueskyClient
+            client: container.authenticating
         )
 
         switch result {
         case .success:
-            await accountStore.refreshAccountProfiles(using: container.blueskyClient)
+            await accountStore.refreshAccountProfiles(using: container.profile)
             dismiss()
         case .needsAuthFactorToken:
             needsAuthFactorToken = true

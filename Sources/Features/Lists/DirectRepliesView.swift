@@ -92,7 +92,7 @@ struct DirectRepliesView: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(viewModel.entries, id: \.post.uri) { entry in
-                    let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
+                    let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.liveClient, internalListStore: internalListStore)
                     let entryCallbacks = PostRowCallbacks(
                         onTapThread: { selectedPostURI = entry.post.uri },
                         onTapImage: { index in
@@ -178,7 +178,6 @@ struct DirectRepliesView: View {
             NavigationStack {
                 ThreadView(postURI: uri, searchAccount: searchAccount)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             ToolbarCloseButton()
@@ -199,12 +198,10 @@ struct DirectRepliesView: View {
         .sheet(item: $showLikesForURI) { uri in
             LikesListView(uri: uri)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
         }
         .sheet(item: $batchOperationConfig) { config in
             BatchOperationProgressView(config: config)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
         }
         .navigationDestination(item: $showProfileFor) { actor in
             BlueskyProfileView(
@@ -212,7 +209,6 @@ struct DirectRepliesView: View {
                 list: nil
             )
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
         }
         .alert(String.localized("post.block_likers.confirm_title", replacements: ["count": "\(pendingLikerTargets.count)"]), isPresented: $showBlockLikersConfirmation) {
             Button(loc("post.block_likers.confirm_block"), role: .destructive) {
@@ -477,7 +473,7 @@ struct DirectRepliesView: View {
     private func loadInitial() async {
         guard let account = searchAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.load(account: account, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.load(account: account, appPassword: appPassword, using: container.liveClient)
     }
 
     private func loadMore() async {
@@ -485,7 +481,7 @@ struct DirectRepliesView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.liveClient)
         }
         loadMoreTask = task
         await task.value
@@ -495,6 +491,6 @@ struct DirectRepliesView: View {
     private func refresh() async {
         guard let account = searchAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.liveClient)
     }
 }

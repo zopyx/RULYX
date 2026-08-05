@@ -9,7 +9,6 @@ struct iPadChatView: View {
     var body: some View {
         ChatTab()
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
             .environmentObject(chatStore)
             .environmentObject(localizationManager)
     }

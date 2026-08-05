@@ -95,6 +95,22 @@ import Foundation
     }
 }
 
+@MainActor final class MockAuthenticatingService: BlueskyAuthenticating {
+    func authenticate(handle: String, appPassword _: String, entrywayURL _: URL?, authFactorToken _: String?) async throws -> BlueskySession {
+        BlueskySession(
+            did: "did:plc:mock",
+            handle: handle,
+            accessJWT: "access",
+            refreshJWT: "refresh",
+            pdsURL: URL(string: "https://bsky.social")!
+        )
+    }
+
+    func persistSession(_: BlueskySession, for _: AppAccount) async throws {}
+
+    func deletePersistedSession(for _: AppAccount) throws {}
+}
+
 @MainActor final class MockMediaService: BlueskyMediaServicing {
     func uploadBlob(data: Data, mimeType: String, account _: AppAccount, appPassword _: String?, progress _: (@Sendable (Double) -> Void)?) async throws -> UploadBlobResponse {
         UploadBlobResponse(blob: UploadedBlob(ref: BlobRef(link: "mock"), mimeType: mimeType, size: data.count, blobType: nil))

@@ -314,7 +314,7 @@ struct BatchOperationProgressView: View {
         }
 
         // Parallel batches of 5 with 300ms delay between batches
-        let client = container.blueskyClient
+        let client = container.social
         let batchSize = 5
         for batchStart in stride(from: 0, to: toProcess.count, by: batchSize) {
             let batchEnd = min(batchStart + batchSize, toProcess.count)
@@ -381,7 +381,7 @@ struct BatchOperationProgressView: View {
         }
 
         // Parallel batches of 5 with 300ms delay between batches
-        let client = container.blueskyClient
+        let client = container.list
         let batchSize = 5
         for batchStart in stride(from: 0, to: toProcess.count, by: batchSize) {
             let batchEnd = min(batchStart + batchSize, toProcess.count)

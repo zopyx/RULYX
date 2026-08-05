@@ -4,15 +4,26 @@ import Foundation
 /// Provides forwarding properties for each service protocol, eliminating the
 /// force-cast `blueskyClient` passthrough.
 ///
-/// Usage: `container.profile.fetchProfile(...)` instead of `container.profile.fetchProfile(...)`
+/// Usage: `container.profile.fetchProfile(...)` for protocol-based calls.
+/// Use `container.liveClient` only for legacy APIs that still require the
+/// concrete `LiveBlueskyClient` type.
 @MainActor
 final class BlueskyServiceContainerWrapper: ObservableObject {
     let container: BlueskyServiceContainer
+
+    /// The concrete live client, for legacy APIs that still require
+    /// `LiveBlueskyClient` (e.g. view models not yet re-typed to protocols).
+    /// Prefer the individual protocol properties below for new code.
+    let liveClient: LiveBlueskyClient
 
     // MARK: - Protocol Forwarding Properties
 
     var auth: BlueskyAuthServicing {
         container.auth
+    }
+
+    var authenticating: BlueskyAuthenticating {
+        container.authenticating
     }
 
     var profile: BlueskyProfileInspecting {
@@ -55,16 +66,10 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
         container.media
     }
 
-    /// Legacy accessor for parameter passing to functions that still accept `LiveBlueskyClient`.
-    /// Prefer using the individual protocol properties above for direct method calls.
-    @available(*, deprecated, message: "Use individual protocol properties (container.profile, container.list, etc.)")
-    var blueskyClient: LiveBlueskyClient {
-        container.auth as! LiveBlueskyClient
-    }
-
     // MARK: - Init
 
     init(liveClient: LiveBlueskyClient, accountStore: AccountStoreProtocol) {
+        self.liveClient = liveClient
         container = BlueskyServiceContainer(liveClient: liveClient, accountStore: accountStore)
     }
 }

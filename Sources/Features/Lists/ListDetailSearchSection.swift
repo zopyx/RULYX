@@ -78,7 +78,7 @@ extension ListDetailView {
                                     to: currentList,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                                 syncSnapshot()
                             }
@@ -97,7 +97,7 @@ extension ListDetailView {
                                 await viewModel.loadMoreSearchResults(
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                             }
                         }
@@ -112,7 +112,7 @@ extension ListDetailView {
                                     query: searchQuery,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                             }
                         }
@@ -157,7 +157,7 @@ extension ListDetailView {
                             to: currentList,
                             account: account,
                             appPassword: appPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                         syncSnapshot()
                     }

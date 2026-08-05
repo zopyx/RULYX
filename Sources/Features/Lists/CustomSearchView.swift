@@ -38,7 +38,7 @@ struct CustomSearchView: View {
                 showLikesForURI: $showLikesForURI,
                 showProfileFor: $showProfileFor,
                 accountStore: accountStore,
-                blueskyClient: container.blueskyClient,
+                blueskyClient: container.liveClient,
                 searchAccount: searchAccount
             ))
             .task {
@@ -67,7 +67,7 @@ struct CustomSearchView: View {
             .task {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                await likerActions.loadAvailableTargetLists(using: container.blueskyClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
+                await likerActions.loadAvailableTargetLists(using: container.liveClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
             }
             .postLikerActions(manager: likerActions)
     }
@@ -336,7 +336,7 @@ struct CustomSearchView: View {
     }
 
     private func postRowView(entry: RichFeedEntry, entries: [RichFeedEntry], isLoadingMore: Bool, hasMore: Bool, loadMore: @escaping () async -> Void) -> some View {
-        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore)
+        let authorCB = makeAuthorCallbacks(author: entry.post.author, accountStore: accountStore, blueskyClient: container.liveClient, internalListStore: internalListStore)
         return CustomSearchPostRow(
             entry: entry,
             entries: entries,
@@ -351,12 +351,12 @@ struct CustomSearchView: View {
             onBlockAllLikers: {
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
+                likerActions.handleBlockAllLikers(postURI: entry.post.uri, using: container.liveClient, fetchAccount: account, fetchPassword: appPassword, confirmBlockAccount: account, confirmBlockPassword: appPassword)
             },
             onAddAllLikersToList: { list in
                 guard let account = accountStore.activeAccount,
                       let appPassword = accountStore.appPassword(for: account) else { return }
-                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.blueskyClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
+                likerActions.handleAddAllLikersToList(postURI: entry.post.uri, list: list, using: container.liveClient, fetchAccount: account, fetchPassword: appPassword, activeAccount: account, activePassword: appPassword, internalListStore: internalListStore)
             },
             onClassify: { likerActions.postToClassify = entry },
             onReportPost: {
@@ -422,20 +422,20 @@ struct CustomSearchView: View {
         guard let searchAccount,
               let appPassword = accountStore.appPassword(for: searchAccount) else { return }
         Task {
-            await viewModel.searchAll(account: searchAccount, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.searchAll(account: searchAccount, appPassword: appPassword, using: container.liveClient)
         }
     }
 
     private func loadMoreTop() async {
         guard let searchAccount,
               let appPassword = accountStore.appPassword(for: searchAccount) else { return }
-        await viewModel.loadMoreTop(account: searchAccount, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.loadMoreTop(account: searchAccount, appPassword: appPassword, using: container.liveClient)
     }
 
     private func loadMoreNewest() async {
         guard let searchAccount,
               let appPassword = accountStore.appPassword(for: searchAccount) else { return }
-        await viewModel.loadMoreNewest(account: searchAccount, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.loadMoreNewest(account: searchAccount, appPassword: appPassword, using: container.liveClient)
     }
 
     private func loadAvailableTargetLists() async {

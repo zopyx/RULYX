@@ -43,7 +43,7 @@ struct NetworkGraphView: View {
                 SearchField(query: $searchQueryA, results: $searchResultsA, onSelect: { actor in
                     accountA = actor
                     searchQueryA = actor.handle
-                }, accountStore: accountStore, blueskyClient: container.blueskyClient)
+                }, accountStore: accountStore, blueskyClient: container.liveClient)
                 if let a = accountA {
                     Label(a.handle, systemImage: "person.fill")
                 }
@@ -55,7 +55,7 @@ struct NetworkGraphView: View {
                 SearchField(query: $searchQueryB, results: $searchResultsB, onSelect: { actor in
                     accountB = actor
                     searchQueryB = actor.handle
-                }, accountStore: accountStore, blueskyClient: container.blueskyClient)
+                }, accountStore: accountStore, blueskyClient: container.liveClient)
                 if let b = accountB {
                     Label(b.handle, systemImage: "person.fill")
                 }

@@ -133,13 +133,11 @@ struct BlueskyProfileView: View {
                     searchAccount: preferredSearchAccount
                 )
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showManagePosts) {
             ManagePostsView(did: member.actor.did)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
         }
         .sheet(item: $shareFileURL) { url in
             ShareSheet(activityItems: [url])
@@ -190,13 +188,11 @@ struct BlueskyProfileView: View {
             if let profile = viewModel.profile {
                 MediaBrowserView(did: profile.did, handle: profile.handle)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showClearskyLists) {
             ClearskyListsView(entries: viewModel.clearskyLists)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
         }
         .sheet(isPresented: $showOwnedLists) {
             NavigationStack {
@@ -212,7 +208,6 @@ struct BlueskyProfileView: View {
                                         onListUpdated: { _ in }
                                     )
                                     .environmentObject(accountStore)
-                                    .environmentObject(container.blueskyClient)
                                     .environmentObject(workspaceStore)
                                 } label: {
                                     VStack(alignment: .leading, spacing: 4) {
@@ -254,7 +249,7 @@ struct BlueskyProfileView: View {
                                 reason: reportReasonText.nilIfBlank,
                                 account: account,
                                 appPassword: appPassword,
-                                using: container.blueskyClient
+                                using: container.liveClient
                             )
                         }
                     }
@@ -303,12 +298,11 @@ struct BlueskyProfileView: View {
                             kind: .moderation,
                             account: sheetAccount,
                             appPassword: sheetAppPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showCreateRegularList) {
@@ -323,12 +317,11 @@ struct BlueskyProfileView: View {
                             kind: .regular,
                             account: sheetAccount,
                             appPassword: sheetAppPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
         }
         .sheet(isPresented: $showCreateInternalList) {
@@ -396,7 +389,6 @@ struct BlueskyProfileView: View {
                                         onListUpdated: { _ in }
                                     )
                                     .environmentObject(accountStore)
-                                    .environmentObject(container.blueskyClient)
                                     .environmentObject(workspaceStore)
                                 } label: {
                                     Text(info.name)
@@ -423,7 +415,6 @@ struct BlueskyProfileView: View {
             {
                 ProfileEditView(account: account, appPassword: password)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
         }
         .confirmationDialog(
@@ -464,7 +455,7 @@ struct BlueskyProfileView: View {
                         await viewModel.toggleFollow(
                             account: account,
                             appPassword: appPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                     }
                 }
@@ -773,7 +764,7 @@ struct BlueskyProfileView: View {
                                         await viewModel.toggleFollow(
                                             account: account,
                                             appPassword: appPassword,
-                                            using: container.blueskyClient
+                                            using: container.liveClient
                                         )
                                     }
                                 }
@@ -789,7 +780,7 @@ struct BlueskyProfileView: View {
                                         await viewModel.toggleBlock(
                                             account: account,
                                             appPassword: appPassword,
-                                            using: container.blueskyClient
+                                            using: container.liveClient
                                         )
                                     }
                                 }
@@ -813,7 +804,7 @@ struct BlueskyProfileView: View {
                                         await viewModel.toggleMute(
                                             account: account,
                                             appPassword: appPassword,
-                                            using: container.blueskyClient
+                                            using: container.liveClient
                                         )
                                     }
                                 }
@@ -853,7 +844,7 @@ struct BlueskyProfileView: View {
                                                     membership,
                                                     account: account,
                                                     appPassword: appPassword,
-                                                    using: container.blueskyClient
+                                                    using: container.liveClient
                                                 )
                                             }
                                         }
@@ -905,7 +896,7 @@ struct BlueskyProfileView: View {
                                                     membership,
                                                     account: account,
                                                     appPassword: appPassword,
-                                                    using: container.blueskyClient
+                                                    using: container.liveClient
                                                 )
                                             }
                                         }
@@ -1298,7 +1289,6 @@ struct BlueskyProfileView: View {
                                         onListUpdated: { _ in }
                                     )
                                     .environmentObject(accountStore)
-                                    .environmentObject(container.blueskyClient)
                                     .environmentObject(workspaceStore)
                                 } label: {
                                     VStack(alignment: .leading, spacing: 2) {
@@ -1366,7 +1356,7 @@ struct BlueskyProfileView: View {
                             viewerPassword: appPassword,
                             dataAccount: dataAccount ?? account,
                             dataPassword: dataAppPassword ?? appPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                     }
                 }
@@ -1382,7 +1372,7 @@ struct BlueskyProfileView: View {
                     viewerPassword: appPassword,
                     dataAccount: dataAccount ?? account,
                     dataPassword: dataAppPassword ?? appPassword,
-                    using: container.blueskyClient
+                    using: container.liveClient
                 )
             }
             // Fetch block counts in the refreshable's own actor context,
@@ -1399,7 +1389,7 @@ struct BlueskyProfileView: View {
                     viewerPassword: appPassword,
                     dataAccount: dataAccount ?? account,
                     dataPassword: dataAppPassword ?? appPassword,
-                    using: container.blueskyClient
+                    using: container.liveClient
                 )
             }
         }
@@ -1417,8 +1407,8 @@ struct BlueskyProfileView: View {
             // No appPassword needed — ClearSky calls are unauthenticated.
             let vm = actionsVM ?? {
                 let v = BlueskyProfileActionsViewModel(
-                    profileService: container.blueskyClient,
-                    clearskyService: container.blueskyClient,
+                    profileService: container.profile,
+                    clearskyService: container.clearsky,
                     accountStore: accountStore,
                     clearskyHeartbeat: clearskyHeartbeat
                 )
@@ -1427,9 +1417,9 @@ struct BlueskyProfileView: View {
             }()
             async let blocks = vm.fetchBlockCounts(isOwnProfile: isOwnProfile)
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
-                async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: container.blueskyClient)
+                async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: container.liveClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
-                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: container.blueskyClient)
+                    async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: container.liveClient)
                     async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password, targetDID: did)
 
                     _ = await (blocks, clearsky, owned, subscribed)
@@ -1612,8 +1602,8 @@ struct BlueskyProfileView: View {
 
     private func wireActionsVM() {
         actionsVM?.reconfigure(
-            profileService: container.blueskyClient,
-            clearskyService: container.blueskyClient,
+            profileService: container.profile,
+            clearskyService: container.clearsky,
             accountStore: accountStore
         )
     }
@@ -1719,7 +1709,7 @@ struct BlueskyProfileView: View {
     }
 
     private func fetchSubscribedListsIfOwn(account: AppAccount, appPassword: String, targetDID: String? = nil) async {
-        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: container.blueskyClient, targetDID: targetDID)
+        await viewModel.fetchSubscribedLists(account: account, appPassword: appPassword, using: container.liveClient, targetDID: targetDID)
     }
 
     @ViewBuilder
@@ -1814,7 +1804,7 @@ struct BlueskyProfileView: View {
         exportTask?.cancel()
         exportTask = Task {
             defer { isExportActive = false }
-            if let url = await viewModel.exportPosts(as: format, account: account, appPassword: appPassword, using: container.blueskyClient) {
+            if let url = await viewModel.exportPosts(as: format, account: account, appPassword: appPassword, using: container.liveClient) {
                 try? await Task.sleep(for: .milliseconds(600))
                 shareFileURL = url
                 showExportSheet = false

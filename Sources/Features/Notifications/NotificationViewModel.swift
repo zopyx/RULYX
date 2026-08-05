@@ -36,11 +36,11 @@ final class NotificationViewModel {
     // MARK: - Init
 
     /// Observer for synchronous account-switch resets.
-    /// `nonisolated(unsafe)` so `deinit` (nonisolated in Swift 6) can unregister it.
-    nonisolated(unsafe) private var accountSwitchObserver: NSObjectProtocol?
+    /// Boxed in a Sendable `let` so `deinit` (nonisolated in Swift 6) can unregister it.
+    private let accountSwitchObserver = ObserverTokenBox()
 
     init() {
-        accountSwitchObserver = NotificationCenter.default.addObserver(
+        accountSwitchObserver.token = NotificationCenter.default.addObserver(
             forName: .accountWillSwitch, object: nil, queue: nil
         ) { [weak self] _ in
             // Posted synchronously on the main actor from `AccountStore.switchAccount`,
@@ -50,8 +50,8 @@ final class NotificationViewModel {
     }
 
     deinit {
-        if let accountSwitchObserver {
-            NotificationCenter.default.removeObserver(accountSwitchObserver)
+        if let token = accountSwitchObserver.token {
+            NotificationCenter.default.removeObserver(token)
         }
     }
 

@@ -60,7 +60,7 @@ extension ListDetailView {
                                     otherList: comparisonList,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                             }
                         }
@@ -79,7 +79,7 @@ extension ListDetailView {
                                     move: false,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                             }
                         }
@@ -98,7 +98,7 @@ extension ListDetailView {
                                     move: true,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                             }
                         }
@@ -117,7 +117,7 @@ extension ListDetailView {
                                     move: true,
                                     account: account,
                                     appPassword: appPassword,
-                                    using: container.blueskyClient
+                                    using: container.liveClient
                                 )
                                 syncSnapshot()
                             }
@@ -211,7 +211,7 @@ extension ListDetailView {
                             to: currentList,
                             account: account,
                             appPassword: appPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                         syncSnapshot()
                     }

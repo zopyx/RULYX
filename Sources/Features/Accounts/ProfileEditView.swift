@@ -95,7 +95,7 @@ struct ProfileEditView: View {
 
     // MARK: - Sections
 
-    private var avatarSection: some View {
+    @MainActor private var avatarSection: some View {
         Section {
             VStack(alignment: .center, spacing: 12) {
                 // Preview
@@ -131,12 +131,15 @@ struct ProfileEditView: View {
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 16) {
+                    // `loc` is resolved here (MainActor) because PhotosPicker's
+                    // label closure is nonisolated in the SDK.
+                    let changeAvatarTitle = loc("profile.edit.avatar.change")
                     PhotosPicker(
                         selection: $avatarPickerItem,
                         matching: .images,
                         photoLibrary: .shared()
                     ) {
-                        Label(loc("profile.edit.avatar.change"), systemImage: "photo")
+                        Label(changeAvatarTitle, systemImage: "photo")
                             .font(.subheadline)
                     }
                     .onChange(of: avatarPickerItem) { _, newItem in
@@ -165,7 +168,7 @@ struct ProfileEditView: View {
         }
     }
 
-    private var bannerSection: some View {
+    @MainActor private var bannerSection: some View {
         Section {
             VStack(alignment: .center, spacing: 12) {
                 // Preview
@@ -207,12 +210,15 @@ struct ProfileEditView: View {
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 16) {
+                    // `loc` is resolved here (MainActor) because PhotosPicker's
+                    // label closure is nonisolated in the SDK.
+                    let changeBannerTitle = loc("profile.edit.banner.change")
                     PhotosPicker(
                         selection: $bannerPickerItem,
                         matching: .images,
                         photoLibrary: .shared()
                     ) {
-                        Label(loc("profile.edit.banner.change"), systemImage: "photo")
+                        Label(changeBannerTitle, systemImage: "photo")
                             .font(.subheadline)
                     }
                     .onChange(of: bannerPickerItem) { _, newItem in
@@ -324,7 +330,7 @@ struct ProfileEditView: View {
 
         // Fetch raw profile record to get current blob refs
         do {
-            if let record = try await container.blueskyClient.fetchMyProfileRecord(account: account, appPassword: appPassword) {
+            if let record = try await container.liveClient.fetchMyProfileRecord(account: account, appPassword: appPassword) {
                 currentAvatarBlob = record.avatar
                 currentBannerBlob = record.banner
             }
@@ -404,7 +410,7 @@ struct ProfileEditView: View {
             try await container.profile.putProfileRecord(record, account: account, appPassword: appPassword)
 
             // 5. Refresh account store profile data
-            await accountStore.refreshAccountProfiles(using: container.blueskyClient)
+            await accountStore.refreshAccountProfiles(using: container.profile)
 
             dismiss()
         } catch {

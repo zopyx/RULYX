@@ -48,7 +48,6 @@ struct NotificationTab: View {
                 case let .thread(postURI):
                     ThreadView(postURI: postURI)
                         .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
                         .environmentObject(workspaceStore)
                         .environmentObject(mutedWordsStore)
                         .environmentObject(analyticsStore)
@@ -85,8 +84,8 @@ struct NotificationTab: View {
             guard let account = accountStore.activeAccount,
                   let appPassword = accountStore.appPassword(for: account)
             else { return }
-            await viewModel.load(account: account, appPassword: appPassword, using: container.blueskyClient)
-            await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.load(account: account, appPassword: appPassword, using: container.liveClient)
+            await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: container.liveClient)
             await loadTargetLists(account: account, appPassword: appPassword)
         }
         .onChange(of: accountStore.activeAccount?.did) { _, _ in
@@ -111,8 +110,8 @@ struct NotificationTab: View {
                             navigationPath.append(TimelineRoute.thread(postURI: uri))
                         }
                     },
-                    onBlockAuthor: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore).onBlock,
-                    onAddAuthorToList: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.blueskyClient, internalListStore: internalListStore).onAddToList,
+                    onBlockAuthor: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.liveClient, internalListStore: internalListStore).onBlock,
+                    onAddAuthorToList: makeAuthorCallbacks(author: entry.relatedPost?.author, accountStore: accountStore, blueskyClient: container.liveClient, internalListStore: internalListStore).onAddToList,
                     availableTargetLists: availableTargetLists,
                     onTapImage: { index in
                         let allImages = entry.relatedPost?.embed?.images ?? []
@@ -204,9 +203,9 @@ struct NotificationTab: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
         else { return }
-        await viewModel.markAllRead(account: account, appPassword: appPassword, using: container.blueskyClient)
-        await viewModel.refresh(account: account, appPassword: appPassword, using: container.blueskyClient)
-        await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: container.blueskyClient)
+        await viewModel.markAllRead(account: account, appPassword: appPassword, using: container.liveClient)
+        await viewModel.refresh(account: account, appPassword: appPassword, using: container.liveClient)
+        await viewModel.updateUnreadCount(account: account, appPassword: appPassword, using: container.liveClient)
     }
 
     /// Triggers pagination load of older notifications.
@@ -214,6 +213,6 @@ struct NotificationTab: View {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account)
         else { return }
-        Task { await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient) }
+        Task { await viewModel.loadMore(account: account, appPassword: appPassword, using: container.liveClient) }
     }
 }

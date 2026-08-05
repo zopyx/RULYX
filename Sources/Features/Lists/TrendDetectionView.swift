@@ -28,7 +28,6 @@ struct TrendDetectionView: View {
                 NavigationLink {
                     BlueskyProfileView(member: BlueskyListMember(recordURI: "trend:\(actor.did)", actor: actor), list: nil)
                         .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(actor.title).font(.headline)

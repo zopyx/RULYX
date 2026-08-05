@@ -79,13 +79,13 @@ extension ListDetailView {
             for: currentList,
             account: account,
             appPassword: appPassword,
-            using: container.blueskyClient
+            using: container.liveClient
         )
         async let listsTask: Void = viewModel.loadAvailableLists(
             excluding: currentList,
             account: account,
             appPassword: appPassword,
-            using: container.blueskyClient
+            using: container.liveClient
         )
         async let subscriptionTask: Void = loadSubscriptionStateIfNeeded(
             account: account,
@@ -179,7 +179,7 @@ extension ListDetailView {
                             sourceDescription: url.lastPathComponent,
                             account: account,
                             appPassword: appPassword,
-                            using: container.blueskyClient
+                            using: container.liveClient
                         )
                     }
                 }

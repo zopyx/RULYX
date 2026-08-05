@@ -9,6 +9,7 @@ extension BlueskyServiceContainer {
     ) -> BlueskyServiceContainer {
         BlueskyServiceContainer(
             auth: MockAuthService(),
+            authenticating: MockAuthenticatingService(),
             profile: profile,
             list: list,
             feed: MockFeedService(),

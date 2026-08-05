@@ -363,7 +363,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
     }
 
     func fetchListDetails(uri: String, account: AppAccount, appPassword: String?) async throws -> (list: BlueskyList, creator: BlueskyActor) {
-        guard let list = try await fetchList(uri: uri, account: account, appPassword: appPassword) else {
+        guard try await fetchList(uri: uri, account: account, appPassword: appPassword) != nil else {
             throw BlueskyAPIError.invalidResponse
         }
         throw BlueskyAPIError.invalidResponse // creator resolution not implemented separately

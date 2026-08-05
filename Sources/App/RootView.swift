@@ -143,7 +143,7 @@ struct RootView: View {
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
         Task {
-            await accountStore.switchAccount(to: account, using: container.blueskyClient)
+            await accountStore.switchAccount(to: account, using: container.liveClient)
             workspaceStore.returnToModerationRoot()
             generator.selectionChanged()
         }
@@ -156,7 +156,6 @@ struct RootView: View {
             if horizontalSizeClass == .regular {
                 iPadRootView()
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                     .environmentObject(workspaceStore)
                     .environmentObject(localizationManager)
                     .environmentObject(mutedWordsStore)
@@ -280,7 +279,7 @@ struct RootView: View {
             AccountSwitcherTabSheet(
                 accountStore: accountStore,
                 workspaceStore: workspaceStore,
-                blueskyClient: container.blueskyClient,
+                blueskyClient: container.liveClient,
                 onSwitch: switchAccount
             )
         }
@@ -377,7 +376,7 @@ struct RootView: View {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first
         {
-            window.safeAreaInsets.bottom
+            _ = window.safeAreaInsets.bottom
         }
         return 0
     }

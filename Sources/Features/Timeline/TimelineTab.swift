@@ -18,7 +18,6 @@ struct TimelineTab: View {
         NavigationStack(path: $navigationPath) {
             FeedTimelineView(viewModel: viewModel, navigationPath: $navigationPath)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(mutedWordsStore)
                 .environmentObject(analyticsStore)
@@ -27,7 +26,6 @@ struct TimelineTab: View {
                     case let .thread(postURI):
                         ThreadView(postURI: postURI)
                             .environmentObject(accountStore)
-                            .environmentObject(container.blueskyClient)
                             .environmentObject(workspaceStore)
                             .environmentObject(mutedWordsStore)
                             .environmentObject(analyticsStore)

@@ -99,7 +99,7 @@ struct iPadListDetailView: View {
                 for: list,
                 account: activeAccount,
                 appPassword: accountStore.appPassword(for: activeAccount) ?? "",
-                using: container.blueskyClient
+                using: container.liveClient
             )
         }
         .task(id: "\(list.id)|sub|\(accountStore.activeAccountID?.uuidString ?? "none")") {
@@ -256,7 +256,7 @@ struct iPadListDetailView: View {
                                         list: list,
                                         account: accountStore.activeAccount!,
                                         appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) } ?? "",
-                                        using: container.blueskyClient
+                                        using: container.liveClient
                                     )
                                 }
                             }

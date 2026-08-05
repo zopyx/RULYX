@@ -87,7 +87,6 @@ struct iPadRootView: View {
         if let did = navState.selectedProfileDID {
             iPadProfileInspector(did: did)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
                 .environmentObject(navState)
@@ -95,7 +94,6 @@ struct iPadRootView: View {
         } else if let list = navState.selectedList, navState.sidebarSelection == .allLists {
             iPadListDetailView(list: list)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
                 .environmentObject(navState)
@@ -111,7 +109,6 @@ struct iPadRootView: View {
         case .allLists:
             iPadListsView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
                 .environmentObject(internalListStore)
@@ -119,13 +116,11 @@ struct iPadRootView: View {
         case .templates:
             ListTemplatesView(onListCreated: { _ in })
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         case .rules:
             ModerationRulesView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         case .dashboard:
@@ -136,51 +131,42 @@ struct iPadRootView: View {
         case .relationships:
             RelationshipsView(mode: .followers, initialCount: nil)
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
                 .environmentObject(workspaceStore)
         case .customSearch:
             CustomSearchView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         case .mentionsSearch:
             iPadMentionsSearchWrapper()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         case .bulkLookup:
             BulkProfileLookupView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         case .networkGraph:
             NetworkGraphView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         case .timeline:
             iPadTimelineView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .environmentObject(localizationManager)
         case .notifications:
             iPadNotificationsView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(localizationManager)
         case .chat:
             iPadChatView()
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(chatStore)
                 .environmentObject(localizationManager)
         case .settings:
             SettingsView()
                 .environmentObject(accountStore)
                 .environmentObject(localizationManager)
-                .environmentObject(container.blueskyClient)
         case .accounts:
             AccountTabView()
                 .environmentObject(accountStore)

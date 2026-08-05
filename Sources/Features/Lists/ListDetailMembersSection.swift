@@ -95,7 +95,7 @@ extension ListDetailView {
                         Task {
                             await viewModel.loadMembers(
                                 for: currentList, account: account,
-                                appPassword: appPassword, using: container.blueskyClient
+                                appPassword: appPassword, using: container.liveClient
                             )
                         }
                     }
@@ -142,7 +142,7 @@ extension ListDetailView {
                                 Task {
                                     await viewModel.remove(
                                         member: member, account: account,
-                                        appPassword: appPassword, using: container.blueskyClient
+                                        appPassword: appPassword, using: container.liveClient
                                     )
                                     syncSnapshot()
                                 }
@@ -165,7 +165,7 @@ extension ListDetailView {
                                 await viewModel.loadMoreMembersIfNeeded(
                                     currentMember: viewModel.filteredMembers.last,
                                     list: currentList, account: account,
-                                    appPassword: appPassword, using: container.blueskyClient
+                                    appPassword: appPassword, using: container.liveClient
                                 )
                             }
                         }

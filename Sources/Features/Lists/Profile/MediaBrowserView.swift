@@ -309,7 +309,7 @@ struct MediaBrowserView: View {
         guard let account = searchAccount ?? accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         let task = Task {
-            await viewModel.load(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.load(account: account, appPassword: appPassword, using: container.liveClient)
         }
         initialLoadTask = task
         await task.value
@@ -320,7 +320,7 @@ struct MediaBrowserView: View {
               let appPassword = accountStore.appPassword(for: account) else { return }
         guard loadMoreTask == nil else { return }
         let task = Task {
-            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.blueskyClient)
+            await viewModel.loadMore(account: account, appPassword: appPassword, using: container.liveClient)
         }
         loadMoreTask = task
         await task.value

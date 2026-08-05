@@ -1323,7 +1323,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             return []
         }
         guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
-            let body = (try? String(data: data, encoding: .utf8)) ?? "empty"
+            let body = String(data: data, encoding: .utf8) ?? "empty"
             AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → decode failed: \(body.prefix(200))")
             return []
         }
