@@ -25,7 +25,7 @@ struct iPadListsView: View {
             await viewModel.load(
                 for: accountStore.activeAccount,
                 appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
-                using: container.blueskyClient
+                using: container.liveClient
             )
         }
         .onChange(of: accountStore.activeAccountID) { _, _ in
@@ -85,6 +85,14 @@ struct iPadListsView: View {
         }
         .listStyle(.sidebar)
         .pageTitle(loc("sidebar.all_lists"))
+        .refreshable {
+            await viewModel.load(
+                for: accountStore.activeAccount,
+                appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
+                using: container.liveClient,
+                isExplicitRefresh: true
+            )
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Menu {
@@ -102,7 +110,6 @@ struct iPadListsView: View {
                 navState.selectedList = list
             })
             .environmentObject(accountStore)
-            .environmentObject(container.blueskyClient)
             .environmentObject(workspaceStore)
             .environmentObject(localizationManager)
         }

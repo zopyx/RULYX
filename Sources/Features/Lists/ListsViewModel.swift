@@ -34,11 +34,11 @@ final class ListsViewModel {
     // MARK: - Init
 
     /// Observer for synchronous account-switch resets.
-    /// `nonisolated(unsafe)` so `deinit` (nonisolated in Swift 6) can unregister it.
-    nonisolated(unsafe) private var accountSwitchObserver: NSObjectProtocol?
+    /// Boxed in a Sendable `let` so `deinit` (nonisolated in Swift 6) can unregister it.
+    private let accountSwitchObserver = ObserverTokenBox()
 
     init() {
-        accountSwitchObserver = NotificationCenter.default.addObserver(
+        accountSwitchObserver.token = NotificationCenter.default.addObserver(
             forName: .accountWillSwitch, object: nil, queue: nil
         ) { [weak self] _ in
             // Posted synchronously on the main actor from `AccountStore.switchAccount`,
@@ -48,8 +48,8 @@ final class ListsViewModel {
     }
 
     deinit {
-        if let accountSwitchObserver {
-            NotificationCenter.default.removeObserver(accountSwitchObserver)
+        if let token = accountSwitchObserver.token {
+            NotificationCenter.default.removeObserver(token)
         }
     }
 
@@ -129,7 +129,7 @@ final class ListsViewModel {
         // Fire all four fetches in parallel with cooperative cancellation.
         // If fetchLists throws, the group cancels the remaining tasks.
         let clientRef = client
-        try? await withThrowingTaskGroup(of: Void.self) { group in
+        await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
                 let lists = try await clientRef.fetchLists(for: account, appPassword: appPassword)
                 try Task.checkCancellation()
@@ -213,6 +213,16 @@ final class ListsViewModel {
 
         lists[index] = updatedList
         updated[updatedList.kind] = lists
+        listsByKind = updated
+        persistCache(forKey: didCacheKey ?? "")
+    }
+
+    /// Removes a deleted list from the in-memory collection and updates the cache.
+    func removeList(_ list: BlueskyList) {
+        var updated = listsByKind
+        guard var lists = updated[list.kind] else { return }
+        lists.removeAll { $0.id == list.id }
+        updated[list.kind] = lists
         listsByKind = updated
         persistCache(forKey: didCacheKey ?? "")
     }

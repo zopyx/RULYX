@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 /// comparison with other lists, and snapshots.
 struct ListDetailView: View {
     let onListUpdated: ((BlueskyList) -> Void)?
+    let onListDeleted: ((BlueskyList) -> Void)?
 
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var container: BlueskyServiceContainerWrapper
@@ -57,8 +58,9 @@ struct ListDetailView: View {
         "\(currentList.name) (\(viewModel.memberCount ?? viewModel.members.count))"
     }
 
-    init(list: BlueskyList, onListUpdated: ((BlueskyList) -> Void)? = nil) {
+    init(list: BlueskyList, onListUpdated: ((BlueskyList) -> Void)? = nil, onListDeleted: ((BlueskyList) -> Void)? = nil) {
         self.onListUpdated = onListUpdated
+        self.onListDeleted = onListDeleted
         _currentList = State(initialValue: list)
     }
 
@@ -96,7 +98,7 @@ struct ListDetailView: View {
                                 description: description,
                                 account: account,
                                 appPassword: appPassword,
-                                using: container.blueskyClient
+                                using: container.liveClient
                             ) {
                                 currentList = updatedList
                                 onListUpdated?(updatedList)
@@ -181,7 +183,7 @@ struct ListDetailView: View {
                                 comparisonList: comparisonList,
                                 account: account,
                                 appPassword: appPassword,
-                                using: container.blueskyClient
+                                using: container.liveClient
                             )
                             syncSnapshot()
                         }
@@ -209,7 +211,7 @@ struct ListDetailView: View {
                                     account: account,
                                     appPassword: appPassword
                                 )
-                                onListUpdated?(currentList)
+                                onListDeleted?(currentList)
                                 dismiss()
                             } catch {
                                 viewModel.errorMessage = AppError.userMessage(from: error)
@@ -397,7 +399,7 @@ struct ListDetailView: View {
                         sourceDescription: loc("list.import.pasted_input"),
                         account: account,
                         appPassword: appPassword,
-                        using: container.blueskyClient
+                        using: container.liveClient
                     )
                 }
             }
@@ -421,7 +423,7 @@ struct ListDetailView: View {
                         to: currentList,
                         account: account,
                         appPassword: appPassword,
-                        using: container.blueskyClient
+                        using: container.liveClient
                     )
                     syncSnapshot()
                 }
@@ -445,7 +447,6 @@ struct ListDetailView: View {
                 NavigationLink {
                     ListTimelineView(list: currentList)
                         .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
                         .environmentObject(internalListStore)
                 } label: {
                     Label(loc("list.timeline.link"), systemImage: "clock.arrow.circlepath")
@@ -522,7 +523,7 @@ struct ListDetailView: View {
                 query: searchQuery,
                 account: account,
                 appPassword: appPassword,
-                using: container.blueskyClient
+                using: container.liveClient
             )
         }
         .refreshable {

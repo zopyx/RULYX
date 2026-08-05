@@ -115,9 +115,11 @@ struct ListsView: View {
                             if let lists = viewModel.listsByKind[.moderation], !lists.isEmpty {
                                 ForEach(lists) { list in
                                     NavigationLink {
-                                        ListDetailView(list: list) { updatedList in
+                                        ListDetailView(list: list, onListUpdated: { updatedList in
                                             viewModel.updateList(updatedList)
-                                        }
+                                        }, onListDeleted: { deletedList in
+                                            viewModel.removeList(deletedList)
+                                        })
                                     } label: {
                                         ListRowView(list: list)
                                             .accessibilityLabel(String.localized("list.row.label", replacements: ["name": list.name, "count": "\(list.memberCount ?? 0)"]))
@@ -163,9 +165,11 @@ struct ListsView: View {
                             if let lists = viewModel.listsByKind[.regular], !lists.isEmpty {
                                 ForEach(lists) { list in
                                     NavigationLink {
-                                        ListDetailView(list: list) { updatedList in
+                                        ListDetailView(list: list, onListUpdated: { updatedList in
                                             viewModel.updateList(updatedList)
-                                        }
+                                        }, onListDeleted: { deletedList in
+                                            viewModel.removeList(deletedList)
+                                        })
                                     } label: {
                                         ListRowView(list: list)
                                             .accessibilityLabel(String.localized("list.row.label", replacements: ["name": list.name, "count": "\(list.memberCount ?? 0)"]))
@@ -328,7 +332,6 @@ struct ListsView: View {
                 NavigationStack {
                     BulkProfileLookupView()
                         .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
                 }
             }
             .sheet(isPresented: $presentationState.isShowingCreateList) {
@@ -353,7 +356,6 @@ struct ListsView: View {
                     }
                 }
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
             .sheet(isPresented: $presentationState.isShowingCreateInternalList) {
                 NavigationStack {
@@ -397,7 +399,6 @@ struct ListsView: View {
                 NavigationStack {
                     UserSearchSheet()
                         .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
                 }
             }
             .sheet(isPresented: $isShowingListPicker) {
@@ -407,7 +408,6 @@ struct ListsView: View {
                 NavigationStack {
                     AccountSwitcherSheet(isPresented: $presentationState.isShowingAccountManagement)
                         .environmentObject(accountStore)
-                        .environmentObject(container.blueskyClient)
                 }
             }
             .sheet(isPresented: $showModerationListsHelp) {
@@ -450,13 +450,11 @@ struct ListsView: View {
                         list: nil
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                 }
             }
             .navigationDestination(isPresented: $presentationState.showFollowers) {
                 RelationshipsView(mode: .followers, initialCount: viewModel.activeProfile?.followersCount)
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showFollowing) {
                 RelationshipsView(
@@ -465,7 +463,6 @@ struct ListsView: View {
                     onCountUpdate: updateRelationshipCount
                 )
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlocking) {
                 RelationshipsView(
@@ -474,7 +471,6 @@ struct ListsView: View {
                     onCountUpdate: updateRelationshipCount
                 )
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showBlockedBy) {
                 RelationshipsView(
@@ -483,7 +479,6 @@ struct ListsView: View {
                     onCountUpdate: updateRelationshipCount
                 )
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showMentionsSearch) {
                 if let activeAccount = accountStore.activeAccount {
@@ -493,13 +488,11 @@ struct ListsView: View {
                         displayName: activeAccount.displayName
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                 }
             }
             .navigationDestination(isPresented: $presentationState.showCustomSearch) {
                 CustomSearchView()
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
             }
             .navigationDestination(isPresented: $presentationState.showDirectReplies) {
                 if let activeAccount = accountStore.activeAccount {
@@ -509,7 +502,6 @@ struct ListsView: View {
                         displayName: activeAccount.displayName
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                 }
             }
         }
@@ -552,7 +544,7 @@ struct ListsView: View {
         await viewModel.load(
             for: accountStore.activeAccount,
             appPassword: password,
-            using: container.blueskyClient
+            using: container.liveClient
         )
     }
 
@@ -561,7 +553,7 @@ struct ListsView: View {
         await viewModel.load(
             for: accountStore.activeAccount,
             appPassword: password,
-            using: container.blueskyClient,
+            using: container.liveClient,
             isExplicitRefresh: true
         )
     }
