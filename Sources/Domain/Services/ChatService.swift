@@ -176,6 +176,34 @@ final class ChatService: ChatServicing {
         )
     }
 
+    // MARK: - Reactions
+
+    /// Adds an emoji reaction to a message.
+    func addReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws {
+        let body = ReactionRequest(convoId: convoId, messageId: messageId, value: value)
+        let _: ReactionResponse = try await chatRequest(
+            path: "chat.bsky.convo.addReaction",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
+    /// Removes an emoji reaction from a message.
+    func removeReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws {
+        let body = ReactionRequest(convoId: convoId, messageId: messageId, value: value)
+        let _: ReactionResponse = try await chatRequest(
+            path: "chat.bsky.convo.removeReaction",
+            method: "POST",
+            queryItems: [],
+            body: body,
+            account: account,
+            appPassword: appPassword
+        )
+    }
+
     // MARK: - Log
 
     /// Gets the chat event log (conversation creation, messages, reactions, etc.).

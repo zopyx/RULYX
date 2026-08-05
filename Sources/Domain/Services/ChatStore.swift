@@ -429,6 +429,48 @@ final class ChatStore: ObservableObject {
         await sendMessage(convoId: convoId, text: text)
     }
 
+    /// Toggles an emoji reaction on a message: adds it when the current account has
+    /// not reacted with this emoji yet, otherwise removes the existing reaction.
+    /// Applies the change optimistically and reverts it on server failure.
+    func toggleReaction(convoId: String, messageId: String, value: String) async {
+        guard let account = activeAccount, let context = activeContext, let senderDID = currentAccountDID else { return }
+
+        let message = (messages[convoId] ?? []).first { kind in
+            if case let .message(m) = kind {
+                return m.id == messageId
+            }
+            return false
+        }
+        var alreadyReacted = false
+        if case let .message(m) = message {
+            alreadyReacted = m.reactions.contains { $0.senderDID == senderDID && $0.value == value }
+        }
+
+        let optimistic = ChatReaction(value: value, senderDID: senderDID, createdAt: .now)
+        if alreadyReacted {
+            applyRemoveReaction(convoId: convoId, messageId: messageId, reaction: optimistic)
+        } else {
+            applyReaction(convoId: convoId, messageId: messageId, reaction: optimistic)
+        }
+
+        do {
+            if alreadyReacted {
+                try await chatService.removeReaction(convoId: convoId, messageId: messageId, value: value, account: account, appPassword: activeAppPassword)
+            } else {
+                try await chatService.addReaction(convoId: convoId, messageId: messageId, value: value, account: account, appPassword: activeAppPassword)
+            }
+        } catch {
+            guard isCurrentContext(context) else { return }
+            // Revert the optimistic change.
+            if alreadyReacted {
+                applyReaction(convoId: convoId, messageId: messageId, reaction: optimistic)
+            } else {
+                applyRemoveReaction(convoId: convoId, messageId: messageId, reaction: optimistic)
+            }
+            messageError = error
+        }
+    }
+
     /// Gets or creates a 1:1 conversation with a member by their DID.
     func getOrCreateConvo(memberDID: String) async -> ChatConversation? {
         guard let account = activeAccount, let context = activeContext else { return nil }

@@ -7,8 +7,19 @@ import SwiftUI
 struct ChatMessageBubble: View {
     let message: ChatMessage
     let isOutgoing: Bool
+    var currentUserDID: String?
     var onOpenProfile: ((String) -> Void)?
     var onRetry: (() -> Void)?
+    var onReact: ((String) -> Void)?
+    /// Whether this bubble's reaction picker popup is currently shown.
+    var isReactionPickerPresented = false
+    /// Long-press handler asking the parent to show/hide this bubble's picker.
+    var onToggleReactionPicker: (() -> Void)?
+    /// Dismisses the picker after an action (react/copy) was taken.
+    var onDismissReactionPicker: (() -> Void)?
+
+    /// Quick-pick emojis offered in the reaction picker popup.
+    private static let quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"]
 
     private var isPending: Bool {
         message.id.hasPrefix("pending-")
@@ -96,12 +107,11 @@ struct ChatMessageBubble: View {
             .background(isOutgoing ? Color.chatBubbleOutgoing : Color(.systemGray5))
             .opacity(isPending ? 0.6 : 1.0)
             .clipShape(BubbleShape(isOutgoing: isOutgoing))
-            .contextMenu {
-                Button {
-                    UIPasteboard.general.string = message.text
-                } label: {
-                    Label(loc("post.copy"), systemImage: "doc.on.doc")
-                }
+            .contentShape(BubbleShape(isOutgoing: isOutgoing))
+            .onLongPressGesture(minimumDuration: 0.4) {
+                guard !isPending, !hasFailed, onReact != nil else { return }
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                onToggleReactionPicker?()
             }
 
             if !isOutgoing {
@@ -110,6 +120,61 @@ struct ChatMessageBubble: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 2)
+        .overlay {
+            if isReactionPickerPresented {
+                reactionPickerPopup
+                    .transition(.scale(scale: 0.85).combined(with: .opacity))
+            }
+        }
+    }
+
+    /// Compact two-row popup: quick-pick emoji row plus a copy row.
+    private var reactionPickerPopup: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                ForEach(Self.quickReactions, id: \.self) { emoji in
+                    Button {
+                        onReact?(emoji)
+                        onDismissReactionPicker?()
+                    } label: {
+                        Text(emoji)
+                            .font(.title3)
+                            .frame(width: 34, height: 34)
+                            .background {
+                                if hasReacted(emoji) {
+                                    Circle().fill(Color.skyPrimary.opacity(0.25))
+                                }
+                            }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+
+            Divider()
+                .padding(.vertical, 4)
+
+            Button {
+                UIPasteboard.general.string = message.text
+                onDismissReactionPicker?()
+            } label: {
+                Label(loc("post.copy"), systemImage: "doc.on.doc")
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.skyPrimary)
+            .padding(.bottom, 8)
+        }
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+        .shadow(color: .black.opacity(0.15), radius: 8, y: 3)
+    }
+
+    /// Whether the current account already reacted to this message with `emoji`.
+    private func hasReacted(_ emoji: String) -> Bool {
+        guard let currentUserDID else { return false }
+        return message.reactions.contains { $0.value == emoji && $0.senderDID == currentUserDID }
     }
 
     /// Converts @mentions in the text to tappable links with a custom mention:// scheme.

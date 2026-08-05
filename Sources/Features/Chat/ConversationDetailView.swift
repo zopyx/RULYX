@@ -14,6 +14,7 @@ struct ConversationDetailView: View {
     @State private var showProfile = false
     @State private var mentionProfileHandle: String?
     @State private var showScrollToBottom = false
+    @State private var reactionPickerMessageID: String?
     @FocusState private var isFocused: Bool
 
     let conversation: ChatConversation
@@ -157,7 +158,6 @@ struct ConversationDetailView: View {
                         list: nil
                     )
                     .environmentObject(accountStore)
-                    .environmentObject(container.blueskyClient)
                     .environmentObject(workspaceStore)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
@@ -188,7 +188,6 @@ struct ConversationDetailView: View {
                     list: nil
                 )
                 .environmentObject(accountStore)
-                .environmentObject(container.blueskyClient)
                 .environmentObject(workspaceStore)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
@@ -262,6 +261,12 @@ struct ConversationDetailView: View {
                 guard convoMessages.count > 0, convoMessages.count <= 50 else { return }
                 withAnimation { proxy.scrollTo("bottom", anchor: .bottom) }
             }
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    guard reactionPickerMessageID != nil else { return }
+                    withAnimation { reactionPickerMessageID = nil }
+                }
+            )
             .overlay(alignment: .bottomTrailing) {
                 if showScrollToBottom {
                     Button {
@@ -345,11 +350,25 @@ struct ConversationDetailView: View {
             ChatMessageBubble(
                 message: msg,
                 isOutgoing: msg.senderDID == chatStore.currentAccountDID,
+                currentUserDID: chatStore.currentAccountDID,
                 onOpenProfile: { handle in
                     mentionProfileHandle = handle
                 },
-                onRetry: msg.rev == "failed" ? { Task { await retrySend(msg) } } : nil
+                onRetry: msg.rev == "failed" ? { Task { await retrySend(msg) } } : nil,
+                onReact: { emoji in
+                    Task { await chatStore.toggleReaction(convoId: conversation.id, messageId: msg.id, value: emoji) }
+                },
+                isReactionPickerPresented: reactionPickerMessageID == msg.id,
+                onToggleReactionPicker: {
+                    withAnimation {
+                        reactionPickerMessageID = reactionPickerMessageID == msg.id ? nil : msg.id
+                    }
+                },
+                onDismissReactionPicker: {
+                    withAnimation { reactionPickerMessageID = nil }
+                }
             )
+            .zIndex(reactionPickerMessageID == msg.id ? 1 : 0)
         case let .deleted(d):
             deletedMessageView(d)
         case let .system(s):

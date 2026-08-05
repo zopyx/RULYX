@@ -238,6 +238,59 @@ final class ChatStoreTests: XCTestCase {
         XCTAssertEqual(store.conversations.count, 1)
     }
 
+    // MARK: - Reactions
+
+    func testToggleReactionAddsOptimisticallyAndCallsService() async {
+        service.messagesResult = .success(makePagedMessages(count: 1))
+        await store.loadMessages(convoId: "c1")
+
+        await store.toggleReaction(convoId: "c1", messageId: "m0", value: "👍")
+
+        XCTAssertEqual(service.addedReactions.map(\.messageId), ["m0"])
+        XCTAssertTrue(service.removedReactions.isEmpty)
+        guard case let .message(msg) = store.messages["c1"]?.first else {
+            return XCTFail("Expected a message")
+        }
+        XCTAssertTrue(msg.reactions.contains { $0.value == "👍" && $0.senderDID == "did:plc:test" })
+    }
+
+    func testToggleReactionRemovesWhenAlreadyReacted() async {
+        service.messagesResult = .success(PagedMessages(
+            messages: [
+                ChatMessageKind.message(ChatMessage(
+                    id: "m0", rev: "r0", text: "Hi", senderDID: "did:plc:other",
+                    sentAt: Date(),
+                    reactions: [ChatReaction(value: "👍", senderDID: "did:plc:test", createdAt: Date())]
+                )),
+            ],
+            cursor: nil
+        ))
+        await store.loadMessages(convoId: "c1")
+
+        await store.toggleReaction(convoId: "c1", messageId: "m0", value: "👍")
+
+        XCTAssertEqual(service.removedReactions.map(\.messageId), ["m0"])
+        XCTAssertTrue(service.addedReactions.isEmpty)
+        guard case let .message(msg) = store.messages["c1"]?.first else {
+            return XCTFail("Expected a message")
+        }
+        XCTAssertFalse(msg.reactions.contains { $0.value == "👍" && $0.senderDID == "did:plc:test" })
+    }
+
+    func testToggleReactionRevertsOnServiceFailure() async {
+        service.messagesResult = .success(makePagedMessages(count: 1))
+        await store.loadMessages(convoId: "c1")
+        service.addReactionResult = .failure(BlueskyAPIError.server("Down"))
+
+        await store.toggleReaction(convoId: "c1", messageId: "m0", value: "👍")
+
+        guard case let .message(msg) = store.messages["c1"]?.first else {
+            return XCTFail("Expected a message")
+        }
+        XCTAssertTrue(msg.reactions.isEmpty)
+        XCTAssertNotNil(store.messageError)
+    }
+
     // MARK: - Helpers
 
     private func makePagedConvos(count: Int, cursor: String? = nil) -> PagedConvos {
@@ -288,8 +341,12 @@ private final class MockChatService: ChatServicing {
     var unmuteResult: Result<Void, Error>?
     var leaveResult: Result<Void, Error>?
     var logResult: Result<([ChatLogEvent], String?), Error>?
+    var addReactionResult: Result<Void, Error>?
+    var removeReactionResult: Result<Void, Error>?
     private(set) var didUpdateRead = false
     private(set) var didClearCaches = false
+    private(set) var addedReactions: [(convoId: String, messageId: String, value: String)] = []
+    private(set) var removedReactions: [(convoId: String, messageId: String, value: String)] = []
 
     func clearCaches() {
         didClearCaches = true
@@ -331,6 +388,20 @@ private final class MockChatService: ChatServicing {
         if let result = muteResult {
             try result.get()
         }
+    }
+
+    func addReaction(convoId: String, messageId: String, value: String, account _: AppAccount, appPassword _: String?) async throws {
+        if let result = addReactionResult {
+            try result.get()
+        }
+        addedReactions.append((convoId: convoId, messageId: messageId, value: value))
+    }
+
+    func removeReaction(convoId: String, messageId: String, value: String, account _: AppAccount, appPassword _: String?) async throws {
+        if let result = removeReactionResult {
+            try result.get()
+        }
+        removedReactions.append((convoId: convoId, messageId: messageId, value: value))
     }
 
     func leaveConvo(convoId _: String, account _: AppAccount, appPassword _: String?) async throws {

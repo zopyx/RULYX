@@ -249,6 +249,20 @@ struct SendMessageResponse: Decodable {
     let sentAt: String
 }
 
+// MARK: - Reactions
+
+/// Request body for `chat.bsky.convo.addReaction` / `removeReaction`.
+struct ReactionRequest: Encodable {
+    let convoId: String
+    let messageId: String
+    let value: String
+}
+
+/// Response from `chat.bsky.convo.addReaction` / `removeReaction`.
+struct ReactionResponse: Decodable {
+    let message: MessageViewDTO?
+}
+
 // MARK: - Update Read
 
 /// Request body for `chat.bsky.convo.updateRead`.

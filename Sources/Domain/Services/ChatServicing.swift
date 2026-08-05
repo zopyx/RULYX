@@ -64,6 +64,26 @@ protocol ChatServicing {
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
     func updateRead(convoId: String, messageId: String?, account: AppAccount, appPassword: String?) async throws
 
+    // MARK: - Reactions
+
+    /// Adds an emoji reaction to a message.
+    /// - Parameters:
+    ///   - convoId: The conversation ID containing the message.
+    ///   - messageId: The message ID to react to.
+    ///   - value: The reaction value (an emoji character).
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func addReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws
+
+    /// Removes an emoji reaction from a message.
+    /// - Parameters:
+    ///   - convoId: The conversation ID containing the message.
+    ///   - messageId: The message ID to remove the reaction from.
+    ///   - value: The reaction value (an emoji character).
+    ///   - account: The account to authenticate with.
+    ///   - appPassword: The app password for authentication, or `nil` to use the cached session.
+    func removeReaction(convoId: String, messageId: String, value: String, account: AppAccount, appPassword: String?) async throws
+
     // MARK: - Conversation Management
 
     /// Leaves a conversation (removes the current account from participants).
