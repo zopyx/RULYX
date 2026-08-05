@@ -26,7 +26,7 @@ struct ReplyComposerView: View {
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedImages: [(data: Data, mimeType: String)] = []
 
-    private let maxImages = 4
+    private let maxImages = 10
     private let maxChars = 300
 
     // MARK: - Body
@@ -223,6 +223,10 @@ struct ReplyComposerView: View {
                     foregroundStyle: .secondary
                 )
             }
+            if let embed = post.embed {
+                PostEmbedView(embed: embed)
+                    .padding(.top, 4)
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -235,7 +239,7 @@ struct ReplyComposerView: View {
     // MARK: - Image Handling
 
     private func handleImageSelection(_ items: [PhotosPickerItem]) async {
-        for item in items {
+        for item in items where selectedImages.count < maxImages {
             guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
             let mime = item.supportedContentTypes.first?.preferredMIMEType ?? "image/jpeg"
             selectedImages.append((data: data, mimeType: mime))

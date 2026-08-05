@@ -121,6 +121,40 @@ final class MediaBrowserViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.filter, .videos)
         XCTAssertEqual(viewModel.filteredItems.count, 1)
     }
+
+    func testImageFeedExtractsAllTenImagesFromOnePost() async {
+        let viewModel = MediaBrowserViewModel(did: "did:plc:test")
+        let client = MockMediaFeedClient(
+            pages: [
+                RichFeedResponse(
+                    cursor: nil,
+                    feed: [
+                        RichFeedEntry(
+                            post: RichPost(
+                                uri: "at://post/ten-images",
+                                cid: nil,
+                                author: nil,
+                                record: RichRecord(text: "Ten images", createdAt: "2024-01-01T00:00:00Z"),
+                                embed: makeTenGalleryEmbed(),
+                                viewer: nil,
+                                replyCount: nil,
+                                repostCount: nil,
+                                likeCount: nil,
+                                indexedAt: "2024-01-01T00:00:00Z"
+                            ),
+                            reply: nil
+                        ),
+                    ]
+                ),
+            ]
+        )
+
+        await viewModel.load(account: makeAccount(), appPassword: "pw", using: client)
+
+        XCTAssertEqual(viewModel.items.count, 10)
+        XCTAssertEqual(viewModel.imageCount, 10)
+        XCTAssertEqual(viewModel.filteredItems.count, 10)
+    }
 }
 
 @MainActor
@@ -169,6 +203,23 @@ private func makeVideoEmbed(thumbnail: String, playlist: String) -> RichEmbed? {
               "$type": "app.bsky.embed.video#view",
               "thumbnail": "\(thumbnail)",
               "playlist": "\(playlist)"
+            }
+            """.utf8
+        )
+    )
+}
+
+private func makeTenGalleryEmbed() -> RichEmbed? {
+    let imageJSON = (1 ... 10).map { index in
+        "{\"fullsize\":\"https://cdn.example/full-\(index).jpg\",\"thumbnail\":\"https://cdn.example/thumbnail-\(index).jpg\",\"alt\":\"image\"}"
+    }.joined(separator: ",")
+    return try? JSONDecoder().decode(
+        RichEmbed.self,
+        from: Data(
+            """
+            {
+              "$type": "app.bsky.embed.gallery#view",
+              "items": [\(imageJSON)]
             }
             """.utf8
         )

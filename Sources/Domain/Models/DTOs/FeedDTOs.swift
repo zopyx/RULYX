@@ -19,6 +19,17 @@ struct PostView: Decodable {
 
 struct EmbedView: Decodable {
     let images: [EmbedImageItem]?
+
+    enum CodingKeys: String, CodingKey {
+        case images
+        case items
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        images = try container.decodeIfPresent([EmbedImageItem].self, forKey: .images)
+            ?? container.decodeIfPresent([EmbedImageItem].self, forKey: .items)
+    }
 }
 
 struct EmbedImageItem: Decodable {
@@ -158,14 +169,28 @@ struct RichEmbed: Decodable {
         case aspectRatio
         case external
         case media
+        case items
         case alt
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decodeIfPresent(String.self, forKey: .type)
-        if type == "app.bsky.embed.images#view" {
-            images = try container.decodeIfPresent([RichEmbedImage].self, forKey: .images)
+        if type == "app.bsky.embed.recordWithMedia#view" {
+            let media = try container.decodeIfPresent(RichEmbed.self, forKey: .media)
+            images = media?.images
+            video = media?.video
+            external = media?.external
+        } else if let decodedImages = try? container.decodeIfPresent([RichEmbedImage].self, forKey: .images) {
+            // Prefer the payload shape over an exact `$type` match. This keeps
+            // image posts readable when the appview introduces a new view type
+            // or returns a versioned image embed type.
+            images = decodedImages
+            video = nil
+            external = nil
+        } else if let galleryImages = try? container.decodeIfPresent([RichEmbedImage].self, forKey: .items) {
+            // Bluesky's gallery embed stores its view images in `items`.
+            images = galleryImages
             video = nil
             external = nil
         } else if type == "app.bsky.embed.video#view" {
@@ -181,11 +206,6 @@ struct RichEmbed: Decodable {
             images = nil
             video = nil
             external = try container.decodeIfPresent(RichEmbedExternal.self, forKey: .external)
-        } else if type == "app.bsky.embed.recordWithMedia#view" {
-            let media = try container.decodeIfPresent(RichEmbed.self, forKey: .media)
-            images = media?.images
-            video = media?.video
-            external = media?.external
         } else {
             images = nil
             video = nil
@@ -199,6 +219,21 @@ struct RichEmbedImage: Decodable {
     let fullsize: String?
     let thumb: String?
     let alt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case fullsize
+        case thumb
+        case thumbnail
+        case alt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        fullsize = try container.decodeIfPresent(String.self, forKey: .fullsize)
+        thumb = try container.decodeIfPresent(String.self, forKey: .thumb)
+            ?? container.decodeIfPresent(String.self, forKey: .thumbnail)
+        alt = try container.decodeIfPresent(String.self, forKey: .alt)
+    }
 }
 
 /// A video embedded in a post.

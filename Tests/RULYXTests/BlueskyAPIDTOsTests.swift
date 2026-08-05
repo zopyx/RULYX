@@ -342,6 +342,83 @@ final class BlueskyAPIDTOsTests: XCTestCase {
         XCTAssertEqual(embed.external?.thumb, "https://cdn.example/thumb.jpg")
     }
 
+    func testRichEmbedDecodesTenImages() throws {
+        let imageJSON = (1 ... 10).map { index in
+            "{\"fullsize\":\"https://cdn.example/full-\(index).jpg\",\"thumb\":\"https://cdn.example/thumb-\(index).jpg\",\"alt\":\"Image \(index)\"}"
+        }.joined(separator: ",")
+        let json = Data("""
+        {
+          "$type": "app.bsky.embed.images#view",
+          "images": [\(imageJSON)]
+        }
+        """.utf8)
+
+        let embed = try JSONDecoder().decode(RichEmbed.self, from: json)
+
+        XCTAssertEqual(embed.images?.count, 10)
+        XCTAssertEqual(embed.images?.last?.fullsize, "https://cdn.example/full-10.jpg")
+    }
+
+    func testRichEmbedDecodesGalleryViewWithTenItems() throws {
+        let itemJSON = (1 ... 10).map { index in
+            "{\"fullsize\":\"https://cdn.example/full-\(index).jpg\",\"thumbnail\":\"https://cdn.example/thumbnail-\(index).jpg\",\"alt\":\"Image \(index)\"}"
+        }.joined(separator: ",")
+        let json = Data("""
+        {
+          "$type": "app.bsky.embed.gallery#view",
+          "items": [\(itemJSON)]
+        }
+        """.utf8)
+
+        let embed = try JSONDecoder().decode(RichEmbed.self, from: json)
+
+        XCTAssertEqual(embed.images?.count, 10)
+        XCTAssertEqual(embed.images?.first?.thumb, "https://cdn.example/thumbnail-1.jpg")
+        XCTAssertNil(embed.video)
+        XCTAssertNil(embed.external)
+    }
+
+    func testEmbedViewDecodesGalleryItemsForImageDownloads() throws {
+        let json = Data("""
+        {
+          "$type": "app.bsky.embed.gallery#view",
+          "items": [
+            {
+              "fullsize": "https://cdn.example/full.jpg",
+              "thumbnail": "https://cdn.example/thumbnail.jpg",
+              "alt": "Image"
+            }
+          ]
+        }
+        """.utf8)
+
+        let embed = try JSONDecoder().decode(EmbedView.self, from: json)
+
+        XCTAssertEqual(embed.images?.count, 1)
+        XCTAssertEqual(embed.images?.first?.fullsize, "https://cdn.example/full.jpg")
+    }
+
+    func testRichEmbedDecodesImagesFromUnknownImageViewType() throws {
+        let json = Data("""
+        {
+          "$type": "app.bsky.embed.images#viewV2",
+          "images": [
+            {
+              "fullsize": "https://cdn.example/full.jpg",
+              "thumb": "https://cdn.example/thumb.jpg",
+              "alt": "Image"
+            }
+          ]
+        }
+        """.utf8)
+
+        let embed = try JSONDecoder().decode(RichEmbed.self, from: json)
+
+        XCTAssertEqual(embed.images?.count, 1)
+        XCTAssertNil(embed.video)
+        XCTAssertNil(embed.external)
+    }
+
     func testRichEmbedDecodesRecordWithMediaExternalView() throws {
         let json = Data("""
         {

@@ -349,7 +349,9 @@ final class BlueskyProfileViewModel {
     /// - Caches results in `BlueskyAPICache` with 5-minute TTL
     /// - Checks cache before scanning; skips entirely on cache hit
     private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
-        let cacheKey = "mediaScan_\(did)"
+        // Bump the key when the media embed decoder changes so a cached zero
+        // from the pre-gallery implementation cannot mask newly found images.
+        let cacheKey = "mediaScan_v2_\(did)"
 
         // Check cache first
         let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.member)

@@ -3,7 +3,8 @@ import SwiftUI
 // MARK: - PostReplyContextView
 
 /// A compact preview of the parent post in a reply chain: shows a vertical connector line,
-/// the parent author's name + handle, and the first two lines of their text.
+/// the parent author's name + handle, the first two lines of their text, and a
+/// compact preview of the first embedded image.
 /// Placed above the reply composer or the replying post in a thread view.
 struct PostReplyContextView: View {
     /// The parent post being replied to.
@@ -33,10 +34,24 @@ struct PostReplyContextView: View {
                                 .lineLimit(1)
                         }
                     }
-                    Text(parent.safeRecord.text ?? "")
-                        .font(.caption)
-                        .lineLimit(2)
-                        .foregroundStyle(.secondary)
+                    if let text = parent.safeRecord.text, !text.isEmpty {
+                        Text(text)
+                            .font(.caption)
+                            .lineLimit(2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                if let image = parent.embed?.images?.first,
+                   let imageURL = image.thumb.flatMap(URL.init) ?? image.fullsize.flatMap(URL.init)
+                {
+                    ThumbnailImageView(url: imageURL, maxPixelSize: 128) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.skyPrimary.opacity(0.08))
+                    }
+                    .scaledToFill()
+                    .frame(width: 48, height: 48)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
             }
             .padding(8)

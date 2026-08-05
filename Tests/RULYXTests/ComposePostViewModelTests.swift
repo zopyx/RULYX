@@ -44,7 +44,7 @@ final class ComposePostViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isPosting)
         XCTAssertNil(viewModel.uploadProgress)
         XCTAssertNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.maxImages, 4)
+        XCTAssertEqual(viewModel.maxImages, 10)
         XCTAssertEqual(viewModel.maxImageDimension, 3600)
     }
 

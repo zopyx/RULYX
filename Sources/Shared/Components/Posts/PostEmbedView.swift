@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Renders the embed content of a post — images (up to 4 in a grid), videos (with play overlay),
+/// Renders the embed content of a post — images in a grid, videos (with play overlay),
 /// external link cards, and Tenor GIF embeds (with inline preview play button).
 struct PostEmbedView: View {
     let embed: RichEmbed
@@ -130,7 +130,7 @@ struct PostEmbedView: View {
 
     // MARK: - Image Grid
 
-    /// Up to 4 images in a flexible grid. Single images render full-width; 2+ render in 2-column layout.
+    /// Images in a flexible grid. Single images render full-width; 2+ render in 2-column layout.
     private func imageGrid(images: [RichEmbedImage]) -> some View {
         let isSingle = images.count == 1
         let cols = isSingle ? 1 : 2
@@ -138,7 +138,7 @@ struct PostEmbedView: View {
             columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: cols),
             spacing: 4
         ) {
-            ForEach(Array(images.prefix(4).enumerated()), id: \.offset) { index, item in
+            ForEach(Array(images.enumerated()), id: \.offset) { index, item in
                 if let previewURL = item.fullsize.flatMap(URL.init) {
                     Button {
                         onTapImage?(index)

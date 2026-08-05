@@ -4,7 +4,7 @@ import SwiftUI
 import UIKit
 
 /// Full compose view for creating, replying to, quoting, or editing posts.
-/// Supports text, images (up to 4), GIFs (beta), video, alt text, reply controls
+/// Supports text, images (up to 10), GIFs (beta), video, alt text, reply controls
 /// (who can reply), and thread-gate rules.
 struct ComposePostView: View {
     @Bindable var viewModel: ComposePostViewModel
@@ -384,6 +384,10 @@ struct ComposePostView: View {
                     text: text,
                     lineLimit: 6
                 )
+            }
+            if let embed = post.embed {
+                PostEmbedView(embed: embed)
+                    .padding(.top, 4)
             }
         }
     }

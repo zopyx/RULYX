@@ -57,7 +57,7 @@ final class ComposePostViewModel {
 
     // MARK: - Constants
 
-    let maxImages = 4
+    let maxImages = 10
     let maxImageDimension: CGFloat = 3600
     let maxImageFileSize = 1_887_437
 
