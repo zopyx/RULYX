@@ -15,16 +15,30 @@ struct PostEmbedView: View {
     @State private var singleImageWidth: CGFloat = 0
     @Environment(\.openURL) private var openURL
 
-    /// Integral display height for a single full-width image.
+    /// Returns an integral display height for a single full-width image.
     ///
-    /// Snapping to a whole point keeps the row height constant across layout passes.
-    /// Aspect-fitting a fractional-width column (e.g. 370.333pt with insetGrouped lists)
-    /// yields a fractional row height (481.5pt) that flips between 481 and 482 on every
-    /// pass — UIKit detects this as a recursive layout loop and crashes with
-    /// `_UICollectionViewFeedbackLoopDebugger` fatal errors.
-    private var snappedSingleImageHeight: CGFloat? {
-        guard let ratio = singleImageRatio, ratio > 0, singleImageWidth > 0 else { return nil }
-        return min(300, singleImageWidth / ratio).rounded()
+    /// The fallback is important while `ThumbnailImageView` transitions from its
+    /// placeholder to the loaded image. Without a fixed integral height, SwiftUI can
+    /// briefly measure the resizable image using its fractional aspect-fit height before
+    /// the aspect-ratio callback updates state. In an inset grouped list that can trigger
+    /// UIKit's recursive `_UICollectionViewFeedbackLoopDebugger` crash.
+    static func integralSingleImageHeight(
+        width: CGFloat,
+        aspectRatio: CGFloat?,
+        maxHeight: CGFloat = 300,
+        fallbackHeight: CGFloat = 200
+    ) -> CGFloat {
+        guard let aspectRatio, aspectRatio > 0, width > 0 else {
+            return fallbackHeight
+        }
+        return min(maxHeight, width / aspectRatio).rounded()
+    }
+
+    private var singleImageDisplayHeight: CGFloat {
+        Self.integralSingleImageHeight(
+            width: singleImageWidth,
+            aspectRatio: singleImageRatio
+        )
     }
 
     var body: some View {
@@ -157,7 +171,7 @@ struct PostEmbedView: View {
             }
         )
         .scaledToFill()
-        .frame(height: snappedSingleImageHeight)
+        .frame(height: singleImageDisplayHeight)
         .frame(maxHeight: 300)
         .clipped()
         .clipShape(RoundedRectangle(cornerRadius: 8))
