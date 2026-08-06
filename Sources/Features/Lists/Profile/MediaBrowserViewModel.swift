@@ -111,11 +111,15 @@ final class MediaSelectionState: ObservableObject {
 }
 
 /// A 256MB memory / 2GB disk cache for media thumbnails.
-private let sharedCache: URLCache = {
-    let cache = URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
-    URLCache.shared = cache
-    return cache
+/// Isolated to its own `URLCache` instance — does NOT overwrite `URLCache.shared`
+/// (which is the 50 MB app-wide cache set in `RULYXApp`). Consumers that need
+/// thumbnail caching should use `MediaBrowserViewModel.thumbnailCache`.
+let mediaThumbnailCache: URLCache = {
+    URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
 }()
+
+/// Backwards-compatible alias — do not use `URLCache.shared` mutation.
+private let sharedCache: URLCache = mediaThumbnailCache
 
 /// Browses and downloads media (images and videos) from a user's feed.
 ///

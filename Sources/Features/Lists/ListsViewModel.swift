@@ -125,6 +125,11 @@ final class ListsViewModel {
             isRefreshing = true
         }
         errorMessage = nil
+        defer {
+            isLoading = false
+            isRefreshing = false
+            isFromCache = false
+        }
 
         // Fire all four fetches in parallel with cooperative cancellation.
         // If fetchLists throws, the group cancels the remaining tasks.
@@ -172,9 +177,6 @@ final class ListsViewModel {
         }
 
         persistCache(forKey: cacheKey)
-        isFromCache = false
-        isLoading = false
-        isRefreshing = false
     }
 
     /// Applies a cached `DashboardCacheData` snapshot to all properties.

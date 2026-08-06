@@ -15,12 +15,15 @@ struct EngagementSnapshot: Codable {
 /// Stores and retrieves engagement snapshots for posts over time.
 /// Persisted in UserDefaults under the key `"engagementSnapshots"`.
 /// Used by post detail views to display engagement trends (like growth/decline arrows).
+/// Implements 30-day TTL per snapshot and 200-post LRU eviction to bound growth.
 @MainActor
 final class AnalyticsStore: ObservableObject {
-    /// Snapshot history keyed by post URI. Each post can have up to 50 snapshots.
+    /// Snapshot history keyed by post URI. Each post can have up to 50 snapshots (newest last).
     @Published private(set) var snapshots: [String: [EngagementSnapshot]] = [:]
 
     private static let saveKey = "engagementSnapshots"
+    private static let ttl: TimeInterval = 30 * 24 * 60 * 60 // 30 days
+    private static let maxPosts = 200
 
     // MARK: - Init
 
@@ -37,8 +40,10 @@ final class AnalyticsStore: ObservableObject {
     ///   - likeCount: Current like count.
     ///   - repostCount: Current repost count.
     ///   - replyCount: Current reply count.
-    /// Keeps at most the last 50 snapshots per post.
+    /// Keeps at most the last 50 snapshots per post, prunes snapshots older than 30d,
+    /// and evicts oldest posts beyond `maxPosts` (LRU by last snapshot time).
     func record(postURI: String, likeCount: Int, repostCount: Int, replyCount: Int) {
+        pruneExpired()
         let snapshot = EngagementSnapshot(
             timestamp: Date(),
             likeCount: likeCount,
@@ -51,7 +56,32 @@ final class AnalyticsStore: ObservableObject {
             postSnapshots = Array(postSnapshots.suffix(50))
         }
         snapshots[postURI] = postSnapshots
+        evictIfNeeded()
         save()
+    }
+
+    /// Remove snapshots older than TTL and empty post entries.
+    private func pruneExpired() {
+        let cutoff = Date().addingTimeInterval(-Self.ttl)
+        for (uri, history) in snapshots {
+            let filtered = history.filter { $0.timestamp > cutoff }
+            if filtered.isEmpty {
+                snapshots.removeValue(forKey: uri)
+            } else if filtered.count != history.count {
+                snapshots[uri] = filtered
+            }
+        }
+    }
+
+    /// If we exceed maxPosts, evict posts whose latest snapshot is oldest.
+    private func evictIfNeeded() {
+        guard snapshots.count > Self.maxPosts else { return }
+        let sorted = snapshots.keys.sorted { a, b in
+            (snapshots[a]?.last?.timestamp ?? .distantPast) < (snapshots[b]?.last?.timestamp ?? .distantPast)
+        }
+        for key in sorted.prefix(snapshots.count - Self.maxPosts) {
+            snapshots.removeValue(forKey: key)
+        }
     }
 
     /// Returns the snapshot history for a post, newest-first.

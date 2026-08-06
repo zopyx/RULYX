@@ -20,6 +20,10 @@ struct SearchPostsResponse: Decodable {
 /// Conforms to `BlueskyAuthenticating`, `BlueskyListServicing`, and `BlueskyProfileInspecting`.
 ///
 /// This class is marked `@MainActor` and all state mutations happen on the main actor.
+/// **Note (P2-19):** This is intentionally a God class (2063 lines, 9 protocols) for now — splitting
+/// into `ListClient`/`ProfileClient`/`FeedClient` actors is tracked as follow-up. Internal helpers
+/// are grouped by `// MARK: -` sections; prefer adding new endpoints to the correct MARK section
+/// and keeping call sites behind the protocol (`BlueskyListServicing` etc.) so the future split is mechanical.
 @MainActor
 class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting, BlueskyAuthServicing, BlueskyFeedServicing, BlueskyPostServicing, BlueskySocialServicing, BlueskyModerationServicing, BlueskyClearSkyServicing, BlueskyNotificationServicing, BlueskyIdentityServicing, BlueskyMediaServicing {
     /// The AT Protocol service DID for the Bluesky App View proxy.
@@ -64,20 +68,21 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     // MARK: - Cache
 
     /// Clears all in-memory and on-disk URL cache responses plus the session cache and API cache.
-    func clearCache() {
-        session.configuration.urlCache?.removeAllCachedResponses()
-        URLCache.shared.removeAllCachedResponses()
-        sessionService.clearSessionCache()
-        Task { await BlueskyAPICache.shared.clearAll() }
-    }
-
-    /// Async version of clearCache that properly awaits all cache clearing, including the API cache.
-    /// Used during account switching where ordering matters.
+    /// Awaits `BlueskyAPICache` clearing so callers (e.g. account switch) observe a fully cleared state.
     func clearAllCaches() async {
         session.configuration.urlCache?.removeAllCachedResponses()
         URLCache.shared.removeAllCachedResponses()
         sessionService.clearSessionCache()
         await BlueskyAPICache.shared.clearAll()
+    }
+
+    /// Legacy synchronous wrapper — retained for protocol conformance only.
+    /// Prefer `clearAllCaches() async` for ordering-sensitive call sites.
+    func clearCache() {
+        session.configuration.urlCache?.removeAllCachedResponses()
+        URLCache.shared.removeAllCachedResponses()
+        sessionService.clearSessionCache()
+        Task { await BlueskyAPICache.shared.clearAll() }
     }
 
     // MARK: - Authentication & Session
@@ -120,9 +125,10 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     if !cached.isStale {
                         return lists
                     }
-                    // Stale: return cached but fire background refresh
-                    Task { [weak self] in
-                        _ = try? await self?.fetchListsNetwork(account: account, appPassword: appPassword)
+                    // Stale: return cached but fire background refresh (strong capture — self is long-lived singleton;
+                    // weak would silently drop refresh if LiveBlueskyClient were deallocated, leaving stale forever).
+                    Task { [self] in
+                        _ = try? await self.fetchListsNetwork(account: account, appPassword: appPassword)
                     }
                     return lists
                 }
@@ -208,15 +214,22 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return lists.first { $0.id == uri }
     }
 
-    /// Fetches all members of a list with automatic pagination.
+    /// Fetches all members of a list with automatic pagination (capped at 100 pages to prevent infinite loops on buggy PDS).
     func fetchListMembers(list: BlueskyList, account: AppAccount, appPassword: String?) async throws -> [BlueskyListMember] {
         var allMembers: [BlueskyListMember] = []
         var cursor: String?
+        var previousCursor: String?
+        var pageCount = 0
+        let maxPages = 100
 
         repeat {
             let page = try await fetchListMembersPage(list: list, cursor: cursor, account: account, appPassword: appPassword)
             allMembers.append(contentsOf: page.members)
+            previousCursor = cursor
             cursor = page.cursor
+            pageCount += 1
+            if pageCount >= maxPages { break }
+            if let cur = cursor, cur == previousCursor { break }
         } while cursor != nil
 
         return allMembers
@@ -313,10 +326,13 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Fetches all moderation lists the account has subscribed to (muted).
-    /// Returns them sorted by subscription date descending, then alphabetically.
+    /// Returns them sorted by subscription date descending, then alphabetically. Capped at 50 pages.
     func fetchSubscribedModerationLists(account: AppAccount, appPassword: String?) async throws -> [SubscribedListInfo] {
         var cursor: String?
         var allLists: [SubscribedListInfo] = []
+        var previousCursor: String?
+        var pageCount = 0
+        let maxPages = 50
 
         repeat {
             let response: PagedListsResponse = try await sessionService.performAuthenticatedRequest(
@@ -337,7 +353,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             }
 
             allLists.append(contentsOf: response.lists.map(mapSubscribedListInfo(from:)))
+            previousCursor = cursor
             cursor = response.cursor
+            pageCount += 1
+            if pageCount >= maxPages { break }
+            if let cur = cursor, cur == previousCursor { break }
         } while cursor != nil
 
         return allLists.sorted { lhs, rhs in
@@ -680,7 +700,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Fetches the set of DIDs currently blocked by the account directly from the PDS.
-    /// Paginates through all `app.bsky.graph.block` records.
+    /// Paginates through all `app.bsky.graph.block` records (capped at 100 pages).
     func fetchExistingBlockedDIDs(account: AppAccount, appPassword: String?) async throws -> Set<String> {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -688,6 +708,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         ) { authSession in
             var allDIDs = Set<String>()
             var cursor: String?
+            var previousCursor: String?
+            var pageCount = 0
+            let maxPages = 100
 
             repeat {
                 var queryItems: [URLQueryItem] = [
@@ -710,14 +733,18 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 for entry in response.records {
                     allDIDs.insert(entry.value.subject)
                 }
+                previousCursor = cursor
                 cursor = response.cursor
+                pageCount += 1
+                if pageCount >= maxPages { break }
+                if let cur = cursor, cur == previousCursor { break }
             } while cursor != nil
 
             return allDIDs
         }
     }
 
-    /// Fetches a mapping of blocked DID → block record URI from the PDS.
+    /// Fetches a mapping of blocked DID → block record URI from the PDS. Capped at 100 pages.
     func fetchExistingBlockRecordURIs(account: AppAccount, appPassword: String?) async throws -> [String: String] {
         try await sessionService.performAuthenticatedRequest(
             account: account,
@@ -725,6 +752,9 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         ) { authSession in
             var result = [String: String]()
             var cursor: String?
+            var previousCursor: String?
+            var pageCount = 0
+            let maxPages = 100
 
             repeat {
                 var queryItems: [URLQueryItem] = [
@@ -747,7 +777,11 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 for entry in response.records {
                     result[entry.value.subject] = entry.uri
                 }
+                previousCursor = cursor
                 cursor = response.cursor
+                pageCount += 1
+                if pageCount >= maxPages { break }
+                if let cur = cursor, cur == previousCursor { break }
             } while cursor != nil
 
             return result

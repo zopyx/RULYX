@@ -44,7 +44,8 @@ struct HTTPRequestDebugEntry: Identifiable {
 // MARK: - HTTPRequestDebugStore
 
 /// In-memory store of HTTP request debug entries, with automatic URL sanitization
-/// (redacts Klipy API keys and JWT tokens). Entries older than 3 hours are purged.
+/// (redacts Klipy API keys and JWT tokens). Entries older than 24 hours are purged
+/// (see `maxAge`). `maxEntries` (2000) caps memory regardless of age.
 /// @unchecked Sendable: ObservableObject with @MainActor-isolated mutable state via @Published.
 final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     static let shared = HTTPRequestDebugStore()
@@ -155,12 +156,13 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
 
     // MARK: - URL Sanitization
 
-    /// Regex patterns for sanitizing URLs (Klipy API keys, JWT tokens).
+    /// Regex patterns for sanitizing URLs (Klipy API keys, JWT tokens, Bearer tokens).
     private static let urlSanitizers: [(NSRegularExpression, String)] = {
         let patterns: [(String, String)] = [
             ("(https?://api\\.klipy\\.com/api/v1/)[A-Za-z0-9]{50,}(/|$)", "$1[REDACTED]$2"),
             ("accessJwt=[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+", "accessJwt=[REDACTED]"),
             ("refreshJwt=[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+", "refreshJwt=[REDACTED]"),
+            ("Bearer [A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+", "Bearer [REDACTED]"),
         ]
         return patterns.compactMap { pattern, template in
             guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
@@ -171,6 +173,7 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     private static let jsonSanitizers: [(NSRegularExpression, String)] = {
         let patterns: [(String, String)] = [
             ("\"(accessJwt|refreshJwt|authorization)\"\\s*:\\s*\"[^\"]+\"", "\"$1\":\"[REDACTED]\""),
+            ("Bearer [A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+", "Bearer [REDACTED]"),
         ]
         return patterns.compactMap { pattern, template in
             guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
@@ -181,8 +184,8 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     /// Redact Klipy API keys and JWT tokens from a URL string.
     private static func sanitizeURL(_ url: String) -> String {
         var result = url
-        let nsRange = NSRange(result.startIndex..., in: result)
         for (regex, template) in urlSanitizers {
+            let nsRange = NSRange(result.startIndex..., in: result)
             result = regex.stringByReplacingMatches(in: result, range: nsRange, withTemplate: template)
         }
         return result
@@ -192,8 +195,8 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     static func sanitizeErrorResponseJSON(_ json: String?) -> String? {
         guard let json else { return nil }
         var result = json
-        let nsRange = NSRange(result.startIndex..., in: result)
         for (regex, template) in jsonSanitizers {
+            let nsRange = NSRange(result.startIndex..., in: result)
             result = regex.stringByReplacingMatches(in: result, range: nsRange, withTemplate: template)
         }
         return result

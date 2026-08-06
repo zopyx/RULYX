@@ -56,7 +56,12 @@ final class GIFService: Sendable {
         return key
     }
 
-    private let baseURL = URL(string: "https://api.klipy.com/api/v1")!
+    private let baseURL: URL = {
+        guard let url = URL(string: "https://api.klipy.com/api/v1") else {
+            preconditionFailure("Invalid URL: https://api.klipy.com/api/v1")
+        }
+        return url
+    }()
     private let httpClient: HTTPClient
     private let keychain: KeychainServicing
     private let maxAttachmentBytes: Int64
@@ -137,8 +142,17 @@ final class GIFService: Sendable {
         return trimmed.isEmpty ? nil : trimmed
     }
 
+    private static let migrateLock = NSLock()
+    nonisolated(unsafe) private static var didMigrate = false
+
     private func migrateLegacyAPIKey() {
+        Self.migrateLock.lock()
+        guard !Self.didMigrate else { Self.migrateLock.unlock(); return }
+        Self.didMigrate = true
+        Self.migrateLock.unlock()
         guard let oldKey = UserDefaults.standard.string(forKey: "klipyAPIKey"), !oldKey.isEmpty else { return }
+        // Only migrate if Keychain doesn't already have a key (avoid overwriting seeded bundled key)
+        if (try? keychain.read(service: Self.keychainService, account: Self.keychainAccount)) != nil { return }
         try? keychain.save(oldKey, service: Self.keychainService, account: Self.keychainAccount)
         UserDefaults.standard.removeObject(forKey: "klipyAPIKey")
     }

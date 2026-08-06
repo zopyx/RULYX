@@ -7,9 +7,9 @@ import UIKit
 // MARK: - ThumbnailPipeline
 
 /// Shared pipeline for fetching and downsampling remote images.
-/// Uses an `NSCache` for in-memory caching, a file-system store for
-/// persistent disk caching (survives app relaunches), and ImageIO
-/// for efficient downsampling without decoding full-resolution images.
+/// Used by both `ThumbnailImageView` and `FreshAvatarImage` so avatar and
+/// media thumbnails share the same in-memory + disk cache (deduped by URL +
+/// maxPixelSize + scale). No duplicate network fetch for the same URL.
 ///
 /// Lookup order: in-memory cache → disk cache → network fetch.
 actor ThumbnailPipeline {

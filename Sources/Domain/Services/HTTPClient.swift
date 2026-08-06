@@ -53,13 +53,9 @@ private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @u
             return
         }
 
-        // Enforce TLS 1.2+ by requiring at least a valid certificate chain.
-        var secResult = SecTrustResultType.invalid
-        guard SecTrustEvaluateWithError(serverTrust, nil),
-              SecTrustGetTrustResult(serverTrust, &secResult) == errSecSuccess,
-              secResult == .proceed || secResult == .unspecified
-        else {
-            AppLogger.http.error("Pinning: \(challenge.protectionSpace.host) → TLS evaluation failed (result: \(secResult.rawValue))")
+        // Require valid certificate chain (TLS 1.2+).
+        guard SecTrustEvaluateWithError(serverTrust, nil) else {
+            AppLogger.http.error("Pinning: \(challenge.protectionSpace.host) → TLS evaluation failed")
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
@@ -167,9 +163,8 @@ struct HTTPClient {
     private let pinnedHashes: Set<String>
 
     /// Default pinned certificate hashes for known RULYX API endpoints.
-    /// These are SHA-256 hashes of the raw public key bytes
-    /// (SecKeyCopyExternalRepresentation), NOT SPKI hashes.
-    /// Generated from iOS runtime — use Pinning: logs to verify.
+    /// These are SHA-256 hashes of the public key bytes via `SecKeyCopyExternalRepresentation`
+    /// (which is the SPKI public key material on iOS). Generated from iOS runtime — use Pinning: logs to verify.
     static let defaultPinnedHashes: Set<String> = [
         // bsky.social (PDS / AppView)
         "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",
@@ -211,14 +206,24 @@ struct HTTPClient {
         }
     }
 
-    /// Deduplicates in-flight network requests by method + URL.
-    /// If a request to the same URL with the same HTTP method is already in flight,
-    /// the second caller awaits the same task instead of starting a duplicate network call.
+    /// Deduplicates in-flight network requests by method + canonicalized URL.
+    /// Query items are sorted alphabetically so `?a=1&b=2` and `?b=2&a=1` share a key.
+    /// Body and auth are intentionally excluded — only idempotent GETs should use `dedupedData`.
     func dedupedData(for request: URLRequest, source: String) async throws -> (Data, HTTPURLResponse) {
-        let cacheKey = "\(request.httpMethod ?? "GET"):\(request.url?.absoluteString ?? "")"
+        let cacheKey = "\(request.httpMethod ?? "GET"):\(Self.canonicalURLString(for: request.url))"
         return try await Self.inflightManager.dedup(key: cacheKey) {
             try await data(for: request, source: source)
         }
+    }
+
+    private static func canonicalURLString(for url: URL?) -> String {
+        guard let url, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return url?.absoluteString ?? ""
+        }
+        if let items = components.queryItems, !items.isEmpty {
+            components.queryItems = items.sorted { ($0.name, $0.value ?? "") < ($1.name, $1.value ?? "") }
+        }
+        return components.url?.absoluteString ?? url.absoluteString
     }
 
     func data(

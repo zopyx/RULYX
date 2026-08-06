@@ -13,6 +13,7 @@ import Foundation
     func deletePersistedSession(for _: AppAccount) throws {}
     func restoreSessions(for _: [AppAccount]) async {}
     func clearCache() {}
+    func clearAllCaches() async {}
 }
 
 @MainActor final class MockFeedService: BlueskyFeedServicing {

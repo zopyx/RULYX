@@ -91,6 +91,7 @@ class iCloudAccountSync: ObservableObject {
     }
 
     /// Pull account data from iCloud and post a notification for the `AccountStore` to consume.
+    /// Validates DID/handle format before posting to prevent malicious KV injection.
     func pullFromCloud() {
         guard isEnabled, let store else { return }
         guard let json = store.string(forKey: accountKey),
@@ -99,7 +100,25 @@ class iCloudAccountSync: ObservableObject {
         else {
             return
         }
-        NotificationCenter.default.post(name: .iCloudAccountsReceived, object: entries)
+        let validated = entries.filter { entry in
+            guard let id = entry["id"], UUID(uuidString: id) != nil,
+                  let handle = entry["handle"], isValidHandle(handle),
+                  let did = entry["did"], isValidDID(did) else { return false }
+            return true
+        }
+        guard !validated.isEmpty else { return }
+        NotificationCenter.default.post(name: .iCloudAccountsReceived, object: validated)
+    }
+
+    private func isValidHandle(_ handle: String) -> Bool {
+        // Bluesky handle: 1-253 chars, alphanumerics/hyphen/dot, must contain dot, no leading/trailing dot
+        guard handle.count >= 3, handle.count <= 253, handle.contains(".") else { return false }
+        let pattern = "^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+        return handle.range(of: pattern, options: .regularExpression) != nil
+    }
+
+    private func isValidDID(_ did: String) -> Bool {
+        return did.hasPrefix("did:plc:") || did.hasPrefix("did:web:")
     }
 }
 

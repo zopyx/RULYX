@@ -15,6 +15,8 @@ struct RecentFeedEntry: Codable, Hashable {
 ///
 /// Persists state to UserDefaults under per-DID keys so that each account
 /// can have an independent feed preference.
+/// **Not reset on account switch by design** — `did`-scoped keys already isolate state;
+/// `AccountStore.switchAccount` does not clear `FeedStore` (see AGENTS.md).
 @MainActor
 final class FeedStore: ObservableObject {
     /// The AT URI of the currently selected custom feed. `nil` means "Following".
