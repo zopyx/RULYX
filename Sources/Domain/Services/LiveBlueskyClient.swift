@@ -1186,13 +1186,15 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Returns the total count of actors the account has blocked.
+    /// DID-only (no profile resolution) — uses the same paginated source as detail views.
     func fetchBlockingCount(for account: AppAccount) async throws -> Int {
-        try await fetchClearskyActors(account: account, endpoint: "blocklist", onProgress: nil).totalCount
+        try await fetchClearskyBlockDIDs(endpoint: "blocklist", for: account).count
     }
 
     /// Returns the total count of actors that have blocked the account.
+    /// DID-only (no profile resolution) — uses the same paginated source as detail views.
     func fetchBlockedByCount(for account: AppAccount) async throws -> Int {
-        try await fetchClearskyActors(account: account, endpoint: "single-blocklist", onProgress: nil).totalCount
+        try await fetchClearskyBlockDIDs(endpoint: "single-blocklist", for: account).count
     }
 
     /// Returns the count of actors that block the account but are not blocked back.
