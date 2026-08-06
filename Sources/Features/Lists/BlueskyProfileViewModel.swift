@@ -177,40 +177,45 @@ final class BlueskyProfileViewModel {
 
             if let targetDID, let lists = subscribedLists {
                 let moderationSubs = lists.filter { $0.kind == .moderation }
-                var blockingNames: [String] = []
-                for list in moderationSubs {
-                    var cursor: String?
-                    var found = false
-                    var pagesChecked = 0
-                    let bskyList = BlueskyList(
-                        id: list.listURI,
-                        name: list.name,
-                        description: list.description ?? "",
-                        memberCount: list.memberCount,
-                        kind: list.kind
-                    )
-                    // Check up to 2 pages of each list to find the target
-                    while !found, pagesChecked < 2 {
-                        let page: PagedListMembers
-                        do {
-                            page = try await client.fetchListMembersPage(
-                                list: bskyList, cursor: cursor,
-                                account: account, appPassword: appPassword
+                // Parallel membership checks — each list up to 2 pages, all lists concurrently
+                let blockingNames: [String] = await withTaskGroup(of: String?.self) { group in
+                    for list in moderationSubs {
+                        group.addTask { [client] in
+                            let bskyList = BlueskyList(
+                                id: list.listURI,
+                                name: list.name,
+                                description: list.description ?? "",
+                                memberCount: list.memberCount,
+                                kind: list.kind
                             )
-                        } catch {
-                            AppLogger.moderation.error("Failed to fetch list members page: \(error.localizedDescription, privacy: .public)")
-                            break
-                        }
-                        found = page.members.contains(where: { $0.actor.did == targetDID })
-                        cursor = page.cursor
-                        pagesChecked += 1
-                        if cursor == nil {
-                            break
+                            var cursor: String?
+                            var found = false
+                            var pagesChecked = 0
+                            while !found, pagesChecked < 2 {
+                                if Task.isCancelled { break }
+                                let page: PagedListMembers
+                                do {
+                                    page = try await client.fetchListMembersPage(
+                                        list: bskyList, cursor: cursor,
+                                        account: account, appPassword: appPassword
+                                    )
+                                } catch {
+                                    AppLogger.moderation.error("Failed to fetch list members page: \(error.localizedDescription, privacy: .public)")
+                                    break
+                                }
+                                found = page.members.contains(where: { $0.actor.did == targetDID })
+                                cursor = page.cursor
+                                pagesChecked += 1
+                                if cursor == nil { break }
+                            }
+                            return found ? list.name : nil
                         }
                     }
-                    if found {
-                        blockingNames.append(list.name)
+                    var collected: [String] = []
+                    for await name in group {
+                        if let name { collected.append(name) }
                     }
+                    return collected
                 }
                 subscribedListBlockingNames = blockingNames.sorted()
                 recomputeCombinedBlockingNames(from: inspection?.profile.viewerState)
