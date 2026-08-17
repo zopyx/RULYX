@@ -443,6 +443,11 @@ struct ListsView: View {
                     Task { await loadInitial() }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .listsDidChange)) { notification in
+                guard let account = notification.object as? AppAccount,
+                      account.id == accountStore.activeAccount?.id else { return }
+                Task { await reload() }
+            }
             .navigationDestination(isPresented: $presentationState.showProfile) {
                 if let activeAccount = accountStore.activeAccount {
                     BlueskyProfileView(

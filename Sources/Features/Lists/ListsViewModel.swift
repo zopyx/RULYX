@@ -14,6 +14,8 @@ final class ListsViewModel {
     private(set) var listsByKind: [BlueskyList.Kind: [BlueskyList]] = [:]
     /// Profile of the currently active account.
     private(set) var activeProfile: BlueskyProfile?
+    /// The account whose data is currently loaded; used to persist cache even when `activeProfile` is not yet resolved.
+    private var lastAccount: AppAccount?
     /// The relationship count for blocking, populated on first load.
     private(set) var blockingCount: Int?
     /// The relationship count for blocked-by, populated on first load.
@@ -59,6 +61,7 @@ final class ListsViewModel {
     func reset() {
         listsByKind = [:]
         activeProfile = nil
+        lastAccount = nil
         blockingCount = nil
         blockedByCount = nil
         followingCount = nil
@@ -84,6 +87,7 @@ final class ListsViewModel {
         guard let account else {
             listsByKind = [:]
             activeProfile = nil
+            lastAccount = nil
             blockingCount = nil
             blockedByCount = nil
             followingCount = nil
@@ -91,6 +95,8 @@ final class ListsViewModel {
             errorMessage = nil
             return
         }
+
+        lastAccount = account
 
         let cacheKey = account.did ?? account.handle
         let hasCache: Bool
@@ -216,7 +222,7 @@ final class ListsViewModel {
         updated[list.kind, default: []].append(list)
         updated[list.kind]?.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         listsByKind = updated
-        persistCache(forKey: didCacheKey ?? "")
+        persistCache(forKey: cacheKey ?? "")
     }
 
     /// Replaces an existing list with an updated version, preserving sort order.
@@ -231,7 +237,7 @@ final class ListsViewModel {
         lists[index] = updatedList
         updated[updatedList.kind] = lists
         listsByKind = updated
-        persistCache(forKey: didCacheKey ?? "")
+        persistCache(forKey: cacheKey ?? "")
     }
 
     /// Removes a deleted list from the in-memory collection and updates the cache.
@@ -241,7 +247,7 @@ final class ListsViewModel {
         lists.removeAll { $0.id == list.id }
         updated[list.kind] = lists
         listsByKind = updated
-        persistCache(forKey: didCacheKey ?? "")
+        persistCache(forKey: cacheKey ?? "")
     }
 
     /// Updates the dashboard relationship count from a completed relationship-list load.
@@ -257,16 +263,16 @@ final class ListsViewModel {
             followersCount = count
         }
 
-        let cacheKey = account?.did ?? account?.handle ?? didCacheKey
-        if let cacheKey {
-            persistCache(forKey: cacheKey)
+        let relationshipCacheKey = account?.did ?? account?.handle ?? cacheKey
+        if let relationshipCacheKey {
+            persistCache(forKey: relationshipCacheKey)
         }
     }
 
     // MARK: - Private Properties
 
-    /// Resolves the cache key from the current active profile.
-    private var didCacheKey: String? {
-        activeProfile?.did ?? activeProfile?.handle
+    /// Resolves the cache key from the current active profile or the last loaded account.
+    private var cacheKey: String? {
+        lastAccount?.did ?? lastAccount?.handle ?? activeProfile?.did ?? activeProfile?.handle
     }
 }

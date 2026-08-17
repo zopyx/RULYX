@@ -80,8 +80,12 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             previousCursor = cursor
             cursor = page.cursor
             pageCount += 1
-            if pageCount >= maxPages { break }
-            if let cur = cursor, cur == previousCursor { break }
+            if pageCount >= maxPages {
+                break
+            }
+            if let cur = cursor, cur == previousCursor {
+                break
+            }
         } while cursor != nil
 
         return allMembers
@@ -231,7 +235,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             )
         }
 
-        return BlueskyList(
+        let newList = BlueskyList(
             id: response.uri,
             name: name,
             description: description.isEmpty ? kind.title : description,
@@ -239,6 +243,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             kind: kind,
             cid: response.cid
         )
+        NotificationCenter.default.post(name: .listsDidChange, object: account)
+        return newList
     }
 
     /// Deletes an entire list and its associated record.
@@ -266,6 +272,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
                 hostURL: authSession.pdsURL
             )
         }
+        NotificationCenter.default.post(name: .listsDidChange, object: account)
     }
 
     /// Updates the name and description of an existing list.
@@ -304,7 +311,7 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             )
         }
 
-        return BlueskyList(
+        let updatedList = BlueskyList(
             id: list.id,
             name: title,
             description: description.isEmpty ? list.kind.title : description,
@@ -313,6 +320,8 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
             avatarURL: list.avatarURL,
             cid: list.cid
         )
+        NotificationCenter.default.post(name: .listsDidChange, object: account)
+        return updatedList
     }
 
     /// Reports a list to the Bluesky moderation service with a free-form reason.

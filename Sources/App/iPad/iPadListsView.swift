@@ -34,6 +34,18 @@ struct iPadListsView: View {
             viewModel.reset()
             navState.selectedList = nil
         }
+        .onReceive(NotificationCenter.default.publisher(for: .listsDidChange)) { notification in
+            guard let account = notification.object as? AppAccount,
+                  account.id == accountStore.activeAccount?.id else { return }
+            Task {
+                await viewModel.load(
+                    for: accountStore.activeAccount,
+                    appPassword: accountStore.activeAccount.flatMap { accountStore.appPassword(for: $0) },
+                    using: container.liveClient,
+                    isExplicitRefresh: true
+                )
+            }
+        }
     }
 
     private var emptyAccountView: some View {
