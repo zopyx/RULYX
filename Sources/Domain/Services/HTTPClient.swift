@@ -163,18 +163,23 @@ struct HTTPClient {
     private let pinnedHashes: Set<String>
 
     /// Default pinned certificate hashes for known RULYX API endpoints.
-    /// These are SHA-256 hashes of the public key bytes via `SecKeyCopyExternalRepresentation`
-    /// (which is the SPKI public key material on iOS). Generated from iOS runtime — use Pinning: logs to verify.
+    /// These are SHA-256 hashes of the public key bytes as returned by `SecKeyCopyExternalRepresentation`:
+    /// - EC endpoints: uncompressed public key point.
+    /// - RSA endpoints: PKCS#1 / SPKI public key DER.
+    /// Update via runtime "Pinning:" rejection logs when certificates rotate.
     static let defaultPinnedHashes: Set<String> = [
-        // bsky.social (PDS / AppView)
+        // bsky.social (PDS / AppView) — current RSA leaf, previous EC leaf
+        "Va6hs2tSCkc4CWC91P6Bga2S05J/R2R+Tp4WPAv7Hlc=",
         "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",
-        // public.api.bsky.app (profile batch, stats, posts) — leaf cert
+        // public.api.bsky.app (profile batch, stats, posts) — current RSA leaf, previous EC leaf
+        "/XM8jP6FzMHD/xY+UaV9ll6qPq7UutVDmmweJlcmwwc=",
         "g5TwoFJudhMvvGmccUw3nojpZxR2H1nG93LLQ6LExzM=",
         // api.clearsky.app (moderation lists)
         "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",
         // public.api.clearsky.services (blocklist, get-did)
         "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
-        // plc.directory (PLC audit log)
+        // plc.directory (PLC audit log) — current RSA leaf, previous EC leaf
+        "qGlCJ4IyYna73sdweX3ivSE3lTNLY98SGAy9ug3e34I=",
         "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",
     ]
 
