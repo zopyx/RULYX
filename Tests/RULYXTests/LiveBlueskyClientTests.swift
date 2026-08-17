@@ -178,11 +178,12 @@ final class LiveBlueskyClientTests: XCTestCase {
     }
 
     @MainActor func testFetchUnblockedBlockersCountPaginatesClearskyResponses() async throws {
+        let actorDID = "did:plc:unblock"
         MockURLProtocol.requestHandler = { request in
             let url = request.url!.absoluteString
             let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
 
-            if url.contains("/blocklist/did:plc:test/2") {
+            if url.contains("/blocklist/\(actorDID)/2") {
                 let json = """
                 {"data": {"blocklist": [
                     {"did": "did:plc:block-only", "blocked_date": "2024-01-01T00:00:00Z"}
@@ -191,7 +192,7 @@ final class LiveBlueskyClientTests: XCTestCase {
                 return (response, json)
             }
 
-            if url.contains("/blocklist/did:plc:test"), !url.contains("/single-blocklist/") {
+            if url.contains("/blocklist/\(actorDID)"), !url.contains("/single-blocklist/") {
                 let entries = (0 ..< 100).map { index in
                     #"{"did":"did:plc:shared\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
                 }.joined(separator: ",")
@@ -199,16 +200,12 @@ final class LiveBlueskyClientTests: XCTestCase {
                 return (response, json)
             }
 
-            if url.contains("/single-blocklist/did:plc:test/2") {
-                let json = """
-                {"data": {"blocklist": [
-                    {"did": "did:plc:blocker-only", "blocked_date": "2024-01-01T00:00:00Z"}
-                ]}}
-                """.data(using: .utf8)!
-                return (response, json)
+            if url.contains("/single-blocklist/\(actorDID)/2") {
+                let notFound = HTTPURLResponse(url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil)!
+                return (notFound, Data())
             }
 
-            if url.contains("/single-blocklist/did:plc:test") {
+            if url.contains("/single-blocklist/\(actorDID)") {
                 let entries = (0 ..< 100).map { index in
                     #"{"did":"did:plc:shared\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
                 }.joined(separator: ",")
@@ -227,7 +224,6 @@ final class LiveBlueskyClientTests: XCTestCase {
                         #"{"did":"did:plc:shared\#(index)","handle":"shared\#(index).bsky.social"}"#
                     }
                     profiles.append(#"{"did":"did:plc:block-only","handle":"block-only.bsky.social"}"#)
-                    profiles.append(#"{"did":"did:plc:blocker-only","handle":"blocker-only.bsky.social"}"#)
                     json = #"{"profiles":[\#(profiles.joined(separator: ","))]}"#.data(using: .utf8)!
                 }
                 return (response, json)
@@ -236,8 +232,134 @@ final class LiveBlueskyClientTests: XCTestCase {
             throw BlueskyAPIError.invalidURL
         }
 
-        let count = try await client.fetchUnblockedBlockersCount(for: makeAccount())
+        let count = try await client.fetchUnblockedBlockersCount(for: makeAccount(did: actorDID))
         XCTAssertEqual(count, 1)
+    }
+
+    @MainActor func testFetchBlockedByCountRetriesTransientServerError() async throws {
+        var page2Attempts = 0
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!.absoluteString
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            if url.contains("/single-blocklist/did:plc:test/2") {
+                page2Attempts += 1
+                if page2Attempts < 2 {
+                    let failureResponse = HTTPURLResponse(url: request.url!, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                    return (failureResponse, Data())
+                }
+                let json = """
+                {"data": {"blocklist": [{"did": "did:plc:page2", "blocked_date": "2024-01-01T00:00:00Z"}]}}
+                """.data(using: .utf8)!
+                return (response, json)
+            }
+
+            if url.contains("/single-blocklist/did:plc:test") {
+                let entries = (0 ..< 100).map { index in
+                    #"{"did":"did:plc:page1-\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
+                }.joined(separator: ",")
+                let json = #"{"data":{"blocklist":[\#(entries)]}}"#.data(using: .utf8)!
+                return (response, json)
+            }
+
+            throw BlueskyAPIError.invalidURL
+        }
+
+        let count = try await client.fetchBlockedByCount(for: makeAccount(), forceRefresh: true)
+        XCTAssertEqual(count, 101)
+        XCTAssertEqual(page2Attempts, 2, "page 2 should be retried once before succeeding")
+    }
+
+    @MainActor func testFetchBlockedByCountThrowsAfterRetriesExhausted() async throws {
+        var page2Attempts = 0
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!.absoluteString
+
+            if url.contains("/single-blocklist/did:plc:test/2") {
+                page2Attempts += 1
+                let response = HTTPURLResponse(url: request.url!, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                return (response, Data())
+            }
+
+            if url.contains("/single-blocklist/did:plc:test") {
+                let entries = (0 ..< 100).map { index in
+                    #"{"did":"did:plc:page1-\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
+                }.joined(separator: ",")
+                let json = #"{"data":{"blocklist":[\#(entries)]}}"#.data(using: .utf8)!
+                let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                return (response, json)
+            }
+
+            throw BlueskyAPIError.invalidURL
+        }
+
+        do {
+            _ = try await client.fetchBlockedByCount(for: makeAccount(), forceRefresh: true)
+            XCTFail("Expected fetchBlockedByCount to throw after retries")
+        } catch {
+            XCTAssertGreaterThanOrEqual(page2Attempts, 2)
+        }
+    }
+
+    @MainActor func testFetchBlockedActorsToleratesPartialError() async throws {
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!.absoluteString
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            if url.contains("/single-blocklist/did:plc:partial/2") {
+                let failureResponse = HTTPURLResponse(url: request.url!, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                return (failureResponse, Data())
+            }
+
+            if url.contains("/single-blocklist/did:plc:partial") {
+                let entries = (0 ..< 10).map { index in
+                    #"{"did":"did:plc:page1-\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
+                }.joined(separator: ",")
+                let json = #"{"data":{"blocklist":[\#(entries)]}}"#.data(using: .utf8)!
+                return (response, json)
+            }
+
+            if url.contains("getProfiles") {
+                let components = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!
+                let dids = components.queryItems?.filter { $0.name == "actors" }.compactMap(\.value) ?? []
+                let profiles = dids.map { did in
+                    #"{"did":"\#(did)","handle":"profile.bsky.social"}"#
+                }.joined(separator: ",")
+                let json = #"{"profiles":[\#(profiles)]}"#.data(using: .utf8)!
+                return (response, json)
+            }
+
+            throw BlueskyAPIError.invalidURL
+        }
+
+        let result = try await client.fetchBlockedByActors(account: makeAccount(did: "did:plc:partial"), appPassword: "pass")
+        XCTAssertEqual(result.totalCount, 10)
+        XCTAssertEqual(result.actors.count, 10)
+    }
+
+    @MainActor func testFetchBlockedByCountStopsAt404() async throws {
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!.absoluteString
+
+            if url.contains("/single-blocklist/did:plc:test/2") {
+                let response = HTTPURLResponse(url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil)!
+                return (response, Data())
+            }
+
+            if url.contains("/single-blocklist/did:plc:test") {
+                let entries = (0 ..< 100).map { index in
+                    #"{"did":"did:plc:page1-\#(index)","blocked_date":"2024-01-01T00:00:00Z"}"#
+                }.joined(separator: ",")
+                let json = #"{"data":{"blocklist":[\#(entries)]}}"#.data(using: .utf8)!
+                let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                return (response, json)
+            }
+
+            throw BlueskyAPIError.invalidURL
+        }
+
+        let count = try await client.fetchBlockedByCount(for: makeAccount(), forceRefresh: true)
+        XCTAssertEqual(count, 100)
     }
 
     @MainActor func testReportListUsesListRecordSubject() async throws {

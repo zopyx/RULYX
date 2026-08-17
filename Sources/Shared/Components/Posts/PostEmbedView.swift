@@ -84,7 +84,7 @@ struct PostEmbedView: View {
 
     private func tenorEmbedCard(previewURL: URL, external: RichEmbedExternal) -> some View {
         ZStack(alignment: .bottomLeading) {
-            ThumbnailImageView(url: previewURL, maxPixelSize: 720) {
+            ThumbnailImageView(url: previewURL, maxPixelSize: 600) {
                 RoundedRectangle(cornerRadius: 12).fill(Color.skyPrimary.opacity(0.08))
             }
             .scaledToFill()
@@ -162,7 +162,7 @@ struct PostEmbedView: View {
     private func singleImageContent(item: RichEmbedImage, previewURL: URL) -> some View {
         ThumbnailImageView(
             url: item.thumb.flatMap(URL.init) ?? previewURL,
-            maxPixelSize: 512,
+            maxPixelSize: 600,
             onLoadedAspectRatio: { ratio in
                 singleImageRatio = ratio
             },
@@ -190,9 +190,9 @@ struct PostEmbedView: View {
         }
     }
 
-    /// 2-column grid cell with a fixed 130pt height.
+    /// 2-column grid cell with a fixed 130pt height. 360 px at 2x is enough (was 512).
     private func gridImageContent(item: RichEmbedImage, previewURL: URL) -> some View {
-        ThumbnailImageView(url: item.thumb.flatMap(URL.init) ?? previewURL, maxPixelSize: 512) {
+        ThumbnailImageView(url: item.thumb.flatMap(URL.init) ?? previewURL, maxPixelSize: 360) {
             Rectangle().fill(Color.skyPrimary.opacity(0.08))
         }
         .aspectRatio(contentMode: .fill)

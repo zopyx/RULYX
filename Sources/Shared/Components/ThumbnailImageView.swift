@@ -4,6 +4,34 @@ import ImageIO
 import SwiftUI
 import UIKit
 
+// MARK: - AsyncSemaphore (T01)
+
+/// Simple async semaphore to cap concurrent work without blocking threads.
+actor AsyncSemaphore {
+    private var value: Int
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+    init(value: Int) {
+        self.value = value
+    }
+
+    func wait() async {
+        if value > 0 {
+            value -= 1
+            return
+        }
+        await withCheckedContinuation { c in waiters.append(c) }
+    }
+
+    func signal() {
+        if let waiter = waiters.first {
+            waiters.removeFirst()
+            waiter.resume()
+        } else {
+            value += 1
+        }
+    }
+}
+
 // MARK: - ThumbnailPipeline
 
 /// Shared pipeline for fetching and downsampling remote images.
@@ -27,10 +55,14 @@ actor ThumbnailPipeline {
     // MARK: - State
 
     private let cache = NSCache<NSString, UIImage>()
+    /// Caps concurrent network + decode work to avoid 200 parallel ImageIO decodes on 4-up feeds (T01).
+    private let decodeSemaphore = AsyncSemaphore(value: 6)
+    /// In-flight dedup — same URL+size requested twice shares one task (T01).
+    private var inflight: [String: Task<UIImage, Error>] = [:]
     private let httpClient: HTTPClient = {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy
-        config.urlCache = URLCache.shared
+        config.urlCache = mediaThumbnailCache
         config.waitsForConnectivity = true
         return HTTPClient(session: URLSession(configuration: config))
     }()
@@ -51,33 +83,44 @@ actor ThumbnailPipeline {
     ///          The in-memory cache has no TTL (evicted by NSCache pressure).
     func image(for url: URL, maxPixelSize: CGFloat, scale: CGFloat, ttl: TimeInterval = 86400) async throws -> UIImage {
         let cacheKey = "\(url.absoluteString)|\(Int(maxPixelSize))|\(Int(scale))" as NSString
+        let inflightKey = cacheKey as String
 
         // 1. In-memory cache
         if let cached = cache.object(forKey: cacheKey) {
             return cached
         }
 
-        // 2. Disk cache (with TTL check)
-        let diskKey = diskCacheKey(for: url, maxPixelSize: maxPixelSize, scale: scale)
-        if let diskData = loadFromDisk(key: diskKey, ttl: ttl) {
-            let image = try downsample(data: diskData, maxPixelSize: maxPixelSize * scale)
+        // Dedup: if same URL+size already in flight, share it
+        if let existing = inflight[inflightKey] {
+            return try await existing.value
+        }
+
+        let task = Task<UIImage, Error> {
+            await decodeSemaphore.wait()
+            defer { Task { await decodeSemaphore.signal() } }
+
+            // Re-check disk cache under semaphore (may have been populated while waiting)
+            let diskKey = diskCacheKey(for: url, maxPixelSize: maxPixelSize, scale: scale)
+            if let diskData = loadFromDisk(key: diskKey, ttl: ttl) {
+                let image = try downsample(data: diskData, maxPixelSize: maxPixelSize * scale)
+                cache.setObject(image, forKey: cacheKey)
+                return image
+            }
+
+            // Network fetch
+            let (data, httpResponse) = try await httpClient.data(from: url, source: "Thumbnail Image")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                throw URLError(.badServerResponse)
+            }
+
+            let image = try downsample(data: data, maxPixelSize: maxPixelSize * scale)
             cache.setObject(image, forKey: cacheKey)
+            saveToDisk(data: data, key: diskKey)
             return image
         }
-
-        // 3. Network fetch
-        let (data, httpResponse) = try await httpClient.data(from: url, source: "Thumbnail Image")
-        guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-
-        let image = try downsample(data: data, maxPixelSize: maxPixelSize * scale)
-        cache.setObject(image, forKey: cacheKey)
-
-        // Write raw data to disk cache in the background (don't block the caller)
-        saveToDisk(data: data, key: diskKey)
-
-        return image
+        inflight[inflightKey] = task
+        defer { inflight[inflightKey] = nil }
+        return try await task.value
     }
 
     /// Clears both the in-memory and on-disk caches.

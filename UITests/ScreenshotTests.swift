@@ -17,9 +17,15 @@ final class ScreenshotTests: XCTestCase {
 
         if handle == nil || password == nil {
             let dotEnv = loadDotEnv()
-            if handle == nil { handle = dotEnv["TEST_HANDLE"] }
-            if password == nil { password = dotEnv["TEST_PASSWORD"] }
-            if pds == nil { pds = dotEnv["TEST_PDS"] }
+            if handle == nil {
+                handle = dotEnv["TEST_HANDLE"]
+            }
+            if password == nil {
+                password = dotEnv["TEST_PASSWORD"]
+            }
+            if pds == nil {
+                pds = dotEnv["TEST_PDS"]
+            }
         }
 
         if let handle, let password {
@@ -39,8 +45,12 @@ final class ScreenshotTests: XCTestCase {
     /// Pass `beta: true` to include `-showBetaFeatures` for timeline/notifications/chat tabs.
     private func launchApp(beta: Bool) {
         app.launchArguments = ["--uitesting"]
-        if beta { app.launchArguments += ["-showBetaFeatures", "1"] }
-        if useTestAccount { app.launchArguments += ["--test-account"] }
+        if beta {
+            app.launchArguments += ["-showBetaFeatures", "1"]
+        }
+        if useTestAccount {
+            app.launchArguments += ["--test-account"]
+        }
         app.launch()
     }
 
@@ -87,18 +97,24 @@ final class ScreenshotTests: XCTestCase {
 
     // MARK: - Snapshot: All Tabs (Existing)
 
-    func testCaptureAllTabs() throws {
+    func testCaptureAllTabs() {
         // Phase 1 — beta features ON: capture Moderation, Timeline, Notifications, Chat
         launchApp(beta: true)
         let tabBar = waitForTabBar()
-        if useTestAccount { sleep(6) } else { sleep(3) }
+        if useTestAccount {
+            sleep(6)
+        } else {
+            sleep(3)
+        }
 
         snapshot("0_Moderation")
 
         tabBar.buttons.element(boundBy: 1).tap()
         let hasFeed = app.collectionViews.firstMatch.cells.firstMatch
             .waitForExistence(timeout: 8)
-        if !hasFeed { sleep(4) }
+        if !hasFeed {
+            sleep(4)
+        }
         snapshot("1_Timeline")
 
         tabBar.buttons.element(boundBy: 2).tap()
@@ -108,7 +124,9 @@ final class ScreenshotTests: XCTestCase {
         tabBar.buttons.element(boundBy: 3).tap()
         let hasChat = app.collectionViews.firstMatch.cells.firstMatch
             .waitForExistence(timeout: 8)
-        if !hasChat { sleep(4) }
+        if !hasChat {
+            sleep(4)
+        }
         snapshot("3_Chat")
 
         // Phase 2 — capture overflow tabs via the More list (still with beta features)
@@ -122,7 +140,7 @@ final class ScreenshotTests: XCTestCase {
 
         // Use app-level cell queries (not tables.cells) to find More list items
         if app.cells.element(boundBy: 0).waitForExistence(timeout: 3) {
-            for i in 0..<overflowTabLabels.count {
+            for i in 0 ..< overflowTabLabels.count {
                 let cell = app.cells.element(boundBy: i)
                 if cell.exists {
                     cell.tap()
@@ -139,7 +157,11 @@ final class ScreenshotTests: XCTestCase {
             app.terminate()
             launchApp(beta: false)
             let tabBar2 = waitForTabBar()
-            if useTestAccount { sleep(6) } else { sleep(3) }
+            if useTestAccount {
+                sleep(6)
+            } else {
+                sleep(3)
+            }
 
             for (label, snapName) in zip(overflowTabLabels, overflowNames) {
                 tabBar2.buttons[label].tap()
@@ -153,7 +175,7 @@ final class ScreenshotTests: XCTestCase {
 
     /// Captures the Moderation tab showing the main Lists view with preview accounts.
     /// Verifies the account summary card, relationship counts, and moderation/regular list sections.
-    func testSnapshotModerationListsView() throws {
+    func testSnapshotModerationListsView() {
         launchAppPreview()
         let tabBar = waitForTabBar()
         sleep(3) // Allow ListsView to render preview data
@@ -174,7 +196,7 @@ final class ScreenshotTests: XCTestCase {
 
     /// Captures the Moderation tab when no moderation lists are configured
     /// (the "Create your first moderation list" prompt).
-    func testSnapshotModerationEmptyLists() throws {
+    func testSnapshotModerationEmptyLists() {
         launchAppPreview()
         _ = waitForTabBar()
         sleep(3)
@@ -185,7 +207,7 @@ final class ScreenshotTests: XCTestCase {
     }
 
     /// Captures the Moderation tab scrolled to the Advanced section (Mentions, Custom Search, Direct Replies).
-    func testSnapshotModerationAdvancedSection() throws {
+    func testSnapshotModerationAdvancedSection() {
         launchAppPreview()
         _ = waitForTabBar()
         sleep(2)
@@ -205,7 +227,7 @@ final class ScreenshotTests: XCTestCase {
     // MARK: - State-Coverage Snapshots: Settings Tab
 
     /// Captures the Settings tab showing Preferences, Moderation, and AI sections.
-    func testSnapshotSettingsAllSections() throws {
+    func testSnapshotSettingsAllSections() {
         launchAppPreview()
         _ = waitForTabBar()
         selectTab("Settings", settle: 3)
@@ -220,7 +242,7 @@ final class ScreenshotTests: XCTestCase {
     }
 
     /// Captures the Settings tab scrolled to reveal Security and Internal sections.
-    func testSnapshotSettingsInternal() throws {
+    func testSnapshotSettingsInternal() {
         launchAppPreview()
         _ = waitForTabBar()
         selectTab("Settings", settle: 3)
@@ -239,7 +261,7 @@ final class ScreenshotTests: XCTestCase {
     // MARK: - State-Coverage Snapshots: Accounts Tab
 
     /// Captures the Accounts tab showing the preview account list with active/inactive states.
-    func testSnapshotAccountsList() throws {
+    func testSnapshotAccountsList() {
         launchAppPreview()
         _ = waitForTabBar()
         selectAccountsTab(settle: 4)
@@ -258,7 +280,7 @@ final class ScreenshotTests: XCTestCase {
     }
 
     /// Captures the account detail/management view by tapping on an account row.
-    func testSnapshotAccountDetail() throws {
+    func testSnapshotAccountDetail() {
         launchAppPreview()
         _ = waitForTabBar()
         selectAccountsTab(settle: 4)
@@ -274,7 +296,7 @@ final class ScreenshotTests: XCTestCase {
     // MARK: - State-Coverage Snapshots: Info Tab
 
     /// Captures the Info tab — Overview section (hero card, claims grid, GitHub link, version).
-    func testSnapshotInfoOverview() throws {
+    func testSnapshotInfoOverview() {
         launchAppPreview()
         _ = waitForTabBar()
         selectTab("Info", settle: 3)
@@ -289,7 +311,7 @@ final class ScreenshotTests: XCTestCase {
     }
 
     /// Captures the Info tab — Features section (moderation lists, export, moderation feature cards).
-    func testSnapshotInfoFeatures() throws {
+    func testSnapshotInfoFeatures() {
         launchAppPreview()
         _ = waitForTabBar()
         selectTab("Info", settle: 3)
@@ -303,7 +325,7 @@ final class ScreenshotTests: XCTestCase {
     }
 
     /// Captures the Info tab — Legal section (author, website, imprint, privacy, license, third-party).
-    func testSnapshotInfoLegal() throws {
+    func testSnapshotInfoLegal() {
         launchAppPreview()
         _ = waitForTabBar()
         selectTab("Info", settle: 3)
@@ -342,7 +364,9 @@ private func loadDotEnv() -> [String: String] {
         if (value.hasPrefix("'") && value.hasSuffix("'")) || (value.hasPrefix("\"") && value.hasSuffix("\"")) {
             value = String(value.dropFirst().dropLast())
         }
-        if !key.isEmpty { result[key] = value }
+        if !key.isEmpty {
+            result[key] = value
+        }
     }
     return result
 }

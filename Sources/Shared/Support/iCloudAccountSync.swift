@@ -118,7 +118,7 @@ class iCloudAccountSync: ObservableObject {
     }
 
     private func isValidDID(_ did: String) -> Bool {
-        return did.hasPrefix("did:plc:") || did.hasPrefix("did:web:")
+        did.hasPrefix("did:plc:") || did.hasPrefix("did:web:")
     }
 }
 

@@ -1,5 +1,5 @@
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 struct ListCountEntry: TimelineEntry {
     let date: Date
@@ -8,16 +8,16 @@ struct ListCountEntry: TimelineEntry {
 }
 
 struct ListCountProvider: TimelineProvider {
-    func placeholder(in context: Context) -> ListCountEntry {
+    func placeholder(in _: Context) -> ListCountEntry {
         ListCountEntry(date: .now, listCounts: [("Spam Watch", 42), ("Trusted Sources", 18)], isPlaceholder: true)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (ListCountEntry) -> Void) {
+    func getSnapshot(in _: Context, completion: @escaping (ListCountEntry) -> Void) {
         let entry = ListCountEntry(date: .now, listCounts: loadCounts(), isPlaceholder: false)
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<ListCountEntry>) -> Void) {
+    func getTimeline(in _: Context, completion: @escaping (Timeline<ListCountEntry>) -> Void) {
         let entry = ListCountEntry(date: .now, listCounts: loadCounts(), isPlaceholder: false)
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 2, to: .now)!
         completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
@@ -25,7 +25,8 @@ struct ListCountProvider: TimelineProvider {
 
     private func loadCounts() -> [(name: String, count: Int)] {
         guard let data = UserDefaults.standard.data(forKey: "widgetListCounts"),
-              let counts = try? JSONDecoder().decode([WidgetListCount].self, from: data) else {
+              let counts = try? JSONDecoder().decode([WidgetListCount].self, from: data)
+        else {
             return [("Add accounts in Rulyx", 0)]
         }
         return counts.map { ($0.name, $0.count) }

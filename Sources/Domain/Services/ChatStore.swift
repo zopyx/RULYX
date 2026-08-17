@@ -102,7 +102,6 @@ final class ChatStore: ObservableObject {
     /// rebuilding the visible conversation list from the chat service response.
     /// Stale rebuilds are discarded via generation check (`isCurrentContext`) + `Task.isCancelled`.
     func rebuildConversations(for account: AppAccount?, appPassword: String?, clearCaches: Bool = false, showPrompts: Bool = false) async {
-
         AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none", privacy: .private); clearCaches=\(clearCaches, privacy: .public); showPrompts=\(showPrompts, privacy: .public)")
         activeAccountID = account?.id
         activeAccount = account
