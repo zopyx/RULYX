@@ -167,7 +167,7 @@ private final class MockMediaFeedClient: MediaFeedFetching {
         self.pages = pages
     }
 
-    func fetchRichFeed(did _: String, cursor: String?, account _: AppAccount, appPassword _: String?) async throws -> RichFeedResponse {
+    func fetchRichFeed(did _: String, cursor: String?, filter _: String?, account _: AppAccount, appPassword _: String?) async throws -> RichFeedResponse {
         requests.append(cursor)
         defer { nextPageIndex += 1 }
         return pages[nextPageIndex]

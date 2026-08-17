@@ -41,6 +41,7 @@ protocol BlueskyFeedServicing: Sendable {
     func fetchRichFeed(
         did: String,
         cursor: String?,
+        filter: String?,
         account: AppAccount,
         appPassword: String?
     ) async throws -> RichFeedResponse

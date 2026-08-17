@@ -356,13 +356,14 @@ final class BlueskyProfileViewModel {
     /// Scans the user's feed counting images and videos.
     ///
     /// Optimizations:
-    /// - Caps at 1000 posts (10 pages of 100) to bound execution time
-    /// - Caches results in `BlueskyAPICache` with 5-minute TTL
-    /// - Checks cache before scanning; skips entirely on cache hit
+    /// - Uses `posts_with_media` so every fetched page contains relevant posts.
+    /// - Caches results in `BlueskyAPICache` with 5-minute TTL.
+    /// - Checks cache before scanning; skips entirely on cache hit.
+    /// - Bounded to 5000 media posts (50 pages of 100) to avoid runaway work.
     private func countMedia(for did: String, account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         // Bump the key when the media embed decoder changes so a cached zero
         // from the pre-gallery implementation cannot mask newly found images.
-        let cacheKey = "mediaScan_v2_\(did)"
+        let cacheKey = "mediaScan_v3_\(did)"
 
         // Check cache first
         let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.member)
@@ -377,7 +378,7 @@ final class BlueskyProfileViewModel {
         isScanningMedia = true
         defer { isScanningMedia = false }
 
-        let maxPages = 10 // 1000 posts max
+        let maxPages = 50
         var cursor: String?
         var images = 0
         var videos = 0
@@ -386,7 +387,13 @@ final class BlueskyProfileViewModel {
         while pagesFetched < maxPages {
             guard !Task.isCancelled else { return }
             do {
-                let response = try await client.fetchRichFeed(did: did, cursor: cursor, account: account, appPassword: appPassword)
+                let response = try await client.fetchRichFeed(
+                    did: did,
+                    cursor: cursor,
+                    filter: "posts_with_media",
+                    account: account,
+                    appPassword: appPassword
+                )
                 pagesFetched += 1
                 for entry in response.feed {
                     guard !Task.isCancelled else { return }

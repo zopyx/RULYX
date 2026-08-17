@@ -2,7 +2,13 @@ import Foundation
 
 @MainActor
 protocol MediaFeedFetching {
-    func fetchRichFeed(did: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> RichFeedResponse
+    func fetchRichFeed(
+        did: String,
+        cursor: String?,
+        filter: String?,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> RichFeedResponse
 }
 
 extension LiveBlueskyClient: MediaFeedFetching {}
@@ -114,9 +120,7 @@ final class MediaSelectionState: ObservableObject {
 /// Isolated to its own `URLCache` instance — does NOT overwrite `URLCache.shared`
 /// (which is the 50 MB app-wide cache set in `RULYXApp`). Consumers that need
 /// thumbnail caching should use `MediaBrowserViewModel.thumbnailCache`.
-let mediaThumbnailCache: URLCache = {
-    URLCache(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
-}()
+let mediaThumbnailCache: URLCache = .init(memoryCapacity: 256 * 1024 * 1024, diskCapacity: 2 * 1024 * 1024 * 1024, diskPath: "media-thumbnails")
 
 /// Backwards-compatible alias — do not use `URLCache.shared` mutation.
 private let sharedCache: URLCache = mediaThumbnailCache
@@ -244,7 +248,13 @@ final class MediaBrowserViewModel: ObservableObject {
     private func fetchPage(account: AppAccount, appPassword: String, using client: some MediaFeedFetching) async {
         do {
             guard !Task.isCancelled else { return }
-            let response = try await client.fetchRichFeed(did: did, cursor: cursor, account: account, appPassword: appPassword)
+            let response = try await client.fetchRichFeed(
+                did: did,
+                cursor: cursor,
+                filter: "posts_with_media",
+                account: account,
+                appPassword: appPassword
+            )
             var batch: [MediaItem] = []
             for entry in response.feed {
                 guard !Task.isCancelled else { return }

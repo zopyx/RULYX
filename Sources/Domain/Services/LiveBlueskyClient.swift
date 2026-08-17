@@ -1715,14 +1715,26 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     }
 
     /// Fetches an author's feed with rich post content (used in the post browser).
-    func fetchRichFeed(did: String, cursor: String? = nil, account: AppAccount, appPassword: String?) async throws -> RichFeedResponse {
+    func fetchRichFeed(
+        did: String,
+        cursor: String? = nil,
+        filter: String? = nil,
+        account: AppAccount,
+        appPassword: String?
+    ) async throws -> RichFeedResponse {
         try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
         ) { authSession in
-            var queryItems = [URLQueryItem(name: "actor", value: did), URLQueryItem(name: "limit", value: "100")]
+            var queryItems = [
+                URLQueryItem(name: "actor", value: did),
+                URLQueryItem(name: "limit", value: "100"),
+            ]
             if let cursor {
                 queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            if let filter {
+                queryItems.append(URLQueryItem(name: "filter", value: filter))
             }
             return try await requestExecutor.send(
                 path: "app.bsky.feed.getAuthorFeed",

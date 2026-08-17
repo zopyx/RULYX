@@ -33,7 +33,7 @@ import Foundation
         GetAuthorFeedResponse(cursor: nil, feed: [])
     }
 
-    func fetchRichFeed(did _: String, cursor _: String?, account _: AppAccount, appPassword _: String?) async throws -> RichFeedResponse {
+    func fetchRichFeed(did _: String, cursor _: String?, filter _: String?, account _: AppAccount, appPassword _: String?) async throws -> RichFeedResponse {
         RichFeedResponse(cursor: nil, feed: [])
     }
 }
