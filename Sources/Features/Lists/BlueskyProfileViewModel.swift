@@ -192,7 +192,9 @@ final class BlueskyProfileViewModel {
                             var found = false
                             var pagesChecked = 0
                             while !found, pagesChecked < 2 {
-                                if Task.isCancelled { break }
+                                if Task.isCancelled {
+                                    break
+                                }
                                 let page: PagedListMembers
                                 do {
                                     page = try await client.fetchListMembersPage(
@@ -206,14 +208,18 @@ final class BlueskyProfileViewModel {
                                 found = page.members.contains(where: { $0.actor.did == targetDID })
                                 cursor = page.cursor
                                 pagesChecked += 1
-                                if cursor == nil { break }
+                                if cursor == nil {
+                                    break
+                                }
                             }
                             return found ? list.name : nil
                         }
                     }
                     var collected: [String] = []
                     for await name in group {
-                        if let name { collected.append(name) }
+                        if let name {
+                            collected.append(name)
+                        }
                     }
                     return collected
                 }
@@ -767,7 +773,7 @@ final class BlueskyProfileViewModel {
                 appPassword: appPassword
             )
 
-            _ = try await client.addActor(
+            let listItemURI = try await client.addActor(
                 did: profile.did,
                 to: newList,
                 account: account,
@@ -776,6 +782,30 @@ final class BlueskyProfileViewModel {
 
             statusMessage = String.localized("profile.status.list_created", replacements: ["name": name, "handle": profile.handle])
 
+            // Optimistically reflect the new list membership so the slider
+            // is immediately ON, even before PDS propagation catches up.
+            let newMembership = ProfileListMembership(
+                listURI: newList.id,
+                name: newList.name,
+                kind: newList.kind,
+                memberCount: 1,
+                isMember: true,
+                listItemRecordURI: listItemURI
+            )
+            if var currentInspection = inspection {
+                var memberships = currentInspection.listMemberships
+                memberships.removeAll { $0.listURI == newList.id }
+                memberships.append(newMembership)
+                inspection = ProfileInspection(
+                    profile: currentInspection.profile,
+                    listMemberships: memberships,
+                    starterPackMemberships: currentInspection.starterPackMemberships
+                )
+            }
+
+            // Refresh counts/history in the background. The optimistic
+            // membership above survives because load() clears pending
+            // states but not the explicit inspection listMemberships.
             await load(
                 did: profile.did,
                 account: account,
@@ -784,6 +814,12 @@ final class BlueskyProfileViewModel {
                 dataPassword: appPassword,
                 using: client
             )
+
+            // If the PDS still didn't report the membership, keep the
+            // slider ON via the pending state until the next refresh.
+            if inspection?.listMemberships.first(where: { $0.listURI == newList.id })?.isMember != true {
+                pendingListMemberStates[newList.id] = true
+            }
         } catch {
             errorMessage = AppError.userMessage(from: error)
         }
