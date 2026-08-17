@@ -50,8 +50,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     private let preferredSearchKey = "bluesky.preferredSearchAccountID"
     private let passwordService = "com.ajung.RULYX.password"
 
-    // Tracks handles currently being added to prevent concurrent duplicate adds
-    // (MainActor-isolated, checked before and after the authenticate suspension point).
+    /// Tracks handles currently being added to prevent concurrent duplicate adds
+    /// (MainActor-isolated, checked before and after the authenticate suspension point).
     private var pendingHandles: Set<String> = []
 
     // MARK: - Init
@@ -180,7 +180,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             )
             // Re-check after suspension — another task may have inserted the same handle/DID
             if accounts.contains(where: { $0.handle.caseInsensitiveCompare(session.handle) == .orderedSame }) ||
-                (session.did != nil && accounts.contains(where: { $0.did == session.did })) {
+                (session.did != nil && accounts.contains(where: { $0.did == session.did }))
+            {
                 errorMessage = String.localized("account.error.already_exists")
                 return .failure
             }
@@ -256,7 +257,8 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
                 authFactorToken: trimmedToken
             )
             if accounts.contains(where: { $0.handle.caseInsensitiveCompare(session.handle) == .orderedSame }) ||
-                (session.did != nil && accounts.contains(where: { $0.did == session.did })) {
+                (session.did != nil && accounts.contains(where: { $0.did == session.did }))
+            {
                 errorMessage = String.localized("account.error.already_exists")
                 return false
             }
@@ -597,4 +599,9 @@ extension Notification.Name {
     /// Account-scoped view models observe this to zero counters/visible state immediately,
     /// independent of view lifecycle (works for tabs that are alive but not visible).
     static let accountWillSwitch = Notification.Name("accountWillSwitch")
+
+    /// Posted by `BlueskyListService` after a moderation/curation list is created, updated, or deleted.
+    /// Dashboard/list views observe this to refresh the list of lists from the server.
+    /// `object` is the affected `AppAccount`.
+    static let listsDidChange = Notification.Name("listsDidChange")
 }
