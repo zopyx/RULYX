@@ -165,21 +165,35 @@ struct HTTPClient {
     /// Default pinned certificate hashes for known RULYX API endpoints.
     /// These are SHA-256 hashes of the public key bytes as returned by `SecKeyCopyExternalRepresentation`:
     /// - EC endpoints: uncompressed public key point.
-    /// - RSA endpoints: PKCS#1 / SPKI public key DER.
-    /// Update via runtime "Pinning:" rejection logs when certificates rotate.
+    /// - RSA endpoints: PKCS#1 RSAPublicKey DER.
+    /// Use the Swift Security framework or `scripts/ios-pin-hash.py` to compute; do not trust `openssl rsa` defaults.
+    ///
+    /// Includes leaf, intermediate, and root hashes so rotation of any single cert does not break the app.
     static let defaultPinnedHashes: Set<String> = [
-        // bsky.social (PDS / AppView) — current RSA leaf, previous EC leaf
-        "Va6hs2tSCkc4CWC91P6Bga2S05J/R2R+Tp4WPAv7Hlc=",
+        // bsky.social (PDS / AppView) — RSA leaf + Amazon intermediate + Amazon root
+        "WFhJn2TdqWwdXy6GW6hkUx6z5lPgtdLTj4FKHxQ+DFE=",
+        "6nxPsa2kTA3VkIjhZo/4AwlOJ2QHhMEFG2KpZqkgNGk=",
+        "UAJ/9yOqq6nk4CX2QtZgDmyT6JHYlkBfihOzezH/8cs=",
         "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",
-        // public.api.bsky.app (profile batch, stats, posts) — current RSA leaf, previous EC leaf
-        "/XM8jP6FzMHD/xY+UaV9ll6qPq7UutVDmmweJlcmwwc=",
+        // public.api.bsky.app (profile batch, stats, posts) — RSA leaf + Let's Encrypt intermediate/root
+        "eelLErHkHORHz4iW6dKQOy14LvowA1ScVtfDvl8jDpc=",
         "g5TwoFJudhMvvGmccUw3nojpZxR2H1nG93LLQ6LExzM=",
-        // api.clearsky.app (moderation lists)
+        "Hy81vkYUgs1Asa55LFV4+vfUaPt3QgaPuLTHTkAxqmE=",
+        "3udbYNAibUAofT8NAf6ktVK0UZSjEhF99kRyhtyJ2yM=",
+        "9Fk6HgfMnM7/vtnBHcUhg1b3gU2bIpSd50XmKZkMbGA=",
+        // api.clearsky.app (moderation lists) — EC leaf + Google WE1 intermediate + GTS Root R4
         "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",
-        // public.api.clearsky.services (blocklist, get-did)
         "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
-        // plc.directory (PLC audit log) — current RSA leaf, previous EC leaf
-        "qGlCJ4IyYna73sdweX3ivSE3lTNLY98SGAy9ug3e34I=",
+        "H7AMYAvicN2+UcFPBz3kJXCDmGrTItZh4ujUBK8hoWg=",
+        "YSoUL4CBzo5aJ/ES9gSZTsavsgtHsiLLnTG+BKUdork=",
+        // public.api.clearsky.services (blocklist, get-did) — EC leaf + Google WE1 intermediate + GTS Root R4
+        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
+        "H7AMYAvicN2+UcFPBz3kJXCDmGrTItZh4ujUBK8hoWg=",
+        "YSoUL4CBzo5aJ/ES9gSZTsavsgtHsiLLnTG+BKUdork=",
+        // plc.directory (PLC audit log) — RSA leaf + Amazon intermediate + Amazon root
+        "17wmhBIxAP8+6PakBtqWz1krJb43Mb+lvSqQIi6jl6I=",
+        "/LWYS0bnqApLztW89p14Ilm/6JdJpH9mSOpWaxSNCL0=",
+        "UAJ/9yOqq6nk4CX2QtZgDmyT6JHYlkBfihOzezH/8cs=",
         "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",
     ]
 
