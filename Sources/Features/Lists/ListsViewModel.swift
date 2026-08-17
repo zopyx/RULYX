@@ -136,7 +136,11 @@ final class ListsViewModel {
         let clientRef = client
         await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
-                let lists = try await clientRef.fetchLists(for: account, appPassword: appPassword)
+                let lists = try await clientRef.fetchLists(
+                    for: account,
+                    appPassword: appPassword,
+                    forceRefresh: isExplicitRefresh
+                )
                 try Task.checkCancellation()
                 await MainActor.run { self.listsByKind = Dictionary(grouping: lists, by: \.kind) }
             }
@@ -144,15 +148,23 @@ final class ListsViewModel {
                 guard let result = try? await clientRef.fetchProfile(
                     did: account.did ?? account.handle,
                     account: account,
-                    appPassword: appPassword
+                    appPassword: appPassword,
+                    forceRefresh: isExplicitRefresh
                 ) else { return }
                 guard !Task.isCancelled else { return }
                 await MainActor.run { self.activeProfile = result }
             }
             group.addTask {
-                // Coalesced: fetch both counts concurrently via DID-only cacheable path
-                async let blockingTask: Int? = try? await clientRef.fetchBlockingCount(for: account)
-                async let blockedByTask: Int? = try? await clientRef.fetchBlockedByCount(for: account)
+                // Coalesced: fetch both counts concurrently via DID-only cacheable path.
+                // On an explicit pull-to-refresh bypass the cache so the numbers actually update.
+                async let blockingTask: Int? = try? await clientRef.fetchBlockingCount(
+                    for: account,
+                    forceRefresh: isExplicitRefresh
+                )
+                async let blockedByTask: Int? = try? await clientRef.fetchBlockedByCount(
+                    for: account,
+                    forceRefresh: isExplicitRefresh
+                )
                 let (blocking, blockedBy) = await (blockingTask, blockedByTask)
                 guard !Task.isCancelled else { return }
                 if let count = blocking {

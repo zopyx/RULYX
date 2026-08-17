@@ -29,7 +29,11 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         )
     }
 
-    override func fetchLists(for account: AppAccount, appPassword _: String?) async throws -> [BlueskyList] {
+    override func fetchLists(
+        for account: AppAccount,
+        appPassword _: String?,
+        forceRefresh _: Bool = false
+    ) async throws -> [BlueskyList] {
         try await Task.sleep(for: .milliseconds(150))
 
         let seed = abs(account.handle.hashValue)
@@ -295,7 +299,8 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
     override func fetchProfile(
         did actorDID: String,
         account _: AppAccount,
-        appPassword _: String?
+        appPassword _: String?,
+        forceRefresh _: Bool = false
     ) async throws -> BlueskyProfile {
         try await Task.sleep(for: .milliseconds(120))
 
@@ -479,11 +484,11 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         return ClearskyBlocklistResult(actors: [], totalCount: 0)
     }
 
-    override func fetchBlockingCount(for _: AppAccount) async throws -> Int {
+    override func fetchBlockingCount(for _: AppAccount, forceRefresh _: Bool = false) async throws -> Int {
         2
     }
 
-    override func fetchBlockedByCount(for _: AppAccount) async throws -> Int {
+    override func fetchBlockedByCount(for _: AppAccount, forceRefresh _: Bool = false) async throws -> Int {
         0
     }
 
@@ -491,7 +496,11 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         0
     }
 
-    override func fetchClearskyBlockDIDs(endpoint _: String, for _: AppAccount) async throws -> Set<String> {
+    override func fetchClearskyBlockDIDs(
+        endpoint _: String,
+        for _: AppAccount,
+        forceRefresh _: Bool = false
+    ) async throws -> Set<String> {
         []
     }
 
