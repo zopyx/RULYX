@@ -1326,14 +1326,16 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Fetches ALL pages from a ClearSky paginated endpoint.
     /// Page 1 is fetched first; if it has 100 entries, remaining pages
-    /// are fetched in mini-batches of 3 via TaskGroup (parallel within batch).
-    /// Once a page returns < 100 entries, remaining batches are skipped.
-    /// On cancellation or errors, returns whatever was collected so far.
+    /// are fetched sequentially with retries. A `404` response marks the end
+    /// of the data. Any other HTTP error or decode failure is retried up to
+    /// 3 times with exponential backoff, then thrown so callers can decide
+    /// whether to accept a partial result.
     private func fetchClearskyEntries(
         actorDID: String,
         endpoint: String,
         onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
-        ignoreCache: Bool = false
+        ignoreCache: Bool = false,
+        toleratePartialErrors: Bool = false
     ) async throws -> [ClearskyBlocklistEntry] {
         // Check BlueskyAPICache (2-min TTL) to avoid full pagination on every dashboard load
         let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
@@ -1353,7 +1355,10 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
 
         // Step 1: fetch page 1 synchronously — determines if more pages exist
-        let page1 = try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: 1)
+        guard let page1 = try await fetchClearskyPageWithRetries(actorDID: actorDID, endpoint: endpoint, page: 1) else {
+            // 404 on page 1 means there is no blocklist data for this actor.
+            return []
+        }
         var seenDIDs = Set(page1.map(\.did))
         await onProgress?(seenDIDs.count)
         guard page1.count >= 100 else {
@@ -1362,53 +1367,51 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
 
         var allEntries = page1
-        let batchSize = 3
-        var page = 2
+        let maxPages = 50
+        var completedWithoutError = true
 
-        // Step 2: fetch remaining pages in mini-batches (parallel within batch)
-        while page <= 50 {
+        // Step 2: fetch remaining pages sequentially with retries. Stopping at the
+        // first short page (or 404) prevents treating transient HTTP errors as EOF.
+        for page in 2 ... maxPages {
             try Task.checkCancellation()
 
-            let batchStart = page
-            let batchEnd = min(page + batchSize - 1, 50)
-            var batchResults: [(Int, [ClearskyBlocklistEntry])] = []
-
-            try await withThrowingTaskGroup(of: (Int, [ClearskyBlocklistEntry]).self) { group in
-                for p in batchStart ... batchEnd {
-                    group.addTask { [self] in
-                        let entries = await (try? fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: p)) ?? []
-                        return (p, entries)
-                    }
-                }
-
-                for try await (p, entries) in group {
-                    batchResults.append((p, entries))
-                }
-            }
-
-            // Process batch results, sorted by page number
-            var foundLast = false
-            for (p, entries) in batchResults.sorted(by: { $0.0 < $1.0 }) {
-                allEntries.append(contentsOf: entries)
-                for entry in entries {
-                    seenDIDs.insert(entry.did)
-                }
-                if entries.count < 100 {
-                    AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(p) (\(entries.count) entries)")
-                    foundLast = true
+            let entries: [ClearskyBlocklistEntry]
+            do {
+                guard let pageEntries = try await fetchClearskyPageWithRetries(
+                    actorDID: actorDID,
+                    endpoint: endpoint,
+                    page: page
+                ) else {
+                    // 404 marks the end of the paginated data.
                     break
                 }
+                entries = pageEntries
+            } catch {
+                if toleratePartialErrors {
+                    completedWithoutError = false
+                    AppLogger.http.warning("Clearsky \(endpoint)/\(actorDID): stopped at page \(page) after retries: \(error.localizedDescription)")
+                    break
+                }
+                throw error
+            }
+
+            allEntries.append(contentsOf: entries)
+            for entry in entries {
+                seenDIDs.insert(entry.did)
             }
             await onProgress?(seenDIDs.count)
-            if foundLast {
+
+            guard entries.count >= 100 else {
+                AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(page) (\(entries.count) entries)")
                 break
             }
-
-            page = batchEnd + 1
         }
 
-        // Cache the complete result
-        await cacheClearskyEntries(allEntries, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
+        // Only cache a complete, successful fetch so the dashboard count
+        // never persists a partial result from a flaky detail load.
+        if completedWithoutError {
+            await cacheClearskyEntries(allEntries, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
+        }
         return allEntries
     }
 
@@ -1424,12 +1427,42 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         AppLogger.performance.debug("Clearsky cache WRITE for \(endpoint)/\(actorDID) (\(entries.count) entries)")
     }
 
-    /// Fetches a single page from ClearSky. Returns the parsed entries or
-    /// an empty array if the page doesn't exist (non-2xx / decode failure).
-    private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry] {
-        if Task.isCancelled {
-            return []
+    /// Fetches a single page from ClearSky with exponential backoff on retryable failures.
+    /// - Returns `nil` when the server responds with `404` (end of paginated data).
+    /// - Throws on network errors, non-2xx status codes other than `404`,
+    ///   decode failures, or cancellation.
+    private func fetchClearskyPageWithRetries(
+        actorDID: String,
+        endpoint: String,
+        page: Int,
+        maxRetries: Int = 3
+    ) async throws -> [ClearskyBlocklistEntry]? {
+        let baseDelay: TimeInterval = 0.5
+        let maxDelay: TimeInterval = 4.0
+        var lastError: Error?
+
+        for attempt in 0 ... maxRetries {
+            do {
+                return try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: page)
+            } catch {
+                if error is CancellationError {
+                    throw error
+                }
+                lastError = error
+                guard attempt < maxRetries else { break }
+                let delay = min(baseDelay * pow(2.0, Double(attempt)), maxDelay)
+                try await Task.sleep(for: .seconds(delay))
+            }
         }
+        throw lastError ?? BlueskyAPIError.invalidResponse
+    }
+
+    /// Fetches a single page from ClearSky.
+    /// - Returns `nil` for a `404` response, signalling the end of the data.
+    /// - Throws for cancellation, invalid URLs, non-2xx status codes other than `404`,
+    ///   and decode failures.
+    private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry]? {
+        try Task.checkCancellation()
         let urlString = page == 1
             ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
             : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
@@ -1437,20 +1470,19 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        let (data, httpResponse): (Data, HTTPURLResponse)
-        do {
-            (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
-        } catch is CancellationError {
-            return []
+        let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
+        if httpResponse.statusCode == 404 {
+            AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page) → 404 (end of data)")
+            return nil
         }
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → HTTP \(httpResponse.statusCode)")
-            return []
+            throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
         }
         guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
             let body = String(data: data, encoding: .utf8) ?? "empty"
             AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → decode failed: \(body.prefix(200))")
-            return []
+            throw BlueskyAPIError.invalidResponse
         }
         let entries = decoded.data.blocklist ?? []
         AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page): \(entries.count) entries")
@@ -1532,7 +1564,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
-        let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint, onProgress: onProgress)
+        let entries = try await fetchClearskyEntries(
+            actorDID: actorDID,
+            endpoint: endpoint,
+            onProgress: onProgress,
+            toleratePartialErrors: true
+        )
         var allDIDs = Set<String>()
         var blockedDates = [String: String]()
         for entry in entries {

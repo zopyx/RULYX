@@ -1,5 +1,5 @@
-import XCTest
 @testable import RULYX
+import XCTest
 
 /// Regression test for AGENTS.md rule: dashboard blocking count and detail
 /// view count must come from the same source — the paginated Clearsky API
@@ -19,7 +19,7 @@ final class BlockingConsistencyTests: XCTestCase {
         // ensure no call to `clearsky.app/api/total` remains in LiveBlueskyClient.
     }
 
-    func testClearskyPaginationNotTotalEndpoint() throws {
+    func testClearskyPaginationNotTotalEndpoint() {
         let fileURL = Bundle.main.url(forResource: "LiveBlueskyClient", withExtension: "swift")
         // LiveBlueskyClient.swift must not reference the /total endpoint for blocking counts.
         // If it does, counts will diverge between dashboard and detail view.

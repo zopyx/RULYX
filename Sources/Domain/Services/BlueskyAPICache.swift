@@ -27,20 +27,43 @@ final class CacheMetricsStore: @unchecked Sendable {
     private var _missCount = 0
 
     var hitCount: Int {
-        lock.lock(); defer { lock.unlock() }; return _hitCount
+        lock.lock()
+        defer { lock.unlock() }
+        return _hitCount
     }
+
     var missCount: Int {
-        lock.lock(); defer { lock.unlock() }; return _missCount
+        lock.lock()
+        defer { lock.unlock() }
+        return _missCount
     }
+
     var hitRatio: Double {
-        lock.lock(); defer { lock.unlock() }
+        lock.lock()
+        defer { lock.unlock() }
         let total = _hitCount + _missCount
         guard total > 0 else { return 0 }
         return Double(_hitCount) / Double(total)
     }
-    func incrementHit() { lock.lock(); _hitCount += 1; lock.unlock() }
-    func incrementMiss() { lock.lock(); _missCount += 1; lock.unlock() }
-    func reset() { lock.lock(); _hitCount = 0; _missCount = 0; lock.unlock() }
+
+    func incrementHit() {
+        lock.lock()
+        _hitCount += 1
+        lock.unlock()
+    }
+
+    func incrementMiss() {
+        lock.lock()
+        _missCount += 1
+        lock.unlock()
+    }
+
+    func reset() {
+        lock.lock()
+        _hitCount = 0
+        _missCount = 0
+        lock.unlock()
+    }
 }
 
 /// Metrics snapshot — value type returned from actor for precise async reads.
