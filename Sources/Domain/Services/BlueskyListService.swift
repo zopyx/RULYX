@@ -65,6 +65,9 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
     ) async throws -> [BlueskyListMember] {
         var allMembers: [BlueskyListMember] = []
         var cursor: String?
+        var previousCursor: String?
+        var pageCount = 0
+        let maxPages = 100
 
         repeat {
             let page = try await fetchListMembersPage(
@@ -74,7 +77,11 @@ final class BlueskyListService: ObservableObject, BlueskyListServicing {
                 appPassword: appPassword
             )
             allMembers.append(contentsOf: page.members)
+            previousCursor = cursor
             cursor = page.cursor
+            pageCount += 1
+            if pageCount >= maxPages { break }
+            if let cur = cursor, cur == previousCursor { break }
         } while cursor != nil
 
         return allMembers

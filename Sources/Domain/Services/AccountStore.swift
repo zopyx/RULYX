@@ -50,6 +50,10 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     private let preferredSearchKey = "bluesky.preferredSearchAccountID"
     private let passwordService = "com.ajung.RULYX.password"
 
+    // Tracks handles currently being added to prevent concurrent duplicate adds
+    // (MainActor-isolated, checked before and after the authenticate suspension point).
+    private var pendingHandles: Set<String> = []
+
     // MARK: - Init
 
     init(
@@ -156,6 +160,14 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             return .failure
         }
 
+        let normalizedHandle = trimmedHandle.lowercased()
+        if pendingHandles.contains(normalizedHandle) {
+            errorMessage = String.localized("account.error.already_exists")
+            return .failure
+        }
+        pendingHandles.insert(normalizedHandle)
+        defer { pendingHandles.remove(normalizedHandle) }
+
         isAddingAccount = true
         defer { isAddingAccount = false }
 
@@ -166,6 +178,12 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
                 entrywayURL: entrywayURL,
                 authFactorToken: nil
             )
+            // Re-check after suspension — another task may have inserted the same handle/DID
+            if accounts.contains(where: { $0.handle.caseInsensitiveCompare(session.handle) == .orderedSame }) ||
+                (session.did != nil && accounts.contains(where: { $0.did == session.did })) {
+                errorMessage = String.localized("account.error.already_exists")
+                return .failure
+            }
             let account = AppAccount(
                 handle: session.handle,
                 displayName: session.handle,
@@ -215,6 +233,18 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             return false
         }
 
+        if accounts.contains(where: { $0.handle.caseInsensitiveCompare(trimmedHandle) == .orderedSame }) {
+            errorMessage = String.localized("account.error.already_exists")
+            return false
+        }
+        let normalizedHandle = trimmedHandle.lowercased()
+        if pendingHandles.contains(normalizedHandle) {
+            errorMessage = String.localized("account.error.already_exists")
+            return false
+        }
+        pendingHandles.insert(normalizedHandle)
+        defer { pendingHandles.remove(normalizedHandle) }
+
         isAddingAccount = true
         defer { isAddingAccount = false }
 
@@ -225,6 +255,11 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
                 entrywayURL: entrywayURL,
                 authFactorToken: trimmedToken
             )
+            if accounts.contains(where: { $0.handle.caseInsensitiveCompare(session.handle) == .orderedSame }) ||
+                (session.did != nil && accounts.contains(where: { $0.did == session.did })) {
+                errorMessage = String.localized("account.error.already_exists")
+                return false
+            }
             let account = AppAccount(
                 handle: session.handle,
                 displayName: session.handle,
@@ -343,6 +378,19 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             previousActiveAccountID = nil
         }
 
+        // Remove orphaned per-DID disk caches for this account
+        if let did = account.did {
+            Task { await BlueskyAPICache.shared.clear(for: did) }
+            DashboardCache.clear(forKey: did)
+            DashboardCache.clear(forKey: account.handle)
+            RelationshipCache.clear(forKey: "blocking_\(did)")
+            RelationshipCache.clear(forKey: "blockedBy_\(did)")
+            RelationshipCache.clear(forKey: "followers_\(did)")
+            RelationshipCache.clear(forKey: "following_\(did)")
+        } else {
+            DashboardCache.clear(forKey: account.handle)
+        }
+
         persist()
     }
 
@@ -373,7 +421,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
     func switchAccount(to account: AppAccount, using client: LiveBlueskyClient) async {
         guard accounts.contains(account) else { return }
         guard account.id != activeAccountID else { return } // no-op if already active
-        AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .public)")
+        AppLogger.persistence.info("Account switch requested for \(account.handle, privacy: .private)")
         // Track the previous account before switching
         previousActiveAccountID = activeAccountID
         // Clear ALL caches — await URL/API cache, Dashboard/Relationship cache, thread cache
@@ -390,7 +438,7 @@ final class AccountStore: ObservableObject, AccountStoreProtocol {
             accounts[index].lastUsedAt = .now
         }
         persist()
-        AppLogger.persistence.info("Account switch completed for \(account.handle, privacy: .public)")
+        AppLogger.persistence.info("Account switch completed for \(account.handle, privacy: .private)")
     }
 
     /// Returns `true` if the given account has been flagged as deactivated.

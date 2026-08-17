@@ -19,11 +19,39 @@ protocol CacheMetricsProviding: AnyObject {
 
 // MARK: - CacheMetricsStore
 
-/// Thread-safe metrics storage for cache statistics.
-/// Uses a simple class with atomic-like access via the actor.
+/// Thread-safe metrics storage using NSLock — accessible from any isolation domain
+/// without data races. Actor `BlueskyAPICache` increments via this store.
 final class CacheMetricsStore: @unchecked Sendable {
-    var hitCount = 0
-    var missCount = 0
+    private let lock = NSLock()
+    private var _hitCount = 0
+    private var _missCount = 0
+
+    var hitCount: Int {
+        lock.lock(); defer { lock.unlock() }; return _hitCount
+    }
+    var missCount: Int {
+        lock.lock(); defer { lock.unlock() }; return _missCount
+    }
+    var hitRatio: Double {
+        lock.lock(); defer { lock.unlock() }
+        let total = _hitCount + _missCount
+        guard total > 0 else { return 0 }
+        return Double(_hitCount) / Double(total)
+    }
+    func incrementHit() { lock.lock(); _hitCount += 1; lock.unlock() }
+    func incrementMiss() { lock.lock(); _missCount += 1; lock.unlock() }
+    func reset() { lock.lock(); _hitCount = 0; _missCount = 0; lock.unlock() }
+}
+
+/// Metrics snapshot — value type returned from actor for precise async reads.
+struct CacheMetricsSnapshot: Sendable {
+    var hitCount: Int = 0
+    var missCount: Int = 0
+    var hitRatio: Double {
+        let total = hitCount + missCount
+        guard total > 0 else { return 0 }
+        return Double(hitCount) / Double(total)
+    }
 }
 
 // MARK: - CachedResponse
@@ -82,9 +110,7 @@ actor BlueskyAPICache: CacheMetricsProviding {
     }
 
     nonisolated var hitRatio: Double {
-        let total = metrics.hitCount + metrics.missCount
-        guard total > 0 else { return 0 }
-        return Double(metrics.hitCount) / Double(total)
+        metrics.hitRatio
     }
 
     nonisolated var currentDiskSizeBytes: Int64 {
@@ -101,8 +127,17 @@ actor BlueskyAPICache: CacheMetricsProviding {
     }
 
     nonisolated func resetMetrics() {
-        metrics.hitCount = 0
-        metrics.missCount = 0
+        metrics.reset()
+    }
+
+    /// Actor-isolated reset (use when you can await).
+    func resetMetricsAsync() {
+        metrics.reset()
+    }
+
+    /// Actor-isolated snapshot for precise metrics.
+    func snapshot() -> CacheMetricsSnapshot {
+        CacheMetricsSnapshot(hitCount: metrics.hitCount, missCount: metrics.missCount)
     }
 
     // MARK: - Public API
@@ -113,7 +148,7 @@ actor BlueskyAPICache: CacheMetricsProviding {
     func read(accountDID: String, url: String, maxAge: TimeInterval) -> (data: Data, isStale: Bool)? {
         let key = cacheKey(accountDID: accountDID, url: url)
         guard let entry = loadFromDisk(key: key) else {
-            metrics.missCount += 1
+            metrics.incrementMiss()
             return nil
         }
 
@@ -121,13 +156,13 @@ actor BlueskyAPICache: CacheMetricsProviding {
         let isStale = age > maxAge
 
         if isStale {
-            metrics.hitCount += 1
+            metrics.incrementHit()
             return (entry.data, true)
         }
 
         // Fresh hit — touch file access time for LRU tracking
         touchFile(key: key)
-        metrics.hitCount += 1
+        metrics.incrementHit()
         return (entry.data, false)
     }
 

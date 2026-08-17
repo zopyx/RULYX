@@ -12,9 +12,9 @@ enum ProviderOption: String, CaseIterable, Identifiable {
 
     var entrywayURL: URL {
         switch self {
-        case .bluesky: URL(string: "https://bsky.social")!
-        case .eurosky: URL(string: "https://eurosky.social")!
-        case .other: URL(string: "https://bsky.social")!
+        case .bluesky: URL.bskySocial
+        case .eurosky: URL(string: "https://eurosky.social") ?? URL.bskySocial
+        case .other: URL.bskySocial
         }
     }
 }

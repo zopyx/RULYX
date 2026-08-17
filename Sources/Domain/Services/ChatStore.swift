@@ -100,8 +100,10 @@ final class ChatStore: ObservableObject {
 
     /// Switches chat to `account` by discarding every cached conversation/message and
     /// rebuilding the visible conversation list from the chat service response.
+    /// Stale rebuilds are discarded via generation check (`isCurrentContext`) + `Task.isCancelled`.
     func rebuildConversations(for account: AppAccount?, appPassword: String?, clearCaches: Bool = false, showPrompts: Bool = false) async {
-        AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none", privacy: .public); clearCaches=\(clearCaches, privacy: .public); showPrompts=\(showPrompts, privacy: .public)")
+
+        AppLogger.persistence.info("Chat rebuild started for \(account?.handle ?? "none", privacy: .private); clearCaches=\(clearCaches, privacy: .public); showPrompts=\(showPrompts, privacy: .public)")
         activeAccountID = account?.id
         activeAccount = account
         activeAppPassword = appPassword
@@ -129,10 +131,12 @@ final class ChatStore: ObservableObject {
 
         if showPrompts {
             try? await Task.sleep(nanoseconds: 1_200_000_000)
+            guard !Task.isCancelled else { return }
             guard context.map(isCurrentContext) ?? false else { return }
             setStatusMessage("Reloading for \(account.handle)", autoDismiss: false)
         }
 
+        guard !Task.isCancelled else { return }
         await loadConvos()
 
         if showPrompts, context.map(isCurrentContext) ?? false {

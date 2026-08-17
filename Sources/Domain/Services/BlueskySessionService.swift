@@ -222,6 +222,8 @@ final class BlueskySessionService: BlueskySessionServicing {
 
     /// Removes every account-dependent cache before notifying the UI that credentials
     /// must be entered again. A subsequent Retry therefore cannot reuse a revoked token.
+    /// Only called for `requiresExplicitReauthentication` (revoked/invalidated/expired token),
+    /// not for transient 401s (rate limit) — caller checks that first.
     private func invalidateAuthenticationState() async {
         cachedSessions.removeAll()
         URLCache.shared.removeAllCachedResponses()
@@ -234,6 +236,11 @@ final class BlueskySessionService: BlueskySessionServicing {
     /// A revoked token is a server-side invalidation, not a transient access-token
     /// expiry. Never retry it with the old session or silently reuse the stored password.
     private func requiresExplicitReauthentication(_ error: BlueskyAPIError) -> Bool {
+        // Prefer structured error codes when available
+        if case let .unauthorized(message) = error, let msg = message?.lowercased() {
+            if msg.contains("expiredtoken") || msg.contains("invalid_token") || msg.contains("invalidtoken") { return true }
+        }
+        if case let .server(message) = error, message.lowercased().contains("expiredtoken") { return true }
         let message: String? = switch error {
         case let .unauthorized(message):
             message
@@ -243,7 +250,14 @@ final class BlueskySessionService: BlueskySessionServicing {
             nil
         }
         let normalized = message?.lowercased() ?? ""
-        return normalized.contains("revoked") || normalized.contains("invalidated") || normalized.contains("expired")
+        let withSeparators = normalized
+            .replacingOccurrences(of: "_", with: " ")
+            .replacingOccurrences(of: "-", with: " ")
+        return withSeparators.contains("revoked")
+            || withSeparators.contains("invalidated")
+            || withSeparators.contains("invalid token")
+            || normalized.contains("invalid_token")
+            || normalized.contains("expire")
     }
 
     /// Posts one account-scoped notification after credentials can no longer recover the session.

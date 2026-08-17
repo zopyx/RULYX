@@ -53,13 +53,9 @@ private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @u
             return
         }
 
-        // Enforce TLS 1.2+ by requiring at least a valid certificate chain.
-        var secResult = SecTrustResultType.invalid
-        guard SecTrustEvaluateWithError(serverTrust, nil),
-              SecTrustGetTrustResult(serverTrust, &secResult) == errSecSuccess,
-              secResult == .proceed || secResult == .unspecified
-        else {
-            AppLogger.http.error("Pinning: \(challenge.protectionSpace.host) → TLS evaluation failed (result: \(secResult.rawValue))")
+        // Require valid certificate chain (TLS 1.2+).
+        guard SecTrustEvaluateWithError(serverTrust, nil) else {
+            AppLogger.http.error("Pinning: \(challenge.protectionSpace.host) → TLS evaluation failed")
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
@@ -167,19 +163,37 @@ struct HTTPClient {
     private let pinnedHashes: Set<String>
 
     /// Default pinned certificate hashes for known RULYX API endpoints.
-    /// These are SHA-256 hashes of the raw public key bytes
-    /// (SecKeyCopyExternalRepresentation), NOT SPKI hashes.
-    /// Generated from iOS runtime — use Pinning: logs to verify.
+    /// These are SHA-256 hashes of the public key bytes as returned by `SecKeyCopyExternalRepresentation`:
+    /// - EC endpoints: uncompressed public key point.
+    /// - RSA endpoints: PKCS#1 RSAPublicKey DER.
+    /// Use the Swift Security framework or `scripts/ios-pin-hash.py` to compute; do not trust `openssl rsa` defaults.
+    ///
+    /// Includes leaf, intermediate, and root hashes so rotation of any single cert does not break the app.
     static let defaultPinnedHashes: Set<String> = [
-        // bsky.social (PDS / AppView)
+        // bsky.social (PDS / AppView) — RSA leaf + Amazon intermediate + Amazon root
+        "WFhJn2TdqWwdXy6GW6hkUx6z5lPgtdLTj4FKHxQ+DFE=",
+        "6nxPsa2kTA3VkIjhZo/4AwlOJ2QHhMEFG2KpZqkgNGk=",
+        "UAJ/9yOqq6nk4CX2QtZgDmyT6JHYlkBfihOzezH/8cs=",
         "Q2N4I92yheflRVU0ILb5pSuK1GJem8UeAXc3wZ8t4lg=",
-        // public.api.bsky.app (profile batch, stats, posts) — leaf cert
+        // public.api.bsky.app (profile batch, stats, posts) — RSA leaf + Let's Encrypt intermediate/root
+        "eelLErHkHORHz4iW6dKQOy14LvowA1ScVtfDvl8jDpc=",
         "g5TwoFJudhMvvGmccUw3nojpZxR2H1nG93LLQ6LExzM=",
-        // api.clearsky.app (moderation lists)
+        "Hy81vkYUgs1Asa55LFV4+vfUaPt3QgaPuLTHTkAxqmE=",
+        "3udbYNAibUAofT8NAf6ktVK0UZSjEhF99kRyhtyJ2yM=",
+        "9Fk6HgfMnM7/vtnBHcUhg1b3gU2bIpSd50XmKZkMbGA=",
+        // api.clearsky.app (moderation lists) — EC leaf + Google WE1 intermediate + GTS Root R4
         "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",
-        // public.api.clearsky.services (blocklist, get-did)
         "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
-        // plc.directory (PLC audit log)
+        "H7AMYAvicN2+UcFPBz3kJXCDmGrTItZh4ujUBK8hoWg=",
+        "YSoUL4CBzo5aJ/ES9gSZTsavsgtHsiLLnTG+BKUdork=",
+        // public.api.clearsky.services (blocklist, get-did) — EC leaf + Google WE1 intermediate + GTS Root R4
+        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
+        "H7AMYAvicN2+UcFPBz3kJXCDmGrTItZh4ujUBK8hoWg=",
+        "YSoUL4CBzo5aJ/ES9gSZTsavsgtHsiLLnTG+BKUdork=",
+        // plc.directory (PLC audit log) — RSA leaf + Amazon intermediate + Amazon root
+        "17wmhBIxAP8+6PakBtqWz1krJb43Mb+lvSqQIi6jl6I=",
+        "/LWYS0bnqApLztW89p14Ilm/6JdJpH9mSOpWaxSNCL0=",
+        "UAJ/9yOqq6nk4CX2QtZgDmyT6JHYlkBfihOzezH/8cs=",
         "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",
     ]
 
@@ -211,14 +225,24 @@ struct HTTPClient {
         }
     }
 
-    /// Deduplicates in-flight network requests by method + URL.
-    /// If a request to the same URL with the same HTTP method is already in flight,
-    /// the second caller awaits the same task instead of starting a duplicate network call.
+    /// Deduplicates in-flight network requests by method + canonicalized URL.
+    /// Query items are sorted alphabetically so `?a=1&b=2` and `?b=2&a=1` share a key.
+    /// Body and auth are intentionally excluded — only idempotent GETs should use `dedupedData`.
     func dedupedData(for request: URLRequest, source: String) async throws -> (Data, HTTPURLResponse) {
-        let cacheKey = "\(request.httpMethod ?? "GET"):\(request.url?.absoluteString ?? "")"
+        let cacheKey = "\(request.httpMethod ?? "GET"):\(Self.canonicalURLString(for: request.url))"
         return try await Self.inflightManager.dedup(key: cacheKey) {
             try await data(for: request, source: source)
         }
+    }
+
+    private static func canonicalURLString(for url: URL?) -> String {
+        guard let url, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return url?.absoluteString ?? ""
+        }
+        if let items = components.queryItems, !items.isEmpty {
+            components.queryItems = items.sorted { ($0.name, $0.value ?? "") < ($1.name, $1.value ?? "") }
+        }
+        return components.url?.absoluteString ?? url.absoluteString
     }
 
     func data(

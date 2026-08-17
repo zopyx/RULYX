@@ -125,6 +125,11 @@ final class ListsViewModel {
             isRefreshing = true
         }
         errorMessage = nil
+        defer {
+            isLoading = false
+            isRefreshing = false
+            isFromCache = false
+        }
 
         // Fire all four fetches in parallel with cooperative cancellation.
         // If fetchLists throws, the group cancels the remaining tasks.
@@ -145,14 +150,17 @@ final class ListsViewModel {
                 await MainActor.run { self.activeProfile = result }
             }
             group.addTask {
-                guard let count = try? await clientRef.fetchBlockingCount(for: account) else { return }
+                // Coalesced: fetch both counts concurrently via DID-only cacheable path
+                async let blockingTask: Int? = try? await clientRef.fetchBlockingCount(for: account)
+                async let blockedByTask: Int? = try? await clientRef.fetchBlockedByCount(for: account)
+                let (blocking, blockedBy) = await (blockingTask, blockedByTask)
                 guard !Task.isCancelled else { return }
-                await MainActor.run { self.blockingCount = count }
-            }
-            group.addTask {
-                guard let count = try? await clientRef.fetchBlockedByCount(for: account) else { return }
-                guard !Task.isCancelled else { return }
-                await MainActor.run { self.blockedByCount = count }
+                if let count = blocking {
+                    await MainActor.run { self.blockingCount = count }
+                }
+                if let count = blockedBy {
+                    await MainActor.run { self.blockedByCount = count }
+                }
             }
 
             do {
@@ -169,9 +177,6 @@ final class ListsViewModel {
         }
 
         persistCache(forKey: cacheKey)
-        isFromCache = false
-        isLoading = false
-        isRefreshing = false
     }
 
     /// Applies a cached `DashboardCacheData` snapshot to all properties.

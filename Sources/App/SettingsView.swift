@@ -321,7 +321,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button(localizationManager.localized("settings.clear_cache"), role: .destructive) {
-                    container.auth.clearCache()
+                    Task { await container.auth.clearAllCaches() }
                     cacheStatusMessage = loc("settings.cache_cleared")
                 }
                 Button(localizationManager.localized("settings.cancel"), role: .cancel) {}

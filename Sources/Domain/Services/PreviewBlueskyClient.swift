@@ -25,7 +25,7 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
             handle: handle,
             accessJWT: "preview-access",
             refreshJWT: nil,
-            pdsURL: URL(string: "https://bsky.social")!
+            pdsURL: URL.bskySocial
         )
     }
 

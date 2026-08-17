@@ -97,10 +97,11 @@ struct PostClassificationView: View {
                 if !results.isEmpty {
                     Section {
                         ForEach(Array(results.keys.sorted()), id: \.self) { modelID in
-                            if let model = catalogModels.first(where: { $0.id == modelID }) {
+                            if let model = catalogModels.first(where: { $0.id == modelID }),
+                               let result = results[modelID] {
                                 ResultCard(
                                     modelName: model.name,
-                                    result: results[modelID]!
+                                    result: result
                                 )
                             }
                         }

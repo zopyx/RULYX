@@ -22,4 +22,7 @@ protocol BlueskyAuthServicing: Sendable {
 
     /// Clear the internal session cache.
     func clearCache()
+
+    /// Async clear that awaits disk cache removal (preferred for account switch).
+    func clearAllCaches() async
 }

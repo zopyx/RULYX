@@ -369,7 +369,7 @@ struct RULYXApp: App {
     private func reloadChatForActiveAccount(showPrompts: Bool) async {
         let account = deps.accountStore.activeAccount
         let appPassword = account.flatMap { deps.accountStore.appPassword(for: $0) }
-        AppLogger.persistence.info("Chat account reload requested for \(account?.handle ?? "none", privacy: .public)")
+        AppLogger.persistence.info("Chat account reload requested for \(account?.handle ?? "none", privacy: .private)")
         await deps.chatStore.rebuildConversations(
             for: account,
             appPassword: appPassword,

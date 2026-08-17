@@ -32,9 +32,18 @@ enum DashboardCache {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode(DashboardCacheData.self, from: data)
         } catch {
-            AppLogger.persistence.error("DashboardCache load failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            // Missing file is expected on first launch — don't log as error
+            let nsError = error as NSError
+            if nsError.domain != NSCocoaErrorDomain || nsError.code != NSFileReadNoSuchFileError {
+                AppLogger.persistence.error("DashboardCache load failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            }
             return nil
         }
+    }
+
+    /// Async variant — runs file IO off the main actor to avoid UI jank.
+    static func loadAsync(forKey key: String) async -> DashboardCacheData? {
+        await Task.detached(priority: .userInitiated) { load(forKey: key) }.value
     }
 
     static func save(_ data: DashboardCacheData, forKey key: String) {
@@ -42,10 +51,15 @@ enum DashboardCache {
         do {
             try FileManager.default.createDirectory(at: cachesDirectory, withIntermediateDirectories: true)
             let encoded = try JSONEncoder().encode(data)
-            try encoded.write(to: url)
+            try encoded.write(to: url, options: .atomic)
         } catch {
             AppLogger.persistence.error("DashboardCache save failed for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// Async variant — runs file IO off the main actor.
+    static func saveAsync(_ data: DashboardCacheData, forKey key: String) async {
+        await Task.detached(priority: .utility) { save(data, forKey: key) }.value
     }
 
     static func clear(forKey key: String) {

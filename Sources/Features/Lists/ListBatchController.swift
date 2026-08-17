@@ -4,6 +4,8 @@ import Foundation
 
 /// Executes bulk moderation actions (add, remove, block, mute, etc.) on
 /// lists of actors with batching, retry, progress callbacks, and cancellation support.
+/// `@MainActor`-isolated so bulk mutations are serialized with `fetchListMembers`/`LiveBlueskyClient`
+/// (also `@MainActor`) — no concurrent count mismatch.
 @MainActor
 final class ListBatchController {
     private let baseDelay: UInt64
