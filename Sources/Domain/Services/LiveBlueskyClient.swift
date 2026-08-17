@@ -207,11 +207,37 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
     }
 
-    /// Fetches a single list by URI via the owning account's list fetch.
-    /// Returns `nil` if the list is not found among the account's lists.
+    /// Fetches a single list by URI via `app.bsky.graph.getList`.
+    /// Returns `nil` if the list cannot be resolved.
     func fetchList(uri: String, account: AppAccount, appPassword: String?) async throws -> BlueskyList? {
-        let lists = try await fetchLists(for: account, appPassword: appPassword)
-        return lists.first { $0.id == uri }
+        let response: GetListResponse = try await sessionService.performAuthenticatedRequest(
+            account: account,
+            appPassword: appPassword
+        ) { authSession in
+            let queryItems = [
+                URLQueryItem(name: "list", value: uri),
+                URLQueryItem(name: "limit", value: "1"),
+            ]
+
+            return try await requestExecutor.send(
+                path: "app.bsky.graph.getList",
+                method: "GET",
+                queryItems: queryItems,
+                accessToken: authSession.accessJWT,
+                hostURL: authSession.pdsURL
+            )
+        }
+
+        guard let list = response.list else { return nil }
+        return BlueskyList(
+            id: list.uri,
+            name: list.name,
+            description: list.description ?? "",
+            memberCount: list.listItemCount,
+            kind: list.purpose.kind,
+            avatarURL: URL(string: list.avatar ?? ""),
+            cid: list.cid
+        )
     }
 
     /// Fetches all members of a list with automatic pagination (capped at 100 pages to prevent infinite loops on buggy PDS).
