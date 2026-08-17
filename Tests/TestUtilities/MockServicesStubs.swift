@@ -43,7 +43,18 @@ import Foundation
         throw BlueskyAPIError.invalidResponse
     }
 
-    func createPost(text _: String, images _: [PostImageAttachment]?, video _: PostVideoAttachment?, external _: PostExternalAttachment?, replyTo _: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?, quote _: (uri: String, cid: String)?, threadGate _: ThreadGateRule?, allowQuoting _: Bool, account _: AppAccount, appPassword _: String?) async throws -> CreateRecordResponse {
+    func createPost(
+        text _: String,
+        images _: [PostImageAttachment]?,
+        video _: PostVideoAttachment?,
+        external _: PostExternalAttachment?,
+        replyTo _: (parentURI: String, parentCID: String, rootURI: String, rootCID: String)?,
+        quote _: (uri: String, cid: String)?,
+        threadGate _: ThreadGateRule?,
+        allowQuoting _: Bool,
+        account _: AppAccount,
+        appPassword _: String?
+    ) async throws -> CreateRecordResponse {
         CreateRecordResponse(uri: "at://mock/post", cid: "cid")
     }
 

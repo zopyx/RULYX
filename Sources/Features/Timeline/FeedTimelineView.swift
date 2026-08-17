@@ -195,7 +195,7 @@ struct FeedTimelineView: View {
                   let appPassword = accountStore.appPassword(for: account) else { return }
             await likerActions.loadAvailableTargetLists(using: container.liveClient, internalListStore: internalListStore, account: account, appPassword: appPassword)
         }
-        .task(id: viewModel.state) {
+        .task(id: viewModel.visibleEntries.count, priority: .utility) {
             await classifyVisiblePosts()
         }
         .onDisappear {
@@ -582,12 +582,27 @@ struct FeedTimelineView: View {
         let entries = viewModel.visibleEntries
         let uncached = entries.filter { aiClassifications[$0.post.uri] == nil }
         guard !uncached.isEmpty else { return }
+        // Batch in groups of 8 and check cancellation between batches (T08)
+        let batches = stride(from: 0, to: uncached.count, by: 8).map { Array(uncached[$0 ..< min($0 + 8, uncached.count)]) }
         let engine = InferenceEngine()
         var newScores = aiClassifications
-        for entry in uncached {
-            guard let text = entry.post.safeRecord.text, !text.isEmpty else { continue }
-            let scores = engine.classify(text: text)
-            newScores[entry.post.uri] = scores
+        for batch in batches {
+            if Task.isCancelled {
+                return
+            }
+            for entry in batch {
+                guard let text = entry.post.safeRecord.text, !text.isEmpty else { continue }
+                if Task.isCancelled {
+                    return
+                }
+                let scores = engine.classify(text: text)
+                newScores[entry.post.uri] = scores
+            }
+            // Yield between batches to keep scroll responsive
+            await Task.yield()
+        }
+        if Task.isCancelled {
+            return
         }
         aiClassifications = newScores
     }

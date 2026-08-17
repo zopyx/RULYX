@@ -44,7 +44,8 @@ struct PostTextContent: View {
         self.font = font
         self.lineLimit = lineLimit
         self.foregroundStyle = foregroundStyle
-        _attributedText = State(initialValue: postAttributedString(from: text))
+        // Use cached value if available, else empty until async load (T04)
+        _attributedText = State(initialValue: PostTextCache.shared.cachedSync(text) ?? AttributedString(text))
     }
 
     // MARK: - Body
@@ -68,8 +69,13 @@ struct PostTextContent: View {
                 }
                 return .systemAction
             })
-            .onChange(of: text) {
-                attributedText = postAttributedString(from: text)
+            .task(id: text) {
+                if let cached = PostTextCache.shared.cachedSync(text) {
+                    attributedText = cached
+                } else {
+                    let result = await PostTextCache.shared.attributedString(for: text)
+                    attributedText = result
+                }
             }
         if let onTapThread {
             textContent
@@ -114,4 +120,34 @@ private enum MentionTextRegex {
     static let shared = try! NSRegularExpression(
         pattern: "@[a-zA-Z0-9_]([a-zA-Z0-9_.-]*[a-zA-Z0-9_])?"
     )
+}
+
+// MARK: - PostTextCache (T04)
+
+/// Caches attributed strings off main thread to keep scrolling smooth.
+/// `NSDataDetector` + `NSRegularExpression` are ~1–3 ms per post on main; with 50 rows that blocks scroll.
+final class PostTextCache: @unchecked Sendable {
+    static let shared = PostTextCache()
+    private let cache = NSCache<NSString, NSStringWrapper>()
+    private let queue = DispatchQueue(label: "PostTextCache", qos: .userInitiated)
+    private final class NSStringWrapper: NSObject { let value: AttributedString
+        init(_ v: AttributedString) {
+            value = v
+        }
+    }
+
+    func cachedSync(_ text: String) -> AttributedString? {
+        cache.object(forKey: text as NSString)?.value
+    }
+
+    func attributedString(for text: String) async -> AttributedString {
+        if let cached = cachedSync(text) {
+            return cached
+        }
+        let result = await Task.detached(priority: .userInitiated) {
+            postAttributedString(from: text)
+        }.value
+        cache.setObject(NSStringWrapper(result), forKey: text as NSString)
+        return result
+    }
 }

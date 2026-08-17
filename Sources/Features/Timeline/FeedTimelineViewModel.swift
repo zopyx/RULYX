@@ -263,6 +263,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             knownURIs = Set(entries.map(\.post.uri))
             cursor = response.cursor
             state = entries.isEmpty ? .empty : (cursor == nil ? .exhausted : .loaded)
+            Task(priority: .utility) { await prefetchImages(for: response.feed) }
         } catch {
             guard !AppError.isCancellation(error) else { return }
             state = .failed(AppError.userMessage(from: error))
@@ -294,6 +295,7 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             knownURIs = Set(entries.map(\.post.uri))
             cursor = response.cursor
             recordAnalytics()
+            Task(priority: .utility) { await prefetchImages(for: response.feed) }
             if lastRefreshHadPosts {
                 newPostCount = knownURIs.subtracting(oldKnown).count
             }
@@ -364,10 +366,29 @@ final class FeedTimelineViewModel: TimelineViewModelProtocol {
             knownURIs.formUnion(response.feed.map(\.post.uri))
             self.cursor = response.cursor
             state = response.cursor == nil ? .exhausted : .loaded
+            Task(priority: .utility) { await prefetchImages(for: response.feed) }
         } catch {
             guard !AppError.isCancellation(error) else { return }
             state = .loadMoreFailed(AppError.userMessage(from: error))
             AppLogger.moderation.error("Failed to load more timeline: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    // MARK: - Prefetch (T07)
+
+    /// Warm ThumbnailPipeline for images in the given entries at low priority
+    /// so they are ready before the row scrolls into view.
+    private func prefetchImages(for entries: [RichFeedEntry]) async {
+        let urls: [URL] = entries.flatMap { entry in
+            entry.post.embed?.images?.compactMap { $0.thumb.flatMap(URL.init) } ?? []
+        }
+        guard !urls.isEmpty else { return }
+        await withTaskGroup(of: Void.self) { group in
+            for url in urls.prefix(20) {
+                group.addTask(priority: .utility) {
+                    _ = try? await ThumbnailPipeline.shared.image(for: url, maxPixelSize: 360, scale: 2, ttl: 86400)
+                }
+            }
         }
     }
 

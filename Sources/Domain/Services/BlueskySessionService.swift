@@ -238,9 +238,13 @@ final class BlueskySessionService: BlueskySessionServicing {
     private func requiresExplicitReauthentication(_ error: BlueskyAPIError) -> Bool {
         // Prefer structured error codes when available
         if case let .unauthorized(message) = error, let msg = message?.lowercased() {
-            if msg.contains("expiredtoken") || msg.contains("invalid_token") || msg.contains("invalidtoken") { return true }
+            if msg.contains("expiredtoken") || msg.contains("invalid_token") || msg.contains("invalidtoken") {
+                return true
+            }
         }
-        if case let .server(message) = error, message.lowercased().contains("expiredtoken") { return true }
+        if case let .server(message) = error, message.lowercased().contains("expiredtoken") {
+            return true
+        }
         let message: String? = switch error {
         case let .unauthorized(message):
             message

@@ -183,7 +183,10 @@ final class ChatAPIDTOsTests: XCTestCase {
 
     func testLogAddReactionDTODecoding() throws {
         let json = Data("""
-        {"convoId":"cid1","message":{"$type":"chat.bsky.convo.defs#messageView","id":"m1","rev":"r1","text":"Hi","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"},"reaction":{"value":"❤️","sender":{"did":"did:plc:s"},"createdAt":"2024-01-01T00:00:00Z"},"rev":"r1"}
+        {"convoId":"cid1","message":{"$type":"chat.bsky.convo.defs#messageView","id":"m1",\
+        "rev":"r1","text":"Hi","sender":{"did":"did:plc:s"},"sentAt":"2024-01-01T00:00:00Z"},\
+        "reaction":{"value":"❤️","sender":{"did":"did:plc:s"},"createdAt":"2024-01-01T00:00:00Z"},\
+        "rev":"r1"}
         """.utf8)
         let dto = try JSONDecoder().decode(LogAddReactionDTO.self, from: json)
         XCTAssertEqual(dto.reaction?.value, "❤️")

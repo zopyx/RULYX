@@ -14,7 +14,9 @@ enum AccountContextResolver {
     }
 
     /// Account used for mutations (block/mute/follow/list membership) — always active.
-    static func actingAccount(active: AppAccount?) -> AppAccount? { active }
+    static func actingAccount(active: AppAccount?) -> AppAccount? {
+        active
+    }
 
     /// Resolve from `AccountStore` directly (convenience).
     @MainActor
