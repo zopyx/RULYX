@@ -100,8 +100,8 @@ struct ListsView: View {
                                 } label: {
                                     relationshipRow(
                                         label: loc("lists.blocked_by"),
-                                        count: viewModel.isRefreshing ? nil : viewModel.blockedByCount,
-                                        isLoading: viewModel.blockedByCount == nil && viewModel.isLoading && !viewModel.isRefreshing
+                                        count: viewModel.blockedByCount,
+                                        isLoading: viewModel.blockedByCount == nil && (viewModel.isLoading || viewModel.isRefreshing)
                                     )
                                 }
                                 .buttonStyle(.plain)

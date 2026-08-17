@@ -147,7 +147,11 @@ private final class MockListsClient: LiveBlueskyClient {
     var shouldFailBlocking = false
     var blockedActors: [BlueskyActor] = []
 
-    override func fetchLists(for account: AppAccount, appPassword _: String?) async throws -> [BlueskyList] {
+    override func fetchLists(
+        for account: AppAccount,
+        appPassword _: String?,
+        forceRefresh _: Bool = false
+    ) async throws -> [BlueskyList] {
         if shouldFailLists {
             throw BlueskyAPIError.server("Failed")
         }
@@ -157,18 +161,23 @@ private final class MockListsClient: LiveBlueskyClient {
         ]
     }
 
-    override func fetchProfile(did actorDID: String, account: AppAccount, appPassword _: String?) async throws -> BlueskyProfile {
+    override func fetchProfile(
+        did actorDID: String,
+        account: AppAccount,
+        appPassword _: String?,
+        forceRefresh _: Bool = false
+    ) async throws -> BlueskyProfile {
         makeProfile(did: actorDID, handle: account.handle)
     }
 
-    override func fetchBlockingCount(for _: AppAccount) async throws -> Int {
+    override func fetchBlockingCount(for _: AppAccount, forceRefresh _: Bool = false) async throws -> Int {
         if shouldFailBlocking {
             throw BlueskyAPIError.server("Failed")
         }
         return blockedActors.count
     }
 
-    override func fetchBlockedByCount(for _: AppAccount) async throws -> Int {
+    override func fetchBlockedByCount(for _: AppAccount, forceRefresh _: Bool = false) async throws -> Int {
         0
     }
 }

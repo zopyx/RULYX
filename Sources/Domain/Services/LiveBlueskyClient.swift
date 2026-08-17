@@ -128,7 +128,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                     // Stale: return cached but fire background refresh (strong capture — self is long-lived singleton;
                     // weak would silently drop refresh if LiveBlueskyClient were deallocated, leaving stale forever).
                     Task { [self] in
-                        _ = try? await self.fetchListsNetwork(account: account, appPassword: appPassword)
+                        _ = try? await fetchListsNetwork(account: account, appPassword: appPassword)
                     }
                     return lists
                 }
@@ -228,8 +228,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             previousCursor = cursor
             cursor = page.cursor
             pageCount += 1
-            if pageCount >= maxPages { break }
-            if let cur = cursor, cur == previousCursor { break }
+            if pageCount >= maxPages {
+                break
+            }
+            if let cur = cursor, cur == previousCursor {
+                break
+            }
         } while cursor != nil
 
         return allMembers
@@ -356,8 +360,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             previousCursor = cursor
             cursor = response.cursor
             pageCount += 1
-            if pageCount >= maxPages { break }
-            if let cur = cursor, cur == previousCursor { break }
+            if pageCount >= maxPages {
+                break
+            }
+            if let cur = cursor, cur == previousCursor {
+                break
+            }
         } while cursor != nil
 
         return allLists.sorted { lhs, rhs in
@@ -736,8 +744,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 previousCursor = cursor
                 cursor = response.cursor
                 pageCount += 1
-                if pageCount >= maxPages { break }
-                if let cur = cursor, cur == previousCursor { break }
+                if pageCount >= maxPages {
+                    break
+                }
+                if let cur = cursor, cur == previousCursor {
+                    break
+                }
             } while cursor != nil
 
             return allDIDs
@@ -780,8 +792,12 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
                 previousCursor = cursor
                 cursor = response.cursor
                 pageCount += 1
-                if pageCount >= maxPages { break }
-                if let cur = cursor, cur == previousCursor { break }
+                if pageCount >= maxPages {
+                    break
+                }
+                if let cur = cursor, cur == previousCursor {
+                    break
+                }
             } while cursor != nil
 
             return result
@@ -1222,13 +1238,23 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
     /// Returns the total count of actors the account has blocked.
     /// DID-only (no profile resolution) — uses the same paginated source as detail views.
     func fetchBlockingCount(for account: AppAccount) async throws -> Int {
-        try await fetchClearskyBlockDIDs(endpoint: "blocklist", for: account).count
+        try await fetchBlockingCount(for: account, forceRefresh: false)
+    }
+
+    /// Returns the total count of actors the account has blocked, optionally bypassing cache.
+    func fetchBlockingCount(for account: AppAccount, forceRefresh: Bool) async throws -> Int {
+        try await fetchClearskyBlockDIDs(endpoint: "blocklist", for: account, forceRefresh: forceRefresh).count
     }
 
     /// Returns the total count of actors that have blocked the account.
     /// DID-only (no profile resolution) — uses the same paginated source as detail views.
     func fetchBlockedByCount(for account: AppAccount) async throws -> Int {
-        try await fetchClearskyBlockDIDs(endpoint: "single-blocklist", for: account).count
+        try await fetchBlockedByCount(for: account, forceRefresh: false)
+    }
+
+    /// Returns the total count of actors that have blocked the account, optionally bypassing cache.
+    func fetchBlockedByCount(for account: AppAccount, forceRefresh: Bool) async throws -> Int {
+        try await fetchClearskyBlockDIDs(endpoint: "single-blocklist", for: account, forceRefresh: forceRefresh).count
     }
 
     /// Returns the count of actors that block the account but are not blocked back.
@@ -1242,19 +1268,56 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return Set(entries.map(\.did))
     }
 
+    /// Public wrapper: fetches DIDs from a ClearSky endpoint (DIDs only, no profile resolution).
+    func fetchClearskyBlockDIDs(endpoint: String, for account: AppAccount) async throws -> Set<String> {
+        try await fetchClearskyBlockDIDs(endpoint: endpoint, for: account, forceRefresh: false)
+    }
+
+    /// Public wrapper with optional cache bypass for explicit refreshes.
+    func fetchClearskyBlockDIDs(
+        endpoint: String,
+        for account: AppAccount,
+        forceRefresh: Bool
+    ) async throws -> Set<String> {
+        try guardClearskyAvailable()
+        let actorDID = try await resolveAccountDID(account)
+        return try await fetchClearskyDIDs(actorDID: actorDID, endpoint: endpoint, ignoreCache: forceRefresh)
+    }
+
+    /// DID-only variant that can bypass the local cache for explicit refreshes.
+    private func fetchClearskyDIDs(
+        actorDID: String,
+        endpoint: String,
+        ignoreCache: Bool
+    ) async throws -> Set<String> {
+        let entries = try await fetchClearskyEntries(
+            actorDID: actorDID,
+            endpoint: endpoint,
+            ignoreCache: ignoreCache
+        )
+        return Set(entries.map(\.did))
+    }
+
     /// Fetches ALL pages from a ClearSky paginated endpoint.
     /// Page 1 is fetched first; if it has 100 entries, remaining pages
-    /// are fetched in mini-batches of 5 via TaskGroup (parallel within batch).
+    /// are fetched in mini-batches of 3 via TaskGroup (parallel within batch).
     /// Once a page returns < 100 entries, remaining batches are skipped.
     /// On cancellation or errors, returns whatever was collected so far.
     private func fetchClearskyEntries(
         actorDID: String,
         endpoint: String,
-        onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil
+        onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
+        ignoreCache: Bool = false
     ) async throws -> [ClearskyBlocklistEntry] {
         // Check BlueskyAPICache (2-min TTL) to avoid full pagination on every dashboard load
         let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
-        if let cached = await BlueskyAPICache.shared.read(accountDID: actorDID, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.relationship) {
+        if !ignoreCache,
+           let cached = await BlueskyAPICache.shared.read(
+               accountDID: actorDID,
+               url: cacheURL,
+               maxAge: BlueskyAPICache.DefaultTTL.relationship
+           )
+        {
             if !cached.isStale,
                let entries = try? JSONDecoder().decode([ClearskyBlocklistEntry].self, from: cached.data)
             {
@@ -1396,13 +1459,6 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
 
         return result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
-    }
-
-    /// Public wrapper: fetches DIDs from a ClearSky endpoint (DIDs only, no profile resolution).
-    func fetchClearskyBlockDIDs(endpoint: String, for account: AppAccount) async throws -> Set<String> {
-        try guardClearskyAvailable()
-        let actorDID = try await resolveAccountDID(account)
-        return try await fetchClearskyDIDs(actorDID: actorDID, endpoint: endpoint)
     }
 
     /// Resolves profiles for a list of DIDs in parallel batches of 25.
