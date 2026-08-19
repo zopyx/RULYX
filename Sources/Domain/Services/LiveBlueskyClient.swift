@@ -1699,7 +1699,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         // Pipeline profile resolution with page fetching: as each page of DIDs
         // arrives, add it to the resolver so profile lookups run concurrently
         // with the next batch of Clearsky pages.
-        let resolver = ProfileBatchResolver(httpClient: httpClient, batchSize: 50)
+        let resolver = ProfileBatchResolver(httpClient: httpClient)
 
         let entries = try await fetchClearskyEntries(
             actorDID: actorDID,
