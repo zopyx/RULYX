@@ -13,7 +13,7 @@ struct CustomSearchPostRow: View {
     @Binding var imagePreview: ImagePreviewCollection?
     @Binding var videoPreviewURL: URL?
     @Binding var showLikesForURI: String?
-    @Binding var showProfileFor: BlueskyActor?
+    let onOpenProfile: ((String) -> Void)?
     let availableTargetLists: [BlueskyList]
     var onBlockAllLikers: (() -> Void)?
     var onAddAllLikersToList: ((BlueskyList) -> Void)?
@@ -41,15 +41,7 @@ struct CustomSearchPostRow: View {
                         videoPreviewURL = url
                     }
                 },
-                onOpenProfile: { _ in
-                    let author = entry.post.safeAuthor
-                    showProfileFor = BlueskyActor(
-                        did: author.did ?? "",
-                        handle: author.handle ?? "",
-                        displayName: author.displayName,
-                        avatarURL: author.avatar.flatMap(URL.init)
-                    )
-                },
+                onOpenProfile: { handle in onOpenProfile?(handle) },
                 onShowLikes: { showLikesForURI = entry.post.uri },
                 onReportPost: onReportPost,
                 onBlockAllLikers: onBlockAllLikers,

@@ -346,7 +346,7 @@ struct CustomSearchView: View {
             imagePreview: $imagePreview,
             videoPreviewURL: $videoPreviewURL,
             showLikesForURI: $showLikesForURI,
-            showProfileFor: $showProfileFor,
+            onOpenProfile: { handle in openProfile(handle) },
             availableTargetLists: availableTargetLists,
             onBlockAllLikers: {
                 guard let account = accountStore.activeAccount,
@@ -436,6 +436,17 @@ struct CustomSearchView: View {
         guard let searchAccount,
               let appPassword = accountStore.appPassword(for: searchAccount) else { return }
         await viewModel.loadMoreNewest(account: searchAccount, appPassword: appPassword, using: container.liveClient)
+    }
+
+    private func openProfile(_ handle: String) {
+        Task {
+            do {
+                let did = try await container.liveClient.resolveHandle(handle)
+                showProfileFor = BlueskyActor(did: did, handle: handle, displayName: nil)
+            } catch {
+                showProfileFor = BlueskyActor(did: handle, handle: handle, displayName: nil)
+            }
+        }
     }
 
     private func loadAvailableTargetLists() async {

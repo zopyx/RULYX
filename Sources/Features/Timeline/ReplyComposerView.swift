@@ -210,14 +210,7 @@ struct ReplyComposerView: View {
             if let text = post.safeRecord.text, !text.isEmpty {
                 PostTextContent(
                     text: text,
-                    onOpenProfile: { handle in
-                        profileToShow = BlueskyActor(
-                            did: handle,
-                            handle: handle,
-                            displayName: nil,
-                            avatarURL: nil
-                        )
-                    },
+                    onOpenProfile: { handle in openProfile(handle) },
                     font: .subheadline,
                     lineLimit: 4,
                     foregroundStyle: .secondary
@@ -245,6 +238,17 @@ struct ReplyComposerView: View {
             selectedImages.append((data: data, mimeType: mime))
         }
         selectedItems = []
+    }
+
+    private func openProfile(_ handle: String) {
+        Task {
+            do {
+                let did = try await blueskyClient.resolveHandle(handle)
+                profileToShow = BlueskyActor(did: did, handle: handle, displayName: nil)
+            } catch {
+                profileToShow = BlueskyActor(did: handle, handle: handle, displayName: nil)
+            }
+        }
     }
 
     /// Fetches the parent post from the API to display as context.

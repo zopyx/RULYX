@@ -320,15 +320,7 @@ struct ThreadView: View {
                     videoPreviewURL = url
                 }
             },
-            onOpenProfile: { handle in
-                if let author = post.author {
-                    profileToShow = BlueskyActor(
-                        did: author.did ?? handle,
-                        handle: author.handle ?? handle,
-                        displayName: author.displayName
-                    )
-                }
-            },
+            onOpenProfile: { handle in openProfile(handle) },
             onReply: { composeContext = makeReplyContext(uri: post.uri, cid: post.cid) },
             onLike: { performLike(uri: post.uri, cid: post.cid) },
             onShowLikes: {
@@ -477,6 +469,17 @@ struct ThreadView: View {
             }
         }
         return nil
+    }
+
+    private func openProfile(_ handle: String) {
+        Task {
+            do {
+                let did = try await container.liveClient.resolveHandle(handle)
+                profileToShow = BlueskyActor(did: did, handle: handle, displayName: nil)
+            } catch {
+                profileToShow = BlueskyActor(did: handle, handle: handle, displayName: nil)
+            }
+        }
     }
 
     private func translateText(_ text: String) {

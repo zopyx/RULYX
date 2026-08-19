@@ -502,9 +502,14 @@ struct FeedTimelineView: View {
     }
 
     private func openProfile(_ handle: String) {
-        guard let entry = viewModel.visibleEntries.first(where: { $0.post.author?.handle == handle || $0.post.author?.did == handle }),
-              let author = entry.post.author else { return }
-        profileToShow = BlueskyActor(did: author.did ?? handle, handle: author.handle ?? handle, displayName: author.displayName)
+        Task {
+            do {
+                let did = try await container.liveClient.resolveHandle(handle)
+                profileToShow = BlueskyActor(did: did, handle: handle, displayName: nil)
+            } catch {
+                profileToShow = BlueskyActor(did: handle, handle: handle, displayName: nil)
+            }
+        }
     }
 
     private var newPostsBanner: some View {

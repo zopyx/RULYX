@@ -12,7 +12,7 @@ struct ConversationDetailView: View {
     @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var messageText = ""
     @State private var showProfile = false
-    @State private var mentionProfileHandle: String?
+    @State private var mentionProfileActor: BlueskyActor?
     @State private var showScrollToBottom = false
     @State private var reactionPickerMessageID: String?
     @FocusState private var isFocused: Bool
@@ -173,17 +173,12 @@ struct ConversationDetailView: View {
                 .interactiveDismissDisabled(false)
             }
         }
-        .sheet(item: $mentionProfileHandle) { handle in
+        .sheet(item: $mentionProfileActor) { actor in
             NavigationStack {
                 BlueskyProfileView(
                     member: BlueskyListMember(
-                        recordURI: "mention:\(handle)",
-                        actor: BlueskyActor(
-                            did: handle,
-                            handle: handle,
-                            displayName: nil,
-                            avatarURL: nil
-                        )
+                        recordURI: "profile:\(actor.did)",
+                        actor: actor
                     ),
                     list: nil
                 )
@@ -192,7 +187,7 @@ struct ConversationDetailView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         Button {
-                            mentionProfileHandle = nil
+                            mentionProfileActor = nil
                         } label: {
                             Image(systemName: "chevron.down.circle.fill")
                         }
@@ -351,9 +346,7 @@ struct ConversationDetailView: View {
                 message: msg,
                 isOutgoing: msg.senderDID == chatStore.currentAccountDID,
                 currentUserDID: chatStore.currentAccountDID,
-                onOpenProfile: { handle in
-                    mentionProfileHandle = handle
-                },
+                onOpenProfile: { handle in openProfile(handle) },
                 onRetry: msg.rev == "failed" ? { Task { await retrySend(msg) } } : nil,
                 onReact: { emoji in
                     Task { await chatStore.toggleReaction(convoId: conversation.id, messageId: msg.id, value: emoji) }
@@ -429,6 +422,18 @@ struct ConversationDetailView: View {
         case let .message(m): m.id
         case let .deleted(d): d.id
         case let .system(s): s.id
+        }
+    }
+
+    /// Opens the profile for the tapped mention handle after resolving its DID.
+    private func openProfile(_ handle: String) {
+        Task {
+            do {
+                let did = try await container.liveClient.resolveHandle(handle)
+                mentionProfileActor = BlueskyActor(did: did, handle: handle, displayName: nil)
+            } catch {
+                mentionProfileActor = BlueskyActor(did: handle, handle: handle, displayName: nil)
+            }
         }
     }
 

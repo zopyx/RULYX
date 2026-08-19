@@ -106,15 +106,7 @@ struct DirectRepliesView: View {
                                 videoPreviewURL = url
                             }
                         },
-                        onOpenProfile: { _ in
-                            let author = entry.post.safeAuthor
-                            showProfileFor = BlueskyActor(
-                                did: author.did ?? "",
-                                handle: author.handle ?? "",
-                                displayName: author.displayName,
-                                avatarURL: author.avatar.flatMap(URL.init)
-                            )
-                        },
+                        onOpenProfile: { handle in openProfile(handle) },
                         onShowLikes: { showLikesForURI = entry.post.uri },
                         onReportPost: {
                             guard let activeDID = accountStore.activeAccount?.did else { return }
@@ -331,6 +323,17 @@ struct DirectRepliesView: View {
     }
 
     // MARK: - Actions
+
+    private func openProfile(_ handle: String) {
+        Task {
+            do {
+                let did = try await container.liveClient.resolveHandle(handle)
+                showProfileFor = BlueskyActor(did: did, handle: handle, displayName: nil)
+            } catch {
+                showProfileFor = BlueskyActor(did: handle, handle: handle, displayName: nil)
+            }
+        }
+    }
 
     private func handleBlockAllLikers(postURI: String) {
         let shouldConfirm = UserDefaults.standard.bool(forKey: "confirmBlocks")
