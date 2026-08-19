@@ -111,6 +111,7 @@ struct NotificationRow: View {
         case "quote": loc("notifications.reason.quote")
         case "mention": loc("notifications.reason.mention")
         case "starterpack_joined": loc("notifications.reason.starterpack_joined")
+        case "subscribed-post": loc("notifications.reason.subscribed_post")
         default:
             // Show raw reason as fallback so unknown reasons are visible
             notification.reason

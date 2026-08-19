@@ -37,6 +37,9 @@ struct RootView: View {
     /// Controls the account switcher sheet from the tab bar.
     @State private var showAccountSwitcher = false
 
+    /// Account currently being switched to; drives the switching overlay animation.
+    @State private var switchingAccount: AppAccount?
+
     /// Account that needs a fresh app password after an authentication failure.
     @State private var reauthRequest: ReauthenticationRequest?
     /// Keeps the shared auth-failure state subscribed before any error surface renders.
@@ -89,8 +92,7 @@ struct RootView: View {
     }
 
     /// The account switcher button in the bottom tab bar.
-    /// Uses ExclusiveGesture: double-tap switches to previous account (takes priority);
-    /// single-tap opens the account switcher sheet.
+    /// Tap cycles to the next account; long press opens the account switcher sheet.
     private var accountSwitcherButton: some View {
         let buttonTint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
         return VStack(spacing: 4) {
@@ -99,18 +101,6 @@ struct RootView: View {
                     .overlay {
                         Circle()
                             .stroke(buttonTint.opacity(workspaceStore.selectedTab == .account ? 1 : 0.3), lineWidth: 2)
-                    }
-                    // Visual indicator: small chevron when quick-switch is available
-                    .overlay(alignment: .bottomTrailing) {
-                        if accountStore.previousActiveAccountID != nil {
-                            Image(systemName: "chevron.left.2")
-                                .font(.caption2.weight(.bold))
-                                .imageScale(.small)
-                                .foregroundStyle(.secondary)
-                                .padding(2)
-                                .background(Circle().fill(.bar))
-                                .offset(x: 4, y: 4)
-                        }
                     }
             } else {
                 Image(systemName: "person.crop.circle")
@@ -121,31 +111,51 @@ struct RootView: View {
                 .lineLimit(1)
         }
         .foregroundStyle(workspaceStore.selectedTab == .account ? buttonTint : .secondary)
-        // ExclusiveGesture: double-tap takes priority; single-tap only fires if no second tap follows
+        .accessibilityLabel(loc("account.switcher.label"))
+        .accessibilityHint(loc("account.switcher.toolbar_hint"))
+        // ExclusiveGesture: long press takes priority; a quick tap fails the long press
+        // and cycles to the next account instead of opening the switcher sheet.
         .gesture(
-            TapGesture(count: 2)
-                .onEnded {
-                    guard let prevID = accountStore.previousActiveAccountID,
-                          let prevAccount = accountStore.accounts.first(where: { $0.id == prevID })
-                    else { return }
+            LongPressGesture(minimumDuration: 0.5)
+                .onEnded { _ in
                     let generator = UIImpactFeedbackGenerator(style: .rigid)
                     generator.prepare()
                     generator.impactOccurred()
-                    switchAccount(prevAccount)
+                    showAccountSwitcher = true
                 }
                 .exclusively(before: TapGesture(count: 1).onEnded {
-                    showAccountSwitcher = true
+                    cycleToNextAccount()
                 })
         )
+    }
+
+    /// Cycles to the next account in the saved accounts list, wrapping around.
+    private func cycleToNextAccount() {
+        guard accountStore.accounts.count > 1,
+              let activeID = accountStore.activeAccountID,
+              let currentIndex = accountStore.accounts.firstIndex(where: { $0.id == activeID })
+        else { return }
+        let nextIndex = (currentIndex + 1) % accountStore.accounts.count
+        let nextAccount = accountStore.accounts[nextIndex]
+        let generator = UISelectionFeedbackGenerator()
+        generator.prepare()
+        generator.selectionChanged()
+        switchAccount(nextAccount)
     }
 
     private func switchAccount(_ account: AppAccount) {
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+            switchingAccount = account
+        }
         Task {
             await accountStore.switchAccount(to: account, using: container.liveClient)
             workspaceStore.returnToModerationRoot()
             generator.selectionChanged()
+            withAnimation(.easeOut(duration: 0.25)) {
+                switchingAccount = nil
+            }
         }
     }
 
@@ -292,7 +302,32 @@ struct RootView: View {
                     .environmentObject(HTTPRequestDebugStore.shared)
             }
         }
+        .overlay {
+            if let account = switchingAccount {
+                switchingOverlay(for: account)
+            }
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: switchingAccount)
         .highPriorityGesture(threeFingerGesture)
+    }
+
+    /// A centered, animated overlay shown while an account switch is in progress.
+    private func switchingOverlay(for account: AppAccount) -> some View {
+        ZStack {
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+            VStack(spacing: 16) {
+                AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 56)
+                Text(loc("account.switching.to").replacingOccurrences(of: "{name}", with: account.displayName))
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 28)
+            .padding(.vertical, 22)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+        .transition(.scale(scale: 0.85).combined(with: .opacity))
     }
 
     /// Three-finger triple-tap gesture that toggles the performance overlay.
