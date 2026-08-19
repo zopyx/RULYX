@@ -48,6 +48,8 @@ struct PostActionBar: View {
                         if let count = effectiveRepostCount {
                             Text("\(count)")
                                 .font(.callout)
+                                .lineLimit(1)
+                                .fixedSize(horizontal: true, vertical: false)
                         }
                     }
                     .foregroundStyle(isReposted ? Color.green : Color(.secondaryLabel))
@@ -71,6 +73,8 @@ struct PostActionBar: View {
                 Button(action: { callbacks.onShowLikes?() }) {
                     Text("\(count)")
                         .font(.callout)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
@@ -303,6 +307,8 @@ struct PostActionBar: View {
                     if let count {
                         Text("\(count)")
                             .font(.callout)
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                 }
             }
@@ -314,6 +320,8 @@ struct PostActionBar: View {
                 if let count {
                     Text("\(count)")
                         .font(.callout)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                 }
             }
         }

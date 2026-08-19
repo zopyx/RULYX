@@ -48,6 +48,8 @@ struct InlineReplyRow: View {
                                     .font(.caption2)
                                 Text("\(likeCount)")
                                     .font(.caption2)
+                                    .lineLimit(1)
+                                    .fixedSize(horizontal: true, vertical: false)
                             }
                             .foregroundStyle(.secondary)
                         }
