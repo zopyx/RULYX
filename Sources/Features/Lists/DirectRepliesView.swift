@@ -242,8 +242,9 @@ struct DirectRepliesView: View {
                 } else {
                     searchAccount = accountStore.activeAccount
                 }
-                await loadInitial()
-                await loadAvailableTargetLists()
+                async let initial: () = loadInitial()
+                async let lists: () = loadAvailableTargetLists()
+                await (initial, lists)
             }
         }
         .onChange(of: accountStore.activeAccount?.id) { _, _ in
@@ -252,8 +253,9 @@ struct DirectRepliesView: View {
             searchAccount = accountStore.accounts.first(where: { $0.id == accountStore.preferredSearchAccountID })
                 ?? accountStore.activeAccount
             Task {
-                await loadInitial()
-                await loadAvailableTargetLists()
+                async let initial: () = loadInitial()
+                async let lists: () = loadAvailableTargetLists()
+                await (initial, lists)
             }
         }
         .onDisappear {

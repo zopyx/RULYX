@@ -1326,14 +1326,20 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Fetches ALL pages from a ClearSky paginated endpoint.
     /// Page 1 is fetched first; if it has 100 entries, remaining pages
-    /// are fetched sequentially with retries. A `404` response marks the end
-    /// of the data. Any other HTTP error or decode failure is retried up to
-    /// 3 times with exponential backoff, then thrown so callers can decide
-    /// whether to accept a partial result.
+    /// are fetched in bounded parallel batches with retries. A `404` response
+    /// marks the end of the data. Any other HTTP error or decode failure is
+    /// retried up to 3 times with exponential backoff, then returned as a
+    /// failed page result so callers can decide whether to accept a partial
+    /// result.
+    ///
+    /// The optional `onPage` callback is invoked for each page as it is
+    /// processed in order, allowing callers to pipeline work such as profile
+    /// resolution while the next batch of pages is still being fetched.
     private func fetchClearskyEntries(
         actorDID: String,
         endpoint: String,
         onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
+        onPage: (@Sendable (Int, [ClearskyBlocklistEntry]) async -> Void)? = nil,
         ignoreCache: Bool = false,
         toleratePartialErrors: Bool = false
     ) async throws -> [ClearskyBlocklistEntry] {
@@ -1361,6 +1367,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         }
         var seenDIDs = Set(page1.map(\.did))
         await onProgress?(seenDIDs.count)
+        await onPage?(1, page1)
         guard page1.count >= 100 else {
             await cacheClearskyEntries(page1, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
             return page1
@@ -1368,43 +1375,69 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
         var allEntries = page1
         let maxPages = 50
+        let pageConcurrency = 5
         var completedWithoutError = true
+        var nextPage = 2
 
-        // Step 2: fetch remaining pages sequentially with retries. Stopping at the
-        // first short page (or 404) prevents treating transient HTTP errors as EOF.
-        for page in 2 ... maxPages {
+        // Step 2: fetch remaining pages in bounded parallel batches. Within each
+        // batch the pages are requested concurrently; across batches we stop at the
+        // first short page (or 404) to avoid treating transient HTTP errors as EOF.
+        while nextPage <= maxPages {
             try Task.checkCancellation()
 
-            let entries: [ClearskyBlocklistEntry]
-            do {
-                guard let pageEntries = try await fetchClearskyPageWithRetries(
-                    actorDID: actorDID,
-                    endpoint: endpoint,
-                    page: page
-                ) else {
-                    // 404 marks the end of the paginated data.
-                    break
+            let batchEnd = min(nextPage + pageConcurrency - 1, maxPages)
+            let pageResults = await fetchClearskyPageBatch(
+                actorDID: actorDID,
+                endpoint: endpoint,
+                startPage: nextPage,
+                endPage: batchEnd
+            )
+
+            let sortedResults = pageResults.sorted { $0.page < $1.page }
+            var shouldBreak = false
+            var batchError: Error?
+
+            for (page, result) in sortedResults {
+                switch result {
+                case let .entries(entries):
+                    allEntries.append(contentsOf: entries)
+                    for entry in entries {
+                        seenDIDs.insert(entry.did)
+                    }
+                    await onProgress?(seenDIDs.count)
+                    await onPage?(page, entries)
+
+                    guard entries.count >= 100 else {
+                        AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(page) (\(entries.count) entries)")
+                        shouldBreak = true
+                        break
+                    }
+
+                case .notFound:
+                    shouldBreak = true
+
+                case let .failure(error):
+                    if error is CancellationError {
+                        throw error
+                    }
+                    batchError = error
                 }
-                entries = pageEntries
-            } catch {
+            }
+
+            if shouldBreak {
+                break
+            }
+
+            if let error = batchError {
                 if toleratePartialErrors {
                     completedWithoutError = false
-                    AppLogger.http.warning("Clearsky \(endpoint)/\(actorDID): stopped at page \(page) after retries: \(error.localizedDescription)")
+                    AppLogger.http.warning("Clearsky \(endpoint)/\(actorDID): stopped at page \(nextPage) after retries: \(error.localizedDescription)")
                     break
                 }
                 throw error
             }
 
-            allEntries.append(contentsOf: entries)
-            for entry in entries {
-                seenDIDs.insert(entry.did)
-            }
-            await onProgress?(seenDIDs.count)
-
-            guard entries.count >= 100 else {
-                AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(page) (\(entries.count) entries)")
-                break
-            }
+            nextPage = batchEnd + 1
         }
 
         // Only cache a complete, successful fetch so the dashboard count
@@ -1413,6 +1446,48 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             await cacheClearskyEntries(allEntries, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
         }
         return allEntries
+    }
+
+    /// Result of fetching a single ClearSky page.
+    private enum ClearskyPageResult {
+        case entries([ClearskyBlocklistEntry])
+        case notFound
+        case failure(Error)
+    }
+
+    /// Fetches a range of ClearSky pages concurrently, packaging each result so
+    /// that a 404 or failure in one page does not stop the entire batch.
+    private func fetchClearskyPageBatch(
+        actorDID: String,
+        endpoint: String,
+        startPage: Int,
+        endPage: Int
+    ) async -> [(page: Int, result: ClearskyPageResult)] {
+        await withTaskGroup(of: (Int, ClearskyPageResult).self) { group in
+            for page in startPage ... endPage {
+                group.addTask {
+                    do {
+                        if let entries = try await self.fetchClearskyPageWithRetries(
+                            actorDID: actorDID,
+                            endpoint: endpoint,
+                            page: page
+                        ) {
+                            return (page, .entries(entries))
+                        } else {
+                            return (page, .notFound)
+                        }
+                    } catch {
+                        return (page, .failure(error))
+                    }
+                }
+            }
+
+            var results: [(Int, ClearskyPageResult)] = []
+            for await result in group {
+                results.append(result)
+            }
+            return results
+        }
     }
 
     /// Writes fetched ClearSky entries to BlueskyAPICache as JSON-encoded Data.
@@ -1519,6 +1594,63 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
     }
 
+    /// Accumulates DIDs and resolves their profiles in concurrent batches.
+    /// Designed for pipelining profile resolution with paginated Clearsky fetches.
+    private actor ProfileBatchResolver {
+        private let httpClient: HTTPClient
+        private let batchSize: Int
+        private var buffer: [String] = []
+        private var tasks: [Task<[BlueskyActor], Never>] = []
+
+        init(httpClient: HTTPClient, batchSize: Int = 25) {
+            self.httpClient = httpClient
+            self.batchSize = batchSize
+        }
+
+        func add(dids: [String]) {
+            buffer.append(contentsOf: dids)
+            flush()
+        }
+
+        func finalize() async -> [BlueskyActor] {
+            flushRemaining()
+
+            var actors: [BlueskyActor] = []
+            for task in tasks {
+                await actors.append(contentsOf: task.value)
+            }
+            return actors
+        }
+
+        private func flush() {
+            while buffer.count >= batchSize {
+                let batch = Array(buffer.prefix(batchSize))
+                buffer.removeFirst(batchSize)
+                enqueue(batch)
+            }
+        }
+
+        private func flushRemaining() {
+            guard !buffer.isEmpty else { return }
+            let batch = buffer
+            buffer.removeAll()
+            enqueue(batch)
+        }
+
+        private func enqueue(_ dids: [String]) {
+            guard !dids.isEmpty else { return }
+            let httpClient = httpClient
+            tasks.append(Task { [httpClient] in
+                do {
+                    return try await LiveBlueskyClient.fetchProfileBatch(identifiers: dids, httpClient: httpClient)
+                } catch {
+                    AppLogger.performance.error("Profile batch lookup failed: \(error.localizedDescription, privacy: .public)")
+                    return []
+                }
+            })
+        }
+    }
+
     /// Resolves profiles for a list of DIDs in parallel batches of 25.
     /// Silently ignores individual batch failures (best-effort resolution).
     private func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
@@ -1555,7 +1687,7 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         return try await resolveHandleToDID(handle: account.handle)
     }
 
-    /// Fetches ClearSky blocklist entries and resolves all actor profiles.
+    /// Fetches all ClearSky blocklist entries and resolves all actor profiles.
     private func fetchClearskyActors(
         account: AppAccount,
         endpoint: String,
@@ -1564,10 +1696,18 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
         try guardClearskyAvailable()
         let actorDID = try await resolveAccountDID(account)
 
+        // Pipeline profile resolution with page fetching: as each page of DIDs
+        // arrives, add it to the resolver so profile lookups run concurrently
+        // with the next batch of Clearsky pages.
+        let resolver = ProfileBatchResolver(httpClient: httpClient, batchSize: 50)
+
         let entries = try await fetchClearskyEntries(
             actorDID: actorDID,
             endpoint: endpoint,
             onProgress: onProgress,
+            onPage: { _, pageEntries in
+                await resolver.add(dids: pageEntries.map(\.did))
+            },
             toleratePartialErrors: true
         )
         var allDIDs = Set<String>()
@@ -1581,8 +1721,14 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             return ClearskyBlocklistResult(actors: [], totalCount: 0)
         }
 
-        // Use best-effort resolution — one failed batch shouldn't kill the entire result.
-        let actors = await resolveProfilesBestEffort(dids: Array(allDIDs).sorted())
+        // If pages were fetched from the cache, the resolver received no work;
+        // fall back to resolving all profiles after the fact. Otherwise finalize
+        // the pipelined resolution tasks.
+        let resolvedActors = await resolver.finalize()
+        let actors = resolvedActors.isEmpty
+            ? await resolveProfilesBestEffort(dids: Array(allDIDs).sorted())
+            : resolvedActors
+
         var result = actors
         for i in result.indices {
             if let dateStr = blockedDates[result[i].did] {
@@ -1634,31 +1780,41 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
 
     /// Static batch profile lookup via `app.bsky.actor.getProfiles`. Bypasses authentication
     /// using the public API endpoint. Used by ClearSky resolution paths.
+    /// Batches requests to stay within the API limit of 25 actors per call.
     static func fetchProfileBatch(identifiers: [String], httpClient: HTTPClient) async throws -> [BlueskyActor] {
-        let actorsParam = identifiers.map { URLQueryItem(name: "actors", value: $0) }
         guard let profilesURL = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles") else {
             throw BlueskyAPIError.invalidURL
         }
-        var components = URLComponents(url: profilesURL, resolvingAgainstBaseURL: false)!
-        components.queryItems = actorsParam
-        guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
-        var req = URLRequest(url: finalURL)
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-        req.timeoutInterval = 30
-        let (data, httpResponse) = try await httpClient.data(for: req, source: "Profile Batch Lookup")
-        guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            throw BlueskyAPIError.invalidResponse
+
+        var actors: [BlueskyActor] = []
+        let batchSize = 25
+
+        for offset in stride(from: 0, to: identifiers.count, by: batchSize) {
+            let chunk = Array(identifiers[offset ..< min(offset + batchSize, identifiers.count)])
+            let actorsParam = chunk.map { URLQueryItem(name: "actors", value: $0) }
+            var components = URLComponents(url: profilesURL, resolvingAgainstBaseURL: false)!
+            components.queryItems = actorsParam
+            guard let finalURL = components.url else { throw BlueskyAPIError.invalidURL }
+            var req = URLRequest(url: finalURL)
+            req.setValue("application/json", forHTTPHeaderField: "Accept")
+            req.timeoutInterval = 30
+            let (data, httpResponse) = try await httpClient.data(for: req, source: "Profile Batch Lookup")
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                throw BlueskyAPIError.invalidResponse
+            }
+            let decoded = try JSONDecoder().decode(GetProfilesResponse.self, from: data)
+            actors.append(contentsOf: decoded.profiles.map {
+                BlueskyActor(
+                    did: $0.did,
+                    handle: $0.handle,
+                    displayName: $0.displayName,
+                    avatarURL: URL(string: $0.avatar ?? ""),
+                    description: $0.description
+                )
+            })
         }
-        let decoded = try JSONDecoder().decode(GetProfilesResponse.self, from: data)
-        return decoded.profiles.map {
-            BlueskyActor(
-                did: $0.did,
-                handle: $0.handle,
-                displayName: $0.displayName,
-                avatarURL: URL(string: $0.avatar ?? ""),
-                description: $0.description
-            )
-        }
+
+        return actors
     }
 
     /// Fetches stats (followers, following, posts, description) for an array of DIDs in batches.

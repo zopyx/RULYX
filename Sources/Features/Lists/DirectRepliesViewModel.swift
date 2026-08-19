@@ -46,7 +46,8 @@ final class DirectRepliesViewModel {
         errorMessage = nil
     }
 
-    /// Loads replies: phase 1 (collect my posts) → phase 2 (fetch threads, extract replies).
+    /// Loads replies by scanning the user's author feed and overlapping thread
+    /// fetches with subsequent feed-page fetches.
     func load(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async {
         guard !isLoading else { return }
         isLoading = true
@@ -61,8 +62,12 @@ final class DirectRepliesViewModel {
             entries = []
             feedCursor = nil
             hasMore = true
-            let myPosts = try await fetchMyPosts(account: account, appPassword: appPassword, using: client)
-            let replies = try await fetchReplies(for: myPosts, account: account, appPassword: appPassword, using: client)
+            let (myPosts, replies, finalCursor) = try await fetchPostsAndRepliesPipelined(
+                account: account,
+                appPassword: appPassword,
+                using: client
+            )
+            feedCursor = finalCursor
             entries = deduplicateAndSort(replies)
             hasMore = !myPosts.isEmpty
         } catch {
@@ -85,8 +90,12 @@ final class DirectRepliesViewModel {
         }
         do {
             guard !Task.isCancelled else { return }
-            let morePosts = try await fetchMyPosts(account: account, appPassword: appPassword, using: client)
-            let moreReplies = try await fetchReplies(for: morePosts, account: account, appPassword: appPassword, using: client)
+            let (morePosts, moreReplies, finalCursor) = try await fetchPostsAndRepliesPipelined(
+                account: account,
+                appPassword: appPassword,
+                using: client
+            )
+            feedCursor = finalCursor
             let existingURIs = Set(entries.map(\.post.uri))
             let newEntries = moreReplies.filter { !existingURIs.contains($0.post.uri) }
             entries = deduplicateAndSort(entries + newEntries)
@@ -114,8 +123,12 @@ final class DirectRepliesViewModel {
         do {
             guard !Task.isCancelled else { return }
             entries = []
-            let myPosts = try await fetchMyPosts(account: account, appPassword: appPassword, using: client)
-            let replies = try await fetchReplies(for: myPosts, account: account, appPassword: appPassword, using: client)
+            let (myPosts, replies, finalCursor) = try await fetchPostsAndRepliesPipelined(
+                account: account,
+                appPassword: appPassword,
+                using: client
+            )
+            feedCursor = finalCursor
             entries = deduplicateAndSort(replies)
             hasMore = !myPosts.isEmpty
         } catch {
@@ -139,34 +152,62 @@ final class DirectRepliesViewModel {
         }
     }
 
-    /// Phase 1: Collect up to `maxPosts` authored by the user (max 5 pages).
-    private func fetchMyPosts(account: AppAccount, appPassword: String, using client: LiveBlueskyClient) async throws -> [RichFeedEntry] {
+    /// Phase 1 + 2 pipelined: collect the user's posts page-by-page and overlap
+    /// fetching replies for each page with loading the next author-feed page.
+    /// Returns the collected posts, the collected replies, and the final cursor.
+    private func fetchPostsAndRepliesPipelined(
+        account: AppAccount,
+        appPassword: String,
+        using client: LiveBlueskyClient
+    ) async throws -> ([RichFeedEntry], [RichFeedEntry], String?) {
         var allPosts: [RichFeedEntry] = []
+        var allReplies: [RichFeedEntry] = []
         var pagesChecked = 0
+        var localCursor = feedCursor
+        var previousRepliesTask: Task<[RichFeedEntry], Error>?
 
         while pagesChecked < 5, !Task.isCancelled, allPosts.count < maxPosts {
             progressLabel = loc("directreplies.fetching_page")
                 .replacingOccurrences(of: "{n}", with: "\(pagesChecked + 1)")
             let response = try await client.fetchRichFeed(
                 did: did,
-                cursor: feedCursor,
+                cursor: localCursor,
                 account: account,
                 appPassword: appPassword
             )
 
             let myPosts = response.feed.filter { $0.post.author?.did == did }
             allPosts += myPosts
-            feedCursor = response.cursor
             pagesChecked += 1
 
+            // Await replies fetched for the previous page while this page is fresh.
+            if let task = previousRepliesTask {
+                allReplies += try await task.value
+                previousRepliesTask = nil
+            }
+
+            // Start fetching replies for the current page in parallel with the
+            // next author-feed page fetch.
+            if !myPosts.isEmpty {
+                let postsToFetch = myPosts
+                previousRepliesTask = Task {
+                    try await self.fetchReplies(for: postsToFetch, account: account, appPassword: appPassword, using: client)
+                }
+            }
+
             guard let next = response.cursor, !next.isEmpty else {
-                feedCursor = nil
+                localCursor = nil
                 break
             }
-            feedCursor = next
+            localCursor = next
         }
 
-        return Array(allPosts.prefix(maxPosts))
+        // Await the final batch of replies.
+        if let task = previousRepliesTask {
+            allReplies += try await task.value
+        }
+
+        return (Array(allPosts.prefix(maxPosts)), allReplies, localCursor)
     }
 
     /// Phase 2: For each user post, fetch the thread (depth 3) and collect replies by other accounts.
