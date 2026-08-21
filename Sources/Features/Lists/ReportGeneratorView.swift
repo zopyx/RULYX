@@ -82,7 +82,15 @@ struct ReportGeneratorView: View {
 
         lines.append(loc("report.doc_recent_activity"))
         for entry in log.prefix(10) {
-            lines.append(loc("report.doc_activity_line").replacingOccurrences(of: "{title}", with: entry.title).replacingOccurrences(of: "{summary}", with: entry.summary).replacingOccurrences(of: "{date}", with: entry.createdAt.formatted(date: .abbreviated, time: .shortened)))
+            let title = entry.title
+            let summary = entry.summary
+            let date = entry.createdAt.formatted(date: .abbreviated, time: .shortened)
+            lines.append(
+                loc("report.doc_activity_line")
+                    .replacingOccurrences(of: "{title}", with: title)
+                    .replacingOccurrences(of: "{summary}", with: summary)
+                    .replacingOccurrences(of: "{date}", with: date)
+            )
         }
 
         reportText = lines.joined(separator: "\n")

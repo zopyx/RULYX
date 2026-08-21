@@ -75,7 +75,16 @@ class PostLikerActionsManager: ObservableObject {
 
     /// Begin the "add all likers to list" flow: fetch likers, then either add to internal list
     /// directly or set `batchOperationConfig` for external list addition.
-    func handleAddAllLikersToList(postURI: String, list: BlueskyList, using blueskyClient: LiveBlueskyClient, fetchAccount: AppAccount, fetchPassword: String, activeAccount: AppAccount, activePassword: String, internalListStore: InternalListStore? = nil) {
+    func handleAddAllLikersToList(
+        postURI: String,
+        list: BlueskyList,
+        using blueskyClient: LiveBlueskyClient,
+        fetchAccount: AppAccount,
+        fetchPassword: String,
+        activeAccount: AppAccount,
+        activePassword: String,
+        internalListStore: InternalListStore? = nil
+    ) {
         if list.kind == .internal, let internalListStore {
             Task {
                 guard let targets = await fetchLikerTargets(for: postURI, using: blueskyClient, fetchAccount: fetchAccount, fetchPassword: fetchPassword) else { return }

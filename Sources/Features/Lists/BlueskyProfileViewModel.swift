@@ -45,6 +45,10 @@ final class BlueskyProfileViewModel {
     var exportError: String?
     /// Lists from ClearSky that contain this profile.
     private(set) var clearskyLists: [ClearskyListEntry] = []
+    /// Total number of ClearSky lists this profile appears on (from the fast `/total/` endpoint).
+    private(set) var clearskyListsCount: Int?
+    /// True while fetching the fast ClearSky list count.
+    private(set) var isFetchingListsCount = false
     /// True while fetching ClearSky list data.
     private(set) var isFetchingLists = false
     /// Error from ClearSky list fetch.
@@ -106,6 +110,8 @@ final class BlueskyProfileViewModel {
         statusMessage = nil
         errorMessage = nil
         clearskyLists = []
+        clearskyListsCount = nil
+        isFetchingListsCount = false
         isFetchingLists = false
         listError = nil
         pendingFollowingState = nil
@@ -244,6 +250,18 @@ final class BlueskyProfileViewModel {
             AppLogger.moderation.error("Clearsky lists failed: \(error.localizedDescription, privacy: .public)")
         }
         isFetchingLists = false
+    }
+
+    /// Fetches the fast total count of ClearSky lists that contain the given handle.
+    func fetchClearskyListsCount(handle: String, using client: LiveBlueskyClient) async {
+        isFetchingListsCount = true
+        defer { isFetchingListsCount = false }
+        do {
+            clearskyListsCount = try await client.fetchClearskyListsCount(handle: handle)
+        } catch {
+            AppLogger.moderation.error("Clearsky lists count failed: \(error.localizedDescription, privacy: .public)")
+            clearskyListsCount = nil
+        }
     }
 
     // MARK: - Private Properties

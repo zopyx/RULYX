@@ -25,7 +25,20 @@ struct SearchPostsResponse: Decodable {
 /// are grouped by `// MARK: -` sections; prefer adding new endpoints to the correct MARK section
 /// and keeping call sites behind the protocol (`BlueskyListServicing` etc.) so the future split is mechanical.
 @MainActor
-class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListServicing, BlueskyProfileInspecting, BlueskyAuthServicing, BlueskyFeedServicing, BlueskyPostServicing, BlueskySocialServicing, BlueskyModerationServicing, BlueskyClearSkyServicing, BlueskyNotificationServicing, BlueskyIdentityServicing, BlueskyMediaServicing {
+class LiveBlueskyClient: ObservableObject,
+    BlueskyAuthenticating,
+    BlueskyListServicing,
+    BlueskyProfileInspecting,
+    BlueskyAuthServicing,
+    BlueskyFeedServicing,
+    BlueskyPostServicing,
+    BlueskySocialServicing,
+    BlueskyModerationServicing,
+    BlueskyClearSkyServicing,
+    BlueskyNotificationServicing,
+    BlueskyIdentityServicing,
+    BlueskyMediaServicing
+{
     /// The AT Protocol service DID for the Bluesky App View proxy.
     private static let bskyAppViewServiceDID = "did:web:api.bsky.app#bsky_appview"
     /// The default base URL for the Bluesky PDS.
@@ -1769,6 +1782,24 @@ class LiveBlueskyClient: ObservableObject, BlueskyAuthenticating, BlueskyListSer
             page += 1
         } while true
         return allLists
+    }
+
+    /// Fetches the total number of ClearSky moderation lists a handle appears on.
+    /// Uses the dedicated `/get-list/total/` endpoint so the counter can be shown
+    /// without paginating through every list page.
+    func fetchClearskyListsCount(handle: String) async throws -> Int {
+        try guardClearskyAvailable()
+        let urlString = "https://api.clearsky.app/csky/api/v1/get-list/total/\(handle)"
+        guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists Count")
+        guard (200 ..< 300).contains(httpResponse.statusCode)
+        else {
+            throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
+        }
+        let decoded = try JSONDecoder().decode(ClearskyTotalResponse.self, from: data)
+        return decoded.data.count
     }
 
     // MARK: - DID Resolution & PLC Audit

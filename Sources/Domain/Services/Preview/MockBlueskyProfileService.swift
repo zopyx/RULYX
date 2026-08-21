@@ -43,7 +43,17 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
             listsCount: 3, starterPacksCount: 1,
             createdAt: .now.addingTimeInterval(-86400 * 200),
             labels: ["spam", "bot"],
-            viewerState: BlueskyViewerState(muted: false, blockedBy: false, isBlocking: false, blockingRecordURI: nil, isFollowing: true, followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1", followsYou: false, mutedByListName: nil, blockingByListName: [])
+            viewerState: BlueskyViewerState(
+                muted: false,
+                blockedBy: false,
+                isBlocking: false,
+                blockingRecordURI: nil,
+                isFollowing: true,
+                followingRecordURI: "at://did:plc:preview/app.bsky.graph.follow/1",
+                followsYou: false,
+                mutedByListName: nil,
+                blockingByListName: []
+            )
         )
     }
 

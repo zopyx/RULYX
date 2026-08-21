@@ -466,7 +466,6 @@ struct BlueskyProfileView: View {
         }
     }
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     // MARK: - Content
 
     /// The account used for data-fetching (preferred search or active).
@@ -699,7 +698,14 @@ struct BlueskyProfileView: View {
                         HStack {
                             Text(loc: "profile.stats.lists")
                             Spacer()
-                            if viewModel.isFetchingLists {
+                            if let count = viewModel.clearskyListsCount {
+                                Text("\(count)")
+                                    .foregroundStyle(.secondary)
+                                Image(systemName: "chevron.right")
+                                    .flipsForRightToLeftLayoutDirection(true)
+                                    .appFont(.subheading)
+                                    .foregroundStyle(.secondary)
+                            } else if viewModel.isFetchingListsCount {
                                 ProgressView()
                                     .scaleEffect(0.6)
                             } else if !viewModel.clearskyLists.isEmpty {
@@ -709,6 +715,9 @@ struct BlueskyProfileView: View {
                                     .flipsForRightToLeftLayoutDirection(true)
                                     .appFont(.subheading)
                                     .foregroundStyle(.secondary)
+                            } else if viewModel.isFetchingLists {
+                                ProgressView()
+                                    .scaleEffect(0.6)
                             } else if viewModel.listError == nil, !viewModel.isLoading {
                                 ProgressView()
                                     .scaleEffect(0.6)
@@ -1418,13 +1427,14 @@ struct BlueskyProfileView: View {
             async let blocks = vm.fetchBlockCounts(isOwnProfile: isOwnProfile)
             if let handle = viewModel.profile?.handle, let did = viewModel.profile?.did {
                 async let clearsky = viewModel.fetchClearskyLists(handle: handle, using: container.liveClient)
+                async let clearskyCount = viewModel.fetchClearskyListsCount(handle: handle, using: container.liveClient)
                 if let acct = searchAccount, let password = accountStore.appPassword(for: acct) {
                     async let owned = viewModel.fetchOwnedLists(did: did, account: acct, appPassword: password, using: container.liveClient)
                     async let subscribed = fetchSubscribedListsIfOwn(account: acct, appPassword: password, targetDID: did)
 
-                    _ = await (blocks, clearsky, owned, subscribed)
+                    _ = await (blocks, clearsky, clearskyCount, owned, subscribed)
                 } else {
-                    _ = await (blocks, clearsky)
+                    _ = await (blocks, clearsky, clearskyCount)
                 }
             } else {
                 await blocks

@@ -132,7 +132,10 @@ final class LocalizationCompletenessTests: XCTestCase {
 
     private func placeholders(in value: String) -> Set<String> {
         let pattern = #"\{[A-Za-z0-9_]+\}"#
-        let regex = try! NSRegularExpression(pattern: pattern)
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            XCTFail("Failed to compile placeholder regex")
+            return []
+        }
         let range = NSRange(value.startIndex..., in: value)
         return Set(regex.matches(in: value, range: range).compactMap {
             Range($0.range, in: value).map { String(value[$0]) }

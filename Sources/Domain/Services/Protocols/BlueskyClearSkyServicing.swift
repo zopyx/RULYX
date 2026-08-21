@@ -53,6 +53,9 @@ protocol BlueskyClearSkyServicing: Sendable {
 
     /// Fetch ClearSky list entries for a handle.
     func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry]
+
+    /// Fetch the total number of ClearSky lists a handle appears on.
+    func fetchClearskyListsCount(handle: String) async throws -> Int
 }
 
 extension BlueskyClearSkyServicing {
