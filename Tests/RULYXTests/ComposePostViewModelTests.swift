@@ -53,6 +53,19 @@ final class ComposePostViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.appPassword, "test-password")
     }
 
+    func testEditPostTextIsAvailableBeforePreloading() {
+        let editViewModel = ComposePostViewModel(
+            postService: postService,
+            mediaService: mediaService,
+            listService: listService,
+            account: account,
+            appPassword: "test-password",
+            editPost: makeEditEntry()
+        )
+
+        XCTAssertEqual(editViewModel.postText, "Old text")
+    }
+
     // MARK: - Post Flow (Happy Path)
 
     func testPostCallsCreatePostAndCompletes() async {

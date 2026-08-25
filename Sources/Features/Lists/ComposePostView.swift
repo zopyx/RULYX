@@ -10,7 +10,6 @@ struct ComposePostView: View {
     @Bindable var viewModel: ComposePostViewModel
 
     @Environment(\.dismiss) private var dismiss
-    @State private var textViewRef: UITextView?
     @EnvironmentObject private var localizationManager: LocalizationManager
 
     // MARK: - Body
@@ -46,7 +45,9 @@ struct ComposePostView: View {
                 }
 
                 Section {
-                    WritingToolsTextView(text: $viewModel.postText, textViewRef: $textViewRef)
+                    TextEditor(text: $viewModel.postText)
+                        .font(.body)
+                        .scrollContentBackground(.hidden)
                         .frame(minHeight: 120)
 
                     HStack {
@@ -514,53 +515,6 @@ struct ComposePostView: View {
                     Button(loc("actions.done")) { viewModel.altEditIndex = nil }
                 }
             }
-        }
-    }
-}
-
-// MARK: - WritingTools UITextView Wrapper
-
-private struct WritingToolsTextView: UIViewRepresentable {
-    @Binding var text: String
-    @Binding var textViewRef: UITextView?
-
-    func makeUIView(context: Context) -> UITextView {
-        let tv = UITextView()
-        tv.font = .preferredFont(forTextStyle: .body)
-        tv.backgroundColor = .clear
-        tv.delegate = context.coordinator
-        tv.isScrollEnabled = false
-        tv.textContainerInset = UIEdgeInsets(top: 8, left: 4, bottom: 8, right: 4)
-        tv.textContainer.lineBreakMode = .byWordWrapping
-        return tv
-    }
-
-    func updateUIView(_ uiView: UITextView, context _: Context) {
-        if uiView.text != text {
-            uiView.text = text
-        }
-        textViewRef = uiView
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text)
-    }
-
-    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context _: Context) -> CGSize? {
-        guard let width = proposal.width, width > 0 else { return nil }
-        let fittingSize = CGSize(width: width, height: UIView.layoutFittingExpandedSize.height)
-        let size = uiView.sizeThatFits(fittingSize)
-        return CGSize(width: width, height: max(size.height, 120))
-    }
-
-    final class Coordinator: NSObject, UITextViewDelegate {
-        @Binding var text: String
-        init(text: Binding<String>) {
-            _text = text
-        }
-
-        func textViewDidChange(_ textView: UITextView) {
-            text = textView.text
         }
     }
 }

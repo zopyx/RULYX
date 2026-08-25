@@ -85,6 +85,7 @@ final class ComposePostViewModel {
         self.quote = quote
         self.placeholder = placeholder
         self.editPost = editPost
+        postText = editPost?.post.safeRecord.text ?? ""
     }
 
     /// Convenience initializer using the live client (for transition period).
@@ -138,9 +139,7 @@ final class ComposePostViewModel {
         isPreloadingEdit = true
         defer { isPreloadingEdit = false }
 
-        if let text = editPost.post.record?.text {
-            postText = text
-        }
+        postText = editPost.post.safeRecord.text ?? ""
 
         if let images = editPost.post.embed?.images {
             for img in images {
