@@ -164,11 +164,11 @@ extension ListDetailViewModel {
         let actorsToImport = importPreview.items.compactMap { item -> BlueskyActor? in
             switch item.classification {
             case .ready:
-                return item.actor
+                item.actor
             case .alreadyPresent:
-                return nil
+                nil
             case .duplicate, .unresolved:
-                return nil
+                nil
             }
         }
 
