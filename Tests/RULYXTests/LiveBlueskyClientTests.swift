@@ -546,4 +546,114 @@ final class LiveBlueskyClientTests: XCTestCase {
 
         try await client.unsubscribeFromModerationList(expectedURI, account: makeAccount(), appPassword: "pass")
     }
+
+    // MARK: - Handle resolution (provider-independent)
+
+    /// Handle resolution must run on the AT Protocol, not on ClearSky: opening a
+    /// profile must not fail while ClearSky is down.
+    @MainActor func testResolveHandleUsesATProtocolNotClearsky() async throws {
+        var requestedHosts: [String] = []
+        MockURLProtocol.requestHandler = { request in
+            requestedHosts.append(request.url?.host ?? "")
+            if request.url?.path == "/xrpc/com.atproto.identity.resolveHandle" {
+                XCTAssertEqual(request.url?.query, "handle=someone.bsky.social")
+                let json = #"{"did":"did:plc:resolved"}"#.data(using: .utf8)!
+                return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+            }
+            // Every ClearSky call fails: resolution must not depend on it.
+            return (HTTPURLResponse(url: request.url!, statusCode: 502, httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        let did = try await client.resolveHandle("someone.bsky.social")
+
+        XCTAssertEqual(did, "did:plc:resolved")
+        XCTAssertEqual(requestedHosts, ["public.api.bsky.app"], "handle resolution must not touch ClearSky")
+    }
+
+    @MainActor func testResolveHandleFallsBackToClearskyWhenATProtocolFails() async throws {
+        MockURLProtocol.requestHandler = { request in
+            if request.url?.host == "public.api.bsky.app" {
+                return (HTTPURLResponse(url: request.url!, statusCode: 503, httpVersion: nil, headerFields: nil)!, Data())
+            }
+            if request.url?.absoluteString.contains("/get-did/") == true {
+                let json = #"{"data":{"did_identifier":"did:plc:from-clearsky"}}"#.data(using: .utf8)!
+                return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+            }
+            throw BlueskyAPIError.invalidURL
+        }
+
+        let did = try await client.resolveHandle("someone.bsky.social")
+
+        XCTAssertEqual(did, "did:plc:from-clearsky")
+    }
+
+    @MainActor func testResolveHandlePassesThroughDIDWithoutNetwork() async throws {
+        MockURLProtocol.requestHandler = { _ in
+            XCTFail("no network call expected for DID input")
+            throw BlueskyAPIError.invalidURL
+        }
+
+        let did = try await client.resolveHandle("did:plc:already-known")
+
+        XCTAssertEqual(did, "did:plc:already-known")
+    }
+
+    // MARK: - Stale cache fallback
+
+    /// A failed refresh must serve the last cached blocklist instead of throwing —
+    /// ClearSky returned `502` on every route for days in September 2026.
+    @MainActor func testStaleClearskyCacheIsServedWhenRefreshFails() async throws {
+        let account = makeAccount(did: "did:plc:stalefallback")
+        var refreshShouldFail = false
+        MockURLProtocol.requestHandler = { request in
+            guard request.url?.absoluteString.contains("/single-blocklist/did:plc:stalefallback") == true else {
+                throw BlueskyAPIError.invalidURL
+            }
+            if refreshShouldFail {
+                return (HTTPURLResponse(url: request.url!, statusCode: 502, httpVersion: nil, headerFields: nil)!, Data())
+            }
+            let json = #"""
+            {"data":{"blocklist":[{"did":"did:plc:stale1","blocked_date":"2024-01-01T00:00:00Z"},{"did":"did:plc:stale2","blocked_date":"2024-01-02T00:00:00Z"}]}}
+            """#.data(using: .utf8)!
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+        }
+
+        // 1) A successful fetch populates the cache.
+        let fresh = try await client.fetchBlockedByCount(for: account)
+        XCTAssertEqual(fresh, 2)
+
+        // 2) Age the cache out and make the refresh fail.
+        client.clearskyCacheMaxAge = 0
+        refreshShouldFail = true
+
+        // 3) The stale payload is served instead of an error.
+        let stale = try await client.fetchBlockedByCount(for: account)
+        XCTAssertEqual(stale, 2, "stale cache must be served when the ClearSky refresh fails")
+    }
+
+    /// Explicit refreshes must not silently fall back to stale data.
+    @MainActor func testForceRefreshStillThrowsWhenClearskyFails() async throws {
+        let account = makeAccount(did: "did:plc:staleforcedecline")
+        var refreshShouldFail = false
+        MockURLProtocol.requestHandler = { request in
+            guard request.url?.absoluteString.contains("/single-blocklist/did:plc:staleforcedecline") == true else {
+                throw BlueskyAPIError.invalidURL
+            }
+            if refreshShouldFail {
+                return (HTTPURLResponse(url: request.url!, statusCode: 502, httpVersion: nil, headerFields: nil)!, Data())
+            }
+            let json = #"{"data":{"blocklist":[{"did":"did:plc:fresh","blocked_date":"2024-01-01T00:00:00Z"}]}}"#.data(using: .utf8)!
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+        }
+
+        _ = try await client.fetchBlockedByCount(for: account)
+        refreshShouldFail = true
+
+        do {
+            _ = try await client.fetchBlockedByCount(for: account, forceRefresh: true)
+            XCTFail("forceRefresh must propagate the ClearSky failure")
+        } catch {
+            XCTAssertTrue(true)
+        }
+    }
 }

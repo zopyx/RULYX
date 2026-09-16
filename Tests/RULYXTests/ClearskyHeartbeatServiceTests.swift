@@ -53,4 +53,30 @@ final class ClearskyHeartbeatServiceTests: XCTestCase {
         await ClearskyHeartbeatService.shared.ping()
         XCTAssertFalse(ClearskyHeartbeatService.shared.isClearskyAvailable)
     }
+
+    /// Regression: the probe must hit a real API route, not the site root. During the
+    /// September 2026 ClearSky outage the root answered `200` while every `/api/...`
+    /// route returned `502`, so a root probe reported "available".
+    func testPingProbesTheApiRouteNotTheSiteRoot() async {
+        var probedPath = ""
+        MockURLProtocol.requestHandler = { request in
+            probedPath = request.url?.path ?? ""
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        await ClearskyHeartbeatService.shared.ping()
+
+        XCTAssertTrue(probedPath.hasPrefix("/api/"), "heartbeat must probe the API route, got '\(probedPath)'")
+    }
+
+    /// `404` (probe account has no blocklist) is a healthy answer — only `5xx` and
+    /// transport failures mean ClearSky is down.
+    func testPingTreatsNotFoundAsAvailable() async {
+        MockURLProtocol.requestHandler = { request in
+            (HTTPURLResponse(url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        await ClearskyHeartbeatService.shared.ping()
+        XCTAssertTrue(ClearskyHeartbeatService.shared.isClearskyAvailable)
+    }
 }

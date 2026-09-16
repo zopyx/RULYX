@@ -53,6 +53,10 @@ class LiveBlueskyClient: ObservableObject,
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
     private let clearskyHeartbeat: ClearskyHeartbeatService
+    /// Age (seconds) after which a cached ClearSky blocklist payload is treated as
+    /// stale. Internal rather than private so tests can shrink it to exercise the
+    /// stale-cache fallback deterministically.
+    var clearskyCacheMaxAge: TimeInterval = BlueskyAPICache.DefaultTTL.relationship
 
     // MARK: - Init
 
@@ -1337,7 +1341,59 @@ class LiveBlueskyClient: ObservableObject,
         return Set(entries.map(\.did))
     }
 
-    /// Fetches ALL pages from a ClearSky paginated endpoint.
+    /// Fetches ALL pages from a ClearSky paginated endpoint, falling back to the
+    /// last cached payload when the refresh fails.
+    ///
+    /// ClearSky is a third-party service with multi-hour outages (e.g. all routes
+    /// answered `502` for days in September 2026). A blocklist from the last
+    /// successful fetch is more useful than an error screen, so a failed refresh
+    /// serves the stale cache instead of throwing. Explicit refreshes
+    /// (`ignoreCache: true`) and task cancellation still propagate.
+    private func fetchClearskyEntries(
+        actorDID: String,
+        endpoint: String,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
+        onPage: (@Sendable (Int, [ClearskyBlocklistEntry]) async -> Void)? = nil,
+        ignoreCache: Bool = false,
+        toleratePartialErrors: Bool = false
+    ) async throws -> [ClearskyBlocklistEntry] {
+        let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
+        var staleFallback: [ClearskyBlocklistEntry]?
+        if !ignoreCache,
+           let cached = await BlueskyAPICache.shared.read(
+               accountDID: actorDID,
+               url: cacheURL,
+               maxAge: clearskyCacheMaxAge
+           ),
+           let entries = try? JSONDecoder().decode([ClearskyBlocklistEntry].self, from: cached.data)
+        {
+            if !cached.isStale {
+                AppLogger.performance.debug("Clearsky cache HIT for \(endpoint)/\(actorDID) (\(entries.count) entries)")
+                return entries
+            }
+            staleFallback = entries
+            AppLogger.performance.debug("Clearsky cache STALE for \(endpoint)/\(actorDID) (\(entries.count) entries kept as fallback)")
+        }
+
+        do {
+            return try await fetchClearskyEntriesFromNetwork(
+                actorDID: actorDID,
+                endpoint: endpoint,
+                onProgress: onProgress,
+                onPage: onPage,
+                toleratePartialErrors: toleratePartialErrors
+            )
+        } catch let cancellation as CancellationError {
+            throw cancellation
+        } catch {
+            guard let staleFallback, !staleFallback.isEmpty else { throw error }
+            AppLogger.http.warning("Clearsky \(endpoint)/\(actorDID) refresh failed (\(error.localizedDescription, privacy: .public)) — serving \(staleFallback.count) cached entries")
+            return staleFallback
+        }
+    }
+
+    /// Fetches ALL pages from a ClearSky paginated endpoint over the network and
+    /// refreshes the cache.
     /// Page 1 is fetched first; if it has 100 entries, remaining pages
     /// are fetched in bounded parallel batches with retries. A `404` response
     /// marks the end of the data. Any other HTTP error or decode failure is
@@ -1348,31 +1404,14 @@ class LiveBlueskyClient: ObservableObject,
     /// The optional `onPage` callback is invoked for each page as it is
     /// processed in order, allowing callers to pipeline work such as profile
     /// resolution while the next batch of pages is still being fetched.
-    private func fetchClearskyEntries(
+    private func fetchClearskyEntriesFromNetwork(
         actorDID: String,
         endpoint: String,
         onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
         onPage: (@Sendable (Int, [ClearskyBlocklistEntry]) async -> Void)? = nil,
-        ignoreCache: Bool = false,
         toleratePartialErrors: Bool = false
     ) async throws -> [ClearskyBlocklistEntry] {
-        // Check BlueskyAPICache (2-min TTL) to avoid full pagination on every dashboard load
         let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
-        if !ignoreCache,
-           let cached = await BlueskyAPICache.shared.read(
-               accountDID: actorDID,
-               url: cacheURL,
-               maxAge: BlueskyAPICache.DefaultTTL.relationship
-           )
-        {
-            if !cached.isStale,
-               let entries = try? JSONDecoder().decode([ClearskyBlocklistEntry].self, from: cached.data)
-            {
-                AppLogger.performance.debug("Clearsky cache HIT for \(endpoint)/\(actorDID) (\(entries.count) entries)")
-                return entries
-            }
-        }
-
         // Step 1: fetch page 1 synchronously — determines if more pages exist
         guard let page1 = try await fetchClearskyPageWithRetries(actorDID: actorDID, endpoint: endpoint, page: 1) else {
             // 404 on page 1 means there is no blocklist data for this actor.
@@ -1551,10 +1590,9 @@ class LiveBlueskyClient: ObservableObject,
     ///   and decode failures.
     private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry]? {
         try Task.checkCancellation()
-        let urlString = page == 1
-            ? "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)"
-            : "https://public.api.clearsky.services/api/v1/anon/\(endpoint)/\(actorDID)/\(page)"
-        guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+        guard let url = ClearskyEndpoints.blocklist(endpoint: endpoint, actorDID: actorDID, page: page) else {
+            throw BlueskyAPIError.invalidURL
+        }
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
@@ -1757,11 +1795,10 @@ class LiveBlueskyClient: ObservableObject,
         var allLists: [ClearskyListEntry] = []
         var page = 1
         repeat {
-            let urlString = page == 1
-                ? "https://api.clearsky.app/csky/api/v1/get-list/\(handle)"
-                : "https://api.clearsky.app/csky/api/v1/get-list/\(handle)/\(page)"
-            AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(urlString, privacy: .public)")
-            guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+            AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(ClearskyEndpoints.listsBaseURL, privacy: .public)")
+            guard let url = ClearskyEndpoints.lists(forHandle: handle, page: page) else {
+                throw BlueskyAPIError.invalidURL
+            }
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists")
@@ -1789,8 +1826,9 @@ class LiveBlueskyClient: ObservableObject,
     /// without paginating through every list page.
     func fetchClearskyListsCount(handle: String) async throws -> Int {
         try guardClearskyAvailable()
-        let urlString = "https://api.clearsky.app/csky/api/v1/get-list/total/\(handle)"
-        guard let url = URL(string: urlString) else { throw BlueskyAPIError.invalidURL }
+        guard let url = ClearskyEndpoints.listsTotal(forHandle: handle) else {
+            throw BlueskyAPIError.invalidURL
+        }
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists Count")
@@ -1887,15 +1925,49 @@ class LiveBlueskyClient: ObservableObject,
         return result
     }
 
-    /// Resolves a handle to a DID via the ClearSky `get-did` endpoint.
+    /// Resolves a handle to a DID.
+    ///
+    /// Resolution runs on the AT Protocol (`com.atproto.identity.resolveHandle`),
+    /// which is authoritative and independent of ClearSky availability: opening a
+    /// profile from the timeline, chat, search or a thread must keep working while
+    /// ClearSky is down. ClearSky's `get-did` is only a fallback.
+    /// DIDs (prefix `did:`) are returned as-is without a network call — callers
+    /// that already know the DID (e.g. from mention facets) skip resolution entirely.
     private func resolveHandleToDID(handle: String) async throws -> String {
-        try guardClearskyAvailable()
-        guard let url = URL(string: "https://public.api.clearsky.services/api/v1/anon/get-did/\(handle)") else {
+        if handle.hasPrefix("did:") {
+            return handle
+        }
+        if let did = try? await resolveHandleViaATProtocol(handle) {
+            return did
+        }
+        return try await resolveHandleViaClearsky(handle)
+    }
+
+    /// Handle → DID via the public AT Protocol AppView (`public.api.bsky.app`).
+    private func resolveHandleViaATProtocol(_ handle: String) async throws -> String {
+        guard var components = URLComponents(string: "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle") else {
             throw BlueskyAPIError.invalidURL
         }
-        var request = URLRequest(url: url)
+        components.queryItems = [URLQueryItem(name: "handle", value: handle)]
+        guard let url = components.url else { throw BlueskyAPIError.invalidURL }
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.timeoutInterval = 30
+        let (data, httpResponse) = try await httpClient.data(for: request, source: "Handle Resolution")
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
+            throw BlueskyAPIError.invalidResponse
+        }
+        return try JSONDecoder().decode(ResolveHandleResponse.self, from: data).did
+    }
+
+    /// Handle → DID via the ClearSky `get-did` endpoint. Fallback only; requires a
+    /// healthy ClearSky heartbeat.
+    private func resolveHandleViaClearsky(_ handle: String) async throws -> String {
+        try guardClearskyAvailable()
+        guard let url = ClearskyEndpoints.did(forHandle: handle) else {
+            throw BlueskyAPIError.invalidURL
+        }
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         let (data, httpResponse) = try await httpClient.data(for: request, source: "Handle Resolution")
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
             throw BlueskyAPIError.invalidResponse
