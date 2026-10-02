@@ -8,7 +8,6 @@ struct iPadRootView: View {
     @EnvironmentObject private var mutedWordsStore: MutedWordsStore
     @EnvironmentObject private var analyticsStore: AnalyticsStore
     @EnvironmentObject private var chatStore: ChatStore
-    @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
     @EnvironmentObject private var internalListStore: InternalListStore
 
     @StateObject private var navState = iPadNavigationState()
@@ -28,11 +27,6 @@ struct iPadRootView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if !clearskyHeartbeat.isClearskyAvailable {
-                ClearskyBanner()
-                    .environmentObject(localizationManager)
-            }
-
             NavigationSplitView(columnVisibility: $navState.columnVisibility) {
                 iPadSidebar(selection: $navState.sidebarSelection)
             } content: {
@@ -43,7 +37,7 @@ struct iPadRootView: View {
             .preferredColorScheme(preferredScheme)
             .environment(\.locale, localizationManager.locale)
             .environment(\.layoutDirection, localizationManager.layoutDirection)
-            .tint(clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7))
+            .tint(Color.skyPrimary)
             .environmentObject(navState)
         }
         .safeAreaInset(edge: .top) {

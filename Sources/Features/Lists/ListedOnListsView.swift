@@ -1,11 +1,25 @@
 import SwiftUI
 
-// MARK: - ClearskyListsView
+// MARK: - ListedOnListsView
 
-/// Lists that a given profile belongs to, sourced from ClearSky metadata.
+/// Lists that a given profile belongs to, from the public index plus AppView metadata.
 /// Shows list name, description, owner handle, member count, and relative date added.
-struct ClearskyListsView: View {
-    let entries: [ClearskyListEntry]
+///
+/// The walk behind this screen is long for a well-listed profile — one metadata request per
+/// owning repo — so the view renders three states: **loading** (with a determinate bar once
+/// the number of lists is known), **empty**, and **content**. While the walk is still running
+/// a progress row stays above the already-resolved entries, and rows whose member count is
+/// still loading say so.
+struct ListedOnListsView: View {
+    /// The entries resolved so far; the array can grow while `isLoading` is true.
+    let entries: [ListedOnListEntry]
+    /// True while the "listed on" walk is still running.
+    var isLoading = false
+    /// Progress of the running walk, when known.
+    var progress: ListedOnProgress?
+    /// Error from the walk; shown when nothing could be loaded at all.
+    var errorMessage: String?
+
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var accountStore: AccountStore
     @EnvironmentObject private var container: BlueskyServiceContainerWrapper
@@ -15,7 +29,7 @@ struct ClearskyListsView: View {
     @State private var isLoadingCounts = false
 
     /// Entries sorted newest-first by date added.
-    private var sortedEntries: [ClearskyListEntry] {
+    private var sortedEntries: [ListedOnListEntry] {
         entries.sorted { a, b in
             date(from: a.dateAdded) > date(from: b.dateAdded)
         }
@@ -25,17 +39,32 @@ struct ClearskyListsView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    ForEach(sortedEntries) { entry in
-                        NavigationLink {
-                            ListDetailView(
-                                list: blueskyList(from: entry),
-                                onListUpdated: { _ in }
-                            )
-                            .environmentObject(accountStore)
-                        } label: {
-                            rowContent(entry)
+            Group {
+                if sortedEntries.isEmpty, isLoading {
+                    loadingPanel
+                } else if sortedEntries.isEmpty, let errorMessage {
+                    EmptyStatePanel(title: loc("lists.listed_on.empty"), message: errorMessage)
+                } else if sortedEntries.isEmpty {
+                    EmptyStatePanel(title: loc("lists.listed_on.empty"))
+                } else {
+                    List {
+                        if isLoading {
+                            Section {
+                                progressRow
+                            }
+                        }
+                        Section {
+                            ForEach(sortedEntries) { entry in
+                                NavigationLink {
+                                    ListDetailView(
+                                        list: blueskyList(from: entry),
+                                        onListUpdated: { _ in }
+                                    )
+                                    .environmentObject(accountStore)
+                                } label: {
+                                    rowContent(entry)
+                                }
+                            }
                         }
                     }
                 }
@@ -57,8 +86,63 @@ struct ClearskyListsView: View {
         }
     }
 
-    /// Converts a ClearSky list entry into a `BlueskyList` model for navigation.
-    private func blueskyList(from entry: ClearskyListEntry) -> BlueskyList {
+    // MARK: - Loading states
+
+    /// Fills the screen while nothing has resolved yet: a determinate bar once the list count
+    /// is known, a spinner during the (open-ended) membership walk before that.
+    @ViewBuilder private var loadingPanel: some View {
+        if case let .lists(resolved, total) = progress, total > 0 {
+            VStack(spacing: 12) {
+                ProgressView(value: Double(resolved), total: Double(total))
+                    .progressViewStyle(.linear)
+                Text(progressCaption)
+                    .appFont(.label)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            .frame(maxWidth: .infinity, minHeight: 120)
+            .padding()
+            .accessibilityElement(children: .combine)
+        } else {
+            LoadingPanel(message: loc("lists.listed_on.loading_memberships"))
+        }
+    }
+
+    /// Sits above the entries while the walk is still running, so a partial screen still
+    /// shows that more is coming.
+    private var progressRow: some View {
+        HStack(spacing: 10) {
+            if let fraction = progress?.fraction {
+                ProgressView(value: fraction)
+                    .progressViewStyle(.linear)
+            } else {
+                ProgressView()
+                    .scaleEffect(0.6)
+            }
+            Text(progressCaption)
+                .appFont(.caption)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Localized caption of the current phase: "12 of 150 lists" once the count is known.
+    private var progressCaption: String {
+        switch progress {
+        case .memberships, .none:
+            loc("lists.listed_on.loading_memberships")
+        case let .lists(resolved, total):
+            loc("lists.listed_on.loading_lists")
+                .replacingOccurrences(of: "{done}", with: "\(resolved)")
+                .replacingOccurrences(of: "{total}", with: "\(total)")
+        }
+    }
+
+    // MARK: - Rows
+
+    /// Converts a listed-on entry into a `BlueskyList` model for navigation.
+    private func blueskyList(from entry: ListedOnListEntry) -> BlueskyList {
         BlueskyList(
             id: atURI(from: entry.url, ownerDID: entry.did) ?? entry.url,
             name: entry.name,
@@ -70,7 +154,7 @@ struct ClearskyListsView: View {
     }
 
     /// Displays the list name, description, owner handle, member count, and relative date.
-    private func rowContent(_ entry: ClearskyListEntry) -> some View {
+    private func rowContent(_ entry: ListedOnListEntry) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
@@ -87,6 +171,17 @@ struct ClearskyListsView: View {
                     Text(loc("internal.list.member_count").replacingOccurrences(of: "{n}", with: "\(count)"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                } else if isLoadingCounts {
+                    // The member count comes from its own per-list request: say so instead of
+                    // leaving the row looking like it simply has no members.
+                    HStack(spacing: 4) {
+                        ProgressView()
+                            .scaleEffect(0.5)
+                        Text(loc("lists.listed_on.loading_member_counts"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
                 }
                 if let handle = ownerHandles[entry.url] {
                     Text(handle)
@@ -100,6 +195,8 @@ struct ClearskyListsView: View {
                 .foregroundStyle(.secondary)
         }
     }
+
+    // MARK: - Enrichment
 
     /// Resolves the DID for each entry to a human-readable handle via batch profile fetch.
     private func loadOwnerHandles() async {

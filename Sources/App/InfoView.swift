@@ -9,7 +9,7 @@ import SwiftUI
 ///   GitHub link, security note, and version/build info.
 /// - **Features**: detailed breakdown of moderation, export, and list management features.
 /// - **Legal**: author info, links to website/imprint/privacy, license, third-party services
-///   (Clearsky), and data classification details.
+///   public indexes, and data classification details.
 ///
 /// ## Easter Eggs
 /// - **Triple-tap** the logo → replays the splash screen animation.
@@ -300,7 +300,7 @@ struct InfoView: View {
     // MARK: - Legal Tab
 
     /// Legal info: author, website, imprint, privacy, license, third-party
-    /// services (Clearsky), and data classification.
+    /// services, and data classification.
     private var legalTab: some View {
         VStack(spacing: 12) {
             legalRow(icon: "person.crop.square", title: localizationManager.localized("info.legal.author"), value: "Andreas Jung")
@@ -344,21 +344,31 @@ struct InfoView: View {
                     .appFont(.subheading)
                     .foregroundStyle(.primary)
 
-                Link(destination: URL(string: "https://clearsky.app")!) {
-                    legalRow(icon: "cloud", title: localizationManager.localized("info.legal.clearsky"), value: "clearsky.app", link: true)
+                Link(destination: URL(string: "https://constellation.microcosm.blue")!) {
+                    legalRow(
+                        icon: "cloud",
+                        title: localizationManager.localized("info.legal.constellation"),
+                        value: "constellation.microcosm.blue",
+                        link: true
+                    )
                 }
                 .tint(.primary)
-                .accessibilityLabel(loc: "info.clearsky.label")
-                .accessibilityHint(loc: "info.clearsky.hint")
+                .accessibilityLabel(loc("info.constellation.label"))
+                .accessibilityHint(loc("info.constellation.hint"))
 
-                Link(destination: URL(string: "https://github.com/ClearskyApp06/clearskyservices")!) {
-                    legalRow(icon: "chevron.left.forwardslash.chevron.right", title: localizationManager.localized("info.legal.clearsky_github"), value: "github.com/ClearskyApp06", link: true)
+                Link(destination: URL(string: "https://public.api.bsky.app")!) {
+                    legalRow(
+                        icon: "cloud",
+                        title: localizationManager.localized("info.legal.appview"),
+                        value: "public.api.bsky.app",
+                        link: true
+                    )
                 }
                 .tint(.primary)
-                .accessibilityLabel(loc: "info.clearsky_github.label")
-                .accessibilityHint(loc: "info.clearsky_github.hint")
+                .accessibilityLabel(loc("info.appview.label"))
+                .accessibilityHint(loc("info.appview.hint"))
 
-                Text(verbatim: localizationManager.localized("info.clearsky.desc"))
+                Text(verbatim: localizationManager.localized("info.sources.desc"))
                     .appFont(.label)
                     .foregroundStyle(.secondary)
                     .padding(.leading, 50)

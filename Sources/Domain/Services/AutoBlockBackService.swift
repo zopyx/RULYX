@@ -79,7 +79,7 @@ final class AutoBlockBackService: ObservableObject {
     @Published private(set) var lastResult: Result?
 
     private weak var container: BlueskyServiceContainerWrapper?
-    private var clearskyService: BlueskyClearSkyServicing?
+    private var blocklistService: BlueskyBlocklistServicing?
     private var profileService: BlueskyProfileInspecting?
     private var listService: BlueskyListServicing?
     private var socialService: BlueskySocialServicing?
@@ -100,14 +100,14 @@ final class AutoBlockBackService: ObservableObject {
 
     /// Creates the service with the required dependencies.
     init(
-        clearskyService: BlueskyClearSkyServicing,
+        blocklistService: BlueskyBlocklistServicing,
         profileService: BlueskyProfileInspecting,
         listService: BlueskyListServicing,
         socialService: BlueskySocialServicing,
         accountStore: AccountStoreProtocol,
         internalListStore: InternalListStore
     ) {
-        self.clearskyService = clearskyService
+        self.blocklistService = blocklistService
         self.profileService = profileService
         self.listService = listService
         self.socialService = socialService
@@ -123,7 +123,7 @@ final class AutoBlockBackService: ObservableObject {
         internalListStore: InternalListStore
     ) {
         self.init(
-            clearskyService: container.clearsky,
+            blocklistService: container.blocklist,
             profileService: container.profile,
             listService: container.list,
             socialService: container.social,
@@ -155,7 +155,7 @@ final class AutoBlockBackService: ObservableObject {
             }
         }
 
-        guard let clearsky = clearskyService,
+        guard let blocklist = blocklistService,
               let profile = profileService,
               let listSvc = listService,
               let social = socialService,
@@ -166,7 +166,7 @@ final class AutoBlockBackService: ObservableObject {
         defer { isRunning = false }
 
         do {
-            let toBlock = try await clearsky.fetchUnblockedBlockerActors(
+            let toBlock = try await blocklist.fetchUnblockedBlockerActors(
                 account: account,
                 appPassword: appPassword
             )
@@ -188,7 +188,7 @@ final class AutoBlockBackService: ObservableObject {
             } catch {
                 existingBlockedDIDs = []
                 AppLogger.moderation.error(
-                    "Auto-block-back: failed to fetch existing block DIDs, falling back to ClearSky data: \(error.localizedDescription, privacy: .public)"
+                    "Auto-block-back: failed to fetch existing block DIDs, using the blocklist data only: \(error.localizedDescription, privacy: .public)"
                 )
             }
             let filteredToBlock = toBlock.filter { !existingBlockedDIDs.contains($0.did) }

@@ -12,7 +12,7 @@ struct BlueskyServiceContainer {
     let post: BlueskyPostServicing
     let social: BlueskySocialServicing
     let moderation: BlueskyModerationServicing
-    let clearsky: BlueskyClearSkyServicing
+    let blocklist: BlueskyBlocklistServicing
     let notification: BlueskyNotificationServicing
     let identity: BlueskyIdentityServicing
     let media: BlueskyMediaServicing
@@ -27,7 +27,7 @@ struct BlueskyServiceContainer {
         post = liveClient
         social = liveClient
         moderation = liveClient
-        clearsky = liveClient
+        blocklist = liveClient
         notification = liveClient
         identity = liveClient
         media = liveClient
@@ -43,7 +43,7 @@ struct BlueskyServiceContainer {
         post: BlueskyPostServicing,
         social: BlueskySocialServicing,
         moderation: BlueskyModerationServicing,
-        clearsky: BlueskyClearSkyServicing,
+        blocklist: BlueskyBlocklistServicing,
         notification: BlueskyNotificationServicing,
         identity: BlueskyIdentityServicing,
         media: BlueskyMediaServicing,
@@ -57,7 +57,7 @@ struct BlueskyServiceContainer {
         self.post = post
         self.social = social
         self.moderation = moderation
-        self.clearsky = clearsky
+        self.blocklist = blocklist
         self.notification = notification
         self.identity = identity
         self.media = media

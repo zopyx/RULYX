@@ -108,7 +108,7 @@ final class ListsViewModel {
             hasCache = false
         }
 
-        // On an explicit pull-to-refresh, clear the Clearsky-derived counters
+        // On an explicit pull-to-refresh, clear the derived counters
         // so the UI shows a loading state and does not keep a stale partial count.
         if isExplicitRefresh {
             blockingCount = nil

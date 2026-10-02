@@ -287,7 +287,7 @@ struct BatchOperationProgressView: View {
     private func runBlock(account: AppAccount, appPassword: String) async {
         let blockedDIDs: Set<String>
         do {
-            let blockedResult = try await container.clearsky.fetchBlockedActors(account: account, appPassword: appPassword)
+            let blockedResult = try await container.blocklist.fetchBlockedActors(account: account, appPassword: appPassword)
             blockedDIDs = Set(blockedResult.actors.map(\.did))
         } catch {
             blockedDIDs = []

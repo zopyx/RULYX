@@ -10,9 +10,8 @@ final class BlueskyProfileActionsViewModel {
     // MARK: - Dependencies
 
     private var profileService: BlueskyProfileInspecting
-    private var clearskyService: BlueskyClearSkyServicing
+    private var blocklistService: BlueskyBlocklistServicing
     private var accountStore: AccountStoreProtocol
-    let clearskyHeartbeat: ClearskyHeartbeatService
 
     // MARK: - Block Counts
 
@@ -43,10 +42,10 @@ final class BlueskyProfileActionsViewModel {
     var blockPreviewActors: [BlueskyActor] = []
     var isFetchingBlockPreview = false
 
-    // MARK: - Recently-Blocked Tracking (PDS-level, not ClearSky)
+    // MARK: - Recently-Blocked Tracking (PDS-level)
 
-    /// Tracks DIDs we've blocked in the current session to supplement
-    /// ClearSky data that may still be stale during post-block-back refreshes.
+    /// Tracks DIDs we've blocked in the current session, so a refresh right after a
+    /// block action already counts them instead of waiting for the repo cache to roll over.
     private var recentlyBlockedDIDs = Set<String>()
 
     // MARK: - Init
@@ -57,24 +56,22 @@ final class BlueskyProfileActionsViewModel {
 
     init(
         profileService: BlueskyProfileInspecting,
-        clearskyService: BlueskyClearSkyServicing,
-        accountStore: AccountStoreProtocol,
-        clearskyHeartbeat: ClearskyHeartbeatService = .shared
+        blocklistService: BlueskyBlocklistServicing,
+        accountStore: AccountStoreProtocol
     ) {
         self.profileService = profileService
-        self.clearskyService = clearskyService
+        self.blocklistService = blocklistService
         self.accountStore = accountStore
-        self.clearskyHeartbeat = clearskyHeartbeat
     }
 
     /// Reconfigure with new services for transition-period wiring.
     func reconfigure(
         profileService: BlueskyProfileInspecting,
-        clearskyService: BlueskyClearSkyServicing,
+        blocklistService: BlueskyBlocklistServicing,
         accountStore: AccountStoreProtocol
     ) {
         self.profileService = profileService
-        self.clearskyService = clearskyService
+        self.blocklistService = blocklistService
         self.accountStore = accountStore
     }
 
@@ -82,16 +79,16 @@ final class BlueskyProfileActionsViewModel {
     convenience init(client: LiveBlueskyClient, accountStore: AccountStore) {
         self.init(
             profileService: client,
-            clearskyService: client,
+            blocklistService: client,
             accountStore: accountStore
         )
     }
 
     // MARK: - Block Counts
 
-    /// Fetches all three block counts from a single pair of ClearSky reads
-    /// (blocklist + single-blocklist), then adjusts for recently-blocked DIDs
-    /// that ClearSky may not have indexed yet.
+    /// Fetches all three block counts from one pair of blocklist reads
+    /// (own repo + backlink index), then adjusts for recently-blocked DIDs
+    /// that a cached response may not have picked up yet.
     func fetchBlockCounts(isOwnProfile: Bool) async {
         guard isOwnProfile else {
             resetBlockBackCounts()
@@ -107,42 +104,34 @@ final class BlueskyProfileActionsViewModel {
         unblockedBlockersCount = nil
         isFetchingUnblocked = true
 
-        do {
-            // Fetch both endpoints in parallel (DIDs only – no profile resolution)
-            async let blockedDIDs = clearskyService.fetchClearskyBlockDIDs(
-                endpoint: "blocklist", for: account
-            )
-            async let blockedByDIDs = clearskyService.fetchClearskyBlockDIDs(
-                endpoint: "single-blocklist", for: account
-            )
-            let (blocked, blockedBy) = try await (blockedDIDs, blockedByDIDs)
+        // Fetch both sides in parallel (DIDs only – no profile resolution). Each side is
+        // optional and independent — own repo vs. backlink index — so a failure on one
+        // side must not blank out the other.
+        async let blockedDIDsResult: Set<String>? = try? blocklistService.fetchBlockedDIDs(for: account)
+        async let blockedByDIDsResult: Set<String>? = try? blocklistService.fetchBlockerDIDs(for: account)
+        let (blocked, blockedBy) = await (blockedDIDsResult, blockedByDIDsResult)
 
-            // Apply our recently-blocked supplement
-            let effectiveBlocked = blocked.union(recentlyBlockedDIDs)
-            let unblockedCount = max(0, blockedBy.count - effectiveBlocked.count)
+        // Apply our recently-blocked supplement
+        let effectiveBlocked = (blocked ?? []).union(recentlyBlockedDIDs)
+        // The unblocked count is a set difference, so it only exists when both sides did.
+        let unblockedCount = (blocked != nil && blockedBy != nil)
+            ? max(0, blockedBy!.count - effectiveBlocked.count)
+            : nil
 
-            await MainActor.run {
-                self.blockingCount = blocked.count
-                self.blockedByCount = blockedBy.count
-                self.unblockedBlockersCount = unblockedCount
-                self.isFetchingBlocking = false
-                self.isFetchingBlockedBy = false
-                self.isFetchingUnblocked = false
-            }
-        } catch {
-            await MainActor.run {
-                self.isFetchingBlocking = false
-                self.isFetchingBlockedBy = false
-                self.isFetchingUnblocked = false
-            }
+        await MainActor.run {
+            self.blockingCount = blocked?.count
+            self.blockedByCount = blockedBy?.count
+            self.unblockedBlockersCount = unblockedCount
+            self.isFetchingBlocking = false
+            self.isFetchingBlockedBy = false
+            self.isFetchingUnblocked = false
         }
     }
 
     // MARK: - Block Back Preview
 
     var blockBackPreviewAvailable: Bool {
-        guard clearskyHeartbeat.isClearskyAvailable,
-              let count = unblockedBlockersCount else { return false }
+        guard let count = unblockedBlockersCount else { return false }
         return count > 0
     }
 
@@ -153,7 +142,7 @@ final class BlueskyProfileActionsViewModel {
         defer { isFetchingBlockPreview = false }
 
         do {
-            blockPreviewActors = try await clearskyService.fetchUnblockedBlockerActors(
+            blockPreviewActors = try await blocklistService.fetchUnblockedBlockerActors(
                 account: account, appPassword: appPassword
             )
             showBlockBackPreview = true
@@ -165,7 +154,6 @@ final class BlueskyProfileActionsViewModel {
     // MARK: - Block Back Execution
 
     func blockBack(actors: [BlueskyActor]? = nil) async {
-        guard clearskyHeartbeat.isClearskyAvailable else { return }
         guard let account = accountStore.activeAccount else { return }
 
         // Password required only when fetching actors live; optional when pre-resolved
@@ -194,7 +182,7 @@ final class BlueskyProfileActionsViewModel {
             if let actors {
                 toBlock = actors
             } else {
-                toBlock = try await clearskyService.fetchUnblockedBlockerActors(
+                toBlock = try await blocklistService.fetchUnblockedBlockerActors(
                     account: account, appPassword: appPassword
                 )
             }
@@ -210,14 +198,14 @@ final class BlueskyProfileActionsViewModel {
         }
 
         // P0: Pre-filter against PDS-level block records to avoid duplicates.
-        // This is a real-time check not subject to ClearSky latency.
+        // This is a real-time check against the PDS, not the cached list state.
         let existingBlockedDIDs: Set<String>
         do {
             existingBlockedDIDs = try await profileService.fetchExistingBlockedDIDs(
                 account: account, appPassword: appPassword
             )
         } catch {
-            // If the PDS query fails, fall back to ClearSky data alone (no pre-filter)
+            // If the PDS query fails, use the blocklist data alone (no pre-filter)
             existingBlockedDIDs = []
             AppLogger.moderation.error("Failed to fetch existing blocked DIDs: \(error.localizedDescription, privacy: .public)")
         }
@@ -265,7 +253,7 @@ final class BlueskyProfileActionsViewModel {
             }
         }
 
-        // Track successfully blocked DIDs to supplement ClearSky data
+        // Track successfully blocked DIDs to supplement the next refresh
         for actor in filteredToBlock {
             recentlyBlockedDIDs.insert(actor.did)
         }

@@ -11,9 +11,13 @@ import SwiftUI
 struct PostTextContent: View {
     /// The raw post text containing mentions and links.
     let text: String
+    /// Rich-text facets for the post. When present, mentions/links are rendered
+    /// from the facet byte ranges and target DIDs/URIs (no handle resolution needed
+    /// on tap); when `nil`, mentions/links are detected via regex as a fallback.
+    let facets: [RichFacet]?
     /// Triggered when the post body is tapped (navigate to thread).
     var onTapThread: (() -> Void)?
-    /// Triggered when a mention link is tapped, passing the handle.
+    /// Triggered when a mention link is tapped, passing the handle or DID.
     var onOpenProfile: ((String) -> Void)?
     /// Triggered when an external URL is tapped.
     var onOpenURL: ((URL) -> Void)?
@@ -30,6 +34,7 @@ struct PostTextContent: View {
 
     init(
         text: String,
+        facets: [RichFacet]? = nil,
         onTapThread: (() -> Void)? = nil,
         onOpenProfile: ((String) -> Void)? = nil,
         onOpenURL: ((URL) -> Void)? = nil,
@@ -38,14 +43,20 @@ struct PostTextContent: View {
         foregroundStyle: Color = .primary
     ) {
         self.text = text
+        self.facets = facets
         self.onTapThread = onTapThread
         self.onOpenProfile = onOpenProfile
         self.onOpenURL = onOpenURL
         self.font = font
         self.lineLimit = lineLimit
         self.foregroundStyle = foregroundStyle
-        // Use cached value if available, else empty until async load (T04)
-        _attributedText = State(initialValue: PostTextCache.shared.cachedSync(text) ?? AttributedString(text))
+        // Facet rendering is cheap (no regex/data detection), so build it inline;
+        // regex-based rendering goes through the cache (T04).
+        if let facets, !facets.isEmpty {
+            _attributedText = State(initialValue: postAttributedString(from: text, facets: facets))
+        } else {
+            _attributedText = State(initialValue: PostTextCache.shared.cachedSync(text) ?? AttributedString(text))
+        }
     }
 
     // MARK: - Body
@@ -58,9 +69,10 @@ struct PostTextContent: View {
             .foregroundStyle(foregroundStyle)
             .frame(maxWidth: .infinity, alignment: .leading)
             .environment(\.openURL, OpenURLAction { url in
-                // Intercept mention:// URLs to navigate to profiles
-                if url.scheme == "mention", let handle = url.host {
-                    onOpenProfile?(handle)
+                // Intercept mention links to navigate to profiles. The target is a DID when
+                // rendered from facets, a handle when rendered by the regex fallback.
+                if let target = MentionLink.target(from: url) {
+                    onOpenProfile?(target)
                     return .handled
                 }
                 if let onOpenURL {
@@ -70,7 +82,10 @@ struct PostTextContent: View {
                 return .systemAction
             })
             .task(id: text) {
-                if let cached = PostTextCache.shared.cachedSync(text) {
+                // Refresh on row recycling: a reused view may now show a different post.
+                if let facets, !facets.isEmpty {
+                    attributedText = postAttributedString(from: text, facets: facets)
+                } else if let cached = PostTextCache.shared.cachedSync(text) {
                     attributedText = cached
                 } else {
                     let result = await PostTextCache.shared.attributedString(for: text)
@@ -78,9 +93,15 @@ struct PostTextContent: View {
                 }
             }
         if let onTapThread {
+            // The "open thread" tap sits *behind* the text (as its background): a gesture
+            // attached to the text itself would win over the link handling the mentions inside
+            // it need, while a tap that misses a link falls through to this layer.
             textContent
-                .contentShape(Rectangle())
-                .onTapGesture { onTapThread() }
+                .background {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture { onTapThread() }
+                }
         } else {
             textContent
         }
@@ -97,7 +118,7 @@ func postAttributedString(from text: String) -> AttributedString {
         guard let range = Range(match.range, in: text),
               let attrRange = Range(match.range, in: attributed) else { continue }
         let handle = String(text[range].dropFirst())
-        attributed[attrRange].link = URL(string: "mention://\(handle)")
+        attributed[attrRange].link = MentionLink.url(for: handle)
         attributed[attrRange].foregroundColor = Color.skyPrimary
         attributed[attrRange].underlineStyle = .single
     }
@@ -113,6 +134,65 @@ func postAttributedString(from text: String) -> AttributedString {
     }
 
     return attributed
+}
+
+/// Builds the attributed string from a post's rich-text facets.
+/// Mention facets become mention links carrying the target DID (already known, so opening the
+/// profile needs no handle resolution); link facets become their URL. Invalid or out-of-range
+/// facets are skipped.
+func postAttributedString(from text: String, facets: [RichFacet]) -> AttributedString {
+    var attributed = AttributedString(text)
+    for facet in facets {
+        guard facet.index.byteEnd > facet.index.byteStart,
+              let lowerTextIndex = text.utf8.index(
+                  text.startIndex,
+                  offsetBy: facet.index.byteStart,
+                  limitedBy: text.endIndex
+              ),
+              let upperTextIndex = text.utf8.index(
+                  lowerTextIndex,
+                  offsetBy: facet.index.byteEnd - facet.index.byteStart,
+                  limitedBy: text.endIndex
+              ),
+              let lower = AttributedString.Index(lowerTextIndex, within: attributed),
+              let upper = AttributedString.Index(upperTextIndex, within: attributed)
+        else { continue }
+        let attrRange = lower ..< upper
+        guard let feature = facet.features.first(where: { $0.did != nil || $0.uri != nil }) else { continue }
+        if let did = feature.did {
+            attributed[attrRange].link = MentionLink.url(for: did)
+        } else if let uri = feature.uri, let url = URL(string: uri) {
+            attributed[attrRange].link = url
+        } else {
+            continue
+        }
+        attributed[attrRange].foregroundColor = Color.skyPrimary
+        attributed[attrRange].underlineStyle = .single
+    }
+    return attributed
+}
+
+// MARK: - MentionLink
+
+/// The custom `mention://` link used to make handles and mentions tappable.
+///
+/// The target travels in the **path**, never in the host: a DID contains colons, and
+/// `URL(string: "mention://did:plc:…")` is not a valid URL at all (the colon reads as a port
+/// separator) — it returns `nil`, so such a mention stayed plain, untappable text while still
+/// being styled like a link.
+enum MentionLink {
+    /// Link for a mention target: a DID (facet rendering) or a handle (regex fallback).
+    static func url(for target: String) -> URL? {
+        URL(string: "mention:///\(target)")
+    }
+
+    /// The target carried by `url`, or `nil` when it is not a mention link.
+    /// Host-form links are still understood, so older attributed strings keep working.
+    static func target(from url: URL) -> String? {
+        guard url.scheme == "mention" else { return nil }
+        let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        return path.isEmpty ? url.host : path
+    }
 }
 
 /// Regex for matching @mention patterns in post text.

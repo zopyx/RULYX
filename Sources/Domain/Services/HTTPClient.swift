@@ -181,20 +181,22 @@ struct HTTPClient {
         "Hy81vkYUgs1Asa55LFV4+vfUaPt3QgaPuLTHTkAxqmE=",
         "3udbYNAibUAofT8NAf6ktVK0UZSjEhF99kRyhtyJ2yM=",
         "9Fk6HgfMnM7/vtnBHcUhg1b3gU2bIpSd50XmKZkMbGA=",
-        // api.clearsky.app (moderation lists) — EC leaf + Google WE1 intermediate + GTS Root R4
-        "Y3I68JHgizJRRLoAuY0WJZTARay+EOI2eaSaIL1gv08=",
-        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
-        "H7AMYAvicN2+UcFPBz3kJXCDmGrTItZh4ujUBK8hoWg=",
-        "YSoUL4CBzo5aJ/ES9gSZTsavsgtHsiLLnTG+BKUdork=",
-        // public.api.clearsky.services (blocklist, get-did) — EC leaf + Google WE1 intermediate + GTS Root R4
-        "HsKVgpqgfcSXIAWyUFFk106M0CDFoKgFt82ZWEd1Pqs=",
-        "H7AMYAvicN2+UcFPBz3kJXCDmGrTItZh4ujUBK8hoWg=",
-        "YSoUL4CBzo5aJ/ES9gSZTsavsgtHsiLLnTG+BKUdork=",
         // plc.directory (PLC audit log) — RSA leaf + Amazon intermediate + Amazon root
         "17wmhBIxAP8+6PakBtqWz1krJb43Mb+lvSqQIi6jl6I=",
         "/LWYS0bnqApLztW89p14Ilm/6JdJpH9mSOpWaxSNCL0=",
         "UAJ/9yOqq6nk4CX2QtZgDmyT6JHYlkBfihOzezH/8cs=",
         "197wZm0ZlRXsMJlYpv2R7x/g4XLsTF2yxzu87O2iT38=",
+        // constellation.microcosm.blue (blocklist index) — EC leaf + Let's Encrypt
+        // YE2 intermediate + ISRG Root X2. The leaf rotates every ~60 days, so the two
+        // longer-lived hashes are what keep pinning alive across rotations.
+        //
+        // - Important: a host reached through a pinned client MUST have at least one of its
+        //   chain hashes listed here. The delegate rejects every chain without a match, so a
+        //   missing host does not fail loudly — it shows up as a cancelled request
+        //   (`URLError.cancelled`, "Abgebrochen") and the feature silently has no data.
+        "97OdXXK8RpY7f8DUwLIEhfxYFIx8tWNnEIuyg0IBL5I=",
+        "uVnyjs8i8IbTN0j/dhQYuoLYVYfhIa0bczhBt2SP4GQ=",
+        "+QHt0j1IgBr88CsiSG197KRsbAlprQDohcvoe1Za45Y=",
     ]
 
     private static let inflightManager = InflightManager()

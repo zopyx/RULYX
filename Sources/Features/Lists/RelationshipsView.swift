@@ -65,7 +65,7 @@ struct RelationshipsView: View {
     @State private var isExporting = false
     @State private var exportProgressMessage: String?
     @State private var exportProgressFraction: Double?
-    @State private var clearskyTotal: Int?
+    @State private var sourceTotal: Int?
     @State private var availableTargetLists: [BlueskyList] = []
     @State private var batchOperationConfig: BatchOperationConfig?
     @State private var listsLoaded = false
@@ -96,7 +96,7 @@ struct RelationshipsView: View {
         let vm = actionsVM ?? {
             let v = BlueskyProfileActionsViewModel(
                 profileService: container.profile,
-                clearskyService: container.clearsky,
+                blocklistService: container.blocklist,
                 accountStore: accountStore
             )
             v.resultDisplayDuration = 0 // fast transition in list view
@@ -106,7 +106,7 @@ struct RelationshipsView: View {
         // Ensure dependencies are current (safe to call if already wired)
         vm.reconfigure(
             profileService: container.profile,
-            clearskyService: container.clearsky,
+            blocklistService: container.blocklist,
             accountStore: accountStore
         )
     }
@@ -370,7 +370,7 @@ struct RelationshipsView: View {
         .pageTitle(
             isRefreshing
                 ? modeLocalized
-                : "\(modeLocalized) (\(clearskyTotal ?? actors.count))"
+                : "\(modeLocalized) (\(sourceTotal ?? actors.count))"
         )
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
@@ -382,7 +382,7 @@ struct RelationshipsView: View {
                         ProgressView()
                             .scaleEffect(0.8)
                     } else {
-                        Text(verbatim: "(\(clearskyTotal ?? actors.count))")
+                        Text(verbatim: "(\(sourceTotal ?? actors.count))")
                             .foregroundStyle(.secondary)
                             .font(.subheadline)
                     }
@@ -1233,7 +1233,7 @@ struct RelationshipsView: View {
 
         actors = []
         profileStats = [:]
-        clearskyTotal = nil
+        sourceTotal = nil
         errorMessage = nil
 
         let cached: [BlueskyActor] = if let key = cacheKey {
@@ -1257,7 +1257,7 @@ struct RelationshipsView: View {
         guard let account = accountStore.activeAccount else { return }
         let appPassword = accountStore.appPassword(for: account)
         // Clear count so title shows loading state
-        clearskyTotal = nil
+        sourceTotal = nil
         isRefreshing = true
         await fetchFromAPI(account: account, appPassword: appPassword)
         isRefreshing = false
@@ -1271,29 +1271,29 @@ struct RelationshipsView: View {
             switch mode {
             case .followers:
                 result = try await container.profile.fetchFollowers(actor: did, account: account, appPassword: appPassword)
-                clearskyTotal = initialCount ?? result.count
+                sourceTotal = initialCount ?? result.count
                 onCountUpdate?(mode, result.count)
             case .following:
                 result = try await container.profile.fetchFollowing(actor: did, account: account, appPassword: appPassword)
-                clearskyTotal = initialCount ?? result.count
+                sourceTotal = initialCount ?? result.count
                 onCountUpdate?(mode, result.count)
             case .blocking:
-                let r = try await container.clearsky.fetchBlockedActors(
+                let r = try await container.blocklist.fetchBlockedActors(
                     account: account,
                     appPassword: appPassword,
-                    onProgress: updateClearskyCount
+                    onProgress: updateSourceCount
                 )
                 result = r.actors
-                clearskyTotal = r.totalCount
+                sourceTotal = r.totalCount
                 onCountUpdate?(mode, r.totalCount)
             case .blockedBy:
-                let r = try await container.clearsky.fetchBlockedByActors(
+                let r = try await container.blocklist.fetchBlockedByActors(
                     account: account,
                     appPassword: appPassword,
-                    onProgress: updateClearskyCount
+                    onProgress: updateSourceCount
                 )
                 result = r.actors
-                clearskyTotal = r.totalCount
+                sourceTotal = r.totalCount
                 onCountUpdate?(mode, r.totalCount)
             }
             if mode == .blocking || mode == .blockedBy {
@@ -1310,7 +1310,7 @@ struct RelationshipsView: View {
             }
 
             // Show status if loaded count differs from expected total
-            if let expected = clearskyTotal, expected != actors.count, mode != .blocking, mode != .blockedBy {
+            if let expected = sourceTotal, expected != actors.count, mode != .blocking, mode != .blockedBy {
                 statusMessage = String.localized("rel.loaded_status", replacements: ["count": "\(actors.count)", "total": "\(expected)"])
             }
 
@@ -1334,8 +1334,8 @@ struct RelationshipsView: View {
     }
 
     @MainActor
-    private func updateClearskyCount(_ count: Int) async {
-        clearskyTotal = count
+    private func updateSourceCount(_ count: Int) async {
+        sourceTotal = count
         onCountUpdate?(mode, count)
     }
 }

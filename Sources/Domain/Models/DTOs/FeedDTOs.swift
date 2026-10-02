@@ -148,10 +148,55 @@ struct RichAuthor: Decodable {
     let avatar: String?
 }
 
-/// The record content of a post (text and creation date).
+/// The record content of a post (text, facets, and creation date).
 struct RichRecord: Decodable {
     let text: String?
     let createdAt: String?
+    /// Rich-text facets (mentions/links with exact byte ranges and target DIDs/URIs).
+    /// `nil` for posts without facets (or when the appview omits them) — callers fall back to regex parsing.
+    let facets: [RichFacet]?
+
+    init(text: String?, createdAt: String?, facets: [RichFacet]? = nil) {
+        self.text = text
+        self.createdAt = createdAt
+        self.facets = facets
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        text = try container.decodeIfPresent(String.self, forKey: .text)
+        createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
+        facets = try container.decodeIfPresent([RichFacet].self, forKey: .facets)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case text, createdAt, facets
+    }
+}
+
+/// A rich-text facet annotation on a post, mirroring `app.bsky.richtext.facet`.
+/// `index` gives the UTF-8 byte range of the annotated text; `features` describes the target(s).
+struct RichFacet: Decodable {
+    let index: RichFacetByteRange
+    let features: [RichFacetFeature]
+}
+
+/// UTF-8 byte offsets into the post text for a facet.
+struct RichFacetByteRange: Decodable {
+    let byteStart: Int
+    let byteEnd: Int
+}
+
+/// A single facet feature. Mention features carry the target `did`; link features carry the `uri`.
+/// Other feature types (`#tag`, unknown) decode with both fields `nil` and are ignored by renderers.
+struct RichFacetFeature: Decodable {
+    let did: String?
+    let uri: String?
+
+    init(did: String? = nil, uri: String? = nil) {
+        self.did = did
+        self.uri = uri
+    }
 }
 
 /// Embedded content in a post (images, video, external links, or records with media).

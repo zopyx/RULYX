@@ -257,9 +257,14 @@ struct iPadProfileInspector: View {
     }
 
     private func listsTab(_: ProfileInspection) -> some View {
-        ClearskyListsView(entries: profileVM.clearskyLists)
-            .environmentObject(accountStore)
-            .environmentObject(localizationManager)
+        ListedOnListsView(
+            entries: profileVM.listedOnLists,
+            isLoading: profileVM.isFetchingLists,
+            progress: profileVM.listedOnProgress,
+            errorMessage: profileVM.listError
+        )
+        .environmentObject(accountStore)
+        .environmentObject(localizationManager)
     }
 }
 

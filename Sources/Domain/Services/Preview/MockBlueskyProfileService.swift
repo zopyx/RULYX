@@ -64,7 +64,7 @@ final class MockBlueskyProfileService: BlueskyProfileInspecting {
             profile: BlueskyProfile(
                 id: "did:plc:preview-inspect", did: "did:plc:preview-inspect",
                 handle: query.isEmpty ? "example.bsky.social" : query,
-                displayName: "Example Profile", description: "Preview inspector data modeled after a ClearSky-style lookup.",
+                displayName: "Example Profile", description: "Preview inspector data modeled after a public blocklist lookup.",
                 websiteURL: URL(string: "https://bsky.app"), avatarURL: nil, bannerURL: nil,
                 followersCount: 5400, followsCount: 420, postsCount: 128,
                 listsCount: 4, starterPacksCount: 2,

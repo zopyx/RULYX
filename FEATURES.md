@@ -61,8 +61,8 @@ Rulyx is a native iOS moderation toolkit for Bluesky, designed for community mod
 
 - **Followers** — paginated list with search/filter by handle or name
 - **Following** — paginated list of accounts you follow
-- **Blocking** — accounts you block (via Clearsky)
-- **Blocked by** — accounts that block you ("who blocks me" via Clearsky)
+- **Blocking** — accounts you block (from your own repository's block records)
+- **Blocked by** — accounts that block you ("who blocks me", from the public Constellation index)
 - **Navigate to profile** — tap any actor entry for full inspection
 - **Export** — download any relationship list as CSV, JSON, XLSX, or ODS
 

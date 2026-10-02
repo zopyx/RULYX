@@ -5,16 +5,16 @@ import XCTest
 final class BlueskyProfileActionsViewModelTests: XCTestCase {
     var sut: BlueskyProfileActionsViewModel!
     var mockProfile: MockProfileService!
-    var mockClearSky: MockClearSkyService!
+    var mockClearSky: MockBlocklistService!
     var mockAccount: MockAccountStore!
 
     override func setUp() async throws {
         mockProfile = MockProfileService()
-        mockClearSky = MockClearSkyService()
+        mockClearSky = MockBlocklistService()
         mockAccount = MockAccountStore()
         sut = BlueskyProfileActionsViewModel(
             profileService: mockProfile,
-            clearskyService: mockClearSky,
+            blocklistService: mockClearSky,
             accountStore: mockAccount
         )
         sut.resultDisplayDuration = 0 // fast tests
@@ -96,15 +96,11 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
 
     func testFetchBlockCountsSetsAllThreeValues() async {
         // Given
-        mockClearSky.fetchClearskyBlockDIDsHandler = { endpoint, _ in
-            switch endpoint {
-            case "blocklist":
-                Set((0 ..< 42).map { "did:plc:blocked_\($0)" })
-            case "single-blocklist":
-                Set((0 ..< 47).map { "did:plc:blocker_\($0)" })
-            default:
-                []
-            }
+        mockClearSky.fetchBlockedDIDsHandler = { _ in
+            Set((0 ..< 42).map { "did:plc:blocked_\($0)" })
+        }
+        mockClearSky.fetchBlockerDIDsHandler = { _ in
+            Set((0 ..< 47).map { "did:plc:blocker_\($0)" })
         }
 
         // When
@@ -196,15 +192,11 @@ final class BlueskyProfileActionsViewModelTests: XCTestCase {
 
     func testFetchBlockCountsWhenProfileIsOwn() async {
         // Given: service returns specific counts for own profile
-        mockClearSky.fetchClearskyBlockDIDsHandler = { endpoint, _ in
-            switch endpoint {
-            case "blocklist":
-                Set((0 ..< 25).map { "did:plc:blocked_\($0)" })
-            case "single-blocklist":
-                Set((0 ..< 40).map { "did:plc:blocker_\($0)" })
-            default:
-                []
-            }
+        mockClearSky.fetchBlockedDIDsHandler = { _ in
+            Set((0 ..< 25).map { "did:plc:blocked_\($0)" })
+        }
+        mockClearSky.fetchBlockerDIDsHandler = { _ in
+            Set((0 ..< 40).map { "did:plc:blocker_\($0)" })
         }
 
         // When

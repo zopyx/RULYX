@@ -56,7 +56,7 @@ struct ChatMessageBubble: View {
                     .font(.body)
                     .fixedSize(horizontal: false, vertical: true)
                     .environment(\.openURL, OpenURLAction { url in
-                        if url.scheme == "mention", let handle = url.host {
+                        if let handle = MentionLink.target(from: url) {
                             onOpenProfile?(handle)
                             return .handled
                         }
@@ -187,7 +187,7 @@ struct ChatMessageBubble: View {
             guard let range = Range(match.range, in: text),
                   let attrRange = Range(match.range, in: attributed) else { continue }
             let handle = String(text[range].dropFirst())
-            attributed[attrRange].link = URL(string: "mention://\(handle)")
+            attributed[attrRange].link = MentionLink.url(for: handle)
             attributed[attrRange].foregroundColor = isOutgoing ? Color.white : Color.skyPrimary
             attributed[attrRange].underlineStyle = .single
         }

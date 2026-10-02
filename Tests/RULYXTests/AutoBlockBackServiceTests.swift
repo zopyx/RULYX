@@ -8,7 +8,7 @@ import XCTest
 /// actor addition dispatching, and the main performAutoBlockBack flow.
 @MainActor
 final class AutoBlockBackServiceTests: XCTestCase {
-    private var mockClearsky: MockClearSkyService!
+    private var mockBlocklist: MockBlocklistService!
     private var mockProfile: MockProfileService!
     private var mockList: MockListService!
     private var mockSocial: MockSocialService!
@@ -18,7 +18,7 @@ final class AutoBlockBackServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockClearsky = MockClearSkyService()
+        mockBlocklist = MockBlocklistService()
         mockProfile = MockProfileService()
         mockList = MockListService()
         mockSocial = MockSocialService()
@@ -138,7 +138,7 @@ final class AutoBlockBackServiceTests: XCTestCase {
 
     private func makeService() -> AutoBlockBackService {
         AutoBlockBackService(
-            clearskyService: mockClearsky,
+            blocklistService: mockBlocklist,
             profileService: mockProfile,
             listService: mockList,
             socialService: mockSocial,

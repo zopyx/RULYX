@@ -23,9 +23,7 @@ func configureCache() {
 ///    reads env vars and creates a live test account.
 /// 3. **Push notifications** — Registers with APNs and syncs the device token
 ///    with the Bluesky PDS.
-/// 4. **Clearsky heartbeat** — Polls the Clearsky API health endpoint to detect
-///    outages and show a warning banner.
-/// 5. **Chat** — Configures the chat store for the active account and starts
+/// 4. **Chat** — Configures the chat store for the active account and starts
 ///    polling for direct messages.
 ///
 /// ## Dependency Injection
@@ -82,7 +80,6 @@ struct RULYXApp: App {
                     .environmentObject(deps.analyticsStore)
                     .environmentObject(deps.chatStore)
                     .environmentObject(deps.httpRequestDebugStore)
-                    .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(deps.internalListStore)
                     .environmentObject(deps.aiService)
                     .environmentObject(deps.autoBlockBackService)
@@ -166,18 +163,7 @@ struct RULYXApp: App {
                         }
                     }
 
-                    // MARK: Lifecycle — Step 4: Clearsky Heartbeat
-
-                    // Begins periodic health checks on the Clearsky API. When Clearsky is
-                    // unreachable, the app displays a red warning banner and disables
-                    // Clearsky-dependent features.
-                    .task {
-                        DispatchQueue.main.async {
-                            deps.clearskyHeartbeat.start()
-                        }
-                    }
-
-                    // MARK: Lifecycle — Step 5: Chat (per Active Account)
+                    // MARK: Lifecycle — Step 4: Chat (per Active Account)
 
                     // Initial chat setup for the active account.
                     .task {
@@ -223,23 +209,21 @@ struct RULYXApp: App {
 
                     // MARK: Lifecycle — Background / Foreground
 
-                    // On entering background: locks the app (if biometric lock is enabled),
-                    // stops the Clearsky heartbeat, and pauses chat polling to save resources.
+                    // On entering background: locks the app (if biometric lock is enabled)
+                    // and pauses chat polling to save resources.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
                         DispatchQueue.main.async {
                             appLockManager.appDidEnterBackground()
-                            deps.clearskyHeartbeat.stop()
                             deps.chatStore.stopPolling()
                             deps.autoBlockBackService.scheduleBackgroundTask()
                         }
                     }
-                    // On becoming active: attempts biometric unlock, resumes the Clearsky
-                    // heartbeat, re-registers push notifications, resumes chat polling,
-                    // triggers an immediate log sync, and performs auto-block-back check.
+                    // On becoming active: attempts biometric unlock, re-registers push
+                    // notifications, resumes chat polling, triggers an immediate log sync, and
+                    // performs an auto-block-back check.
                     .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                         DispatchQueue.main.async {
                             appLockManager.appDidBecomeActive()
-                            deps.clearskyHeartbeat.start()
                             deps.pushNotificationCoordinator.start()
                             deps.chatStore.startPolling()
                             deps.chatStore.signalSync()
@@ -355,7 +339,6 @@ struct RULYXApp: App {
                     .environmentObject(deps.analyticsStore)
                     .environmentObject(deps.chatStore)
                     .environmentObject(deps.httpRequestDebugStore)
-                    .environmentObject(deps.clearskyHeartbeat)
                     .environmentObject(deps.internalListStore)
                     .environmentObject(deps.aiService)
                     .environmentObject(appLockManager)

@@ -347,7 +347,7 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
                 did: "did:plc:preview-inspect",
                 handle: query.isEmpty ? "example.bsky.social" : query,
                 displayName: "Example Profile",
-                description: "Preview inspector data modeled after a ClearSky-style lookup.",
+                description: "Preview inspector data modeled after a public blocklist lookup.",
                 websiteURL: URL(string: "https://bsky.app"),
                 avatarURL: nil,
                 bannerURL: nil,
@@ -467,21 +467,21 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
     override func fetchBlockedActors(
         account _: AppAccount,
         appPassword _: String?
-    ) async throws -> ClearskyBlocklistResult {
+    ) async throws -> BlocklistResult {
         try await Task.sleep(for: .milliseconds(80))
         let actors = [
             BlueskyActor(did: "did:plc:blocked1", handle: "spam.bsky.social", displayName: "Spam Account"),
             BlueskyActor(did: "did:plc:blocked2", handle: "troll.bsky.social", displayName: "Troll Account"),
         ]
-        return ClearskyBlocklistResult(actors: actors, totalCount: actors.count)
+        return BlocklistResult(actors: actors, totalCount: actors.count)
     }
 
     override func fetchBlockedByActors(
         account _: AppAccount,
         appPassword _: String?
-    ) async throws -> ClearskyBlocklistResult {
+    ) async throws -> BlocklistResult {
         try await Task.sleep(for: .milliseconds(80))
-        return ClearskyBlocklistResult(actors: [], totalCount: 0)
+        return BlocklistResult(actors: [], totalCount: 0)
     }
 
     override func fetchBlockingCount(for _: AppAccount, forceRefresh _: Bool = false) async throws -> Int {
@@ -496,11 +496,11 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         0
     }
 
-    override func fetchClearskyBlockDIDs(
-        endpoint _: String,
-        for _: AppAccount,
-        forceRefresh _: Bool = false
-    ) async throws -> Set<String> {
+    override func fetchBlockedDIDs(for _: AppAccount) async throws -> Set<String> {
+        ["did:plc:blocked1", "did:plc:blocked2"]
+    }
+
+    override func fetchBlockerDIDs(for _: AppAccount) async throws -> Set<String> {
         []
     }
 

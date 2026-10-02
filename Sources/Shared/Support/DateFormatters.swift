@@ -36,4 +36,10 @@ enum SharedDateFormatters {
         }
         return iso8601Plain.date(from: value)
     }
+
+    /// Formats a date as an ISO 8601 string without fractional seconds
+    /// (e.g. "2024-01-15T10:30:00Z") — the shape `parseISO8601` reads back.
+    static func formatISO8601(_ date: Date) -> String {
+        iso8601Plain.string(from: date)
+    }
 }

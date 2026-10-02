@@ -200,7 +200,7 @@ actor BlueskyAPICache: CacheMetricsProviding {
     func clear(for accountDID: String) {
         guard let dir = cacheDirectory() else { return }
         guard let enumerator = fileManager.enumerator(at: dir, includingPropertiesForKeys: nil) else { return }
-        let prefix = SHA256.hash(data: Data(accountDID.utf8)).map { String(format: "%02x", $0) }.joined()
+        let prefix = Self.accountPrefix(for: accountDID)
         for case let fileURL as URL in enumerator {
             if fileURL.lastPathComponent.hasPrefix(prefix) {
                 try? fileManager.removeItem(at: fileURL)
@@ -245,12 +245,24 @@ actor BlueskyAPICache: CacheMetricsProviding {
         return dir
     }
 
-    /// Stable unique key for a cache entry: SHA-256 of `accountDID + "|" + url`.
+    /// Stable unique key for a cache entry: the **account prefix** followed by the hash
+    /// of `accountDID + "|" + url`.
+    ///
+    /// The prefix is part of the file name on purpose: `clear(for:)` drops one account's
+    /// entries by matching it. A key hashed from the account and URL together could never
+    /// be matched back to an account, which silently turned per-account invalidation
+    /// (account removal) into a no-op.
     private func cacheKey(accountDID: String, url: String) -> String {
         let input = "\(accountDID)|\(url)"
         let data = Data(input.utf8)
         let hash = SHA256.hash(data: data)
-        return hash.map { String(format: "%02x", $0) }.joined()
+        let entryHash = hash.map { String(format: "%02x", $0) }.joined()
+        return "\(Self.accountPrefix(for: accountDID))-\(entryHash)"
+    }
+
+    /// SHA-256 of the account DID, used as the cache file name prefix.
+    private static func accountPrefix(for accountDID: String) -> String {
+        SHA256.hash(data: Data(accountDID.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
     /// Load a `CachedResponse` from disk by its key.

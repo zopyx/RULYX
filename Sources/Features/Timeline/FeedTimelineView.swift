@@ -501,14 +501,13 @@ struct FeedTimelineView: View {
         await refresh()
     }
 
-    private func openProfile(_ handle: String) {
+    /// Opens a profile from a mention/author target: a DID (facet rendering) or a handle
+    /// (regex fallback, author header). Resolving a DID hands it straight back, so one path
+    /// covers both.
+    private func openProfile(_ target: String) {
         Task {
-            do {
-                let did = try await container.liveClient.resolveHandle(handle)
-                profileToShow = BlueskyActor(did: did, handle: handle, displayName: nil)
-            } catch {
-                profileToShow = BlueskyActor(did: handle, handle: handle, displayName: nil)
-            }
+            let did = await (try? container.liveClient.resolveHandle(target)) ?? target
+            profileToShow = BlueskyActor(did: did, handle: target, displayName: nil)
         }
     }
 

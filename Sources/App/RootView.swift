@@ -26,7 +26,6 @@ struct RootView: View {
     @EnvironmentObject private var mutedWordsStore: MutedWordsStore
     @EnvironmentObject private var analyticsStore: AnalyticsStore
     @EnvironmentObject private var chatStore: ChatStore
-    @EnvironmentObject private var clearskyHeartbeat: ClearskyHeartbeatService
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -94,7 +93,7 @@ struct RootView: View {
     /// The account switcher button in the bottom tab bar.
     /// Tap cycles to the next account; long press opens the account switcher sheet.
     private var accountSwitcherButton: some View {
-        let buttonTint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
+        let buttonTint: Color = .skyPrimary
         return VStack(spacing: 4) {
             if let account = accountStore.activeAccount {
                 AccountAvatarView(account: account, tint: .accountTint(account.tintColor), size: 24)
@@ -171,7 +170,6 @@ struct RootView: View {
                     .environmentObject(mutedWordsStore)
                     .environmentObject(analyticsStore)
                     .environmentObject(chatStore)
-                    .environmentObject(clearskyHeartbeat)
             } else {
                 compactBody
             }
@@ -221,14 +219,9 @@ struct RootView: View {
     }
 
     private var compactBody: some View {
-        let tint: Color = clearskyHeartbeat.isClearskyAvailable ? .skyPrimary : Color.red.opacity(0.7)
+        let tint: Color = .skyPrimary
 
         return VStack(spacing: 0) {
-            if !clearskyHeartbeat.isClearskyAvailable {
-                ClearskyBanner()
-                    .environmentObject(localizationManager)
-            }
-
             ZStack {
                 switch workspaceStore.selectedTab {
                 case .moderation: ModerationSplitView()

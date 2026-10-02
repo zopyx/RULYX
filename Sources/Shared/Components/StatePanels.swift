@@ -27,6 +27,32 @@ struct LoadingPanel: View {
     }
 }
 
+// MARK: - ListedOnProgressIndicator
+
+/// Compact progress for a still-running "Listed on" lookup: a small determinate bar once the
+/// number of lists is known, an indeterminate spinner before that.
+/// Used inline in the profile's stats row, where the list count is already visible.
+struct ListedOnProgressIndicator: View {
+    /// Progress of the walk; `nil` while the phase has no known total.
+    let progress: ListedOnProgress?
+    @EnvironmentObject private var localizationManager: LocalizationManager
+
+    // MARK: - Body
+
+    var body: some View {
+        if let fraction = progress?.fraction {
+            ProgressView(value: fraction)
+                .progressViewStyle(.linear)
+                .frame(width: 44)
+                .accessibilityLabel(loc("lists.listed_on.loading_lists"))
+        } else {
+            ProgressView()
+                .scaleEffect(0.6)
+                .accessibilityLabel(loc("lists.listed_on.loading_memberships"))
+        }
+    }
+}
+
 // MARK: - EmptyStatePanel
 
 /// A centered empty-state placeholder with a tray icon, title, and optional message.

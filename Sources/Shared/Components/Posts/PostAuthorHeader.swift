@@ -41,7 +41,8 @@ struct PostAuthorHeader: View {
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Button {
-                onOpenProfile?(author.handle ?? author.did ?? "")
+                // DID first: opening a profile from a known DID needs no handle resolution.
+                onOpenProfile?(author.did ?? author.handle ?? "")
             } label: {
                 if let url = author.avatar.flatMap(URL.init) {
                     ThumbnailImageView(url: url, maxPixelSize: 72) {

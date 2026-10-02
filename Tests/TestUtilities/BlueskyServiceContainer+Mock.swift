@@ -3,7 +3,7 @@
 extension BlueskyServiceContainer {
     static func mock(
         profile: BlueskyProfileInspecting = MockProfileService(),
-        clearsky: BlueskyClearSkyServicing = MockClearSkyService(),
+        blocklist: BlueskyBlocklistServicing = MockBlocklistService(),
         list: BlueskyListServicing = MockListService(),
         accountStore: AccountStoreProtocol = MockAccountStore()
     ) -> BlueskyServiceContainer {
@@ -16,7 +16,7 @@ extension BlueskyServiceContainer {
             post: MockPostService(),
             social: MockSocialService(),
             moderation: MockModerationService(),
-            clearsky: clearsky,
+            blocklist: blocklist,
             notification: MockNotificationService(),
             identity: MockIdentityService(),
             media: MockMediaService(),

@@ -50,8 +50,8 @@ final class BlueskyServiceContainerWrapper: ObservableObject {
         container.moderation
     }
 
-    var clearsky: BlueskyClearSkyServicing {
-        container.clearsky
+    var blocklist: BlueskyBlocklistServicing {
+        container.blocklist
     }
 
     var notification: BlueskyNotificationServicing {

@@ -53,7 +53,7 @@ protocol BlueskyProfileInspecting: Sendable {
     func blockActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws
 
     /// Fetches the set of DIDs currently blocked by the account directly from the PDS.
-    /// This is a real-time check (not subject to ClearSky latency).
+    /// This is a real-time check against the PDS (not the cached blocklist state).
     /// - Parameters:
     ///   - account: The account to query.
     ///   - appPassword: The app password for authentication, or `nil` to use the cached session.

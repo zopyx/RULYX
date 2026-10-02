@@ -482,4 +482,44 @@ final class BlueskyAPIDTOsTests: XCTestCase {
         XCTAssertTrue(external.isTenorEmbed)
         XCTAssertEqual(external.preferredInlineMediaURL?.absoluteString, "https://media.tenor.com/example.gif")
     }
+
+    func testRichRecordDecodesMentionAndLinkFacets() throws {
+        let json = Data("""
+        {
+          "text": "Hi @alice.bsky.social, check https://example.com!",
+          "createdAt": "2024-01-01T00:00:00Z",
+          "facets": [
+            {"index": {"byteStart": 3, "byteEnd": 20}, "features": [{"$type": "app.bsky.richtext.facet#mention", "did": "did:plc:alice"}]},
+            {"index": {"byteStart": 28, "byteEnd": 47}, "features": [{"$type": "app.bsky.richtext.facet#link", "uri": "https://example.com"}]}
+          ]
+        }
+        """.utf8)
+        let record = try JSONDecoder().decode(RichRecord.self, from: json)
+
+        XCTAssertEqual(record.text, "Hi @alice.bsky.social, check https://example.com!")
+        XCTAssertEqual(record.facets?.count, 2)
+        XCTAssertEqual(record.facets?[0].index.byteStart, 3)
+        XCTAssertEqual(record.facets?[0].index.byteEnd, 20)
+        XCTAssertEqual(record.facets?[0].features.first?.did, "did:plc:alice")
+        XCTAssertNil(record.facets?[0].features.first?.uri)
+        XCTAssertEqual(record.facets?[1].features.first?.uri, "https://example.com")
+        XCTAssertNil(record.facets?[1].features.first?.did)
+    }
+
+    func testRichRecordMissingFacetsDecodesAsNil() throws {
+        let json = Data("""
+        {"text": "plain post", "createdAt": "2024-01-01T00:00:00Z"}
+        """.utf8)
+        let record = try JSONDecoder().decode(RichRecord.self, from: json)
+
+        XCTAssertEqual(record.text, "plain post")
+        XCTAssertNil(record.facets)
+    }
+
+    func testRichRecordConvenienceInitDefaultsFacetsToNil() {
+        let record = RichRecord(text: "constructed", createdAt: "2024-01-01T00:00:00Z")
+
+        XCTAssertEqual(record.text, "constructed")
+        XCTAssertNil(record.facets)
+    }
 }

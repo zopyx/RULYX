@@ -36,39 +36,7 @@ struct BlueskyListMember: Identifiable, Hashable, Sendable {
         id = recordURI
         self.recordURI = recordURI
         self.actor = actor
-        self.createdAt = createdAt ?? Self.extractTimestampFromURI(recordURI)
+        self.createdAt = createdAt ?? AtProtoTid.date(fromATURI: recordURI)
         self.viewerState = viewerState
-    }
-
-    // MARK: - Private Helpers
-
-    /// Decodes the AT Protocol TID record key from an AT URI.
-    /// TIDs encode microseconds since Unix epoch in the high 53 bits and reserve
-    /// the low 10 bits for clock/sequence data.
-    private static func extractTimestampFromURI(_ uri: String) -> Date? {
-        let tidChars = "234567abcdefghijklmnopqrstuvwxyz"
-        var charToValue: [Character: UInt64] = [:]
-        for (index, character) in tidChars.enumerated() {
-            charToValue[character] = UInt64(index)
-        }
-
-        guard let tid = uri.split(separator: "/").last, tid.count == 13 else {
-            return nil
-        }
-
-        var value: UInt64 = 0
-        for character in tid {
-            guard let digit = charToValue[character] else {
-                return nil
-            }
-            value = (value << 5) | digit
-        }
-
-        let timestampMicros = value >> 10
-        let date = Date(timeIntervalSince1970: Double(timestampMicros) / 1_000_000)
-        guard date <= Date().addingTimeInterval(60 * 60 * 24) else {
-            return nil
-        }
-        return date
     }
 }

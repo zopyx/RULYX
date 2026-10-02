@@ -72,19 +72,32 @@
 
 ## Third-Party Services
 
-### Clearsky
+### Constellation (microcosm.blue)
 
-**Base URL:** `https://public.api.clearsky.services/api/v1/anon/`
+**Base URL:** `https://constellation.microcosm.blue`
 
-| Endpoint | Purpose | File | Lines |
-|----------|---------|------|-------|
-| `/{endpoint}/{did}` | Fetch blocklist (blocked or blocked-by) | `LiveBlueskyClient.swift` | 575–577 |
-| `/{endpoint}/total/{did}` | Fetch blocklist count | `LiveBlueskyClient.swift` | 601 |
-| `/get-did/{handle}` | Resolve handle → DID | `LiveBlueskyClient.swift` | 664–665 |
+| Endpoint | Purpose | File |
+|----------|---------|------|
+| `blue.microcosm.links.getBacklinks?source=app.bsky.graph.block:subject` | "Blocked by": who blocks a DID | `ConstellationClient.swift` |
+| `blue.microcosm.links.getManyToManyCounts?source=app.bsky.graph.listitem:subject` | "Listed on": the lists a profile appears on | `ConstellationClient.swift` |
+| `blue.microcosm.links.getManyToMany?source=app.bsky.graph.listitem:subject` | "Listed on": memberships with their record keys | `ConstellationClient.swift` |
 
-- **Used for:** Block list fetching (since AT Protocol doesn't expose this directly)
-- **Auth:** None (public anonymous API)
-- **User-Agent:** `"Rulyx Moderation App"`
+- **Used for:** Block backlinks and list memberships — questions no single repository can answer
+- **Auth:** None (public index)
+- **Pins:** the host is certificate-pinned in `HTTPClient.defaultPinnedHashes`
+
+### Own PDS (`com.atproto.repo.listRecords`)
+
+- **Used for:** "Blocking" — the account's own `app.bsky.graph.block` records are the blocklist
+- **Auth:** None (public records); the client is deliberately unpinned because the PDS host varies per account
+- **File:** `AtProtoRepoClient.swift`
+
+### Bluesky AppView
+
+**Base URL:** `https://public.api.bsky.app`
+
+- **Used for:** list metadata for "Listed on" (`app.bsky.graph.getLists`/`getList`), profile batches (`app.bsky.actor.getProfiles`), handle resolution (`com.atproto.identity.resolveHandle`)
+- **Auth:** None (public API)
 
 ### PLC Directory
 

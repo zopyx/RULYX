@@ -1,7 +1,7 @@
 import Foundation
 
-/// Result from fetching actors via ClearSky (blocklist or single-blocklist endpoint).
-struct ClearskyBlocklistResult {
+/// Blocklist actors plus the source's total count (own repo or backlink index).
+struct BlocklistResult {
     let actors: [BlueskyActor]
     let totalCount: Int
 }
@@ -15,7 +15,7 @@ struct SearchPostsResponse: Decodable {
 
 /// Primary API client for Bluesky network operations. Provides authenticated access to
 /// all major AT Protocol lexicons used by the app: lists, profiles, feeds, posts,
-/// notifications, chat, moderation reports, and ClearSky integration.
+/// notifications, chat, moderation reports, and blocklist reads.
 ///
 /// Conforms to `BlueskyAuthenticating`, `BlueskyListServicing`, and `BlueskyProfileInspecting`.
 ///
@@ -34,7 +34,7 @@ class LiveBlueskyClient: ObservableObject,
     BlueskyPostServicing,
     BlueskySocialServicing,
     BlueskyModerationServicing,
-    BlueskyClearSkyServicing,
+    BlueskyBlocklistServicing,
     BlueskyNotificationServicing,
     BlueskyIdentityServicing,
     BlueskyMediaServicing
@@ -43,20 +43,26 @@ class LiveBlueskyClient: ObservableObject,
     private static let bskyAppViewServiceDID = "did:web:api.bsky.app#bsky_appview"
     /// The default base URL for the Bluesky PDS.
     private let baseURL: URL
-    private let httpClient: HTTPClient
-    /// HTTP client for AppView-proxied PDS requests. Pins known Bluesky/ClearSky
-    /// hosts via HTTPClient.defaultPinnedHashes; custom PDS hosts use standard TLS
-    /// validation (CertificatePinningDelegate falls back to performDefaultHandling
-    /// when no pin matches the host).
+    /// Internal (not private): `LiveBlueskyClient+Blocklist.swift` reads through it.
+    let httpClient: HTTPClient
+    /// HTTP client for AppView-proxied PDS requests. Pins the app's fixed API hosts via
+    /// `HTTPClient.defaultPinnedHashes`; a host without a matching pin in the chain is
+    /// **rejected** by `CertificatePinningDelegate` (not passed through), which surfaces
+    /// as a cancelled request — so every host reached through this client needs its pins
+    /// listed there.
     private let appViewHTTPClient = HTTPClient(session: URLSession.shared, pinnedHashes: HTTPClient.defaultPinnedHashes)
     private let session: URLSession
     private let requestExecutor: BlueskyRequestExecuting
     private let sessionService: BlueskySessionServicing
-    private let clearskyHeartbeat: ClearskyHeartbeatService
-    /// Age (seconds) after which a cached ClearSky blocklist payload is treated as
-    /// stale. Internal rather than private so tests can shrink it to exercise the
-    /// stale-cache fallback deterministically.
-    var clearskyCacheMaxAge: TimeInterval = BlueskyAPICache.DefaultTTL.relationship
+    /// Second data source for "Blocked by" — the Constellation backlink index.
+    /// Internal so tests can shrink its cache age to exercise the stale branch.
+    let constellation: ConstellationClient
+    /// Source for "Blocking" — the account's own repo, read from its PDS.
+    /// Internal so tests can shrink its cache age to exercise the stale branch.
+    let repo: AtProtoRepoClient
+    /// Resolves the "Listed on" screen from the index plus per-owner AppView metadata.
+    /// Internal so tests can shrink its cache age.
+    let listedOnResolver: ListedOnListResolver
 
     // MARK: - Init
 
@@ -66,13 +72,20 @@ class LiveBlueskyClient: ObservableObject,
         keychain: KeychainServicing = KeychainService(),
         requestExecutor: BlueskyRequestExecuting? = nil,
         sessionService: BlueskySessionServicing? = nil,
-        clearskyHeartbeat: ClearskyHeartbeatService = .shared
+        repoClient: AtProtoRepoClient? = nil
     ) {
         self.baseURL = baseURL
         let clientSession = URLSession.shared
         session = clientSession
         self.httpClient = httpClient ?? HTTPClient(session: clientSession, pinnedHashes: HTTPClient.defaultPinnedHashes)
-        self.clearskyHeartbeat = clearskyHeartbeat
+        constellation = ConstellationClient(httpClient: self.httpClient)
+        // Deliberately unpinned: it talks to the account's PDS, whose host varies per
+        // account and is not (and should not be) part of the pinned host set. Tests
+        // inject their own client, usually the same mock session as `httpClient`.
+        repo = repoClient ?? AtProtoRepoClient(httpClient: httpClient ?? HTTPClient(session: clientSession))
+        // List metadata comes from the public AppView, which is a pinned host — so this
+        // resolver uses the AppView client (or the injected one, in tests).
+        listedOnResolver = ListedOnListResolver(constellation: constellation, httpClient: httpClient ?? appViewHTTPClient)
         let executor = requestExecutor ?? BlueskyRequestExecutor(baseURL: baseURL, httpClient: self.httpClient)
         self.requestExecutor = executor
         self.sessionService = sessionService ?? BlueskySessionService(
@@ -1241,63 +1254,68 @@ class LiveBlueskyClient: ObservableObject,
         return profile
     }
 
-    // MARK: - Clearsky Integration
+    // MARK: - Blocklist reads
 
-    /// Checks that ClearSky service is available; throws if the heartbeat has failed.
-    private func guardClearskyAvailable() throws {
-        guard clearskyHeartbeat.isClearskyAvailable else {
-            throw BlueskyAPIError.server("ClearSky is temporarily unavailable")
-        }
+    //
+    // These entry points stay in the class body (not in `LiveBlueskyClient+Blocklist.swift`)
+    // because `PreviewBlueskyClient` overrides them and Swift forbids overriding a member
+    // declared in an extension. The sources they read live in that extension file:
+    // "Blocking" from the account's own repo, "Blocked by" from the Constellation index.
+
+    /// The actors the account has blocked — the `app.bsky.graph.block` records of its own
+    /// repo, where the block record's `subject` *is* the blocked account.
+    func fetchBlockedActors(account: AppAccount, appPassword _: String?) async throws -> BlocklistResult {
+        try await fetchBlockedActors(account: account, appPassword: nil, onProgress: nil)
     }
 
-    /// Fetches the list of actors blocked by the account (the "my blocklist" view).
-    func fetchBlockedActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
-        try await fetchClearskyActors(account: account, endpoint: "blocklist", onProgress: nil)
-    }
-
-    /// Fetches the list of actors blocked by the account (the "my blocklist" view), reporting partial counts as pages load.
+    /// The actors the account has blocked, reporting partial counts as records load.
     func fetchBlockedActors(
         account: AppAccount,
         appPassword _: String?,
         onProgress: (@MainActor @Sendable (Int) async -> Void)?
-    ) async throws -> ClearskyBlocklistResult {
-        try await fetchClearskyActors(account: account, endpoint: "blocklist", onProgress: onProgress)
+    ) async throws -> BlocklistResult {
+        try await repoBlockedActors(account: account, onProgress: onProgress)
     }
 
-    /// Fetches the list of actors that have blocked the account (the "blocked by" view).
-    func fetchBlockedByActors(account: AppAccount, appPassword _: String?) async throws -> ClearskyBlocklistResult {
-        try await fetchClearskyActors(account: account, endpoint: "single-blocklist", onProgress: nil)
+    /// The actors blocking the account, from the Constellation backlink index (the
+    /// `app.bsky.graph.block` records that point at the account).
+    func fetchBlockedByActors(account: AppAccount, appPassword _: String?) async throws -> BlocklistResult {
+        try await fetchBlockedByActors(account: account, appPassword: nil, onProgress: nil)
     }
 
-    /// Fetches the list of actors that have blocked the account (the "blocked by" view), reporting partial counts as pages load.
+    /// The actors blocking the account, reporting partial counts as records load.
     func fetchBlockedByActors(
         account: AppAccount,
         appPassword _: String?,
         onProgress: (@MainActor @Sendable (Int) async -> Void)?
-    ) async throws -> ClearskyBlocklistResult {
-        try await fetchClearskyActors(account: account, endpoint: "single-blocklist", onProgress: onProgress)
+    ) async throws -> BlocklistResult {
+        try await constellation.blockerActors(
+            actorDID: resolveAccountDID(account),
+            onProgress: onProgress
+        )
     }
 
     /// Returns the total count of actors the account has blocked.
-    /// DID-only (no profile resolution) — uses the same paginated source as detail views.
+    /// DID-only (no profile resolution) — uses the same source as the detail view.
     func fetchBlockingCount(for account: AppAccount) async throws -> Int {
         try await fetchBlockingCount(for: account, forceRefresh: false)
     }
 
     /// Returns the total count of actors the account has blocked, optionally bypassing cache.
     func fetchBlockingCount(for account: AppAccount, forceRefresh: Bool) async throws -> Int {
-        try await fetchClearskyBlockDIDs(endpoint: "blocklist", for: account, forceRefresh: forceRefresh).count
+        try await repo.blockRecords(for: account, onProgress: nil, forceRefresh: forceRefresh).count
     }
 
     /// Returns the total count of actors that have blocked the account.
-    /// DID-only (no profile resolution) — uses the same paginated source as detail views.
+    /// DID-only (no profile resolution) — uses the same source as the detail view.
     func fetchBlockedByCount(for account: AppAccount) async throws -> Int {
         try await fetchBlockedByCount(for: account, forceRefresh: false)
     }
 
     /// Returns the total count of actors that have blocked the account, optionally bypassing cache.
-    func fetchBlockedByCount(for account: AppAccount, forceRefresh: Bool) async throws -> Int {
-        try await fetchClearskyBlockDIDs(endpoint: "single-blocklist", for: account, forceRefresh: forceRefresh).count
+    /// The index reports its exact total independently of the page size.
+    func fetchBlockedByCount(for account: AppAccount, forceRefresh _: Bool) async throws -> Int {
+        try await constellation.blockerCount(actorDID: resolveAccountDID(account))
     }
 
     /// Returns the count of actors that block the account but are not blocked back.
@@ -1305,406 +1323,21 @@ class LiveBlueskyClient: ObservableObject,
         try await fetchUnblockedBlockerActors(account: account, appPassword: nil).count
     }
 
-    /// Fetches the set of DIDs from a ClearSky endpoint (no profile resolution).
-    private func fetchClearskyDIDs(actorDID: String, endpoint: String) async throws -> Set<String> {
-        let entries = try await fetchClearskyEntries(actorDID: actorDID, endpoint: endpoint)
-        return Set(entries.map(\.did))
+    /// DIDs of the accounts the account has blocked — the `subject` of every
+    /// `app.bsky.graph.block` record in its own repo.
+    func fetchBlockedDIDs(for account: AppAccount) async throws -> Set<String> {
+        try await repoBlockedDIDs(account: account)
     }
 
-    /// Public wrapper: fetches DIDs from a ClearSky endpoint (DIDs only, no profile resolution).
-    func fetchClearskyBlockDIDs(endpoint: String, for account: AppAccount) async throws -> Set<String> {
-        try await fetchClearskyBlockDIDs(endpoint: endpoint, for: account, forceRefresh: false)
-    }
-
-    /// Public wrapper with optional cache bypass for explicit refreshes.
-    func fetchClearskyBlockDIDs(
-        endpoint: String,
-        for account: AppAccount,
-        forceRefresh: Bool
-    ) async throws -> Set<String> {
-        try guardClearskyAvailable()
-        let actorDID = try await resolveAccountDID(account)
-        return try await fetchClearskyDIDs(actorDID: actorDID, endpoint: endpoint, ignoreCache: forceRefresh)
-    }
-
-    /// DID-only variant that can bypass the local cache for explicit refreshes.
-    private func fetchClearskyDIDs(
-        actorDID: String,
-        endpoint: String,
-        ignoreCache: Bool
-    ) async throws -> Set<String> {
-        let entries = try await fetchClearskyEntries(
-            actorDID: actorDID,
-            endpoint: endpoint,
-            ignoreCache: ignoreCache
-        )
-        return Set(entries.map(\.did))
-    }
-
-    /// Fetches ALL pages from a ClearSky paginated endpoint, falling back to the
-    /// last cached payload when the refresh fails.
-    ///
-    /// ClearSky is a third-party service with multi-hour outages (e.g. all routes
-    /// answered `502` for days in September 2026). A blocklist from the last
-    /// successful fetch is more useful than an error screen, so a failed refresh
-    /// serves the stale cache instead of throwing. Explicit refreshes
-    /// (`ignoreCache: true`) and task cancellation still propagate.
-    private func fetchClearskyEntries(
-        actorDID: String,
-        endpoint: String,
-        onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
-        onPage: (@Sendable (Int, [ClearskyBlocklistEntry]) async -> Void)? = nil,
-        ignoreCache: Bool = false,
-        toleratePartialErrors: Bool = false
-    ) async throws -> [ClearskyBlocklistEntry] {
-        let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
-        var staleFallback: [ClearskyBlocklistEntry]?
-        if !ignoreCache,
-           let cached = await BlueskyAPICache.shared.read(
-               accountDID: actorDID,
-               url: cacheURL,
-               maxAge: clearskyCacheMaxAge
-           ),
-           let entries = try? JSONDecoder().decode([ClearskyBlocklistEntry].self, from: cached.data)
-        {
-            if !cached.isStale {
-                AppLogger.performance.debug("Clearsky cache HIT for \(endpoint)/\(actorDID) (\(entries.count) entries)")
-                return entries
-            }
-            staleFallback = entries
-            AppLogger.performance.debug("Clearsky cache STALE for \(endpoint)/\(actorDID) (\(entries.count) entries kept as fallback)")
-        }
-
-        do {
-            return try await fetchClearskyEntriesFromNetwork(
-                actorDID: actorDID,
-                endpoint: endpoint,
-                onProgress: onProgress,
-                onPage: onPage,
-                toleratePartialErrors: toleratePartialErrors
-            )
-        } catch let cancellation as CancellationError {
-            throw cancellation
-        } catch {
-            guard let staleFallback, !staleFallback.isEmpty else { throw error }
-            AppLogger.http.warning("Clearsky \(endpoint)/\(actorDID) refresh failed (\(error.localizedDescription, privacy: .public)) — serving \(staleFallback.count) cached entries")
-            return staleFallback
-        }
-    }
-
-    /// Fetches ALL pages from a ClearSky paginated endpoint over the network and
-    /// refreshes the cache.
-    /// Page 1 is fetched first; if it has 100 entries, remaining pages
-    /// are fetched in bounded parallel batches with retries. A `404` response
-    /// marks the end of the data. Any other HTTP error or decode failure is
-    /// retried up to 3 times with exponential backoff, then returned as a
-    /// failed page result so callers can decide whether to accept a partial
-    /// result.
-    ///
-    /// The optional `onPage` callback is invoked for each page as it is
-    /// processed in order, allowing callers to pipeline work such as profile
-    /// resolution while the next batch of pages is still being fetched.
-    private func fetchClearskyEntriesFromNetwork(
-        actorDID: String,
-        endpoint: String,
-        onProgress: (@MainActor @Sendable (Int) async -> Void)? = nil,
-        onPage: (@Sendable (Int, [ClearskyBlocklistEntry]) async -> Void)? = nil,
-        toleratePartialErrors: Bool = false
-    ) async throws -> [ClearskyBlocklistEntry] {
-        let cacheURL = "clearsky/\(endpoint)/\(actorDID)"
-        // Step 1: fetch page 1 synchronously — determines if more pages exist
-        guard let page1 = try await fetchClearskyPageWithRetries(actorDID: actorDID, endpoint: endpoint, page: 1) else {
-            // 404 on page 1 means there is no blocklist data for this actor.
-            return []
-        }
-        var seenDIDs = Set(page1.map(\.did))
-        await onProgress?(seenDIDs.count)
-        await onPage?(1, page1)
-        guard page1.count >= 100 else {
-            await cacheClearskyEntries(page1, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
-            return page1
-        }
-
-        var allEntries = page1
-        let maxPages = 50
-        let pageConcurrency = 5
-        var completedWithoutError = true
-        var nextPage = 2
-
-        // Step 2: fetch remaining pages in bounded parallel batches. Within each
-        // batch the pages are requested concurrently; across batches we stop at the
-        // first short page (or 404) to avoid treating transient HTTP errors as EOF.
-        while nextPage <= maxPages {
-            try Task.checkCancellation()
-
-            let batchEnd = min(nextPage + pageConcurrency - 1, maxPages)
-            let pageResults = await fetchClearskyPageBatch(
-                actorDID: actorDID,
-                endpoint: endpoint,
-                startPage: nextPage,
-                endPage: batchEnd
-            )
-
-            let sortedResults = pageResults.sorted { $0.page < $1.page }
-            var shouldBreak = false
-            var batchError: Error?
-
-            for (page, result) in sortedResults {
-                switch result {
-                case let .entries(entries):
-                    allEntries.append(contentsOf: entries)
-                    for entry in entries {
-                        seenDIDs.insert(entry.did)
-                    }
-                    await onProgress?(seenDIDs.count)
-                    await onPage?(page, entries)
-
-                    guard entries.count >= 100 else {
-                        AppLogger.http.info("Clearsky \(endpoint)/\(actorDID): last page was \(page) (\(entries.count) entries)")
-                        shouldBreak = true
-                        break
-                    }
-
-                case .notFound:
-                    shouldBreak = true
-
-                case let .failure(error):
-                    if error is CancellationError {
-                        throw error
-                    }
-                    batchError = error
-                }
-            }
-
-            if shouldBreak {
-                break
-            }
-
-            if let error = batchError {
-                if toleratePartialErrors {
-                    completedWithoutError = false
-                    AppLogger.http.warning("Clearsky \(endpoint)/\(actorDID): stopped at page \(nextPage) after retries: \(error.localizedDescription)")
-                    break
-                }
-                throw error
-            }
-
-            nextPage = batchEnd + 1
-        }
-
-        // Only cache a complete, successful fetch so the dashboard count
-        // never persists a partial result from a flaky detail load.
-        if completedWithoutError {
-            await cacheClearskyEntries(allEntries, actorDID: actorDID, endpoint: endpoint, cacheURL: cacheURL)
-        }
-        return allEntries
-    }
-
-    /// Result of fetching a single ClearSky page.
-    private enum ClearskyPageResult {
-        case entries([ClearskyBlocklistEntry])
-        case notFound
-        case failure(Error)
-    }
-
-    /// Fetches a range of ClearSky pages concurrently, packaging each result so
-    /// that a 404 or failure in one page does not stop the entire batch.
-    private func fetchClearskyPageBatch(
-        actorDID: String,
-        endpoint: String,
-        startPage: Int,
-        endPage: Int
-    ) async -> [(page: Int, result: ClearskyPageResult)] {
-        await withTaskGroup(of: (Int, ClearskyPageResult).self) { group in
-            for page in startPage ... endPage {
-                group.addTask {
-                    do {
-                        if let entries = try await self.fetchClearskyPageWithRetries(
-                            actorDID: actorDID,
-                            endpoint: endpoint,
-                            page: page
-                        ) {
-                            return (page, .entries(entries))
-                        } else {
-                            return (page, .notFound)
-                        }
-                    } catch {
-                        return (page, .failure(error))
-                    }
-                }
-            }
-
-            var results: [(Int, ClearskyPageResult)] = []
-            for await result in group {
-                results.append(result)
-            }
-            return results
-        }
-    }
-
-    /// Writes fetched ClearSky entries to BlueskyAPICache as JSON-encoded Data.
-    private func cacheClearskyEntries(
-        _ entries: [ClearskyBlocklistEntry],
-        actorDID: String,
-        endpoint: String,
-        cacheURL: String
-    ) async {
-        guard let data = try? JSONEncoder().encode(entries) else { return }
-        await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
-        AppLogger.performance.debug("Clearsky cache WRITE for \(endpoint)/\(actorDID) (\(entries.count) entries)")
-    }
-
-    /// Fetches a single page from ClearSky with exponential backoff on retryable failures.
-    /// - Returns `nil` when the server responds with `404` (end of paginated data).
-    /// - Throws on network errors, non-2xx status codes other than `404`,
-    ///   decode failures, or cancellation.
-    private func fetchClearskyPageWithRetries(
-        actorDID: String,
-        endpoint: String,
-        page: Int,
-        maxRetries: Int = 3
-    ) async throws -> [ClearskyBlocklistEntry]? {
-        let baseDelay: TimeInterval = 0.5
-        let maxDelay: TimeInterval = 4.0
-        var lastError: Error?
-
-        for attempt in 0 ... maxRetries {
-            do {
-                return try await fetchClearskyPage(actorDID: actorDID, endpoint: endpoint, page: page)
-            } catch {
-                if error is CancellationError {
-                    throw error
-                }
-                lastError = error
-                guard attempt < maxRetries else { break }
-                let delay = min(baseDelay * pow(2.0, Double(attempt)), maxDelay)
-                try await Task.sleep(for: .seconds(delay))
-            }
-        }
-        throw lastError ?? BlueskyAPIError.invalidResponse
-    }
-
-    /// Fetches a single page from ClearSky.
-    /// - Returns `nil` for a `404` response, signalling the end of the data.
-    /// - Throws for cancellation, invalid URLs, non-2xx status codes other than `404`,
-    ///   and decode failures.
-    private func fetchClearskyPage(actorDID: String, endpoint: String, page: Int) async throws -> [ClearskyBlocklistEntry]? {
-        try Task.checkCancellation()
-        guard let url = ClearskyEndpoints.blocklist(endpoint: endpoint, actorDID: actorDID, page: page) else {
-            throw BlueskyAPIError.invalidURL
-        }
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Blocklists")
-        if httpResponse.statusCode == 404 {
-            AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page) → 404 (end of data)")
-            return nil
-        }
-        guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → HTTP \(httpResponse.statusCode)")
-            throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
-        }
-        guard let decoded = try? JSONDecoder().decode(ClearskyBlocklistResponse.self, from: data) else {
-            let body = String(data: data, encoding: .utf8) ?? "empty"
-            AppLogger.http.error("Clearsky \(endpoint)/\(actorDID) page \(page) → decode failed: \(body.prefix(200))")
-            throw BlueskyAPIError.invalidResponse
-        }
-        let entries = decoded.data.blocklist ?? []
-        AppLogger.http.info("Clearsky \(endpoint)/\(actorDID) page \(page): \(entries.count) entries")
-        return entries
-    }
-
-    /// Fetches actors that block the account but are not blocked back.
-    /// Resolves profiles in parallel batches and sorts by block date descending.
-    func fetchUnblockedBlockerActors(account: AppAccount, appPassword _: String?) async throws -> [BlueskyActor] {
-        try guardClearskyAvailable()
-        let actorDID = try await resolveAccountDID(account)
-
-        // Fetch blocked (actors we block) and blocked-by (actors that block us) in parallel.
-        async let blockedDIDsTask = fetchClearskyDIDs(actorDID: actorDID, endpoint: "blocklist")
-        async let blockedByEntriesTask = fetchClearskyEntries(actorDID: actorDID, endpoint: "single-blocklist")
-        let (blockedDIDs, blockedByEntries) = try await (blockedDIDsTask, blockedByEntriesTask)
-
-        // Filter to only those that block us but aren't on our blocklist.
-        let candidateEntries = blockedByEntries.filter { !blockedDIDs.contains($0.did) }
-        guard !candidateEntries.isEmpty else { return [] }
-
-        var blockedDates = [String: String]()
-        for entry in candidateEntries {
-            blockedDates[entry.did] = entry.blockedDate
-        }
-
-        var result = await resolveProfilesBestEffort(dids: candidateEntries.map(\.did))
-        for index in result.indices {
-            if let dateString = blockedDates[result[index].did] {
-                result[index].blockedDate = parseDate(dateString)
-            }
-        }
-
-        return result.sorted { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
-    }
-
-    /// Accumulates DIDs and resolves their profiles in concurrent batches.
-    /// Designed for pipelining profile resolution with paginated Clearsky fetches.
-    private actor ProfileBatchResolver {
-        private let httpClient: HTTPClient
-        private let batchSize: Int
-        private var buffer: [String] = []
-        private var tasks: [Task<[BlueskyActor], Never>] = []
-
-        init(httpClient: HTTPClient, batchSize: Int = 25) {
-            self.httpClient = httpClient
-            self.batchSize = batchSize
-        }
-
-        func add(dids: [String]) {
-            buffer.append(contentsOf: dids)
-            flush()
-        }
-
-        func finalize() async -> [BlueskyActor] {
-            flushRemaining()
-
-            var actors: [BlueskyActor] = []
-            for task in tasks {
-                await actors.append(contentsOf: task.value)
-            }
-            return actors
-        }
-
-        private func flush() {
-            while buffer.count >= batchSize {
-                let batch = Array(buffer.prefix(batchSize))
-                buffer.removeFirst(batchSize)
-                enqueue(batch)
-            }
-        }
-
-        private func flushRemaining() {
-            guard !buffer.isEmpty else { return }
-            let batch = buffer
-            buffer.removeAll()
-            enqueue(batch)
-        }
-
-        private func enqueue(_ dids: [String]) {
-            guard !dids.isEmpty else { return }
-            let httpClient = httpClient
-            tasks.append(Task { [httpClient] in
-                do {
-                    return try await LiveBlueskyClient.fetchProfileBatch(identifiers: dids, httpClient: httpClient)
-                } catch {
-                    AppLogger.performance.error("Profile batch lookup failed: \(error.localizedDescription, privacy: .public)")
-                    return []
-                }
-            })
-        }
+    /// DIDs of the accounts blocking the account, from the Constellation backlink index.
+    func fetchBlockerDIDs(for account: AppAccount) async throws -> Set<String> {
+        try await constellationBlockerDIDs(account: account)
     }
 
     /// Resolves profiles for a list of DIDs in parallel batches of 25.
     /// Silently ignores individual batch failures (best-effort resolution).
-    private func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
+    /// Internal (not private): used by the blocklist extension file.
+    func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
         let uniqueDIDs = Array(Set(dids)).sorted()
         return await withTaskGroup(of: [BlueskyActor].self) { group in
             var offset = 0
@@ -1730,114 +1363,13 @@ class LiveBlueskyClient: ObservableObject,
     }
 
     /// Resolves the DID for an account. If the account already has a DID, returns it;
-    /// otherwise resolves the handle to a DID via ClearSky.
-    private func resolveAccountDID(_ account: AppAccount) async throws -> String {
+    /// otherwise resolves the handle via the AT Protocol.
+    /// Internal (not private): used by the blocklist extension file.
+    func resolveAccountDID(_ account: AppAccount) async throws -> String {
         if let did = account.did {
             return did
         }
         return try await resolveHandleToDID(handle: account.handle)
-    }
-
-    /// Fetches all ClearSky blocklist entries and resolves all actor profiles.
-    private func fetchClearskyActors(
-        account: AppAccount,
-        endpoint: String,
-        onProgress: (@MainActor @Sendable (Int) async -> Void)?
-    ) async throws -> ClearskyBlocklistResult {
-        try guardClearskyAvailable()
-        let actorDID = try await resolveAccountDID(account)
-
-        // Pipeline profile resolution with page fetching: as each page of DIDs
-        // arrives, add it to the resolver so profile lookups run concurrently
-        // with the next batch of Clearsky pages.
-        let resolver = ProfileBatchResolver(httpClient: httpClient)
-
-        let entries = try await fetchClearskyEntries(
-            actorDID: actorDID,
-            endpoint: endpoint,
-            onProgress: onProgress,
-            onPage: { _, pageEntries in
-                await resolver.add(dids: pageEntries.map(\.did))
-            },
-            toleratePartialErrors: true
-        )
-        var allDIDs = Set<String>()
-        var blockedDates = [String: String]()
-        for entry in entries {
-            allDIDs.insert(entry.did)
-            blockedDates[entry.did] = entry.blockedDate
-        }
-
-        guard !allDIDs.isEmpty else {
-            return ClearskyBlocklistResult(actors: [], totalCount: 0)
-        }
-
-        // If pages were fetched from the cache, the resolver received no work;
-        // fall back to resolving all profiles after the fact. Otherwise finalize
-        // the pipelined resolution tasks.
-        let resolvedActors = await resolver.finalize()
-        let actors = resolvedActors.isEmpty
-            ? await resolveProfilesBestEffort(dids: Array(allDIDs).sorted())
-            : resolvedActors
-
-        var result = actors
-        for i in result.indices {
-            if let dateStr = blockedDates[result[i].did] {
-                result[i].blockedDate = parseDate(dateStr)
-            }
-        }
-        return ClearskyBlocklistResult(actors: result, totalCount: allDIDs.count)
-    }
-
-    /// Fetches all ClearSky moderation lists for a given handle with pagination.
-    func fetchClearskyLists(handle: String) async throws -> [ClearskyListEntry] {
-        try guardClearskyAvailable()
-        var allLists: [ClearskyListEntry] = []
-        var page = 1
-        repeat {
-            AppLogger.performance.debug("Fetching Clearsky lists page \(page) from: \(ClearskyEndpoints.listsBaseURL, privacy: .public)")
-            guard let url = ClearskyEndpoints.lists(forHandle: handle, page: page) else {
-                throw BlueskyAPIError.invalidURL
-            }
-            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
-            let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists")
-            guard (200 ..< 300).contains(httpResponse.statusCode) else {
-                if page == 1 {
-                    if let body = String(data: data, encoding: .utf8) {
-                        AppLogger.performance.error("Clearsky lists API returned \(httpResponse.statusCode): \(body, privacy: .public)")
-                    }
-                    throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
-                }
-                break
-            }
-            let decoded = try JSONDecoder().decode(ClearskyListsResponse.self, from: data)
-            allLists += decoded.data.lists
-            if decoded.data.lists.count < 100 {
-                break
-            }
-            page += 1
-        } while true
-        return allLists
-    }
-
-    /// Fetches the total number of ClearSky moderation lists a handle appears on.
-    /// Uses the dedicated `/get-list/total/` endpoint so the counter can be shown
-    /// without paginating through every list page.
-    func fetchClearskyListsCount(handle: String) async throws -> Int {
-        try guardClearskyAvailable()
-        guard let url = ClearskyEndpoints.listsTotal(forHandle: handle) else {
-            throw BlueskyAPIError.invalidURL
-        }
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        let (data, httpResponse) = try await httpClient.data(for: request, source: "Clearsky Lists Count")
-        guard (200 ..< 300).contains(httpResponse.statusCode)
-        else {
-            throw BlueskyAPIError.server("Clearsky returned HTTP \(httpResponse.statusCode)")
-        }
-        let decoded = try JSONDecoder().decode(ClearskyTotalResponse.self, from: data)
-        return decoded.data.count
     }
 
     // MARK: - DID Resolution & PLC Audit
@@ -1848,7 +1380,7 @@ class LiveBlueskyClient: ObservableObject,
     }
 
     /// Static batch profile lookup via `app.bsky.actor.getProfiles`. Bypasses authentication
-    /// using the public API endpoint. Used by ClearSky resolution paths.
+    /// using the public API endpoint.
     /// Batches requests to stay within the API limit of 25 actors per call.
     static func fetchProfileBatch(identifiers: [String], httpClient: HTTPClient) async throws -> [BlueskyActor] {
         guard let profilesURL = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles") else {
@@ -1927,20 +1459,17 @@ class LiveBlueskyClient: ObservableObject,
 
     /// Resolves a handle to a DID.
     ///
-    /// Resolution runs on the AT Protocol (`com.atproto.identity.resolveHandle`),
-    /// which is authoritative and independent of ClearSky availability: opening a
-    /// profile from the timeline, chat, search or a thread must keep working while
-    /// ClearSky is down. ClearSky's `get-did` is only a fallback.
+    /// Resolution runs on the AT Protocol (`com.atproto.identity.resolveHandle`), which
+    /// is authoritative: opening a profile from the timeline, chat, search or a thread
+    /// must keep working regardless of any third-party service.
     /// DIDs (prefix `did:`) are returned as-is without a network call — callers
     /// that already know the DID (e.g. from mention facets) skip resolution entirely.
-    private func resolveHandleToDID(handle: String) async throws -> String {
+    /// Internal (not private): used by the blocklist extension file.
+    func resolveHandleToDID(handle: String) async throws -> String {
         if handle.hasPrefix("did:") {
             return handle
         }
-        if let did = try? await resolveHandleViaATProtocol(handle) {
-            return did
-        }
-        return try await resolveHandleViaClearsky(handle)
+        return try await resolveHandleViaATProtocol(handle)
     }
 
     /// Handle → DID via the public AT Protocol AppView (`public.api.bsky.app`).
@@ -1957,30 +1486,6 @@ class LiveBlueskyClient: ObservableObject,
             throw BlueskyAPIError.invalidResponse
         }
         return try JSONDecoder().decode(ResolveHandleResponse.self, from: data).did
-    }
-
-    /// Handle → DID via the ClearSky `get-did` endpoint. Fallback only; requires a
-    /// healthy ClearSky heartbeat.
-    private func resolveHandleViaClearsky(_ handle: String) async throws -> String {
-        try guardClearskyAvailable()
-        guard let url = ClearskyEndpoints.did(forHandle: handle) else {
-            throw BlueskyAPIError.invalidURL
-        }
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        let (data, httpResponse) = try await httpClient.data(for: request, source: "Handle Resolution")
-        guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            throw BlueskyAPIError.invalidResponse
-        }
-        struct ClearskyDIDResponse: Decodable {
-            let data: ClearskyDIDData
-        }
-        struct ClearskyDIDData: Decodable {
-            let didIdentifier: String
-            enum CodingKeys: String, CodingKey { case didIdentifier = "did_identifier" }
-        }
-        let decoded = try JSONDecoder().decode(ClearskyDIDResponse.self, from: data)
-        return decoded.data.didIdentifier
     }
 
     /// Public wrapper to resolve a handle to a DID.

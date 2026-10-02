@@ -55,7 +55,6 @@ final class AppDependencies: ObservableObject {
     let chatStore: ChatStore
     let pushNotificationCoordinator: PushNotificationCoordinator
     let httpRequestDebugStore: HTTPRequestDebugStore
-    let clearskyHeartbeat: ClearskyHeartbeatService
     let internalListStore: InternalListStore
     let aiService: LiveAIService
     let autoBlockBackService: AutoBlockBackService
@@ -87,7 +86,6 @@ final class AppDependencies: ObservableObject {
         let sessionService = BlueskySessionService(requestExecutor: requestExecutor, keychain: keychain)
 
         httpRequestDebugStore = HTTPRequestDebugStore.shared
-        clearskyHeartbeat = ClearskyHeartbeatService.shared
         let useRealAccount = isUITesting && CommandLine.arguments.contains("--test-account")
         accountStore = useRealAccount ? AccountStore(keychain: keychain) : (isUITesting ? AccountStore(preview: true) : AccountStore(keychain: keychain))
         workspaceStore = ModerationWorkspaceStore()
@@ -101,7 +99,7 @@ final class AppDependencies: ObservableObject {
         internalListStore = InternalListStore()
         aiService = LiveAIService()
         autoBlockBackService = AutoBlockBackService(
-            clearskyService: blueskyClient,
+            blocklistService: blueskyClient,
             profileService: blueskyClient,
             listService: blueskyClient,
             socialService: blueskyClient,

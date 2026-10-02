@@ -12,7 +12,7 @@ struct BlockingListInfo: Identifiable, Hashable {
 /// Manages inspection, moderation actions, and data export for a single Bluesky profile.
 ///
 /// Supports reading viewer state (block/mute/follow), toggling moderation actions,
-/// fetching list memberships, owned/subscribed lists, ClearSky data, media counts,
+/// fetching list memberships, owned/subscribed lists, "listed on" data, media counts,
 /// handle history, and post export. Uses optimistic pending states for instant UI feedback.
 @MainActor
 @Observable
@@ -43,15 +43,17 @@ final class BlueskyProfileViewModel {
     private(set) var exportProgressLabel: String?
     /// Error that occurred during post export.
     var exportError: String?
-    /// Lists from ClearSky that contain this profile.
-    private(set) var clearskyLists: [ClearskyListEntry] = []
-    /// Total number of ClearSky lists this profile appears on (from the fast `/total/` endpoint).
-    private(set) var clearskyListsCount: Int?
-    /// True while fetching the fast ClearSky list count.
+    /// Lists that contain this profile, from the public index.
+    private(set) var listedOnLists: [ListedOnListEntry] = []
+    /// Total number of lists this profile appears on (exact, from the index's own total).
+    private(set) var listedOnCount: Int?
+    /// True while fetching the list count.
     private(set) var isFetchingListsCount = false
-    /// True while fetching ClearSky list data.
+    /// True while fetching the list entries.
     private(set) var isFetchingLists = false
-    /// Error from ClearSky list fetch.
+    /// Progress of the "listed on" lookup while it runs (`nil` when idle or done).
+    private(set) var listedOnProgress: ListedOnProgress?
+    /// Error from the "listed on" fetch.
     var listError: String?
     /// Optimistic pending state for follow toggle (nil = resolved).
     private(set) var pendingFollowingState: Bool?
@@ -109,10 +111,11 @@ final class BlueskyProfileViewModel {
         isScanningMedia = false
         statusMessage = nil
         errorMessage = nil
-        clearskyLists = []
-        clearskyListsCount = nil
+        listedOnLists = []
+        listedOnCount = nil
         isFetchingListsCount = false
         isFetchingLists = false
+        listedOnProgress = nil
         listError = nil
         pendingFollowingState = nil
         pendingBlockState = nil
@@ -239,28 +242,41 @@ final class BlueskyProfileViewModel {
         isFetchingSubscribedLists = false
     }
 
-    /// Fetches ClearSky public lists that contain the given handle.
-    func fetchClearskyLists(handle: String, using client: LiveBlueskyClient) async {
+    /// Fetches the lists that contain the given handle ("Listed on").
+    /// Memberships come from the Constellation index, list metadata from the public
+    /// AppView (see `ListedOnListResolver`). `did` skips a handle resolution when the DID
+    /// is already known.
+    ///
+    /// `listedOnProgress` mirrors the walk while it runs, so the row and the sheet can show
+    /// how far along the (request-per-owner) metadata phase is.
+    func fetchListedOnLists(handle: String, did: String?, using client: LiveBlueskyClient) async {
         isFetchingLists = true
+        listedOnProgress = nil
         listError = nil
         do {
-            clearskyLists = try await client.fetchClearskyLists(handle: handle)
+            listedOnLists = try await client.fetchListedOnLists(handle: handle, did: did) { [weak self] progress in
+                self?.listedOnProgress = progress
+            }
         } catch {
             listError = error.localizedDescription
-            AppLogger.moderation.error("Clearsky lists failed: \(error.localizedDescription, privacy: .public)")
+            AppLogger.moderation.error("Listed-on lists failed: \(error.localizedDescription, privacy: .public)")
         }
         isFetchingLists = false
+        listedOnProgress = nil
     }
 
-    /// Fetches the fast total count of ClearSky lists that contain the given handle.
-    func fetchClearskyListsCount(handle: String, using client: LiveBlueskyClient) async {
+    /// Fetches the number of lists that contain the given handle ("Listed on").
+    /// Counts the profile's `listitem` records straight from the index (exact total, no
+    /// pagination of the memberships themselves). `did` skips a handle resolution when the
+    /// DID is already known.
+    func fetchListedOnCount(handle: String, did: String?, using client: LiveBlueskyClient) async {
         isFetchingListsCount = true
         defer { isFetchingListsCount = false }
         do {
-            clearskyListsCount = try await client.fetchClearskyListsCount(handle: handle)
+            listedOnCount = try await client.fetchListedOnCount(handle: handle, did: did)
         } catch {
-            AppLogger.moderation.error("Clearsky lists count failed: \(error.localizedDescription, privacy: .public)")
-            clearskyListsCount = nil
+            AppLogger.moderation.error("Listed-on count failed: \(error.localizedDescription, privacy: .public)")
+            listedOnCount = nil
         }
     }
 

@@ -55,6 +55,7 @@ struct PostRowView: View {
                 if let text = post.safeRecord.text, !text.isEmpty {
                     PostTextContent(
                         text: text,
+                        facets: post.safeRecord.facets,
                         onTapThread: callbacks.onTapThread,
                         onOpenProfile: callbacks.onOpenProfile,
                         onOpenURL: callbacks.onOpenURL,
@@ -100,6 +101,7 @@ struct PostRowView: View {
             if let text = post.safeRecord.text, !text.isEmpty {
                 PostTextContent(
                     text: text,
+                    facets: post.safeRecord.facets,
                     onTapThread: callbacks.onTapThread,
                     onOpenProfile: callbacks.onOpenProfile,
                     onOpenURL: callbacks.onOpenURL,
