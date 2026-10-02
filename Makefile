@@ -1,9 +1,17 @@
 PROJECT := RULYX.xcodeproj
 SCHEME := RULYX
-SIMULATOR_DESTINATION := platform=iOS Simulator,id=0B0AC0B5-3A0C-429B-A229-276BF5610A9D
+
+# Build destination for compiling: `generic` needs no simulator, so it works on any machine
+# (developer machine or CI runner).
+GENERIC_DESTINATION ?= generic/platform=iOS Simulator
+
+# Tests need a concrete simulator; `scripts/simulator-destination.py` resolves one that exists
+# here (CI device first, newest runtime, shut down) — UDIDs and device sets differ per machine.
+# Override to pin one: make test SIMULATOR_DESTINATION='platform=iOS Simulator,name=iPhone 17 Pro Max'
+SIMULATOR_DESTINATION ?= $(shell python3 scripts/simulator-destination.py)
 DERIVED_DATA_PATH := /private/tmp/RULYX-TestDerivedData
 
-.PHONY: help generate build build-for-testing test test-sim test-fresh lint format screenshots translations-export translations-sync translations-repair translations-validate translations-validate-ci
+.PHONY: help ensure-secrets generate build build-for-testing test test-ci test-sim test-fresh lint format screenshots translations-export translations-sync translations-repair translations-validate translations-validate-ci
 
 help:
 	@printf '%s\n' \
@@ -20,17 +28,28 @@ help:
 		'  make translations-sync Sync JSON bundles into Localizable.xcstrings' \
 		'  make translations-repair Repair placeholder mismatches via English fallback'
 
-generate:
+# Config/Secrets.xcconfig is gitignored but referenced by project.yml, so xcodegen refuses to
+# generate the project without it. A fresh clone — and CI — gets the tracked template copied
+# into place; real values are never committed.
+ensure-secrets:
+	@mkdir -p Config
+	@test -f Config/Secrets.xcconfig || cp Config/Secrets.xcconfig.template Config/Secrets.xcconfig
+
+generate: ensure-secrets
 	xcodegen generate
 
 build:
-	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(SIMULATOR_DESTINATION)' build CODE_SIGNING_ALLOWED=NO
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(GENERIC_DESTINATION)' build CODE_SIGNING_ALLOWED=NO
 
 build-for-testing:
-	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(SIMULATOR_DESTINATION)' build-for-testing CODE_SIGNING_ALLOWED=NO
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(GENERIC_DESTINATION)' build-for-testing CODE_SIGNING_ALLOWED=NO
 
 test:
 	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(SIMULATOR_DESTINATION)' test CODE_SIGNING_ALLOWED=NO
+
+# The unit-test run CI uses: coverage + parallel testing, app target only.
+test-ci:
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(SIMULATOR_DESTINATION)' -only-testing:RULYXTests -enableCodeCoverage YES -parallel-testing-enabled YES test CODE_SIGNING_ALLOWED=NO
 
 test-sim: test
 
@@ -62,4 +81,4 @@ translations-validate:
 	python3 scripts/validate-translations.py
 
 translations-validate-ci: translations-validate
-	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(GENERIC_DESTINATION)' test CODE_SIGNING_ALLOWED=NO -only-testing:RULYXTests/LocalizationCompletenessTests
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(SIMULATOR_DESTINATION)' test CODE_SIGNING_ALLOWED=NO -only-testing:RULYXTests/LocalizationCompletenessTests

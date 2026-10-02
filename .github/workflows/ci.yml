@@ -23,6 +23,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Generate project
+        run: make generate
       - name: Validate translations
         run: make translations-validate-ci
 
@@ -46,23 +50,16 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen
 
+      # `make generate` also seeds Config/Secrets.xcconfig from the tracked template: the real
+      # file is gitignored (secrets), and xcodegen refuses to run without it.
       - name: Generate project
-        run: xcodegen generate
+        run: make generate
 
       - name: Build
-        run: |
-          xcodebuild -project RULYX.xcodeproj -scheme RULYX \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
-            build CODE_SIGNING_ALLOWED=NO
+        run: make build
 
       - name: Run unit tests
-        run: |
-          xcodebuild -project RULYX.xcodeproj -scheme RULYX \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
-            -only-testing:RULYXTests \
-            -enableCodeCoverage YES \
-            -parallel-testing-enabled YES \
-            test CODE_SIGNING_ALLOWED=NO
+        run: make test-ci
 
       - name: Validate localization keys
         run: make translations-validate-ci
