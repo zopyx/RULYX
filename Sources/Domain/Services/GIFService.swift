@@ -82,6 +82,13 @@ final class GIFService: Sendable {
         Self.seedKeyIfNeeded(in: keychain)
     }
 
+    /// Whether this build carries a bundled Klipy key. CI and development checkouts lack the
+    /// gitignored `Secrets.xcconfig`, so there is nothing to seed — callers that would otherwise
+    /// assert on a seeded key must skip instead of failing.
+    static var hasBundledAPIKey: Bool {
+        loadBundledAPIKey() != nil
+    }
+
     static func seedKeyIfNeeded(in keychain: KeychainServicing = KeychainService()) {
         guard (try? keychain.read(service: keychainService, account: keychainAccount)) == nil,
               let apiKey = loadBundledAPIKey()

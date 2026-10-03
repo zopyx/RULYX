@@ -27,6 +27,10 @@ final class GIFServiceModelTests: XCTestCase {
     }
 
     func testSeedKeyIfNeededStoresBundledKey() throws {
+        try XCTSkipIf(
+            !GIFService.hasBundledAPIKey,
+            "no bundled Klipy key in this build (checkout without Secrets.xcconfig)"
+        )
         let keychain = MockKeychain()
 
         GIFService.seedKeyIfNeeded(in: keychain)

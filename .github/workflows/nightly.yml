@@ -26,8 +26,10 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen
 
+      # `make generate` seeds Config/Secrets.xcconfig from the tracked template (the real file is
+      # gitignored), without which xcodegen refuses to run.
       - name: Generate project
-        run: xcodegen generate
+        run: make generate
 
       - name: Build
         run: |
