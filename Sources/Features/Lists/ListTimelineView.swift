@@ -529,10 +529,17 @@ struct ListTimelineView: View {
         await refresh()
     }
 
-    private func openProfile(_ handle: String) {
-        guard let entry = viewModel.entries.first(where: { $0.post.author?.handle == handle || $0.post.author?.did == handle }),
-              let author = entry.post.author else { return }
-        profileToShow = BlueskyActor(did: author.did ?? handle, handle: author.handle ?? handle, displayName: author.displayName)
+    /// Opens the profile of a tapped `@mention`.
+    ///
+    /// The tapped target is a DID when the post was rendered from facets and a handle otherwise;
+    /// `resolveHandle` passes a DID straight through, so one call covers both. It deliberately does
+    /// NOT look the target up among the loaded posts' authors — a mention usually points at an
+    /// account that has no post in this list, and the old author lookup made the tap a silent no-op.
+    private func openProfile(_ target: String) {
+        Task {
+            let did = await (try? container.liveClient.resolveHandle(target)) ?? target
+            profileToShow = BlueskyActor(did: did, handle: target, displayName: nil)
+        }
     }
 
     private func muteUser(handle: String, did: String?) async {
