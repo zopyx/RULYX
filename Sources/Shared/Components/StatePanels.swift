@@ -257,13 +257,7 @@ struct StatusChip: View {
             .foregroundStyle(foregroundColor)
             .padding(.horizontal, 12)
             .padding(.vertical, 14)
-            .background {
-                if #available(iOS 26, *) {
-                    Color.clear.glassEffect(.regular.tint(tintColor), in: .rect(cornerRadius: .infinity))
-                } else {
-                    Color.clear.background(backgroundColor, in: Capsule())
-                }
-            }
+            .glassTintedBackground(tint: tintColor, in: Capsule(), opaqueFallback: backgroundColor)
     }
 
     // MARK: - Private Helpers

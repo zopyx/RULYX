@@ -211,7 +211,7 @@ extension View {
     func hapticOnTap(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) -> some View {
         simultaneousGesture(
             TapGesture().onEnded { _ in
-                UIImpactFeedbackGenerator(style: style).impactOccurred()
+                Haptics.impact(style)
             }
         )
     }
@@ -225,5 +225,16 @@ extension View {
         accessibilityAddTraits(.isButton)
             .accessibilityLabel(label)
             .accessibilityHint(hint)
+    }
+
+    /// Pointer feedback for iPad mouse/trackpad users (iOS 18+); no-op on earlier releases and
+    /// on devices without a pointer, where the system simply never triggers it.
+    @ViewBuilder
+    func appHoverLift() -> some View {
+        if #available(iOS 18.0, *) {
+            hoverEffect(.lift)
+        } else {
+            self
+        }
     }
 }

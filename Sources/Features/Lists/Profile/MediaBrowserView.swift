@@ -128,6 +128,8 @@ struct MediaBrowserView: View {
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 2) {
                                 ForEach(displayItems) { item in
                                     mediaThumbnail(item)
+                                        .accessibilityIdentifier("media-cell-\(item.id)")
+                                        .appHoverLift()
                                         .onAppear {
                                             if loadMoreTriggerIDs.contains(item.id) {
                                                 Task { await loadMore() }

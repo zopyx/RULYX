@@ -98,26 +98,14 @@ struct PendingActionsSheet: View {
                 .font(.caption2.weight(.semibold))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background {
-                    if #available(iOS 26, *) {
-                        Color.clear.glassEffect(.regular, in: .rect(cornerRadius: .infinity))
-                    } else {
-                        Color.clear.background(Color.secondary.opacity(0.12), in: Capsule())
-                    }
-                }
+                .glassBackground(in: Capsule(), opaqueFallback: Color.secondary.opacity(0.12))
                 .foregroundStyle(.secondary)
         case .running:
             Text(loc: "pending.badge_running")
                 .font(.caption2.weight(.semibold))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background {
-                    if #available(iOS 26, *) {
-                        Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
-                    } else {
-                        Color.clear.background(Color.skyPrimary.opacity(0.12), in: Capsule())
-                    }
-                }
+                .glassTintedBackground(tint: .skyPrimary, in: Capsule(), opaqueFallback: Color.skyPrimary.opacity(0.12))
                 .foregroundStyle(Color.skyPrimary)
         case let .completed(succeeded, failed):
             if failed > 0 {
@@ -125,26 +113,14 @@ struct PendingActionsSheet: View {
                     .font(.caption2.weight(.semibold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background {
-                        if #available(iOS 26, *) {
-                            Color.clear.glassEffect(.regular.tint(.orange), in: .rect(cornerRadius: .infinity))
-                        } else {
-                            Color.clear.background(Color.orange.opacity(0.12), in: Capsule())
-                        }
-                    }
+                    .glassTintedBackground(tint: .orange, in: Capsule(), opaqueFallback: Color.orange.opacity(0.12))
                     .foregroundStyle(Color.warningOrange)
             } else {
                 Text(loc: "pending.status.done")
                     .font(.caption2.weight(.semibold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background {
-                        if #available(iOS 26, *) {
-                            Color.clear.glassEffect(.regular.tint(.green), in: .rect(cornerRadius: .infinity))
-                        } else {
-                            Color.clear.background(Color.green.opacity(0.12), in: Capsule())
-                        }
-                    }
+                    .glassTintedBackground(tint: .green, in: Capsule(), opaqueFallback: Color.green.opacity(0.12))
                     .foregroundStyle(Color.successGreen)
             }
         }

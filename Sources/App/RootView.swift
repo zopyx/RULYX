@@ -28,6 +28,10 @@ struct RootView: View {
     @EnvironmentObject private var chatStore: ChatStore
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// Accessibility gates: the tab bar keeps its captions only while they are legible, and the
+    /// account-switch overlay stops animating when Reduce Motion is on.
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// UserDefaults key `"hasSeenOnboarding"`: whether the first-launch onboarding
     /// has been shown. Suppresses the onboarding sheet on subsequent launches.
@@ -81,15 +85,22 @@ struct RootView: View {
         let localizationManager: LocalizationManager
         let tint: Color
 
+        /// At accessibility sizes the caption cannot be rendered legibly inside a ~45pt slot, so
+        /// the slot falls back to its icon — the icon is the same shape VoiceOver announces.
+        @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
         var body: some View {
             VStack(spacing: 3) {
                 Image(systemName: item.icon)
                     .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
-                Text(localizationManager.localized(item.label))
-                    .font(.caption2)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .multilineTextAlignment(.center)
+                    .scaledToFit()
+                if !dynamicTypeSize.isAccessibilitySize {
+                    Text(localizationManager.localized(item.label))
+                        .font(.caption2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .multilineTextAlignment(.center)
+                }
             }
             .foregroundStyle(isSelected ? tint : .secondary)
         }
@@ -110,21 +121,21 @@ struct RootView: View {
                 Image(systemName: "person.crop.circle")
                     .font(.system(size: 22))
             }
-            Text(localizationManager.localized("tab.accounts"))
-                .font(.caption2)
-                .lineLimit(1)
+            if !dynamicTypeSize.isAccessibilitySize {
+                Text(localizationManager.localized("tab.accounts"))
+                    .font(.caption2)
+                    .lineLimit(1)
+            }
         }
         .foregroundStyle(workspaceStore.selectedTab == .account ? buttonTint : .secondary)
-        .accessibilityLabel(loc("account.switcher.label"))
-        .accessibilityHint(loc("account.switcher.toolbar_hint"))
+        // Label, hint, traits and the `tab-accounts` identifier are declared by the toolbar slot,
+        // which collapses this button into a single accessibility element.
         // ExclusiveGesture: long press takes priority; a quick tap fails the long press
         // and cycles to the next account instead of opening the switcher sheet.
         .gesture(
             LongPressGesture(minimumDuration: 0.5)
                 .onEnded { _ in
-                    let generator = UIImpactFeedbackGenerator(style: .rigid)
-                    generator.prepare()
-                    generator.impactOccurred()
+                    Haptics.impact(.rigid)
                     showAccountSwitcher = true
                 }
                 .exclusively(before: TapGesture(count: 1).onEnded {
@@ -141,24 +152,29 @@ struct RootView: View {
         else { return }
         let nextIndex = (currentIndex + 1) % accountStore.accounts.count
         let nextAccount = accountStore.accounts[nextIndex]
-        let generator = UISelectionFeedbackGenerator()
-        generator.prepare()
-        generator.selectionChanged()
+        Haptics.selection()
         switchAccount(nextAccount)
     }
 
     private func switchAccount(_ account: AppAccount) {
-        let generator = UISelectionFeedbackGenerator()
-        generator.prepare()
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+        let generator = Haptics.preparedSelection()
+        if reduceMotion {
             switchingAccount = account
+        } else {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                switchingAccount = account
+            }
         }
         Task {
             await accountStore.switchAccount(to: account, using: container.liveClient)
             workspaceStore.returnToModerationRoot()
             generator.selectionChanged()
-            withAnimation(.easeOut(duration: 0.25)) {
+            if reduceMotion {
                 switchingAccount = nil
+            } else {
+                withAnimation(.easeOut(duration: 0.25)) {
+                    switchingAccount = nil
+                }
             }
         }
     }
@@ -272,7 +288,7 @@ struct RootView: View {
                 switchingOverlay(for: account)
             }
         }
-        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: switchingAccount)
+        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7), value: switchingAccount)
         .highPriorityGesture(threeFingerGesture)
     }
 
@@ -294,12 +310,22 @@ struct RootView: View {
                 .frame(width: itemWidth)
                 .frame(maxHeight: .infinity)
                 .contentShape(Capsule())
+                .appHoverLift()
                 .background {
                     if workspaceStore.selectedTab == .account {
                         selectionIndicator
                             .matchedGeometryEffect(id: "tabSelection", in: tabSelectionNamespace)
                     }
                 }
+                // The slot is a tap/long-press gesture pair, not a SwiftUI Button, so SwiftUI
+                // never infers the button trait on its own. Collapse the avatar + caption into
+                // ONE element and declare label, hint, trait and identifier on it — otherwise
+                // the descendants inherit the trait and XCUITest finds several matches for
+                // `app.buttons["tab-accounts"]`.
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(loc("account.switcher.label"))
+                .accessibilityHint(loc("account.switcher.toolbar_hint"))
+                .accessibilityAddTraits(.isButton)
                 .accessibilityIdentifier("tab-accounts")
                 .id(WorkspaceTab.account.rawValue)
         }
@@ -327,6 +353,7 @@ struct RootView: View {
             .frame(width: itemWidth)
             .frame(maxHeight: .infinity)
             .contentShape(Capsule())
+            .appHoverLift()
             .background {
                 if isSelected {
                     selectionIndicator
@@ -482,13 +509,7 @@ private struct AccountSwitcherRow: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background {
-                            if #available(iOS 26, *) {
-                                Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
-                            } else {
-                                Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
-                            }
-                        }
+                        .glassTintedBackground(tint: .skyPrimary, in: Capsule(), opaqueFallback: Color.skyPrimary.opacity(0.14))
                 }
                 if isDeactivated {
                     Image(systemName: "exclamationmark.triangle.fill")

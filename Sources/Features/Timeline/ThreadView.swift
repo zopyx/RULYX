@@ -417,7 +417,7 @@ struct ThreadView: View {
               let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
         let threadPost = findPost(byURI: uri)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        Haptics.impact(.light)
         Task {
             do {
                 if let threadPost, threadPost.isLikedByMe, let likeURI = threadPost.myLikeURI {

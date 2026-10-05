@@ -32,6 +32,9 @@ struct ListRowView: View {
         }
         .padding(.vertical, 4)
         .appScrollTransition()
+        // Stable handle for UI tests and VoiceOver: one row per list.
+        .accessibilityIdentifier("list-row-\(list.id)")
+        .appHoverLift()
     }
 }
 

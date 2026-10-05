@@ -166,14 +166,7 @@ struct AddAccountView: View {
                         Color.black.opacity(0.08).ignoresSafeArea()
                         ProgressView(loc("account.add.validating"))
                             .padding(20)
-                            .background {
-                                if #available(iOS 26, *) {
-                                    Color.clear
-                                        .glassEffect(.regular, in: .rect(cornerRadius: 16))
-                                } else {
-                                    Color.clear.background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                }
-                            }
+                            .glassBackground(in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
                 }
             }

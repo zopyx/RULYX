@@ -196,8 +196,7 @@ struct AccountSwitcherSheet: View {
     /// Switch to the given account with haptic feedback, then dismiss the sheet.
     private func switchAccount(to account: AppAccount) {
         switchingAccountID = account.id
-        let generator = UIImpactFeedbackGenerator(style: .rigid)
-        generator.prepare()
+        let generator = Haptics.preparedImpact(.rigid)
         Task { @MainActor in
             await accountStore.switchAccount(to: account, using: container.liveClient)
             workspaceStore.returnToModerationRoot()

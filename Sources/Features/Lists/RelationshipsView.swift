@@ -50,6 +50,9 @@ struct RelationshipsView: View {
     @State private var isLoading = true
     @State private var isRefreshing = false
     @State private var searchQuery = ""
+    /// Top-most row identity, kept so a refetch after a batch action does not scroll the list
+    /// back to the top.
+    @State private var scrollPositionID: String?
     @State private var errorMessage: String?
     @State private var statusMessage: String?
     @State private var profileStats: [String: (followers: Int, following: Int, posts: Int, description: String)] = [:]
@@ -207,6 +210,10 @@ struct RelationshipsView: View {
                                     selectedActor = actor
                                 }
                                 .appScrollTransition()
+                                .accessibilityIdentifier("relationship-row-\(actor.did)")
+                                .appHoverLift()
+                                // iOS 27: copy the actor so it can be pasted into another list.
+                                .appCopyable([TransferableActor(actor: actor)])
                                 .contextMenu {
                                     Button(role: .destructive) {
                                         actorToBlock = actor
@@ -285,6 +292,9 @@ struct RelationshipsView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                // Keeps the scroll position across the refetches that follow block/unblock, so a
+                // long block list does not jump back to the top after an action.
+                .scrollPosition(id: $scrollPositionID)
                 .environment(\.showActorDescriptions, showActorDescriptions)
                 .overlay(alignment: .bottom) {
                     if actionsVM?.isBlockingBack ?? false, (actionsVM?.blockBackTotal ?? 0) > 0 {
