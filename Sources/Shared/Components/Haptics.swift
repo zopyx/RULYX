@@ -9,8 +9,13 @@ import UIKit
 /// `UINotificationFeedbackGenerator`), so the feel of the app could not be tuned or audited in
 /// one place. Everything now goes through here.
 ///
+/// The whole enum is `@MainActor`: UIKit's `impactOccurred()`/`selectionChanged()`/
+/// `notificationOccurred()` are main-actor isolated, and calling them from a nonisolated context
+/// is a strict-concurrency warning (an error once the Swift 6 language mode is enforced).
+///
 /// The two-phase variants exist because a generator that is `prepare()`d before an `await`
 /// fires with noticeably lower latency — account switching keeps that behaviour.
+@MainActor
 enum Haptics {
     /// A short impact: row taps, toggles, drag handles.
     static func impact(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
