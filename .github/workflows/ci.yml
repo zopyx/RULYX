@@ -14,7 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install SwiftFormat
-        run: brew install swiftformat swiftlint
+        # `brew update` first. The runner image ships a swiftformat of its own, and a bare
+        # `brew install` then reports it "already installed and up-to-date", so CI lints with
+        # the image's (older) version while a local brew has the current stable. A formatter
+        # bugfix in between silently turns this gate red — see
+        # rulyx-development/references/build-and-ci.md. The printed versions make any future
+        # drift visible in the log.
+        run: |
+          # Best-effort: if the network is down, keep the runner image's tools rather than
+          # failing the gate; the versions below make the drift visible either way.
+          brew update > /dev/null 2>&1 || echo "brew update failed — keeping the runner image's tools"
+          brew install swiftformat swiftlint
+          swiftformat --version
+          swiftlint version
       - name: Run lint
         run: make lint
 
