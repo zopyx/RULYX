@@ -608,7 +608,7 @@ final class AccountStoreTests: XCTestCase {
         let profileService = MockProfileService()
 
         await addTestAccount(store: store, client: authClient, handle: "did-test.bsky.social")
-        XCTAssertEqual(store.activeAccount?.did, "did:plc:test")
+        XCTAssertEqual(store.activeAccount?.did, MockAuthenticatingClient.did(for: "did-test.bsky.social"))
 
         profileService.fetchProfileHandler = { did, _, _ in
             BlueskyProfile(
@@ -712,6 +712,14 @@ private final class MockAuthenticatingClient: BlueskyAuthenticating {
         self.shouldFailAuth = shouldFailAuth
     }
 
+    /// A distinct DID per handle, the way a real PDS answers. `AccountStore.addAccount`
+    /// rejects an account whose DID it already holds (one account per DID), so a constant DID
+    /// made every second `addAccount` in a test look like a duplicate and left the store with
+    /// a single account — which is what turned the multi-account tests red.
+    static func did(for handle: String) -> String {
+        "did:plc:" + handle.lowercased().replacingOccurrences(of: ".", with: "-")
+    }
+
     func authenticate(handle: String, appPassword _: String, entrywayURL _: URL? = nil, authFactorToken: String? = nil) async throws -> BlueskySession {
         receivedAuthFactorTokens.append(authFactorToken)
         if shouldFailAuth {
@@ -721,7 +729,7 @@ private final class MockAuthenticatingClient: BlueskyAuthenticating {
             throw BlueskyAPIError.authFactorTokenRequired(nil)
         }
         return BlueskySession(
-            did: "did:plc:test",
+            did: Self.did(for: handle),
             handle: handle,
             accessJWT: "access",
             refreshJWT: "refresh",
