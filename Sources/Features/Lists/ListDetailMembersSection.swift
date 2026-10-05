@@ -124,8 +124,6 @@ extension ListDetailView {
                         }
                         .accessibilityIdentifier("member-row-\(member.id)")
                         .appHoverLift()
-                        // iOS 27: copy the member so it can be pasted into another list.
-                        .appCopyable([TransferableActor(actor: member.actor)])
                         .simultaneousGesture(
                             TapGesture().onEnded {
                                 let now = Date()
