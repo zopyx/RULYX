@@ -212,8 +212,6 @@ struct RelationshipsView: View {
                                 .appScrollTransition()
                                 .accessibilityIdentifier("relationship-row-\(actor.did)")
                                 .appHoverLift()
-                                // iOS 27: copy the actor so it can be pasted into another list.
-                                .appCopyable([TransferableActor(actor: actor)])
                                 .contextMenu {
                                     Button(role: .destructive) {
                                         actorToBlock = actor

@@ -162,9 +162,6 @@ struct AccountTabView: View {
                     .accessibilityLabel(loc("account.manage.more"))
                 }
             }
-            .appReorderContainer(for: AppAccount.self) { request in
-                applyReorder(request)
-            }
             .task {
                 await accountStore.refreshAccountProfiles(using: container.profile)
             }
@@ -382,28 +379,16 @@ struct AccountTabView: View {
 
     // MARK: - Account Rows
 
-    /// The saved-account rows, with the iOS 27 direct-drag affordance where available.
-    ///
-    /// The `ForEach` is written twice because `.reorderable()` is iOS 27-only and cannot be
-    /// applied through an availability check on a `DynamicViewContent` (the branches would be a
-    /// `_ConditionalContent`, which is not dynamic content). Only the modifiers differ — the row
-    /// builder is shared.
-    @ViewBuilder
+    /// The saved-account rows. Reordering uses `onMove` (edit mode), which is the only reorder
+    /// path available to this project: CI builds with Xcode 26.6, whose SDK has no iOS 27
+    /// `reorderable()`/`reorderContainer` — those symbols do not exist there at all, so an
+    /// `if #available(iOS 27, *)` guard cannot make them compile.
     private var accountRows: some View {
-        if #available(iOS 27.0, *) {
-            ForEach(accountStore.accounts) { account in
-                accountRow(account)
-            }
-            .reorderable()
-            .onMove(perform: accountStore.moveAccount)
-            .onDelete(perform: deleteAccounts)
-        } else {
-            ForEach(accountStore.accounts) { account in
-                accountRow(account)
-            }
-            .onMove(perform: accountStore.moveAccount)
-            .onDelete(perform: deleteAccounts)
+        ForEach(accountStore.accounts) { account in
+            accountRow(account)
         }
+        .onMove(perform: accountStore.moveAccount)
+        .onDelete(perform: deleteAccounts)
     }
 
     private func accountRow(_ account: AppAccount) -> some View {
@@ -433,26 +418,6 @@ struct AccountTabView: View {
             let account = accountStore.accounts[index]
             accountStore.removeAccount(account, client: container.authenticating)
         }
-    }
-
-    /// Applies a reorder reported by the iOS 27 reorder container: `sources` are the dragged
-    /// account ids, the destination is either another id (insert before it) or the end of the
-    /// list. It maps onto `AccountStore.moveAccount`, which uses the same offset semantics as
-    /// `onMove`, so both paths produce identical ordering.
-    private func applyReorder(_ request: ReorderRequest<AppAccount.ID>) {
-        let accounts = accountStore.accounts
-        let sourceOffsets = IndexSet(accounts.enumerated().compactMap { index, account in
-            request.sources.contains(account.id) ? index : nil
-        })
-        guard !sourceOffsets.isEmpty else { return }
-
-        let destination: Int = switch request.destination {
-        case let .before(id):
-            accounts.firstIndex { $0.id == id } ?? accounts.count
-        case .end:
-            accounts.count
-        }
-        accountStore.moveAccount(from: sourceOffsets, to: destination)
     }
 
     private func switchToAccount(_ account: AppAccount) {

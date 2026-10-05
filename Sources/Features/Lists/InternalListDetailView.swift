@@ -117,18 +117,6 @@ struct InternalListDetailView: View {
             }
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: loc("list.search.placeholder"))
-        // iOS 27: paste copied actors straight into this internal list.
-        .appPasteDestination(for: TransferableActor.self) { actors in
-            for actor in actors {
-                internalListStore.addMember(
-                    did: actor.did,
-                    handle: actor.handle,
-                    displayName: actor.displayName,
-                    to: list.id
-                )
-            }
-            Haptics.success()
-        }
         .navigationTitle("")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
