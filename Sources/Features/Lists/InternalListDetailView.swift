@@ -90,6 +90,8 @@ struct InternalListDetailView: View {
                                 }
                             }
                         }
+                        .accessibilityIdentifier("internal-list-member-\(member.id)")
+                        .appHoverLift()
                         .swipeActions(edge: .trailing) {
                             Button(role: .destructive) {
                                 if let current = internalListStore.lists.first(where: { $0.id == list.id }) {
@@ -115,6 +117,18 @@ struct InternalListDetailView: View {
             }
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: loc("list.search.placeholder"))
+        // iOS 27: paste copied actors straight into this internal list.
+        .appPasteDestination(for: TransferableActor.self) { actors in
+            for actor in actors {
+                internalListStore.addMember(
+                    did: actor.did,
+                    handle: actor.handle,
+                    displayName: actor.displayName,
+                    to: list.id
+                )
+            }
+            Haptics.success()
+        }
         .navigationTitle("")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

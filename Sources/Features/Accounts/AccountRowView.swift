@@ -39,13 +39,7 @@ struct AccountRowView: View {
                             .foregroundStyle(Color.skyPrimary)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background {
-                                if #available(iOS 26, *) {
-                                    Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
-                                } else {
-                                    Color.clear.background(Color.skyPrimary.opacity(0.1), in: Capsule())
-                                }
-                            }
+                            .glassTintedBackground(tint: .skyPrimary, in: Capsule(), opaqueFallback: Color.skyPrimary.opacity(0.1))
                     }
                 }
                 Text(account.handle)
@@ -58,13 +52,7 @@ struct AccountRowView: View {
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 5)
                         .padding(.vertical, 2)
-                        .background {
-                            if #available(iOS 26, *) {
-                                Color.clear.glassEffect(.regular, in: .rect(cornerRadius: .infinity))
-                            } else {
-                                Color.clear.background(Color.secondary.opacity(0.15), in: Capsule())
-                            }
-                        }
+                        .glassBackground(in: Capsule(), opaqueFallback: Color.secondary.opacity(0.15))
                 }
             }
 
@@ -78,13 +66,7 @@ struct AccountRowView: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background {
-                    if #available(iOS 26, *) {
-                        Color.clear.glassEffect(.regular.tint(.skyPrimary), in: .rect(cornerRadius: .infinity))
-                    } else {
-                        Color.clear.background(Color.skyPrimary.opacity(0.14), in: Capsule())
-                    }
-                }
+                .glassTintedBackground(tint: .skyPrimary, in: Capsule(), opaqueFallback: Color.skyPrimary.opacity(0.14))
             }
 
             if isDeactivated {
@@ -96,13 +78,7 @@ struct AccountRowView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background {
-                    if #available(iOS 26, *) {
-                        Color.clear.glassEffect(.regular.tint(.red), in: .rect(cornerRadius: .infinity))
-                    } else {
-                        Color.clear.background(Color.red.opacity(0.14), in: Capsule())
-                    }
-                }
+                .glassTintedBackground(tint: .red, in: Capsule(), opaqueFallback: Color.red.opacity(0.14))
                 .foregroundStyle(Color.errorRed)
             }
         }

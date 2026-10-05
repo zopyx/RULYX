@@ -424,7 +424,7 @@ struct FeedTimelineView: View {
     private func handleLike(_ entry: RichFeedEntry) {
         guard let account = accountStore.activeAccount,
               let appPassword = accountStore.appPassword(for: account) else { return }
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        Haptics.impact(.light)
         Task {
             await viewModel.toggleLike(uri: entry.post.uri, account: account, appPassword: appPassword, using: container.liveClient)
         }

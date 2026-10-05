@@ -788,9 +788,15 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text(loc("profile.following")) } icon: { Image(systemName: "person.badge.plus") }
+                                Label {
+                                    Text(loc("profile.following"))
+                                } icon: {
+                                    Image(systemName: "person.badge.plus")
+                                        .symbolEffect(.bounce, value: viewerState.isFollowing)
+                                }
                             }
                             .disabled(viewModel.isUpdatingModeration)
+                            .accessibilityIdentifier("profile-action-follow")
 
                             Toggle(isOn: Binding(
                                 get: { viewModel.pendingBlockState ?? viewerState.isBlocking },
@@ -804,9 +810,15 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text(loc: "profile.block") } icon: { Image(systemName: "hand.raised") }
+                                Label {
+                                    Text(loc: "profile.block")
+                                } icon: {
+                                    Image(systemName: "hand.raised")
+                                        .symbolEffect(.bounce, value: viewerState.isBlocking)
+                                }
                             }
                             .disabled(viewModel.isUpdatingModeration || viewModel.isBlockedByList)
+                            .accessibilityIdentifier("profile-action-block")
                             .accessibilityHint(viewerState.isBlocking ? loc("profile.unblock.hint") : loc("profile.block.hint"))
                             if viewModel.isBlockedByList {
                                 let displayText = Self.formattedBlockingList(viewModel.combinedBlockingNames)
@@ -828,9 +840,15 @@ struct BlueskyProfileView: View {
                                     }
                                 }
                             )) {
-                                Label { Text(loc: "profile.mute") } icon: { Image(systemName: "speaker.slash") }
+                                Label {
+                                    Text(loc: "profile.mute")
+                                } icon: {
+                                    Image(systemName: "speaker.slash")
+                                        .symbolEffect(.bounce, value: viewerState.muted)
+                                }
                             }
                             .disabled(viewModel.isUpdatingModeration)
+                            .accessibilityIdentifier("profile-action-mute")
                             .accessibilityHint(viewerState.muted ? loc("profile.unmute.hint") : loc("profile.mute.hint"))
                         }
 
@@ -1795,13 +1813,11 @@ struct BlueskyProfileView: View {
             .foregroundStyle(emphasized ? tint : Color.secondary)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background {
-                if #available(iOS 26, *) {
-                    Color.clear.glassEffect(.regular.tint(emphasized ? tint : Color.secondary), in: .rect(cornerRadius: .infinity))
-                } else {
-                    Color.clear.background((emphasized ? tint : Color.secondary).opacity(0.12), in: Capsule())
-                }
-            }
+            .glassTintedBackground(
+                tint: emphasized ? tint : Color.secondary,
+                in: Capsule(),
+                opaqueFallback: (emphasized ? tint : Color.secondary).opacity(0.12)
+            )
     }
 
     private func runModeration(_ operation: @escaping @Sendable () async -> Void) {

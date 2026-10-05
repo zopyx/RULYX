@@ -73,13 +73,7 @@ private struct Tag: View {
     var body: some View {
         Text(text).font(.caption2.weight(.semibold))
             .foregroundStyle(color).padding(.horizontal, 6).padding(.vertical, 2)
-            .background {
-                if #available(iOS 26, *) {
-                    Color.clear.glassEffect(.regular.tint(color), in: .rect(cornerRadius: .infinity))
-                } else {
-                    Color.clear.background(color.opacity(0.12), in: Capsule())
-                }
-            }
+            .glassTintedBackground(tint: color, in: Capsule(), opaqueFallback: color.opacity(0.12))
     }
 }
 

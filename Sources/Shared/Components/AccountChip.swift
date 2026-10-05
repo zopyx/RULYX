@@ -29,14 +29,7 @@ struct AccountChip: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 12)
-        .background {
-            if #available(iOS 26, *) {
-                Color.clear
-                    .glassEffect(.regular.interactive(), in: .rect(cornerRadius: .infinity))
-            } else {
-                Color.clear.background(.thinMaterial, in: Capsule())
-            }
-        }
+        .glassBackground(in: Capsule(), interactive: true)
     }
 
     // MARK: - Private Helpers

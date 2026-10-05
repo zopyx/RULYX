@@ -678,7 +678,7 @@ struct ListDetailView: View {
         exportProgressMessage = nil
         shareFileURL = url
         showExportCompleteToast = true
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        Haptics.success()
     }
 
     // MARK: - Helpers

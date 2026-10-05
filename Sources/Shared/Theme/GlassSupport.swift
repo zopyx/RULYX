@@ -28,23 +28,84 @@ extension View {
 
 extension View {
     /// Apply a glass/material background with the given shape.
-    /// Uses iOS 26 `glassEffect` or falls back to `.thinMaterial`.
-    @ViewBuilder
-    func glassBackground(in shape: some Shape = RoundedRectangle(cornerRadius: 12)) -> some View {
-        if #available(iOS 26, *) {
-            background(Color.clear.glassEffect(.regular, in: shape))
-        } else {
-            background(.thinMaterial, in: shape)
-        }
+    ///
+    /// Uses the iOS 26 `glassEffect`, falls back to `.thinMaterial` before that — and to an opaque
+    /// surface when Reduce Transparency is on, where a translucent surface over scrolling content
+    /// is unreadable.
+    func glassBackground(
+        in shape: some Shape = RoundedRectangle(cornerRadius: 12),
+        interactive: Bool = false,
+        opaqueFallback: Color? = nil
+    ) -> some View {
+        modifier(GlassBackgroundModifier(shape: shape, interactive: interactive, opaqueFallback: opaqueFallback))
     }
 
     /// Apply a tinted glass background with the given tint color and shape.
+    func glassTintedBackground(
+        tint: Color,
+        in shape: some Shape = RoundedRectangle(cornerRadius: 12),
+        interactive: Bool = false,
+        opaqueFallback: Color? = nil
+    ) -> some View {
+        modifier(GlassBackgroundModifier(
+            shape: shape,
+            tint: tint,
+            interactive: interactive,
+            opaqueFallback: opaqueFallback
+        ))
+    }
+
+    /// Groups neighbouring glass surfaces so iOS 26 can sample and blend them as one material
+    /// (a bar plus the pill it holds must not be sampled separately). No-op before iOS 26.
     @ViewBuilder
-    func glassTintedBackground(tint: Color, in shape: some Shape = RoundedRectangle(cornerRadius: 12)) -> some View {
+    func glassContainer(spacing: CGFloat = 12) -> some View {
         if #available(iOS 26, *) {
-            background(Color.clear.glassEffect(.regular.tint(tint), in: shape))
+            GlassEffectContainer(spacing: spacing) { self }
         } else {
-            background(tint.opacity(0.12), in: shape)
+            self
+        }
+    }
+}
+
+/// Backs `glassBackground`/`glassTintedBackground`. It is a modifier rather than an inline
+/// `background` because reading `accessibilityReduceTransparency` requires a view in the tree.
+private struct GlassBackgroundModifier<S: Shape>: ViewModifier {
+    let shape: S
+    var tint: Color?
+    var interactive = false
+    var opaqueFallback: Color?
+
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    /// The surface used when transparency is reduced: the caller's fallback, else a tint wash,
+    /// else the system's grouped background.
+    private var opaqueColor: Color {
+        opaqueFallback ?? tint?.opacity(0.16) ?? Color(uiColor: .secondarySystemBackground)
+    }
+
+    func body(content: Content) -> some View {
+        if reduceTransparency {
+            content.background(opaqueColor, in: shape)
+        } else if #available(iOS 26, *) {
+            content.background { glassView }
+        } else {
+            content.background(.thinMaterial, in: shape)
+        }
+    }
+
+    @available(iOS 26, *)
+    @ViewBuilder
+    private var glassView: some View {
+        if let tint {
+            Color.clear.glassEffect(
+                interactive ? .regular.tint(tint).interactive() : .regular.tint(tint),
+                in: shape
+            )
+        } else {
+            Color.clear.glassEffect(
+                interactive ? .regular.interactive() : .regular,
+                in: shape
+            )
         }
     }
 }

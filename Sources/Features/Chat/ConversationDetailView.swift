@@ -127,7 +127,7 @@ struct ConversationDetailView: View {
                         }
                     }
                     Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        Haptics.impact(.light)
                         Task { await chatStore.loadMessages(convoId: conversation.id) }
                     } label: {
                         Label(loc("chat.reload"), systemImage: "arrow.clockwise")

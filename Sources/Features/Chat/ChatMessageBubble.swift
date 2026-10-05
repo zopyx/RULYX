@@ -110,7 +110,7 @@ struct ChatMessageBubble: View {
             .contentShape(BubbleShape(isOutgoing: isOutgoing))
             .onLongPressGesture(minimumDuration: 0.4) {
                 guard !isPending, !hasFailed, onReact != nil else { return }
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                Haptics.impact(.light)
                 onToggleReactionPicker?()
             }
 
