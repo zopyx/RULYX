@@ -209,17 +209,6 @@ final class ConstellationClient {
         var blockedDates: [String: String] = [:]
         var total = 0
 
-        // Stamps each resolved actor with the block date carried by its index entry.
-        func dated(_ batch: [BlueskyActor]) -> [BlueskyActor] {
-            batch.map { actor in
-                var actor = actor
-                if let raw = blockedDates[actor.did] {
-                    actor.blockedDate = parseDate(raw)
-                }
-                return actor
-            }
-        }
-
         try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
             var inFlight = 0
             for try await page in blockerEntryPages(actorDID: actorDID) {
@@ -240,7 +229,7 @@ final class ConstellationClient {
                     // the window is full, emitting it before fetching more.
                     if inFlight >= Self.profileBatchConcurrency, let batch = try await group.next() {
                         inFlight -= 1
-                        let resolved = dated(batch)
+                        let resolved = dated(batch, blockedDates: blockedDates)
                         collected.append(contentsOf: resolved)
                         await onActors?(resolved)
                     }
@@ -248,13 +237,25 @@ final class ConstellationClient {
             }
             // Drain the tail in completion order — each batch is emitted as it resolves.
             for try await batch in group {
-                let resolved = dated(batch)
+                let resolved = dated(batch, blockedDates: blockedDates)
                 collected.append(contentsOf: resolved)
                 await onActors?(resolved)
             }
         }
 
         return BlocklistResult(actors: collected, totalCount: max(total, collected.count))
+    }
+
+    /// Stamps each resolved actor with the block date carried by its index entry, so the
+    /// list can be ordered newest-block-first as it streams in.
+    private func dated(_ batch: [BlueskyActor], blockedDates: [String: String]) -> [BlueskyActor] {
+        batch.map { actor in
+            var actor = actor
+            if let raw = blockedDates[actor.did] {
+                actor.blockedDate = parseDate(raw)
+            }
+            return actor
+        }
     }
 
     /// Walks the blocker backlink index page by page, emitting each page as it arrives.
