@@ -38,7 +38,9 @@ final class ConstellationBlocklistTests: XCTestCase {
         MockURLProtocol.requestHandler = nil
         client = nil
         mockSession = nil
-        await BlueskyAPICache.shared.clear(for: ownerDID)
+        // `.shared`-scoped entries (profiles, backlinks) are not matched by `clear(for:)` —
+        // reset the whole cache so they cannot leak into the next test.
+        await BlueskyAPICache.shared.clearAll()
         try await super.tearDown()
     }
 

@@ -269,6 +269,21 @@ Row 2: @handle
 - **No secrets in UserDefaults** — the old `UserDefaults.standard.string(forKey: "klipyAPIKey")` pattern is deprecated; migration runs in `GIFService.init()` to move any leftover key to Keychain
 - **View helper**: `KlipyKeychainHelper` enum in `GIFService.swift` provides `read()`, `save(_:)`, `exists()` for views that need to check/display API key status
 
+## HTTP Caching
+
+Two independent layers, both surfaced in the performance overlay (three-finger triple-tap).
+
+| Layer | What | Where |
+|-------|------|-------|
+| URL cache | `HTTPClient.apiURLCache` (64 MB mem / 256 MB disk) attached to the **pinned** API session, policy `.useProtocolCachePolicy` — honours the origin's `Cache-Control: public, max-age=30` | `HTTPClient.swift` |
+| API cache | `BlueskyAPICache` actor — JSON files in Caches, per-entry TTL, stale-while-revalidate, ETag revalidation, 50 MB LRU ceiling | `BlueskyAPICache.swift` |
+
+**Scopes** (`BlueskyAPICache.Scope`): `.shared` for viewer-independent payloads (public profiles, list metadata, Constellation backlinks) so one entry serves every account; `.account(did)` for anything carrying viewer state (profiles' `viewerState`, own lists, repo blocklists). `clear(for:)` drops one account and keeps `.shared`; the account-switch `clearAll()` wipes everything (required by `openspec/changes/account-switch-state-reset`).
+
+**Never** make the pinned session `.ephemeral` with `reloadIgnoringLocalCacheData` — that silently discards the URL cache and every request goes to the network.
+
+**Metrics:** fresh/stale/miss counters on `BlueskyAPICache`, plus real URL-cache hits from `URLSessionTaskMetrics` (`resourceFetchType == .localCache`) reported through `HTTPRequestDebugStore`. `isCachedResponse` does not exist in the iOS 27 SDK.
+
 ## HTTP Debug & URL Sanitization
 - `HTTPRequestDebugStore` logs all HTTP request URLs for debugging in `HTTPRequestDebugView`
 - URLs containing API keys (Klipy pattern `https://api.klipy.com/api/v1/{key}/...`) are **automatically redacted** via `sanitizeURL()` in `HTTPRequestDebugStore.begin()` — the key segment is replaced with `[REDACTED]` before storage

@@ -10,7 +10,8 @@ import SwiftUI
 /// **Compact mode** (default): small HUD at top of screen showing:
 /// - Total request count
 /// - Average latency
-/// - Cache hit ratio
+/// - API cache freshness ratio (hand-rolled `BlueskyAPICache`)
+/// - URL cache hit ratio (URLSession's own cache, via `URLSessionTaskMetrics`)
 /// - Slowest endpoint
 ///
 /// **Expanded mode** (tap to toggle): scrollable list of last 20 requests with full details.
@@ -58,10 +59,11 @@ struct PerformanceMonitorOverlay: View {
     // MARK: - Compact HUD
 
     private var compactHUD: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             metricItem(label: "Req", value: "\(requestCount)")
             metricItem(label: "Avg", value: averageLatencyString)
-            metricItem(label: "Cache", value: cacheHitRatioString)
+            metricItem(label: "API", value: apiCacheRatioString)
+            metricItem(label: "URL", value: urlCacheRatioString)
             metricItem(label: "Slow", value: slowestEndpointString)
         }
         .font(.caption2.monospacedDigit().weight(.medium))
@@ -98,9 +100,14 @@ struct PerformanceMonitorOverlay: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text("Cache: \(cacheHitPercent)% (\(cacheHits)/\(cacheMisses))")
-                    .font(.caption2.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text("API cache: \(apiCachePercent)% fresh (\(freshHits)✓/\(staleHits)~ of \(cacheMisses)✗)")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                    Text("URL cache: \(urlCachePercent)% (\(urlCacheHits)✓/\(urlCacheMisses)✗)")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding(.horizontal, 10)
             .padding(.top, 4)
@@ -213,22 +220,53 @@ struct PerformanceMonitorOverlay: View {
         }.sorted { $0.averageDuration > $1.averageDuration }
     }
 
-    private var cacheHits: Int {
+    // MARK: - API cache metrics (BlueskyAPICache)
+
+    /// Entries served without network work.
+    private var freshHits: Int {
         cacheMetrics.hitCount
+    }
+
+    /// Entries served but past their TTL — a revalidation is still owed.
+    private var staleHits: Int {
+        cacheMetrics.staleCount
     }
 
     private var cacheMisses: Int {
         cacheMetrics.missCount
     }
 
-    private var cacheHitPercent: Int {
-        let total = cacheHits + cacheMisses
+    /// Share of API lookups answered from a *fresh* entry.
+    private var apiCachePercent: Int {
+        let total = freshHits + staleHits + cacheMisses
         guard total > 0 else { return 0 }
-        return Int(Double(cacheHits) / Double(total) * 100)
+        return Int(Double(freshHits) / Double(total) * 100)
     }
 
-    private var cacheHitRatioString: String {
-        "\(cacheHitPercent)%"
+    private var apiCacheRatioString: String {
+        "\(apiCachePercent)%"
+    }
+
+    // MARK: - URL cache metrics (URLSessionTaskMetrics)
+
+    @MainActor
+    private var urlCacheHits: Int {
+        debugStore.urlCacheHitCount
+    }
+
+    @MainActor
+    private var urlCacheMisses: Int {
+        debugStore.urlCacheMissCount
+    }
+
+    @MainActor
+    private var urlCachePercent: Int {
+        Int(debugStore.urlCacheHitRatio * 100)
+    }
+
+    @MainActor
+    private var urlCacheRatioString: String {
+        "\(urlCachePercent)%"
     }
 
     // MARK: - Helpers

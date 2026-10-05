@@ -75,7 +75,7 @@ final class ConstellationClient {
         let cacheURL = "constellation/listed-on/\(actorDID)"
         var staleFallback: ConstellationListedOnCache?
         if let cached = await BlueskyAPICache.shared.read(
-            accountDID: actorDID,
+            scope: .shared,
             url: cacheURL,
             maxAge: cacheMaxAge
         ),
@@ -105,7 +105,7 @@ final class ConstellationClient {
 
             let payload = ConstellationListedOnCache(lists: lists)
             if let data = try? JSONEncoder().encode(payload) {
-                await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
+                await BlueskyAPICache.shared.write(scope: .shared, url: cacheURL, data: data)
                 AppLogger.performance.debug("Constellation listed-on cache WRITE for \(actorDID) (\(lists.count) lists, \(page) pages)")
             }
             return lists
@@ -129,7 +129,7 @@ final class ConstellationClient {
         let cacheURL = "constellation/listed-on-memberships/\(actorDID)"
         var staleFallback: ConstellationListedOnMembershipCache?
         if let cached = await BlueskyAPICache.shared.read(
-            accountDID: actorDID,
+            scope: .shared,
             url: cacheURL,
             maxAge: cacheMaxAge
         ),
@@ -165,7 +165,7 @@ final class ConstellationClient {
 
             let payload = ConstellationListedOnMembershipCache(memberships: memberships)
             if let data = try? JSONEncoder().encode(payload) {
-                await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
+                await BlueskyAPICache.shared.write(scope: .shared, url: cacheURL, data: data)
                 AppLogger.performance.debug("Constellation listed-on memberships cache WRITE for \(actorDID) (\(memberships.count), \(page) pages)")
             }
             return memberships
@@ -222,7 +222,7 @@ final class ConstellationClient {
                 for offset in stride(from: 0, to: page.entries.count, by: Self.profileBatchSize) {
                     let dids = page.entries[offset ..< min(offset + Self.profileBatchSize, page.entries.count)].map(\.did)
                     group.addTask { [httpClient] in
-                        await Self.resolveProfileChunk(dids: dids, httpClient: httpClient, cacheNamespace: actorDID)
+                        await Self.resolveProfileChunk(dids: dids, httpClient: httpClient)
                     }
                     inFlight += 1
                     // Keep at most one window of batches in flight: drain one as soon as
@@ -270,7 +270,7 @@ final class ConstellationClient {
                 let cacheURL = "constellation/blocked-by/\(actorDID)"
                 var staleFallback: ConstellationBlockerCache?
                 if let cached = await BlueskyAPICache.shared.read(
-                    accountDID: actorDID,
+                    scope: .shared,
                     url: cacheURL,
                     maxAge: cacheMaxAge
                 ),
@@ -314,7 +314,7 @@ final class ConstellationClient {
                     // The firehose keeps moving while we page: never report fewer records than we hold.
                     let payload = ConstellationBlockerCache(total: max(total, entries.count), entries: entries)
                     if let data = try? JSONEncoder().encode(payload) {
-                        await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
+                        await BlueskyAPICache.shared.write(scope: .shared, url: cacheURL, data: data)
                         AppLogger.performance.debug("Constellation cache WRITE for \(actorDID) (\(entries.count)/\(payload.total) entries)")
                     }
                     continuation.finish()
@@ -437,14 +437,13 @@ final class ConstellationClient {
     /// deliberate: a blocker whose profile cannot be resolved still counts, it just renders
     /// without a handle.
     ///
-    /// Public profile data is viewer-independent, so entries are cached under the subject's
-    /// DID (`cacheNamespace` = the inspected account) rather than the viewer's: that keeps
-    /// them in the same namespace as the blocker walk, so the account switch's cache clear
-    /// drops them too.
+    /// Public profile data is viewer-independent, so entries live in the `.shared` scope:
+    /// every account reuses the same profile row, and removing a single account
+    /// (`clear(for:)`) leaves them intact. A full account *switch* still clears everything,
+    /// as the state-reset contract requires.
     nonisolated static func resolveProfileChunk(
         dids: [String],
-        httpClient: HTTPClient,
-        cacheNamespace: String
+        httpClient: HTTPClient
     ) async -> [BlueskyActor] {
         guard !dids.isEmpty else { return [] }
 
@@ -452,7 +451,7 @@ final class ConstellationClient {
         var misses: [String] = []
         for did in dids {
             if let cached = await BlueskyAPICache.shared.read(
-                accountDID: cacheNamespace,
+                scope: .shared,
                 url: profileCacheURL(for: did),
                 maxAge: BlueskyAPICache.DefaultTTL.profile
             ),
@@ -476,7 +475,7 @@ final class ConstellationClient {
                 for actor in fetched where !actor.did.isEmpty {
                     if let data = try? JSONEncoder().encode(actor) {
                         await BlueskyAPICache.shared.write(
-                            accountDID: cacheNamespace,
+                            scope: .shared,
                             url: profileCacheURL(for: actor.did),
                             data: data
                         )
@@ -495,8 +494,9 @@ final class ConstellationClient {
     }
 
     /// Cache key for one profile lookup — shared by the read and the write path so a
-    /// resolved profile is reused on the next visit.
+    /// resolved profile is reused on the next visit. Delegates to `BlueskyAPICache` so the
+    /// blocker walk and the batch lookup cannot drift apart.
     nonisolated static func profileCacheURL(for did: String) -> String {
-        "public.api.bsky.app/getProfiles?actor=\(did)"
+        BlueskyAPICache.profileKey(for: did)
     }
 }

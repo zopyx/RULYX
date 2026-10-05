@@ -60,7 +60,7 @@ final class AtProtoRepoClient {
         let cacheURL = "repo/blocklist/\(repo)"
         var staleFallback: [RepoBlockRecord]?
         if !forceRefresh,
-           let cached = await BlueskyAPICache.shared.read(accountDID: repo, url: cacheURL, maxAge: cacheMaxAge),
+           let cached = await BlueskyAPICache.shared.read(scope: .account(repo), url: cacheURL, maxAge: cacheMaxAge),
            let payload = try? JSONDecoder().decode([RepoBlockRecord].self, from: cached.data)
         {
             if !cached.isStale {
@@ -77,7 +77,7 @@ final class AtProtoRepoClient {
                 onProgress: onProgress
             )
             if let data = try? JSONEncoder().encode(records) {
-                await BlueskyAPICache.shared.write(accountDID: repo, url: cacheURL, data: data)
+                await BlueskyAPICache.shared.write(scope: .account(repo), url: cacheURL, data: data)
             }
             return records
         } catch let cancellation as CancellationError {

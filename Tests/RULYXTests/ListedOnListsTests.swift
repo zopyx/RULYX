@@ -37,8 +37,9 @@ final class ListedOnListsTests: XCTestCase {
         MockURLProtocol.requestHandler = nil
         client = nil
         mockSession = nil
-        await BlueskyAPICache.shared.clear(for: profileDID)
-        await BlueskyAPICache.shared.clear(for: "did:plc:owner-a")
+        // Viewer-independent payloads live in the cache's `.shared` scope, which
+        // `clear(for:)` does not match — reset the whole cache or they leak into the next test.
+        await BlueskyAPICache.shared.clearAll()
         try await super.tearDown()
     }
 

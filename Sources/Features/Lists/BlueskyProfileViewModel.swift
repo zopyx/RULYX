@@ -400,7 +400,7 @@ final class BlueskyProfileViewModel {
         let cacheKey = "mediaScan_v3_\(did)"
 
         // Check cache first
-        let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.member)
+        let cached = await BlueskyAPICache.shared.read(scope: .shared, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.member)
         if let cachedData = cached, !cachedData.isStale {
             if let counts = try? JSONDecoder().decode(MediaScanResult.self, from: cachedData.data) {
                 mediaImageCount = counts.images
@@ -455,7 +455,7 @@ final class BlueskyProfileViewModel {
         // Write to cache
         let result = MediaScanResult(images: images, videos: videos)
         if let encoded = try? JSONEncoder().encode(result) {
-            await BlueskyAPICache.shared.write(accountDID: did, url: cacheKey, data: encoded)
+            await BlueskyAPICache.shared.write(scope: .shared, url: cacheKey, data: encoded)
         }
     }
 

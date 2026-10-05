@@ -55,6 +55,10 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
     @MainActor private var lastPurgeDate: Date?
     /// Per-endpoint latency tracking for the performance overlay.
     @MainActor private var endpointStats: [String: EndpointLatencyStats] = [:]
+    /// Transactions URLSession answered from its URL cache, reported via `URLSessionTaskMetrics`.
+    @MainActor private var urlCacheHits = 0
+    /// Transactions that had to reach the network.
+    @MainActor private var urlCacheMisses = 0
 
     private let maxEntries: Int
     private let maxAge: TimeInterval = 24 * 60 * 60
@@ -132,6 +136,38 @@ final class HTTPRequestDebugStore: ObservableObject, @unchecked Sendable {
             entries.removeAll()
             nextSequenceNumber = 1
         }
+    }
+
+    // MARK: - URL cache metrics
+
+    /// Record how many of a finished task's transactions the URL cache served.
+    ///
+    /// Called from `URLSessionTaskDelegate` on the session's delegate queue, hence the hop
+    /// to the main actor. `resourceFetchType == .localCache` is the only reliable signal for
+    /// a URL-cache hit — such a request never produces a network transaction that could be
+    /// observed anywhere else.
+    func recordURLCacheTransactions(cached: Int, total: Int) async {
+        await MainActor.run {
+            urlCacheHits += max(0, cached)
+            urlCacheMisses += max(0, total - cached)
+        }
+    }
+
+    /// Transactions served from the URL cache.
+    @MainActor var urlCacheHitCount: Int {
+        urlCacheHits
+    }
+
+    /// Transactions served from the network.
+    @MainActor var urlCacheMissCount: Int {
+        urlCacheMisses
+    }
+
+    /// URL-cache hit ratio (0.0 – 1.0) across finished tasks.
+    @MainActor var urlCacheHitRatio: Double {
+        let total = urlCacheHits + urlCacheMisses
+        guard total > 0 else { return 0 }
+        return Double(urlCacheHits) / Double(total)
     }
 
     // MARK: - Private Helpers

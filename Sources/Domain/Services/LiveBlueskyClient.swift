@@ -13,6 +13,13 @@ struct SearchPostsResponse: Decodable {
     let posts: [RichPost]
 }
 
+/// Codable wrapper for a cached page of actors: `PagedActorSearch` itself is not `Codable`,
+/// and widening it would push a cache-only concern into the public model.
+private struct CachedActorPage: Codable {
+    let actors: [BlueskyActor]
+    let cursor: String?
+}
+
 /// Primary API client for Bluesky network operations. Provides authenticated access to
 /// all major AT Protocol lexicons used by the app: lists, profiles, feeds, posts,
 /// notifications, chat, moderation reports, and blocklist reads.
@@ -102,6 +109,12 @@ class LiveBlueskyClient: ObservableObject,
     func clearAllCaches() async {
         session.configuration.urlCache?.removeAllCachedResponses()
         URLCache.shared.removeAllCachedResponses()
+        // The pinned API session caches into its own store, so it needs clearing explicitly
+        // — otherwise viewer-relative responses survive an account switch. Note that
+        // `URLCache` applies this asynchronously (the entry is still readable for a short
+        // moment afterwards); the authoritative store, `BlueskyAPICache`, is cleared
+        // synchronously below.
+        HTTPClient.apiURLCache.removeAllCachedResponses()
         sessionService.clearSessionCache()
         await BlueskyAPICache.shared.clearAll()
     }
@@ -111,8 +124,30 @@ class LiveBlueskyClient: ObservableObject,
     func clearCache() {
         session.configuration.urlCache?.removeAllCachedResponses()
         URLCache.shared.removeAllCachedResponses()
+        HTTPClient.apiURLCache.removeAllCachedResponses()
         sessionService.clearSessionCache()
         Task { await BlueskyAPICache.shared.clearAll() }
+    }
+
+    // MARK: - Relationship page cache
+
+    /// Cache key for the *first* page of a followers/following listing.
+    ///
+    /// Later pages are cursor-keyed and rarely re-requested, so they are not cached: the
+    /// first page is the one every visit re-fetches.
+    private static func firstPageKey(_ path: String, actor: String) -> String {
+        "\(path)?actor=\(actor)&page=first"
+    }
+
+    /// Drop the cached first pages whose viewer-relative badges a relationship change
+    /// invalidates (the viewer's own follow lists, plus the affected actor's followers).
+    private func invalidateRelationshipCaches(for account: AppAccount, affectedActor: String? = nil) async {
+        let scope = BlueskyAPICache.Scope.account(account.cacheIdentity)
+        await BlueskyAPICache.shared.remove(scope: scope, url: Self.firstPageKey("app.bsky.graph.getFollows", actor: account.cacheIdentity))
+        await BlueskyAPICache.shared.remove(scope: scope, url: Self.firstPageKey("app.bsky.graph.getFollowers", actor: account.cacheIdentity))
+        if let affectedActor {
+            await BlueskyAPICache.shared.remove(scope: scope, url: Self.firstPageKey("app.bsky.graph.getFollowers", actor: affectedActor))
+        }
     }
 
     // MARK: - Authentication & Session
@@ -147,10 +182,12 @@ class LiveBlueskyClient: ObservableObject,
     /// Fetches all lists owned by the authenticated account.
     /// Uses `BlueskyAPICache`; set `forceRefresh = true` to bypass cache.
     func fetchLists(for account: AppAccount, appPassword: String?, forceRefresh: Bool = false) async throws -> [BlueskyList] {
-        // Cache check
-        if !forceRefresh, let did = account.did {
+        // Cache check. Account-scoped: the payload is the signed-in account's own lists.
+        // `cacheIdentity` falls back to the local UUID, so caching works before the DID is known.
+        let scope = BlueskyAPICache.Scope.account(account.cacheIdentity)
+        if !forceRefresh {
             let cacheURL = "app.bsky.graph.getLists"
-            if let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.list) {
+            if let cached = await BlueskyAPICache.shared.read(scope: scope, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.list) {
                 if let lists = try? JSONDecoder().decode([BlueskyList].self, from: cached.data) {
                     if !cached.isStale {
                         return lists
@@ -199,8 +236,12 @@ class LiveBlueskyClient: ObservableObject,
         }
 
         // Write to cache
-        if let did = account.did, let encoded = try? JSONEncoder().encode(lists) {
-            await BlueskyAPICache.shared.write(accountDID: did, url: "app.bsky.graph.getLists", data: encoded)
+        if let encoded = try? JSONEncoder().encode(lists) {
+            await BlueskyAPICache.shared.write(
+                scope: .account(account.cacheIdentity),
+                url: "app.bsky.graph.getLists",
+                data: encoded
+            )
         }
 
         return lists
@@ -868,7 +909,7 @@ class LiveBlueskyClient: ObservableObject,
     /// Follows an actor by DID. Creates a `app.bsky.graph.follow` record.
     @discardableResult
     func followActor(did actorDID: String, account: AppAccount, appPassword: String?) async throws -> String {
-        try await sessionService.performAuthenticatedRequest(
+        let uri = try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
         ) { authSession in
@@ -889,11 +930,15 @@ class LiveBlueskyClient: ObservableObject,
 
             return response.uri
         }
+        await invalidateRelationshipCaches(for: account, affectedActor: actorDID)
+        return uri
     }
 
     /// Unfollows an actor by their follow record URI. Delegates to `removeMember`.
     func unfollowActor(recordURI: String, account: AppAccount, appPassword: String?) async throws {
         try await removeMember(recordURI: recordURI, account: account, appPassword: appPassword)
+        // The record URI carries no DID, so only the viewer's own lists can be invalidated here.
+        await invalidateRelationshipCaches(for: account)
     }
 
     /// Mutes an actor by DID.
@@ -1199,10 +1244,12 @@ class LiveBlueskyClient: ObservableObject,
     /// Returns a `BlueskyProfile` with viewer state, labels, and associated counts.
     /// Uses `BlueskyAPICache` for instant re-visits; set `forceRefresh = true` to bypass cache.
     func fetchProfile(did actorDID: String, account: AppAccount, appPassword: String?, forceRefresh: Bool = false) async throws -> BlueskyProfile {
-        // Cache check (unless forced refresh)
-        if !forceRefresh, let did = account.did {
+        // Cache check (unless forced refresh). Account-scoped: the payload carries
+        // `viewerState` (blocking/muting), so it must never be shared between accounts.
+        let scope = BlueskyAPICache.Scope.account(account.cacheIdentity)
+        if !forceRefresh {
             let cacheURL = "app.bsky.actor.getProfile?actor=\(actorDID)"
-            if let cached = await BlueskyAPICache.shared.read(accountDID: did, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.profile) {
+            if let cached = await BlueskyAPICache.shared.read(scope: scope, url: cacheURL, maxAge: BlueskyAPICache.DefaultTTL.profile) {
                 if let profile = try? JSONDecoder().decode(BlueskyProfile.self, from: cached.data) {
                     if !cached.isStale {
                         return profile
@@ -1246,9 +1293,13 @@ class LiveBlueskyClient: ObservableObject,
         )
 
         // Write to cache
-        if let did = account.did, let encoded = try? JSONEncoder().encode(profile) {
+        if let encoded = try? JSONEncoder().encode(profile) {
             let cacheURL = "app.bsky.actor.getProfile?actor=\(actorDID)"
-            await BlueskyAPICache.shared.write(accountDID: did, url: cacheURL, data: encoded)
+            await BlueskyAPICache.shared.write(
+                scope: .account(account.cacheIdentity),
+                url: cacheURL,
+                data: encoded
+            )
         }
 
         return profile
@@ -1395,15 +1446,45 @@ class LiveBlueskyClient: ObservableObject,
     /// using the public API endpoint.
     /// Batches requests to stay within the API limit of 25 actors per call.
     static func fetchProfileBatch(identifiers: [String], httpClient: HTTPClient) async throws -> [BlueskyActor] {
+        guard !identifiers.isEmpty else { return [] }
+
+        // Public profile rows are viewer-independent, so they live in the `.shared` scope:
+        // one fetch serves every account, and the blocker walk (which uses the same key)
+        // reuses them instead of refetching. Only the misses go to the network.
+        var actors: [BlueskyActor] = []
+        var seenDIDs = Set<String>()
+        var missing: [String] = []
+
+        // Deduplicate by DID: a partially cached batch would otherwise return the same
+        // profile twice — once from the cache and once from the chunk response — and the
+        // blocker walk appends both.
+        func append(_ actor: BlueskyActor) {
+            guard !actor.did.isEmpty, seenDIDs.insert(actor.did).inserted else { return }
+            actors.append(actor)
+        }
+
+        for identifier in identifiers {
+            if let entry = await BlueskyAPICache.shared.read(
+                scope: .shared,
+                url: BlueskyAPICache.profileKey(for: identifier),
+                maxAge: BlueskyAPICache.DefaultTTL.profile
+            ), let actor = try? JSONDecoder().decode(BlueskyActor.self, from: entry.data) {
+                append(actor)
+            } else {
+                missing.append(identifier)
+            }
+        }
+
+        guard !missing.isEmpty else { return actors }
+
         guard let profilesURL = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles") else {
             throw BlueskyAPIError.invalidURL
         }
 
-        var actors: [BlueskyActor] = []
         let batchSize = 25
 
-        for offset in stride(from: 0, to: identifiers.count, by: batchSize) {
-            let chunk = Array(identifiers[offset ..< min(offset + batchSize, identifiers.count)])
+        for offset in stride(from: 0, to: missing.count, by: batchSize) {
+            let chunk = Array(missing[offset ..< min(offset + batchSize, missing.count)])
             let actorsParam = chunk.map { URLQueryItem(name: "actors", value: $0) }
             var components = URLComponents(url: profilesURL, resolvingAgainstBaseURL: false)!
             components.queryItems = actorsParam
@@ -1416,15 +1497,25 @@ class LiveBlueskyClient: ObservableObject,
                 throw BlueskyAPIError.invalidResponse
             }
             let decoded = try JSONDecoder().decode(GetProfilesResponse.self, from: data)
-            actors.append(contentsOf: decoded.profiles.map {
-                BlueskyActor(
-                    did: $0.did,
-                    handle: $0.handle,
-                    displayName: $0.displayName,
-                    avatarURL: URL(string: $0.avatar ?? ""),
-                    description: $0.description
+            for profile in decoded.profiles {
+                let actor = BlueskyActor(
+                    did: profile.did,
+                    handle: profile.handle,
+                    displayName: profile.displayName,
+                    avatarURL: URL(string: profile.avatar ?? ""),
+                    description: profile.description
                 )
-            })
+                append(actor)
+                // Keyed by the returned DID (not the requested identifier, which may be a
+                // handle) so every caller of the same profile shares one entry.
+                if let encoded = try? JSONEncoder().encode(actor) {
+                    await BlueskyAPICache.shared.write(
+                        scope: .shared,
+                        url: BlueskyAPICache.profileKey(for: actor.did),
+                        data: encoded
+                    )
+                }
+            }
         }
 
         return actors
@@ -1704,6 +1795,18 @@ class LiveBlueskyClient: ObservableObject,
 
     /// Fetches a single page of followers.
     func fetchFollowersPage(actor actorDID: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedActorSearch {
+        // Only the first page is cached: it is the one re-requested on every visit, and a
+        // cursor-keyed entry would be invalidated the moment the list shifts.
+        let scope = BlueskyAPICache.Scope.account(account.cacheIdentity)
+        let cacheKey = Self.firstPageKey("app.bsky.graph.getFollowers", actor: actorDID)
+        if cursor == nil,
+           let entry = await BlueskyAPICache.shared.read(scope: scope, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.relationship),
+           !entry.isStale,
+           let page = try? JSONDecoder().decode(CachedActorPage.self, from: entry.data)
+        {
+            return PagedActorSearch(actors: page.actors, cursor: page.cursor)
+        }
+
         let response: GetFollowersResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
@@ -1723,7 +1826,7 @@ class LiveBlueskyClient: ObservableObject,
                 hostURL: authSession.pdsURL
             )
         }
-        return PagedActorSearch(
+        let page = PagedActorSearch(
             actors: response.followers.map {
                 BlueskyActor(
                     did: $0.did,
@@ -1737,6 +1840,10 @@ class LiveBlueskyClient: ObservableObject,
             },
             cursor: response.cursor
         )
+        if cursor == nil, let encoded = try? JSONEncoder().encode(CachedActorPage(actors: page.actors, cursor: page.cursor)) {
+            await BlueskyAPICache.shared.write(scope: scope, url: cacheKey, data: encoded)
+        }
+        return page
     }
 
     /// Fetches all accounts the given actor is following, with automatic pagination (up to 50 pages).
@@ -1777,6 +1884,17 @@ class LiveBlueskyClient: ObservableObject,
 
     /// Fetches a single page of accounts the given actor follows.
     func fetchFollowingPage(actor actorDID: String, cursor: String?, account: AppAccount, appPassword: String?) async throws -> PagedActorSearch {
+        // First page only — see `fetchFollowersPage`.
+        let scope = BlueskyAPICache.Scope.account(account.cacheIdentity)
+        let cacheKey = Self.firstPageKey("app.bsky.graph.getFollows", actor: actorDID)
+        if cursor == nil,
+           let entry = await BlueskyAPICache.shared.read(scope: scope, url: cacheKey, maxAge: BlueskyAPICache.DefaultTTL.relationship),
+           !entry.isStale,
+           let page = try? JSONDecoder().decode(CachedActorPage.self, from: entry.data)
+        {
+            return PagedActorSearch(actors: page.actors, cursor: page.cursor)
+        }
+
         let response: GetFollowsResponse = try await sessionService.performAuthenticatedRequest(
             account: account,
             appPassword: appPassword
@@ -1796,7 +1914,7 @@ class LiveBlueskyClient: ObservableObject,
                 hostURL: authSession.pdsURL
             )
         }
-        return PagedActorSearch(
+        let page = PagedActorSearch(
             actors: response.follows.map {
                 BlueskyActor(
                     did: $0.did,
@@ -1810,6 +1928,10 @@ class LiveBlueskyClient: ObservableObject,
             },
             cursor: response.cursor
         )
+        if cursor == nil, let encoded = try? JSONEncoder().encode(CachedActorPage(actors: page.actors, cursor: page.cursor)) {
+            await BlueskyAPICache.shared.write(scope: scope, url: cacheKey, data: encoded)
+        }
+        return page
     }
 
     // MARK: - Profile Inspection

@@ -54,4 +54,13 @@ struct AppAccount: Identifiable, Codable, Hashable, Sendable {
         self.createdAt = createdAt
         self.lastUsedAt = lastUsedAt
     }
+
+    // MARK: - Derived
+
+    /// Stable token for account-scoped cache entries: the DID once resolved, otherwise the
+    /// local account UUID. Without the fallback, every account-scoped lookup would be
+    /// skipped until the DID is known, so nothing was cached on a cold start.
+    var cacheIdentity: String {
+        did ?? id.uuidString
+    }
 }

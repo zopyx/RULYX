@@ -83,11 +83,23 @@ struct BlueskyRequestExecutor: BlueskyRequestExecuting {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
 
-        let (data, httpResponse) = try await httpClient.data(
-            for: request,
-            source: Self.sourceLabel(for: path),
-            origin: Self.originLabel(for: path, method: method)
-        )
+        // Idempotent GETs collapse with any identical in-flight request (same method, URL
+        // and auth); everything else must reach the network untouched.
+        let (data, httpResponse): (Data, HTTPURLResponse)
+        if method == "GET" {
+            (data, httpResponse) = try await httpClient.dedupedData(
+                for: request,
+                authToken: accessToken,
+                source: Self.sourceLabel(for: path),
+                origin: Self.originLabel(for: path, method: method)
+            )
+        } else {
+            (data, httpResponse) = try await httpClient.data(
+                for: request,
+                source: Self.sourceLabel(for: path),
+                origin: Self.originLabel(for: path, method: method)
+            )
+        }
 
         if httpResponse.statusCode == 401 {
             if let errorPayload = try? JSONDecoder().decode(APIErrorPayload.self, from: data),

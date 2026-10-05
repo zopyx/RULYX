@@ -35,7 +35,9 @@ final class OwnRepoBlocklistTests: XCTestCase {
         MockURLProtocol.requestHandler = nil
         client = nil
         mockSession = nil
-        await BlueskyAPICache.shared.clear(for: ownerDID)
+        // Profile rows are cached in the `.shared` scope, which `clear(for:)` does not match —
+        // reset the whole cache so a previous test's profiles cannot leak into this one.
+        await BlueskyAPICache.shared.clearAll()
         try await super.tearDown()
     }
 

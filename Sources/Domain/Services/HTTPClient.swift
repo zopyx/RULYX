@@ -26,13 +26,28 @@ private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate, Se
 ///
 /// - Important: Pinning is opt-in. Pass an empty set or omit `pinnedHashes`
 ///   to disable pinning and allow all connections.
-private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
+///
+/// Also collects `URLSessionTaskMetrics` so URL-cache effectiveness is observable:
+/// a transaction whose `resourceFetchType` is `.localCache` was answered by the URL cache —
+/// such a request produces no observable network activity anywhere else.
+private final class CertificatePinningDelegate: NSObject, URLSessionDelegate, URLSessionTaskDelegate, @unchecked Sendable {
     /// @unchecked Sendable: NSObject-based URLSession delegate; thread-safety
     /// is guaranteed by URLSession's serial delegate queue.
     private let pinnedHashes: Set<String>
 
-    init(pinnedHashes: Set<String>) {
+    /// Receives `(cachedTransactions, totalTransactions)` after each task finishes.
+    private let onTaskMetrics: (@Sendable (Int, Int) -> Void)?
+
+    init(pinnedHashes: Set<String>, onTaskMetrics: (@Sendable (Int, Int) -> Void)? = nil) {
         self.pinnedHashes = pinnedHashes
+        self.onTaskMetrics = onTaskMetrics
+    }
+
+    func urlSession(_: URLSession, task _: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        let transactions = metrics.transactionMetrics
+        guard !transactions.isEmpty else { return }
+        let cached = transactions.filter { $0.resourceFetchType == .localCache }.count
+        onTaskMetrics?(cached, transactions.count)
     }
 
     func urlSession(
@@ -201,6 +216,35 @@ struct HTTPClient {
 
     private static let inflightManager = InflightManager()
 
+    /// On-disk URL cache shared by every pinned API session.
+    ///
+    /// The pinned session used to be `.ephemeral` with `reloadIgnoringLocalCacheData`,
+    /// which discarded the origin's `Cache-Control: public, max-age=…` entirely — every
+    /// request went to the network even though the API advertises a 30 s freshness window.
+    /// A dedicated cache (rather than `URLCache.shared`, which the media pipelines use)
+    /// keeps API entries evictable independently and gives `clearAllCaches()` something
+    /// precise to purge on an account switch.
+    static let apiURLCache = URLCache(
+        memoryCapacity: 64 * 1024 * 1024,
+        diskCapacity: 256 * 1024 * 1024,
+        diskPath: "bluesky-api-cache"
+    )
+
+    /// Extracts origin freshness metadata so callers can persist it and revalidate later.
+    static func cacheMetadata(from response: HTTPURLResponse) -> (etag: String?, lastModified: String?, serverMaxAge: TimeInterval?) {
+        let etag = response.value(forHTTPHeaderField: "ETag")
+        let lastModified = response.value(forHTTPHeaderField: "Last-Modified")
+        var serverMaxAge: TimeInterval?
+        if let cacheControl = response.value(forHTTPHeaderField: "Cache-Control") {
+            for directive in cacheControl.split(separator: ",") {
+                let part = directive.trimmingCharacters(in: .whitespaces).lowercased()
+                guard part.hasPrefix("max-age=") else { continue }
+                serverMaxAge = TimeInterval(part.dropFirst("max-age=".count))
+            }
+        }
+        return (etag, lastModified, serverMaxAge)
+    }
+
     /// Creates an HTTP client with optional certificate pinning and debug store logging.
     ///
     /// - Parameters:
@@ -220,21 +264,46 @@ struct HTTPClient {
         if pinnedHashes.isEmpty {
             self.session = session
         } else {
-            let delegate = CertificatePinningDelegate(pinnedHashes: pinnedHashes)
-            let config = URLSessionConfiguration.ephemeral
-            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            // Cookies and credentials stay out of persistent storage (the reason the
+            // session was ephemeral), but the URL cache is kept so origin-declared
+            // freshness is honoured instead of re-fetching on every call.
+            let store = debugStore
+            let delegate = CertificatePinningDelegate(pinnedHashes: pinnedHashes) { cached, total in
+                Task { await store?.recordURLCacheTransactions(cached: cached, total: total) }
+            }
+            let config = URLSessionConfiguration.default
+            config.requestCachePolicy = .useProtocolCachePolicy
+            config.urlCache = Self.apiURLCache
+            config.httpCookieStorage = nil
+            config.httpShouldSetCookies = false
+            config.urlCredentialStorage = nil
             self.session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
         }
     }
 
-    /// Deduplicates in-flight network requests by method + canonicalized URL.
+    /// Deduplicates in-flight network requests by method + auth + canonicalized URL.
     /// Query items are sorted alphabetically so `?a=1&b=2` and `?b=2&a=1` share a key.
     /// Body and auth are intentionally excluded — only idempotent GETs should use `dedupedData`.
-    func dedupedData(for request: URLRequest, source: String) async throws -> (Data, HTTPURLResponse) {
-        let cacheKey = "\(request.httpMethod ?? "GET"):\(Self.canonicalURLString(for: request.url))"
+    func dedupedData(
+        for request: URLRequest,
+        authToken: String? = nil,
+        source: String,
+        origin: String? = nil
+    ) async throws -> (Data, HTTPURLResponse) {
+        // The auth token is part of the key: the same URL fetched by two signed-in accounts
+        // returns viewer-relative payloads, and collapsing those into one response would
+        // hand one account the other's viewer state.
+        let auth = Self.authDiscriminator(authToken)
+        let cacheKey = "\(request.httpMethod ?? "GET"):\(auth):\(Self.canonicalURLString(for: request.url))"
         return try await Self.inflightManager.dedup(key: cacheKey) {
-            try await data(for: request, source: source)
+            try await data(for: request, source: source, origin: origin)
         }
+    }
+
+    private static func authDiscriminator(_ authToken: String?) -> String {
+        guard let authToken else { return "-" }
+        let digest = SHA256.hash(data: Data(authToken.utf8))
+        return digest.prefix(8).map { String(format: "%02x", $0) }.joined()
     }
 
     private static func canonicalURLString(for url: URL?) -> String {
@@ -272,7 +341,7 @@ struct HTTPClient {
                 AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
                 throw BlueskyAPIError.invalidResponse
             }
-            if (200 ..< 300).contains(httpResponse.statusCode) {
+            if Self.isSuccess(httpResponse.statusCode) {
                 await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
             } else {
                 let bodyPreview = Self.prettyPrintedJSON(from: data) ?? String(data: data, encoding: .utf8) ?? ""
@@ -337,7 +406,7 @@ struct HTTPClient {
                 )
                 throw BlueskyAPIError.invalidResponse
             }
-            if (200 ..< 300).contains(httpResponse.statusCode) {
+            if Self.isSuccess(httpResponse.statusCode) {
                 await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
             } else {
                 let responseData = try? Data(contentsOf: fileURL)
@@ -386,7 +455,7 @@ struct HTTPClient {
                 AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → invalid response (not HTTP)")
                 throw BlueskyAPIError.invalidResponse
             }
-            if (200 ..< 300).contains(httpResponse.statusCode) {
+            if Self.isSuccess(httpResponse.statusCode) {
                 await debugStore?.succeed(id: entryID ?? UUID(), statusCode: httpResponse.statusCode)
             } else {
                 let bodyPreview = Self.prettyPrintedJSON(from: data) ?? String(data: data, encoding: .utf8) ?? ""
@@ -407,6 +476,14 @@ struct HTTPClient {
             AppLogger.http.error("\(request.httpMethod ?? "?") \(request.url?.absoluteString ?? "?") → \(error.localizedDescription)")
             throw error
         }
+    }
+
+    /// Whether a status code counts as a successful outcome.
+    ///
+    /// `304 Not Modified` is a success for a conditional request: it confirms the cached
+    /// payload is still valid, and the caller keeps its cached body.
+    private static func isSuccess(_ statusCode: Int) -> Bool {
+        (200 ..< 300).contains(statusCode) || statusCode == 304
     }
 
     private static func makeOrigin(fileID: String, function: String, line: Int) -> String {

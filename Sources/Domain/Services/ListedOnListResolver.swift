@@ -186,7 +186,7 @@ final class ListedOnListResolver {
         let cacheURL = "appview/lists/\(ownerDID)"
         var cached: [AppViewListView] = []
         var cacheIsFresh = false
-        if let entry = await BlueskyAPICache.shared.read(accountDID: ownerDID, url: cacheURL, maxAge: cacheMaxAge),
+        if let entry = await BlueskyAPICache.shared.read(scope: .shared, url: cacheURL, maxAge: cacheMaxAge),
            let payload = try? JSONDecoder().decode([AppViewListView].self, from: entry.data)
         {
             cached = payload
@@ -213,7 +213,7 @@ final class ListedOnListResolver {
             } while cursor != nil && page < Self.maxPagesPerOwner && !wanted.isSubset(of: known)
 
             if let data = try? JSONEncoder().encode(lists) {
-                await BlueskyAPICache.shared.write(accountDID: ownerDID, url: cacheURL, data: data)
+                await BlueskyAPICache.shared.write(scope: .shared, url: cacheURL, data: data)
             }
         } catch let cancellation as CancellationError {
             _ = cancellation
