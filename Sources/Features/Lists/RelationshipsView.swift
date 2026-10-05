@@ -1290,7 +1290,8 @@ struct RelationshipsView: View {
                 let r = try await container.blocklist.fetchBlockedByActors(
                     account: account,
                     appPassword: appPassword,
-                    onProgress: updateSourceCount
+                    onProgress: updateSourceCount,
+                    onActors: appendBlockedByActors
                 )
                 result = r.actors
                 sourceTotal = r.totalCount
@@ -1309,8 +1310,10 @@ struct RelationshipsView: View {
                 }
             }
 
-            // Show status if loaded count differs from expected total
-            if let expected = sourceTotal, expected != actors.count, mode != .blocking, mode != .blockedBy {
+            // Show status if loaded count differs from expected total. "Blocked by" is no
+            // longer excluded: a profile batch that stays unresolved after its retry leaves
+            // the list shorter than the header count, and that must not be silent.
+            if let expected = sourceTotal, expected != actors.count, mode != .blocking {
                 statusMessage = String.localized("rel.loaded_status", replacements: ["count": "\(actors.count)", "total": "\(expected)"])
             }
 
@@ -1337,6 +1340,21 @@ struct RelationshipsView: View {
     private func updateSourceCount(_ count: Int) async {
         sourceTotal = count
         onCountUpdate?(mode, count)
+    }
+
+    /// Appends a batch of blockers as soon as its profiles resolve, so the list fills in
+    /// progressively instead of staying behind the full-screen spinner until the last
+    /// profile is resolved. Re-sorts by block date to keep newest-first order while growing.
+    @MainActor
+    private func appendBlockedByActors(_ batch: [BlueskyActor]) async {
+        guard !batch.isEmpty else {
+            return
+        }
+        actors.append(contentsOf: batch)
+        actors.sort { ($0.blockedDate ?? .distantPast) > ($1.blockedDate ?? .distantPast) }
+        if isLoading {
+            isLoading = false
+        }
     }
 }
 

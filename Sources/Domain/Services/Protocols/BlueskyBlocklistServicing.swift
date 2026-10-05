@@ -38,6 +38,16 @@ protocol BlueskyBlocklistServicing: Sendable {
         onProgress: (@MainActor @Sendable (Int) async -> Void)?
     ) async throws -> BlocklistResult
 
+    /// The actors blocking the account, reporting partial counts as records load and
+    /// emitting each resolved batch of actors as it becomes available, so a caller can
+    /// render the list while profiles are still being resolved.
+    func fetchBlockedByActors(
+        account: AppAccount,
+        appPassword: String?,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?,
+        onActors: (@MainActor @Sendable ([BlueskyActor]) async -> Void)?
+    ) async throws -> BlocklistResult
+
     /// Number of actors the account has blocked.
     func fetchBlockingCount(for account: AppAccount) async throws -> Int
 
@@ -75,5 +85,14 @@ extension BlueskyBlocklistServicing {
         onProgress _: (@MainActor @Sendable (Int) async -> Void)?
     ) async throws -> BlocklistResult {
         try await fetchBlockedByActors(account: account, appPassword: appPassword)
+    }
+
+    func fetchBlockedByActors(
+        account: AppAccount,
+        appPassword: String?,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?,
+        onActors _: (@MainActor @Sendable ([BlueskyActor]) async -> Void)?
+    ) async throws -> BlocklistResult {
+        try await fetchBlockedByActors(account: account, appPassword: appPassword, onProgress: onProgress)
     }
 }

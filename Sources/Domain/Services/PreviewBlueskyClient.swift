@@ -484,6 +484,15 @@ final class PreviewBlueskyClient: LiveBlueskyClient {
         return BlocklistResult(actors: [], totalCount: 0)
     }
 
+    override func fetchBlockedByActors(
+        account: AppAccount,
+        appPassword: String?,
+        onProgress _: (@MainActor @Sendable (Int) async -> Void)?,
+        onActors _: (@MainActor @Sendable ([BlueskyActor]) async -> Void)?
+    ) async throws -> BlocklistResult {
+        try await fetchBlockedByActors(account: account, appPassword: appPassword)
+    }
+
     override func fetchBlockingCount(for _: AppAccount, forceRefresh _: Bool = false) async throws -> Int {
         2
     }

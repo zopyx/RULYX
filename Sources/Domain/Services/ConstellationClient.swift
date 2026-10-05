@@ -178,30 +178,159 @@ final class ConstellationClient {
         }
     }
 
+    /// One page of the blocker walk, emitted as the walk proceeds.
+    struct BlockerPage: Sendable {
+        /// Entries first seen on this page (DID + block date).
+        let entries: [ConstellationBlockerEntry]
+        /// Distinct blockers seen so far — the running `onProgress` value for this page.
+        let seenCount: Int
+        /// The index's own total for the subject.
+        let total: Int
+    }
+
     /// Actors blocking `actorDID`, with profiles resolved best-effort and each block
     /// dated from its record key; the index equivalent of the
     /// `single-blocklist` payload.
+    ///
+    /// Pagination and profile resolution overlap: each page's DIDs are handed to the
+    /// resolver as soon as the page arrives, instead of waiting for the whole (sequential)
+    /// walk to finish. `onActors` receives each resolved batch as it completes, so a caller
+    /// can render the list incrementally rather than waiting for every profile.
+    ///
+    /// The fan-out stays bounded (`profileBatchConcurrency` batches in flight), so a large
+    /// blocklist cannot flood the AppView. `totalCount` always comes from the index's own
+    /// total, even while the actor list is still growing.
     func blockerActors(
         actorDID: String,
-        onProgress: (@MainActor @Sendable (Int) async -> Void)?
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?,
+        onActors: (@MainActor @Sendable ([BlueskyActor]) async -> Void)? = nil
     ) async throws -> BlocklistResult {
-        let payload = try await blockerEntries(actorDID: actorDID, onProgress: onProgress)
-        guard !payload.entries.isEmpty else {
-            return BlocklistResult(actors: [], totalCount: payload.total)
-        }
+        var collected: [BlueskyActor] = []
+        var blockedDates: [String: String] = [:]
+        var total = 0
 
-        var blockedDates = [String: String]()
-        for entry in payload.entries {
-            blockedDates[entry.did] = entry.blockedDate
-        }
-
-        var actors = await resolveProfilesBestEffort(dids: Array(blockedDates.keys).sorted())
-        for index in actors.indices {
-            if let dateString = blockedDates[actors[index].did] {
-                actors[index].blockedDate = parseDate(dateString)
+        // Stamps each resolved actor with the block date carried by its index entry.
+        func dated(_ batch: [BlueskyActor]) -> [BlueskyActor] {
+            batch.map { actor in
+                var actor = actor
+                if let raw = blockedDates[actor.did] {
+                    actor.blockedDate = parseDate(raw)
+                }
+                return actor
             }
         }
-        return BlocklistResult(actors: actors, totalCount: payload.total)
+
+        try await withThrowingTaskGroup(of: [BlueskyActor].self) { group in
+            var inFlight = 0
+            for try await page in blockerEntryPages(actorDID: actorDID) {
+                total = page.total
+                await onProgress?(page.seenCount)
+                for entry in page.entries {
+                    blockedDates[entry.did] = entry.blockedDate
+                }
+                guard !page.entries.isEmpty else { continue }
+
+                for offset in stride(from: 0, to: page.entries.count, by: Self.profileBatchSize) {
+                    let dids = page.entries[offset ..< min(offset + Self.profileBatchSize, page.entries.count)].map(\.did)
+                    group.addTask { [httpClient] in
+                        await Self.resolveProfileChunk(dids: dids, httpClient: httpClient, cacheNamespace: actorDID)
+                    }
+                    inFlight += 1
+                    // Keep at most one window of batches in flight: drain one as soon as
+                    // the window is full, emitting it before fetching more.
+                    if inFlight >= Self.profileBatchConcurrency, let batch = try await group.next() {
+                        inFlight -= 1
+                        let resolved = dated(batch)
+                        collected.append(contentsOf: resolved)
+                        await onActors?(resolved)
+                    }
+                }
+            }
+            // Drain the tail in completion order — each batch is emitted as it resolves.
+            for try await batch in group {
+                let resolved = dated(batch)
+                collected.append(contentsOf: resolved)
+                await onActors?(resolved)
+            }
+        }
+
+        return BlocklistResult(actors: collected, totalCount: max(total, collected.count))
+    }
+
+    /// Walks the blocker backlink index page by page, emitting each page as it arrives.
+    ///
+    /// Serves and refreshes the same on-disk payload as `blockerEntries`; a fresh cache hit
+    /// is emitted as a single page, and the last good payload is served when the index fails
+    /// mid-walk. Streaming the pages is what lets a caller resolve profiles while the
+    /// (cursor-chained, therefore sequential) walk is still running.
+    func blockerEntryPages(actorDID: String) -> AsyncThrowingStream<BlockerPage, Error> {
+        AsyncThrowingStream { continuation in
+            let task = Task { @MainActor [self] in
+                let cacheURL = "constellation/blocked-by/\(actorDID)"
+                var staleFallback: ConstellationBlockerCache?
+                if let cached = await BlueskyAPICache.shared.read(
+                    accountDID: actorDID,
+                    url: cacheURL,
+                    maxAge: cacheMaxAge
+                ),
+                    let payload = try? JSONDecoder().decode(ConstellationBlockerCache.self, from: cached.data)
+                {
+                    if !cached.isStale {
+                        AppLogger.performance.debug("Constellation cache HIT for \(actorDID) (\(payload.entries.count) entries)")
+                        continuation.yield(BlockerPage(entries: payload.entries, seenCount: payload.entries.count, total: payload.total))
+                        continuation.finish()
+                        return
+                    }
+                    staleFallback = payload
+                }
+
+                do {
+                    var entries: [ConstellationBlockerEntry] = []
+                    var seenDIDs = Set<String>()
+                    var cursor: String?
+                    var total = 0
+                    var page = 0
+
+                    repeat {
+                        try Task.checkCancellation()
+                        let response = try await backlinks(
+                            actorDID: actorDID,
+                            limit: ConstellationEndpoints.maxLimit,
+                            cursor: cursor
+                        )
+                        total = response.total
+                        var pageEntries: [ConstellationBlockerEntry] = []
+                        for record in response.records where seenDIDs.insert(record.did).inserted {
+                            // A record key that is not a decodable TID keeps the blocker, undated.
+                            pageEntries.append(ConstellationBlockerEntry(record: record) ?? ConstellationBlockerEntry(did: record.did, blockedDate: ""))
+                        }
+                        entries.append(contentsOf: pageEntries)
+                        continuation.yield(BlockerPage(entries: pageEntries, seenCount: entries.count, total: total))
+                        cursor = response.cursor
+                        page += 1
+                    } while cursor != nil && page < Self.maxPages
+
+                    // The firehose keeps moving while we page: never report fewer records than we hold.
+                    let payload = ConstellationBlockerCache(total: max(total, entries.count), entries: entries)
+                    if let data = try? JSONEncoder().encode(payload) {
+                        await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
+                        AppLogger.performance.debug("Constellation cache WRITE for \(actorDID) (\(entries.count)/\(payload.total) entries)")
+                    }
+                    continuation.finish()
+                } catch is CancellationError {
+                    continuation.finish()
+                } catch {
+                    guard let staleFallback, !staleFallback.entries.isEmpty else {
+                        continuation.finish(throwing: error)
+                        return
+                    }
+                    AppLogger.http.warning("Constellation blocked-by refresh failed (\(error.localizedDescription, privacy: .public)) — serving \(staleFallback.entries.count) cached entries")
+                    continuation.yield(BlockerPage(entries: staleFallback.entries, seenCount: staleFallback.entries.count, total: staleFallback.total))
+                    continuation.finish()
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
     }
 
     /// Every blocker entry for `actorDID` (DID + block date), paginated and cached,
@@ -211,60 +340,14 @@ final class ConstellationClient {
         actorDID: String,
         onProgress: (@MainActor @Sendable (Int) async -> Void)?
     ) async throws -> ConstellationBlockerCache {
-        let cacheURL = "constellation/blocked-by/\(actorDID)"
-        var staleFallback: ConstellationBlockerCache?
-        if let cached = await BlueskyAPICache.shared.read(
-            accountDID: actorDID,
-            url: cacheURL,
-            maxAge: cacheMaxAge
-        ),
-            let payload = try? JSONDecoder().decode(ConstellationBlockerCache.self, from: cached.data)
-        {
-            if !cached.isStale {
-                AppLogger.performance.debug("Constellation cache HIT for \(actorDID) (\(payload.entries.count) entries)")
-                return payload
-            }
-            staleFallback = payload
+        var entries: [ConstellationBlockerEntry] = []
+        var total = 0
+        for try await page in blockerEntryPages(actorDID: actorDID) {
+            entries.append(contentsOf: page.entries)
+            total = page.total
+            await onProgress?(page.seenCount)
         }
-
-        do {
-            var entries: [ConstellationBlockerEntry] = []
-            var seenDIDs = Set<String>()
-            var cursor: String?
-            var total = 0
-            var page = 0
-
-            repeat {
-                try Task.checkCancellation()
-                let response = try await backlinks(
-                    actorDID: actorDID,
-                    limit: ConstellationEndpoints.maxLimit,
-                    cursor: cursor
-                )
-                total = response.total
-                for record in response.records where seenDIDs.insert(record.did).inserted {
-                    // A record key that is not a decodable TID keeps the blocker, undated.
-                    entries.append(ConstellationBlockerEntry(record: record) ?? ConstellationBlockerEntry(did: record.did, blockedDate: ""))
-                }
-                await onProgress?(seenDIDs.count)
-                cursor = response.cursor
-                page += 1
-            } while cursor != nil && page < Self.maxPages
-
-            // The firehose keeps moving while we page: never report fewer records than we hold.
-            let payload = ConstellationBlockerCache(total: max(total, entries.count), entries: entries)
-            if let data = try? JSONEncoder().encode(payload) {
-                await BlueskyAPICache.shared.write(accountDID: actorDID, url: cacheURL, data: data)
-                AppLogger.performance.debug("Constellation cache WRITE for \(actorDID) (\(entries.count)/\(payload.total) entries)")
-            }
-            return payload
-        } catch let cancellation as CancellationError {
-            throw cancellation
-        } catch {
-            guard let staleFallback, !staleFallback.entries.isEmpty else { throw error }
-            AppLogger.http.warning("Constellation blocked-by refresh failed (\(error.localizedDescription, privacy: .public)) — serving \(staleFallback.entries.count) cached entries")
-            return staleFallback
-        }
+        return ConstellationBlockerCache(total: max(total, entries.count), entries: entries)
     }
 
     // MARK: - Private
@@ -348,37 +431,71 @@ final class ConstellationClient {
         return decoded
     }
 
-    /// Resolves profiles for a list of DIDs in parallel batches, ignoring failures:
-    /// a blocker whose profile cannot be resolved still counts, it just renders
+    /// Resolves one profile batch (≤ `profileBatchSize` DIDs), serving already-cached
+    /// profiles from `BlueskyAPICache` and fetching only the misses. Ignoring failures is
+    /// deliberate: a blocker whose profile cannot be resolved still counts, it just renders
     /// without a handle.
-    private func resolveProfilesBestEffort(dids: [String]) async -> [BlueskyActor] {
+    ///
+    /// Public profile data is viewer-independent, so entries are cached under the subject's
+    /// DID (`cacheNamespace` = the inspected account) rather than the viewer's: that keeps
+    /// them in the same namespace as the blocker walk, so the account switch's cache clear
+    /// drops them too.
+    nonisolated static func resolveProfileChunk(
+        dids: [String],
+        httpClient: HTTPClient,
+        cacheNamespace: String
+    ) async -> [BlueskyActor] {
         guard !dids.isEmpty else { return [] }
-        let chunks = stride(from: 0, to: dids.count, by: Self.profileBatchSize).map {
-            Array(dids[$0 ..< min($0 + Self.profileBatchSize, dids.count)])
-        }
 
-        var actors: [BlueskyActor] = []
-        var offset = 0
-        while offset < chunks.count {
-            let batch = Array(chunks[offset ..< min(offset + Self.profileBatchConcurrency, chunks.count)])
-            offset += Self.profileBatchConcurrency
-
-            await withTaskGroup(of: [BlueskyActor].self) { group in
-                for chunk in batch {
-                    group.addTask { [httpClient] in
-                        do {
-                            return try await LiveBlueskyClient.fetchProfileBatch(identifiers: chunk, httpClient: httpClient)
-                        } catch {
-                            AppLogger.performance.error("Constellation profile batch failed: \(error.localizedDescription, privacy: .public)")
-                            return []
-                        }
-                    }
-                }
-                for await resolved in group {
-                    actors.append(contentsOf: resolved)
-                }
+        var resolved: [BlueskyActor] = []
+        var misses: [String] = []
+        for did in dids {
+            if let cached = await BlueskyAPICache.shared.read(
+                accountDID: cacheNamespace,
+                url: profileCacheURL(for: did),
+                maxAge: BlueskyAPICache.DefaultTTL.profile
+            ),
+                let actor = try? JSONDecoder().decode(BlueskyActor.self, from: cached.data)
+            {
+                resolved.append(actor)
+            } else {
+                misses.append(did)
             }
         }
-        return actors
+
+        guard !misses.isEmpty else { return resolved }
+
+        // One retry: a transient AppView hiccup must not silently drop a blocker from the
+        // list. A DID still unresolved after both attempts leaves the resolved list shorter
+        // than the index total, which `RelationshipsView` surfaces as "Loaded X of Y".
+        let maxAttempts = 2
+        for attempt in 1 ... maxAttempts {
+            do {
+                let fetched = try await LiveBlueskyClient.fetchProfileBatch(identifiers: misses, httpClient: httpClient)
+                for actor in fetched where !actor.did.isEmpty {
+                    if let data = try? JSONEncoder().encode(actor) {
+                        await BlueskyAPICache.shared.write(
+                            accountDID: cacheNamespace,
+                            url: profileCacheURL(for: actor.did),
+                            data: data
+                        )
+                    }
+                }
+                return resolved + fetched
+            } catch {
+                guard attempt < maxAttempts else {
+                    AppLogger.performance.error("Constellation profile batch failed after \(attempt) attempts: \(error.localizedDescription, privacy: .public)")
+                    return resolved
+                }
+                try? await Task.sleep(for: .milliseconds(250))
+            }
+        }
+        return resolved
+    }
+
+    /// Cache key for one profile lookup — shared by the read and the write path so a
+    /// resolved profile is reused on the next visit.
+    nonisolated static func profileCacheURL(for did: String) -> String {
+        "public.api.bsky.app/getProfiles?actor=\(did)"
     }
 }

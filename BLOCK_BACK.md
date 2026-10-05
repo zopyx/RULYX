@@ -757,7 +757,11 @@ Both walks are sequential by contract: the index chains its cursors (`getBacklin
 
 ### 14.2 Profile Resolution Bottleneck
 
-`fetchBlockedActors()`/`fetchBlockedByActors()` resolve profiles in 25-DID batches and drop a DID whose profile does not resolve — for large lists this dominates the latency. The two paths differ in how wide they fan out: the repo side (`LiveBlueskyClient.resolveProfilesBestEffort`) starts every batch at once, while the index side (`ConstellationClient.resolveProfilesBestEffort`) keeps five batches (125 DIDs) in flight. The DID-only reads `fetchBlockedDIDs()`/`fetchBlockerDIDs()` skip profile resolution entirely — which is why `fetchUnblockedBlockersCount()` and the counts use those.
+`fetchBlockedActors()`/`fetchBlockedByActors()` resolve profiles in 25-DID batches and drop a DID whose profile does not resolve — for large lists this dominates the latency. The two paths differ in how wide they fan out: the repo side (`LiveBlueskyClient.resolveProfilesBestEffort`) starts every batch at once, while the index side keeps five batches (125 DIDs) in flight.
+
+The index side no longer waits for the whole walk before it starts resolving: `ConstellationClient.blockerEntryPages()` streams the backlink pages as they arrive, and `blockerActors()` hands each page's DIDs to the resolver immediately, so **pagination and profile resolution overlap**. Each resolved batch is emitted through `onActors` as it completes, so `RelationshipsView` renders the list incrementally instead of waiting behind the full-screen spinner for the last profile. Resolved profiles are cached per DID in `BlueskyAPICache` (2-minute TTL, under the inspected account's namespace), so reopening the screen reuses them instead of re-querying the AppView.
+
+The DID-only reads `fetchBlockedDIDs()`/`fetchBlockerDIDs()` skip profile resolution entirely — which is why `fetchUnblockedBlockersCount()` and the counts use those.
 
 ### 14.3 "Listed on" Fan-Out
 

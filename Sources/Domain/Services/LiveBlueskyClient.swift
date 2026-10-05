@@ -1289,9 +1289,21 @@ class LiveBlueskyClient: ObservableObject,
         appPassword _: String?,
         onProgress: (@MainActor @Sendable (Int) async -> Void)?
     ) async throws -> BlocklistResult {
+        try await fetchBlockedByActors(account: account, appPassword: nil, onProgress: onProgress, onActors: nil)
+    }
+
+    /// The actors blocking the account, reporting partial counts as records load and
+    /// emitting each resolved batch as it becomes available (see `blockerActors`).
+    func fetchBlockedByActors(
+        account: AppAccount,
+        appPassword _: String?,
+        onProgress: (@MainActor @Sendable (Int) async -> Void)?,
+        onActors: (@MainActor @Sendable ([BlueskyActor]) async -> Void)?
+    ) async throws -> BlocklistResult {
         try await constellation.blockerActors(
             actorDID: resolveAccountDID(account),
-            onProgress: onProgress
+            onProgress: onProgress,
+            onActors: onActors
         )
     }
 
