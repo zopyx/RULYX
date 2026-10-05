@@ -53,6 +53,9 @@ struct RootView: View {
     /// Tracks three-finger triple-tap to toggle overlay visibility.
     @State private var overlayVisible = false
 
+    /// Namespace for the sliding selection pill in the floating tab bar.
+    @Namespace private var tabSelectionNamespace
+
     /// Converts the `appearanceMode` string to a SwiftUI `ColorScheme?`.
     /// Returns `.light`, `.dark`, or `nil` for system-following mode.
     private var preferredScheme: ColorScheme? {
@@ -79,12 +82,14 @@ struct RootView: View {
         let tint: Color
 
         var body: some View {
-            VStack(spacing: 4) {
+            VStack(spacing: 3) {
                 Image(systemName: item.icon)
-                    .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
                 Text(localizationManager.localized(item.label))
                     .font(.caption2)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .multilineTextAlignment(.center)
             }
             .foregroundStyle(isSelected ? tint : .secondary)
         }
@@ -219,9 +224,7 @@ struct RootView: View {
     }
 
     private var compactBody: some View {
-        let tint: Color = .skyPrimary
-
-        return VStack(spacing: 0) {
+        VStack(spacing: 0) {
             ZStack {
                 switch workspaceStore.selectedTab {
                 case .moderation: ModerationSplitView()
@@ -242,38 +245,7 @@ struct RootView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 0) {
-                ForEach(tabBarItems) { item in
-                    Button {
-                        if workspaceStore.selectedTab == item.tab, item.tab == .moderation {
-                            workspaceStore.returnToModerationRoot()
-                        } else {
-                            workspaceStore.selectedTab = item.tab
-                        }
-                    } label: {
-                        TabBarItemView(
-                            item: item,
-                            isSelected: workspaceStore.selectedTab == item.tab,
-                            localizationManager: localizationManager,
-                            tint: tint
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .accessibilityIdentifier("tab-\(item.tab.rawValue)")
-                }
-
-                accountSwitcherButton
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .accessibilityIdentifier("tab-accounts")
-            }
-            .padding(.horizontal, 4)
-            .padding(.top, 6)
-            .padding(.bottom, 4)
-            .background(.bar)
+            floatingTabBar
         }
         .preferredColorScheme(preferredScheme)
         .environment(\.locale, localizationManager.locale)
@@ -302,6 +274,79 @@ struct RootView: View {
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.7), value: switchingAccount)
         .highPriorityGesture(threeFingerGesture)
+    }
+
+    // MARK: - Floating Tab Bar
+
+    /// The floating Liquid Glass tab bar. Slots are sized to the available width and slide
+    /// horizontally whenever they no longer fit (small device, large Dynamic Type).
+    private var floatingTabBar: some View {
+        FloatingGlassToolbar(
+            itemCount: tabBarItems.count + 1,
+            selectedID: workspaceStore.selectedTab.rawValue
+        ) { itemWidth in
+            ForEach(tabBarItems) { item in
+                tabBarButton(for: item, itemWidth: itemWidth)
+                    .id(item.tab.rawValue)
+            }
+
+            accountSwitcherButton
+                .frame(width: itemWidth)
+                .frame(maxHeight: .infinity)
+                .contentShape(Capsule())
+                .background {
+                    if workspaceStore.selectedTab == .account {
+                        selectionIndicator
+                            .matchedGeometryEffect(id: "tabSelection", in: tabSelectionNamespace)
+                    }
+                }
+                .accessibilityIdentifier("tab-accounts")
+                .id(WorkspaceTab.account.rawValue)
+        }
+        .padding(.horizontal, 10)
+        .padding(.bottom, 4)
+    }
+
+    /// A single tab slot in the floating bar.
+    private func tabBarButton(for item: TabBarItem, itemWidth: CGFloat) -> some View {
+        let isSelected = workspaceStore.selectedTab == item.tab
+
+        return Button {
+            if isSelected, item.tab == .moderation {
+                workspaceStore.returnToModerationRoot()
+            } else {
+                workspaceStore.selectedTab = item.tab
+            }
+        } label: {
+            TabBarItemView(
+                item: item,
+                isSelected: isSelected,
+                localizationManager: localizationManager,
+                tint: .skyPrimary
+            )
+            .frame(width: itemWidth)
+            .frame(maxHeight: .infinity)
+            .contentShape(Capsule())
+            .background {
+                if isSelected {
+                    selectionIndicator
+                        .matchedGeometryEffect(id: "tabSelection", in: tabSelectionNamespace)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("tab-\(item.tab.rawValue)")
+    }
+
+    /// The pill behind the selected slot.
+    ///
+    /// Deliberately a plain tinted capsule, not a second `glassEffect`: a tinted glass shape
+    /// nested in the bar's own glass renders as an oversized opaque blob on iOS 26 (and
+    /// `matchedGeometryEffect` makes it morph). The bar carries the Liquid Glass look.
+    private var selectionIndicator: some View {
+        Capsule()
+            .fill(Color.skyPrimary.opacity(0.16))
+            .padding(.vertical, 5)
     }
 
     /// A centered, animated overlay shown while an account switch is in progress.
