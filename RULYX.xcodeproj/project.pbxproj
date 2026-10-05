@@ -11,6 +11,7 @@
 		00D5C6A70AAE4088B621153A /* BlueskyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7FA070494DC5485DFB0CCC /* BlueskyProfileView.swift */; };
 		0136F3F4DCA06EE302737E0A /* MutedWordsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268B982DFE12400C4195EE8D /* MutedWordsStore.swift */; };
 		014529A964A3F05FBE0745FA /* BlueskyListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3437EF23B86025FCCAFEBF /* BlueskyListService.swift */; };
+		01FAD6D9B4CC02892CEA883E /* BlueskyAPICacheFreshnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B39EB8CF3D1608F32D6E88 /* BlueskyAPICacheFreshnessTests.swift */; };
 		01FBC10B1CCE745D118D53D7 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97F1C64A2434A71ED6D5D5E /* AppError.swift */; };
 		029C5637395249C53FBEE2C6 /* ManagePostsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84269A96C2A099E6E07514FC /* ManagePostsViewModel.swift */; };
 		02A00E5236C6A0DF59848B98 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FFDF59404421F648A8D1C3E6 /* PrivacyInfo.xcprivacy */; };
@@ -556,6 +557,7 @@
 		7F6E935CDEF1D4A0995B5A76 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		81930EF4108C09CDD9DB4507 /* ListsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsViewModelTests.swift; sourceTree = "<group>"; };
 		819D4EF66469752EB5C9061A /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
+		81B39EB8CF3D1608F32D6E88 /* BlueskyAPICacheFreshnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueskyAPICacheFreshnessTests.swift; sourceTree = "<group>"; };
 		8230452C82C6F12684AC1C95 /* MentionsSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsSearchViewModel.swift; sourceTree = "<group>"; };
 		824692A0A8442A52D569C6EC /* AccountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStore.swift; sourceTree = "<group>"; };
 		82878D19E2603A1619CD7C70 /* PushNotificationRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationRoute.swift; sourceTree = "<group>"; };
@@ -788,6 +790,7 @@
 				D6FE3D947649618C9D859AC4 /* AutoBlockBackServiceTests.swift */,
 				9EA5E1E66329FD142F581DD3 /* BlockingConsistencyTests.swift */,
 				015F2557D6D84373D2A8DBD5 /* BlueskyAPICacheAccountScopeTests.swift */,
+				81B39EB8CF3D1608F32D6E88 /* BlueskyAPICacheFreshnessTests.swift */,
 				BD3C1DD3F3BB3D87F33F4615 /* BlueskyAPIDTOsTests.swift */,
 				5FBBE749A4442A2FAD4D7772 /* BlueskyListServiceTests.swift */,
 				6C3A1037F26DBBCB58FD4674 /* BlueskyProfileActionsViewModelTests.swift */,
@@ -1541,6 +1544,7 @@
 				A4968323AA9B14B1BD019803 /* AutoBlockBackServiceTests.swift in Sources */,
 				9888554AF241A495746EF636 /* BlockingConsistencyTests.swift in Sources */,
 				BFFA7616952AF45FF89727DC /* BlueskyAPICacheAccountScopeTests.swift in Sources */,
+				01FAD6D9B4CC02892CEA883E /* BlueskyAPICacheFreshnessTests.swift in Sources */,
 				250FF75DC49FBBA5927742A2 /* BlueskyAPIDTOsTests.swift in Sources */,
 				F00D2CE8A347BD81931B72E7 /* BlueskyListServiceTests.swift in Sources */,
 				6CE509BD1D1CB94B5F20C43E /* BlueskyProfileActionsViewModelTests.swift in Sources */,
@@ -2006,13 +2010,13 @@
 				APS_ENVIRONMENT = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 383;
+				CURRENT_PROJECT_VERSION = 384;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.17;
+				MARKETING_VERSION = 1.0.18;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2025,13 +2029,13 @@
 				APS_ENVIRONMENT = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 383;
+				CURRENT_PROJECT_VERSION = 384;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.17;
+				MARKETING_VERSION = 1.0.18;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajung.RULYX;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
